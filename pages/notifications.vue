@@ -200,8 +200,8 @@
                     </span>
                   </p>
                   <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                    {{ settings.webPush.subscribed ? 
-                      'You will receive notifications on this device' : 
+                    {{ settings.webPush.subscribed ?
+                      'You will receive notifications on this device' :
                       'Subscribe to receive notifications on this device' }}
                   </p>
                 </div>
@@ -361,4 +361,3 @@ async function toggleWebPushSubscription() {
   }
 }
 </script>
-

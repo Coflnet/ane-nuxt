@@ -13,8 +13,6 @@ useHead({
   meta: [
     { name: 'description', content: 'Track auctions across marketplaces with custom filters and notifications' }
   ],
-  link: [
-    { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }
-  ]
+
 })
 </script>

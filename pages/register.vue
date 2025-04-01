@@ -12,7 +12,7 @@
         </div>
 
         <div class="space-y-4">
-          <button @click="registerWithGoogle"
+          <button @click="loginWithGoogle"
             class="w-full flex items-center justify-center space-x-2 py-3 px-4 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors">
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo"
               class="w-5 h-5" />
@@ -47,13 +47,20 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { BellIcon } from 'lucide-vue-next'
+const userStore = useUserStore()
+const auth = useFirebaseAuth()!
 
-function registerWithGoogle() {
-  // Implement Google registration logic
-  console.log('Registering with Google...')
-  // After successful registration, redirect to dashboard
-  // navigateTo('/dashboard')
+async function loginWithGoogle() {
+  if (!auth) {
+    console.log(auth)
+    console.error('Firebase shit the bed');
+    return;
+  }
+  if (await userStore.loginWithGoogle(auth)) {
+    navigateTo("/");
+  }
 }
 </script>

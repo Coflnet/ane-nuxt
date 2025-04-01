@@ -1,30 +1,21 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+
+  compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
-
-  modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt'],
-
-  build: {
-    transpile: ['lucide-vue-next']
+  modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt', 'nuxt-vuefire'],
+  vuefire: {
+    config: {
+      apiKey: "AIzaSyB8B7BaoOT_PhPJaa2peh2a_Q8VKDOb0yU",
+      authDomain: "anenotifier.firebaseapp.com",
+      projectId: "anenotifier",
+      storageBucket: "anenotifier.firebasestorage.app",
+      messagingSenderId: "625983368920",
+      appId: "1:625983368920:web:04af5415ef9a54d14331ad"
+    },
+    auth: {
+      enabled: true
+    },
   },
 
-  app: {
-    head: {
-      title: 'ANE - Advanced Notification Engine',
-      meta: [
-        { name: 'description', content: 'Track auctions across marketplaces with custom filters and notifications' }
-      ],
-      link: [
-        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }
-      ]
-    }
-  },
-
-  runtimeConfig: {
-    public: {
-      apiBaseUrl: 'https://ane.coflnet.com/api'
-    }
-  },
-
-  compatibilityDate: '2025-03-28'
 })

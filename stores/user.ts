@@ -1,10 +1,13 @@
 import { defineStore } from "pinia"
 import { ref, computed } from "vue"
 import { navigateTo } from "#app"
+import { GoogleAuthProvider, signInWithPopup, type Auth } from "firebase/auth"
+import { loginFirebase, type TokenContainer } from "~/src/api-client"
+import { createClient } from "@hey-api/client-nuxt"
 
 // Types
 export interface User {
-  id: number
+  id: string
   name: string
   email: string
   avatar?: string
@@ -40,6 +43,7 @@ export const useUserStore = defineStore("user", () => {
   const error = ref<string | null>(null)
   const token = ref<string | null>(null)
 
+
   const notificationSettings = ref<NotificationSettings>({
     discord: {
       enabled: false,
@@ -63,44 +67,50 @@ export const useUserStore = defineStore("user", () => {
 
   const isLoadingSettings = ref(false)
 
-  // Getters (computed)
   const isLoggedIn = computed(() => isAuthenticated.value)
   const getUser = computed(() => user.value)
   const getNotificationSettings = computed(() => notificationSettings.value)
 
-  // Actions (functions)
-  async function loginWithGoogle(token: string) {
+  async function loginWithGoogle(clientAuth: Auth) {
     isLoading.value = true
     error.value = null
 
+    console.log("fuck this shit")
     try {
-      // In a real implementation, this would call the API
-      // const { data } = await useFetch('/api/auth/google', {
-      //   method: 'POST',
-      //   body: { token }
-      // })
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(clientAuth, provider);
+      const loggedInUser = result.user;
 
-      // For now, simulate a successful login
-      const userData = {
-        id: 1,
-        name: "John Doe",
-        email: "john@example.com",
-        avatar: "/placeholder.svg?height=100&width=100",
+      if (loggedInUser) {
+        user.value = {
+          id: loggedInUser.uid,
+          name: loggedInUser.displayName ?? "",
+          email: loggedInUser.email ?? "",
+          avatar: loggedInUser.photoURL ?? "",
+        };
+        isAuthenticated.value = true;
+
+
+        await fetchNotificationSettings();
       }
 
-      user.value = userData
-      isAuthenticated.value = true
-      token.value = "mock_token"
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      let tokenen: TokenContainer = { 'authToken': credential?.accessToken }
 
-      // Load notification settings after login
-      await fetchNotificationSettings()
+      const response = await loginFirebase({
+        composable: "useAsyncData",
+        body: { authToken: credential?.accessToken }
+      })
+      console.log(response)
+      token.value = response.data.value?.authToken ?? ""
 
-      return { success: true }
+
+      return { success: true };
     } catch (err) {
-      error.value = "Failed to login. Please try again."
-      return { success: false, error: error.value }
+      error.value = "Failed to login. Please try again.";
+      return { success: false, error: error.value };
     } finally {
-      isLoading.value = false
+      isLoading.value = false;
     }
   }
 
@@ -113,7 +123,6 @@ export const useUserStore = defineStore("user", () => {
     token.value = null
     resetNotificationSettings()
 
-    // Redirect to login page
     navigateTo("/login")
   }
 
@@ -123,7 +132,7 @@ export const useUserStore = defineStore("user", () => {
 
     // Simulate a valid session for demo
     user.value = {
-      id: 1,
+      id: "",
       name: "John Doe",
       email: "john@example.com",
       avatar: "/placeholder.svg?height=100&width=100",
@@ -339,6 +348,7 @@ export const useUserStore = defineStore("user", () => {
     notificationSettings,
     isLoadingSettings,
 
+
     // Getters
     isLoggedIn,
     getUser,
@@ -356,6 +366,7 @@ export const useUserStore = defineStore("user", () => {
     toggleWebPushSubscription,
     updateProfile,
   }
+}, {
+  persist: true,
 })
-
 

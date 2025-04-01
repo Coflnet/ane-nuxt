@@ -10,12 +10,24 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@nuxtjs/tailwindcss": "6.13.2",
-    "@pinia/nuxt": "0.10.1",
-    "lucide-vue-next": "^0.484.0",
+    "@firebase/app-types": "^0.9.3",
+    "@hey-api/client-nuxt": "^0.4.0",
+    "@nuxtjs/tailwindcss": "^6.13.2",
+    "@pinia/nuxt": "^0.10.1",
+    "firebase": "^11.5.0",
+    "firebase-admin": "^13.2.0",
+    "firebase-functions": "^6.3.2",
+    "lucide-vue-next": "^0.485.0",
     "nuxt": "^3.16.1",
+    "nuxt-vuefire": "^1.0.5",
     "pinia": "^3.0.1",
+    "pinia-plugin-persistedstate": "^4.2.0",
     "vue": "^3.5.13",
-    "vue-router": "^4.5.0"
+    "vue-router": "^4.5.0",
+    "vuefire": "^3.2.1"
+  },
+  "devDependencies": {
+    "eslint": "^9.23.0",
+    "eslint-plugin-nuxt": "^4.0.0"
   }
 }

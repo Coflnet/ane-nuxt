@@ -36,6 +36,26 @@
             </div>
           </div>
 
+          <!-- Search Value Field -->
+          <div>
+            <label for="search-value" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Search
+              Value</label>
+            <input id="search-value" v-model="filter.searchValue" type="text" placeholder="Enter search term"
+              class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400" />
+          </div>
+
+          <!-- Add Search Text Radius field -->
+          <div>
+            <label for="search-radius"
+              class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Radius</label>
+            <div class="flex items-center gap-2">
+              <input id="search-radius" v-model="filter.searchRadius" type="number" placeholder="e.g., 10" min="0"
+                class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400" />
+              <span class="text-sm text-slate-500 dark:text-slate-400">words</span>
+            </div>
+            <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Search Radius from your location in KM</p>
+          </div>
+
           <div>
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Keywords</label>
             <div
@@ -107,23 +127,48 @@
             </div>
           </div>
 
+          <!-- Updated Blacklist Section with Confirmation -->
           <div>
-            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Blacklist Keywords</label>
-            <div
-              class="flex flex-wrap items-center gap-2 p-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700">
-              <div v-for="(keyword, index) in filter.blacklist" :key="index"
-                class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-rose-100 dark:bg-rose-900 text-rose-800 dark:text-rose-200">
-                {{ keyword }}
-                <button type="button" @click="removeBlacklist(index)"
-                  class="ml-1 text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-200">
-                  <XIcon class="w-4 h-4" />
+            <label class=" block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Blacklist Keywords</label>
+            <div class="space-y-3">
+              <div class="flex items-center gap-2">
+                <input v-model="newBlacklist" @keydown.enter.prevent="confirmBlacklist" type="text"
+                  placeholder="Add blacklist keyword and press Enter"
+                  class="flex-grow px-4 py-4 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400" />
+                <button type="button" @click="confirmBlacklist"
+                  class="px-4 py-2 bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-200 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500 transition-colors">
+                  Add
                 </button>
               </div>
 
-              <div class="relative flex-grow">
-                <input v-model="newBlacklist" @keydown.enter.prevent="addBlacklist" type="text"
-                  placeholder="Add blacklist keyword and press Enter"
-                  class="w-full px-3 py-1 border-0 bg-transparent text-slate-900 dark:text-white focus:outline-none focus:ring-0" />
+              <!-- Confirmation Dialog -->
+              <div v-if="blacklistConfirmation.show"
+                class="p-3 bg-slate-100 dark:bg-slate-700 rounded-lg border border-slate-300 dark:border-slate-600">
+                <p class="text-sm text-slate-700 dark:text-slate-300 mb-2">
+                  Add "<span class="font-medium">{{ blacklistConfirmation.value }}</span>" to blacklist?
+                </p>
+                <div class="flex gap-2">
+                  <button type="button" @click="addBlacklist"
+                    class="px-3 py-1 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors text-sm">
+                    Confirm
+                  </button>
+                  <button type="button" @click="cancelBlacklist"
+                    class="px-3 py-1 bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-200 rounded-md hover:bg-slate-300 dark:hover:bg-slate-500 transition-colors text-sm">
+                    Cancel
+                  </button>
+                </div>
+              </div>
+
+              <!-- Blacklist Items -->
+              <div class="flex flex-wrap gap-2 mt-2">
+                <div v-for="(keyword, index) in filter.blacklist" :key="index"
+                  class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-rose-100 dark:bg-rose-900 text-rose-800 dark:text-rose-200">
+                  {{ keyword }}
+                  <button type="button" @click="removeBlacklist(index)"
+                    class="ml-1 text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-200">
+                    <XIcon class="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
             <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Add keywords to exclude from search results</p>
@@ -195,26 +240,53 @@
         </form>
       </div>
     </div>
+
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
+<script setup lang="ts">
+import { ref, computed } from 'vue'
 import { ArrowLeftIcon, XIcon, MessageSquareIcon, MailIcon, BellIcon } from 'lucide-vue-next'
+import { addFilter, testFilter } from '~/src/api-client'
 
 const newKeyword = ref('')
 const newBlacklist = ref('')
+const showAddFieldModal = ref(false)
 
+// Blacklist confirmation state
+const blacklistConfirmation = ref({
+  show: false,
+  value: ''
+})
+
+// New field state
+const newField = ref({
+  name: '',
+  type: 'string',
+  value: '',
+  options: ['']
+})
+
+const userStore = useUserStore()
+
+var apiToken = userStore.token;
+apiToken = "Bearer " + apiToken;
+
+// Update the filter object to include the new fields
 const filter = ref({
   name: '',
   marketplace: '',
-  keywords: [],
-  blacklist: [],
+  searchValue: '',
+  searchRadius: null, // New search radius field
+  seller: '', // New seller field
+  keywords: [] as string[],
+  blacklist: [] as string[],
   minPrice: null,
   maxPrice: null,
   currency: '€',
   location: '',
   radius: null,
+  customFields: [] as any[],
   notifications: {
     discord: true,
     email: true,
@@ -229,25 +301,83 @@ function addKeyword() {
   }
 }
 
-function removeKeyword(index) {
+function removeKeyword(index: number) {
   filter.value.keywords.splice(index, 1)
 }
 
-function addBlacklist() {
-  if (newBlacklist.value.trim()) {
-    filter.value.blacklist.push(newBlacklist.value.trim())
-    newBlacklist.value = ''
+// Updated blacklist functions with confirmation
+function confirmBlacklist() {
+  const value = newBlacklist.value.trim()
+  if (value) {
+    blacklistConfirmation.value = {
+      show: true,
+      value: value
+    }
   }
 }
 
-function removeBlacklist(index) {
+function addBlacklist() {
+  if (blacklistConfirmation.value.value) {
+    filter.value.blacklist.push(blacklistConfirmation.value.value)
+    newBlacklist.value = ''
+    blacklistConfirmation.value.show = false
+  }
+}
+
+function cancelBlacklist() {
+  blacklistConfirmation.value.show = false
+}
+
+function removeBlacklist(index: number) {
   filter.value.blacklist.splice(index, 1)
 }
 
-function saveFilter() {
-  // Here you would typically send the filter data to your API
-  console.log('Saving filter:', filter.value)
-  // After saving, redirect to the filters page
-  // navigateTo('/filters')
+// Custom fields functions
+function addOption() {
+  newField.value.options.push('')
 }
+
+function removeOption(index: number) {
+  newField.value.options.splice(index, 1)
+  if (newField.value.options.length === 0) {
+    newField.value.options.push('')
+  }
+}
+
+const isValidField = computed(() => {
+  if (!newField.value.name.trim()) return false
+
+  if (newField.value.type === 'dropdown') {
+    // Check if at least one option is filled
+    return newField.value.options.some(option => option.trim() !== '')
+  }
+
+  return true
+})
+
+
+
+function removeCustomField(index: number) {
+  filter.value.customFields.splice(index, 1)
+}
+
+function saveFilter() {
+  addFilter({
+    composable: '$fetch',
+    headers: { Authorization: apiToken },
+    body: {
+      name: filter.value.name,
+      filters: handleFilters()
+    }
+  })
+  console.log('Saving filter:', filter.value)
+}
+
+function handleFilters(): [] {
+  var filtersList = []
+  filter.value.keywords.map((i) => { filtersList.push({ "name": "ContainsKeyWord", "value": i }) })
+  filter.value.blacklist.map((i) => { filtersList.push({ "name": "IsBlacklist", "value": i }) })
+  return []
+}
+
 </script>

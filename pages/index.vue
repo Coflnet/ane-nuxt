@@ -185,6 +185,7 @@
 <script setup>
 import { ref } from 'vue'
 import { BellIcon, FilterIcon, TagIcon, ExternalLinkIcon, HeartIcon, MessageSquareIcon, MailIcon, PlusIcon } from 'lucide-vue-next'
+import { getFilters } from '~/src/api-client';
 
 // Mock data for dashboard
 const stats = ref({
@@ -195,6 +196,18 @@ const stats = ref({
   notificationsSent: 65,
   notificationChannels: 3
 })
+
+const userStore = useUserStore()
+
+var apiToken = userStore.token;
+apiToken = "Bearer " + apiToken;
+
+async function loadStats() {
+  const response = await getFilters({ composable: '$fetch', headers: { Authorization: apiToken } })
+
+  console.log(response)
+
+}
 
 const recentMatches = ref([
   {
@@ -257,4 +270,8 @@ const topFilters = ref([
     matches: 18
   }
 ])
+
+onMounted(() => {
+  loadStats()
+})
 </script>

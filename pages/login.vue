@@ -47,13 +47,22 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { BellIcon } from 'lucide-vue-next'
 
-function loginWithGoogle() {
-  // Implement Google login logic
-  console.log('Logging in with Google...')
-  // After successful login, redirect to dashboard
-  // navigateTo('/dashboard')
+
+const userStore = useUserStore()
+const auth = useFirebaseAuth()
+
+async function loginWithGoogle() {
+  if (!auth) {
+    console.error('Firebase shit the bed');
+    return;
+  }
+  if (await userStore.loginWithGoogle(auth)) {
+    //navigateTo("/");
+  }
 }
+
+onMounted(() => console.log(userStore.getUser))
 </script>
