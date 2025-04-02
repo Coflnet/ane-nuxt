@@ -31,7 +31,6 @@
                 <option value="">Select a marketplace</option>
                 <option value="ebay">eBay</option>
                 <option value="ebay-kleinanzeigen">eBay Kleinanzeigen</option>
-                <option value="all">All Marketplaces</option>
               </select>
             </div>
           </div>
@@ -44,16 +43,40 @@
               class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400" />
           </div>
 
-          <!-- Add Search Text Radius field -->
-          <div>
-            <label for="search-radius"
-              class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Radius</label>
-            <div class="flex items-center gap-2">
-              <input id="search-radius" v-model="filter.searchRadius" type="number" placeholder="e.g., 10" min="0"
-                class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400" />
-              <span class="text-sm text-slate-500 dark:text-slate-400">words</span>
+          <!-- Replace the Search Text Radius field section with this grid layout: -->
+          <!-- Search Text Radius and Commercial Seller in a grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12">
+            <div>
+              <label for="search-radius"
+                class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Search Text Radius</label>
+              <div class="flex items-center gap-2">
+                <input id="search-radius" v-model="filter.searchRadius" type="number" placeholder="e.g., 10" min="0"
+                  class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400" />
+              </div>
+              <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Maximum distance between search terms</p>
             </div>
-            <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Search Radius from your location in KM</p>
+
+            <div>
+              <label for="commercial-seller"
+                class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Commercial Seller</label>
+              <div
+                class="flex items-center h-10 px-4 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700">
+                <input id="commercial-seller" v-model="filter.commercialSeller" type="checkbox"
+                  class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded" />
+                <label for="commercial-seller" class="ml-2 text-sm text-slate-900 dark:text-white">
+                  Only show commercial sellers
+                </label>
+              </div>
+              <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Filter listings from business accounts</p>
+            </div>
+          </div>
+
+          <!-- Add Seller field -->
+          <div>
+            <label for="seller" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Seller</label>
+            <input id="seller" v-model="filter.seller" type="text" placeholder="Enter seller username"
+              class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400" />
+            <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Filter by specific seller</p>
           </div>
 
           <div>
@@ -79,7 +102,7 @@
               for</p>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
             <div>
               <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Price Range</label>
               <div class="flex items-center space-x-2">
@@ -97,6 +120,18 @@
                     class="w-full pl-8 pr-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400" />
                 </div>
               </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Total Cost</label>
+              <div class="flex items-center space-x-2">
+                <div class="relative w-full">
+                  <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 dark:text-slate-400">{{
+                    filter.currency }}</span>
+                  <input v-model="filter.totalCost" type="number" placeholder="Min"
+                    class="w-full pl-8 pr-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400" />
+                </div>
+              </div>
+              <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Cost after all fees and taxes</p>
             </div>
 
             <div>
@@ -129,12 +164,12 @@
 
           <!-- Updated Blacklist Section with Confirmation -->
           <div>
-            <label class=" block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Blacklist Keywords</label>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Blacklist Keywords</label>
             <div class="space-y-3">
               <div class="flex items-center gap-2">
                 <input v-model="newBlacklist" @keydown.enter.prevent="confirmBlacklist" type="text"
                   placeholder="Add blacklist keyword and press Enter"
-                  class="flex-grow px-4 py-4 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400" />
+                  class="flex-grow px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400" />
                 <button type="button" @click="confirmBlacklist"
                   class="px-4 py-2 bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-200 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500 transition-colors">
                   Add
@@ -174,45 +209,66 @@
             <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Add keywords to exclude from search results</p>
           </div>
 
+          <!-- Notification Channels section -->
           <div>
             <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-3">Notification Channels</h3>
             <div class="space-y-4">
               <div
-                class="flex items-center p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/50">
-                <input id="discord-notification" v-model="filter.notifications.discord" type="checkbox"
-                  class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded" />
-                <label for="discord-notification" class="ml-3 flex items-center">
-                  <div
-                    class="w-8 h-8 rounded-md bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center mr-3">
-                    <MessageSquareIcon class="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                class="flex items-start p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/50">
+                <div class="flex items-center h-5">
+                  <input id="discord-notification" v-model="filter.notificationType" type="radio" value="discord"
+                    class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300" />
+                </div>
+                <label for="discord-notification" class="ml-3 flex flex-col">
+                  <div class="flex items-center">
+                    <div
+                      class="w-8 h-8 rounded-md bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center mr-3">
+                      <MessageSquareIcon class="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                    </div>
+                    <div>
+                      <p class="font-medium text-slate-900 dark:text-white">Discord</p>
+                      <p class="text-xs text-slate-500 dark:text-slate-400">Send notifications to your Discord channel
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p class="font-medium text-slate-900 dark:text-white">Discord</p>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">Send notifications to your Discord channel</p>
+                  <div v-if="filter.notificationType === 'discord'" class="mt-3 ml-11">
+                    <input v-model="filter.notificationTarget.discord" type="text"
+                      placeholder="Enter Discord webhook URL"
+                      class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400" />
+                  </div>
+                </label>
+              </div>
+
+              <div
+                class="flex items-start p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/50">
+                <div class="flex items-center h-5">
+                  <input id="email-notification" v-model="filter.notificationType" type="radio" value="email"
+                    class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300" />
+                </div>
+                <label for="email-notification" class="ml-3 flex flex-col">
+                  <div class="flex items-center">
+                    <div
+                      class="w-8 h-8 rounded-md bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center mr-3">
+                      <MailIcon class="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                    </div>
+                    <div>
+                      <p class="font-medium text-slate-900 dark:text-white">Email</p>
+                      <p class="text-xs text-slate-500 dark:text-slate-400">Send notifications to your email address</p>
+                    </div>
+                  </div>
+                  <div v-if="filter.notificationType === 'email'" class="mt-3 ml-11">
+                    <input v-model="filter.notificationTarget.email" type="email" placeholder="Enter email address"
+                      class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400" />
                   </div>
                 </label>
               </div>
 
               <div
                 class="flex items-center p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/50">
-                <input id="email-notification" v-model="filter.notifications.email" type="checkbox"
-                  class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded" />
-                <label for="email-notification" class="ml-3 flex items-center">
-                  <div
-                    class="w-8 h-8 rounded-md bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center mr-3">
-                    <MailIcon class="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                  </div>
-                  <div>
-                    <p class="font-medium text-slate-900 dark:text-white">Email</p>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">Send notifications to your email address</p>
-                  </div>
-                </label>
-              </div>
-
-              <div
-                class="flex items-center p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/50">
-                <input id="push-notification" v-model="filter.notifications.push" type="checkbox"
-                  class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded" />
+                <div class="flex items-center h-5">
+                  <input id="push-notification" v-model="filter.notificationType" type="radio" value="FireBase"
+                    class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300" />
+                </div>
                 <label for="push-notification" class="ml-3 flex items-center">
                   <div
                     class="w-8 h-8 rounded-md bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center mr-3">
@@ -224,6 +280,23 @@
                   </div>
                 </label>
               </div>
+
+              <div
+                class="flex items-center p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/50">
+                <div class="flex items-center h-5">
+                  <input id="none-notification" v-model="filter.notificationType" type="radio" value="none"
+                    class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300" />
+                </div>
+                <label for="none-notification" class="ml-3 flex items-center">
+                  <div class="w-8 h-8 rounded-md bg-slate-100 dark:bg-slate-800 flex items-center justify-center mr-3">
+                    <XIcon class="w-5 h-5 text-slate-600 dark:text-slate-400" />
+                  </div>
+                  <div>
+                    <p class="font-medium text-slate-900 dark:text-white">None</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Don't send any notifications</p>
+                  </div>
+                </label>
+              </div>
             </div>
           </div>
 
@@ -232,7 +305,7 @@
               class="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
               Cancel
             </NuxtLink>
-            <button type="submit"
+            <button type="submit" @click="saveFilter()"
               class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
               Create Filter
             </button>
@@ -241,6 +314,7 @@
       </div>
     </div>
 
+    <!-- Add Field Modal -->
   </div>
 </template>
 
@@ -259,38 +333,33 @@ const blacklistConfirmation = ref({
   value: ''
 })
 
-// New field state
-const newField = ref({
-  name: '',
-  type: 'string',
-  value: '',
-  options: ['']
-})
-
 const userStore = useUserStore()
 
 var apiToken = userStore.token;
 apiToken = "Bearer " + apiToken;
 
-// Update the filter object to include the new fields
+type NotificationType = 'discord' | 'email' | 'FireBase';
 const filter = ref({
   name: '',
   marketplace: '',
   searchValue: '',
-  searchRadius: null, // New search radius field
-  seller: '', // New seller field
+  totalCost: 0,
+  searchRadius: null,
+  commercialSeller: false,
+  seller: '',
   keywords: [] as string[],
   blacklist: [] as string[],
-  minPrice: null,
-  maxPrice: null,
+  minPrice: 0,
+  maxPrice: 0,
   currency: '€',
   location: '',
   radius: null,
   customFields: [] as any[],
-  notifications: {
-    discord: true,
-    email: true,
-    push: false
+  notificationType: 'none' as NotificationType, // Default to none
+  notificationTarget: {
+    'discord': '',
+    'email': '',
+    'FireBase': 'FireBase'
   }
 })
 
@@ -305,7 +374,7 @@ function removeKeyword(index: number) {
   filter.value.keywords.splice(index, 1)
 }
 
-// Updated blacklist functions with confirmation
+
 function confirmBlacklist() {
   const value = newBlacklist.value.trim()
   if (value) {
@@ -332,52 +401,45 @@ function removeBlacklist(index: number) {
   filter.value.blacklist.splice(index, 1)
 }
 
-// Custom fields functions
-function addOption() {
-  newField.value.options.push('')
-}
-
-function removeOption(index: number) {
-  newField.value.options.splice(index, 1)
-  if (newField.value.options.length === 0) {
-    newField.value.options.push('')
-  }
-}
-
-const isValidField = computed(() => {
-  if (!newField.value.name.trim()) return false
-
-  if (newField.value.type === 'dropdown') {
-    // Check if at least one option is filled
-    return newField.value.options.some(option => option.trim() !== '')
-  }
-
-  return true
-})
-
-
-
-function removeCustomField(index: number) {
-  filter.value.customFields.splice(index, 1)
-}
-
 function saveFilter() {
+  var target = ""
+  if (filter.value.notificationType != 'discord') {
+    target = filter.value.notificationTarget[filter.value.notificationType]
+  }
+  console.log(handleFilters())
+  console.log(navigator.geolocation)
+  return;
   addFilter({
     composable: '$fetch',
     headers: { Authorization: apiToken },
     body: {
       name: filter.value.name,
+      target: target,
       filters: handleFilters()
     }
   })
   console.log('Saving filter:', filter.value)
 }
 
-function handleFilters(): [] {
-  var filtersList = []
-  filter.value.keywords.map((i) => { filtersList.push({ "name": "ContainsKeyWord", "value": i }) })
-  filter.value.blacklist.map((i) => { filtersList.push({ "name": "IsBlacklist", "value": i }) })
-  return []
-}
+function handleFilters(): { name: string; value: any }[] {
+  var filters: { name: string; value: any }[] = []
 
+  filter.value.keywords.map((i) => { filters.push({ name: "ContainsKeyWord", value: i }) })
+  filter.value.blacklist.map((i) => { filters.push({ name: "NotContainsKeyWord", value: i }) })
+  if (filter.value.minPrice != 0 || filter.value.maxPrice) {
+    filters.push({ name: "PriceRange", value: `${Number(filter.value.minPrice)}-${Number(filter.value.maxPrice)}` })
+  }
+  if (filter.value.marketplace != "") {
+    filters.push({
+      name: "IncludePlatforms",
+      // dont ask me akwav uses 305 
+      value: filter.value.marketplace == 'ebay' ? '305' : 'Kleinanzeigen'
+    })
+  }
+  if (filter.value.commercialSeller) {
+    filters.push({ name: "CommercialSeller", value: true })
+  }
+
+  return filters
+}
 </script>
