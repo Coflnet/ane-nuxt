@@ -12,8 +12,7 @@
 
         <div class="flex items-center space-x-4">
 
-          <!-- use userStore.isLoggedIn when user auth is setup -->
-          <template v-if="true">
+          <template v-if="userStore.isLoggedIn">
             <NuxtLink to="/"
               class="text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400">Home
             </NuxtLink>
@@ -55,8 +54,7 @@
             </div>
           </template>
 
-          <!-- use v-else when user auth is setup -->
-          <template v-if="!loggedIn">
+          <template v-else>
             <NuxtLink to="/login"
               class="text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400">Log in
             </NuxtLink>
