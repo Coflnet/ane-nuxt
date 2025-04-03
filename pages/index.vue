@@ -12,7 +12,7 @@
       </NuxtLink>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 ">
       <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-medium text-slate-900 dark:text-white">Active Filters</h3>
@@ -21,35 +21,27 @@
           </div>
         </div>
         <p class="text-3xl font-bold text-slate-900 dark:text-white">{{ stats.activeFilters }}</p>
-        <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
-          <span class="text-green-500">+{{ stats.newFilters }}</span> new this week
-        </p>
+
       </div>
 
       <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-medium text-slate-900 dark:text-white">Matched Auctions</h3>
+          <h3 class="text-lg font-medium text-slate-900 dark:text-white">Total Matched Auctions</h3>
           <div class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
             <TagIcon class="w-5 h-5 text-purple-600 dark:text-purple-400" />
           </div>
         </div>
         <p class="text-3xl font-bold text-slate-900 dark:text-white">{{ stats.matchedAuctions }}</p>
-        <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
-          <span class="text-green-500">+{{ stats.newMatches }}</span> in the last 24 hours
-        </p>
       </div>
 
       <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-medium text-slate-900 dark:text-white">Notifications Sent</h3>
+          <h3 class="text-lg font-medium text-slate-900 dark:text-white">Auctions per hour</h3>
           <div class="w-10 h-10 rounded-full bg-rose-100 dark:bg-rose-900 flex items-center justify-center">
             <BellIcon class="w-5 h-5 text-rose-600 dark:text-rose-400" />
           </div>
         </div>
-        <p class="text-3xl font-bold text-slate-900 dark:text-white">{{ stats.notificationsSent }}</p>
-        <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
-          Across {{ stats.notificationChannels }} channels
-        </p>
+        <p class="text-3xl font-bold text-slate-900 dark:text-white">{{ stats.notificationperHour }}</p>
       </div>
     </div>
 
@@ -72,25 +64,23 @@
                 class="border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50">
                 <td class="px-4 py-3 text-sm text-slate-900 dark:text-white">
                   <div class="flex items-center space-x-3">
-                    <img :src="auction.image" alt="Auction thumbnail" class="w-10 h-10 rounded-md object-cover" />
+                    <img :src="auction.image ?? ''" alt="Auction thumbnail" class="w-10 h-10 rounded-md object-cover" />
                     <div>
                       <p class="font-medium">{{ auction.title }}</p>
                       <p class="text-xs text-slate-500 dark:text-slate-400">{{ auction.marketplace }}</p>
                     </div>
                   </div>
                 </td>
-                <td class="px-4 py-3 text-sm text-slate-900 dark:text-white">{{ auction.filter }}</td>
+                <td class="px-4 py-3 text-sm text-slate-900 dark:text-white">{{ filters[auction.filter ?? 0] }}</td>
                 <td class="px-4 py-3 text-sm font-medium text-slate-900 dark:text-white">{{ auction.price }}</td>
                 <td class="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">{{ auction.matchedAt }}</td>
                 <td class="px-4 py-3 text-sm">
-                  <div class="flex items-center space-x-2">
-                    <a :href="auction.url" target="_blank"
+                  <div class="flex items-center space-x-2 ml-2.5">
+                    <a :href="auction.url ?? ''" target="_blank"
                       class="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700" title="View auction">
-                      <ExternalLinkIcon class="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                      <ExternalLinkIcon class="w-5 h-5 text-slate-500 dark:text-slate-400" />
                     </a>
-                    <button class="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700" title="Mark as favorite">
-                      <HeartIcon class="w-4 h-4 text-slate-500 dark:text-slate-400" />
-                    </button>
+
                   </div>
                 </td>
               </tr>
@@ -104,7 +94,7 @@
       <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6">
         <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Top Filters</h2>
         <div class="space-y-4">
-          <div v-for="(filter, index) in topFilters" :key="index" class="flex items-center justify-between">
+          <div v-for="(filter, index) in sortTopFilers()" :key="index" class="flex items-center justify-between">
             <div class="flex items-center space-x-3">
               <div
                 class="w-8 h-8 rounded-md bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-medium">
@@ -182,96 +172,140 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
-import { BellIcon, FilterIcon, TagIcon, ExternalLinkIcon, HeartIcon, MessageSquareIcon, MailIcon, PlusIcon } from 'lucide-vue-next'
-import { getFilters } from '~/src/api-client';
+import { BellIcon, FilterIcon, TagIcon, ExternalLinkIcon, HeartIcon, MessageSquareIcon, MailIcon, PlusIcon, List } from 'lucide-vue-next'
+import { getFilters, getMatches, type Platform } from '~/src/api-client';
 
 // Mock data for dashboard
 const stats = ref({
-  activeFilters: 12,
+  activeFilters: 0,
   newFilters: 3,
   matchedAuctions: 87,
   newMatches: 14,
   notificationsSent: 65,
+  notificationperHour: 0,
   notificationChannels: 3
 })
 
 const userStore = useUserStore()
+
+interface MatchItem {
+  title: string | null | undefined;
+  marketplace: Platform | undefined;
+  price: number | undefined; matchedAt: string;
+  filter: number | undefined;
+  url: string | null | undefined;
+  image: string | null | undefined
+}
+
+const recentMatches = ref<MatchItem[]>([])
+const filters = ref<Record<number, string>>({});
+
+interface topFilter {
+  name: string;
+  matches: number;
+  keywords: string[];
+}
+
+const topFilters = ref<{ [id: string]: topFilter }>({})
+
 
 var apiToken = userStore.token;
 apiToken = "Bearer " + apiToken;
 
 async function loadStats() {
   const response = await getFilters({ composable: '$fetch', headers: { Authorization: apiToken } })
+  response.map((i) => {
+    if (i.id) {
+      filters.value[i.id] = i.name ?? ''
+    }
+  });
+  stats.value.activeFilters = response.length
 
-  console.log(response)
+  // TODO: fix this when after is added 
+  var yesterday = new Date(new Date().getTime() - (24 * 60 * 60 * 1000));
+  const responseMatches = await getMatches({
+    query: {},
+    composable: "$fetch",
+    headers: { Authorization: apiToken },
+  })
 
+  responseMatches.map((i) => {
+    if (!topFilters.value.hasOwnProperty(i.listenerId ?? "")) {
+      topFilters.value[String(i.listenerId) ?? "" as string] = {
+        name: filters.value[i.listenerId ?? 0],
+        matches: 1,
+        keywords: []
+      }
+    }
+    topFilters.value[String(i.listenerId)].matches += 1
+  })
+  console.log(topFilters.value)
+
+  stats.value.notificationperHour = responseMatches.length / 24
 }
 
-const recentMatches = ref([
-  {
-    title: 'Vintage Camera Collection',
-    marketplace: 'eBay',
-    filter: 'Photography Equipment',
-    price: '$249.99',
-    matchedAt: '2 hours ago',
-    url: '#',
-    image: '/placeholder.svg?height=80&width=80'
-  },
-  {
-    title: 'Mountain Bike - Almost New',
-    marketplace: 'eBay Kleinanzeigen',
-    filter: 'Outdoor Gear',
-    price: '€399',
-    matchedAt: '5 hours ago',
-    url: '#',
-    image: '/placeholder.svg?height=80&width=80'
-  },
-  {
-    title: 'Antique Wooden Desk',
-    marketplace: 'eBay',
-    filter: 'Furniture',
-    price: '$180',
-    matchedAt: '1 day ago',
-    url: '#',
-    image: '/placeholder.svg?height=80&width=80'
-  },
-  {
-    title: 'Gaming PC Bundle',
-    marketplace: 'eBay Kleinanzeigen',
-    filter: 'Electronics',
-    price: '€850',
-    matchedAt: '1 day ago',
-    url: '#',
-    image: '/placeholder.svg?height=80&width=80'
-  }
-])
+function sortTopFilers(): topFilter[] {
+  console.log("hi hello")
+  const array = Object.values(topFilters.value);
 
-const topFilters = ref([
-  {
-    name: 'Photography Equipment',
-    keywords: ['camera', 'lens', 'tripod'],
-    matches: 32
-  },
-  {
-    name: 'Outdoor Gear',
-    keywords: ['bike', 'hiking', 'camping'],
-    matches: 28
-  },
-  {
-    name: 'Electronics',
-    keywords: ['laptop', 'smartphone', 'gaming'],
-    matches: 24
-  },
-  {
-    name: 'Furniture',
-    keywords: ['vintage', 'desk', 'chair'],
-    matches: 18
+  const sortedArray = array.sort((a: topFilter, b: topFilter) => a.matches - b.matches);
+  return sortedArray
+}
+
+async function loadRecentMatches() {
+  const response = await getMatches({
+    query: { limit: 5 },
+    composable: "$fetch",
+    headers: { Authorization: apiToken },
+  })
+
+  response.map((item) => {
+    recentMatches.value.push({
+      title: item.listingData?.title ?? null,
+      marketplace: item.listingData?.platform,
+      price: item.listingData?.price,
+      matchedAt: timeAgo(item.matchedAt ?? ""),
+      filter: item.listenerId ?? undefined,
+      url: getUrl(item.listingData?.platform ?? "", item.listingData?.id ?? ""),
+      image: item?.listingData?.imageUrls![0]
+    });
+  })
+}
+
+function getUrl(listing: string, id: string) {
+  if (listing === 'Ebay') {
+    if (navigator.language == "de") {
+      return `https://www.ebay.de/itm/` + id;
+    }
+    return `https://www.ebay.com/itm/` + id;
   }
-])
+  if (listing === 'Kleinanzeigen') {
+    return `https://www.kleinanzeigen.de/s-anzeige/copy/${id}-1-1`;
+  }
+  return "";
+}
+
+function timeAgo(timestamp: string): string {
+  const now = new Date();
+  const past = new Date(timestamp);
+  const diff = (now.getTime() - past.getTime()) / 1000;
+  if (diff < 900) {
+    return "Just now";
+  } else if (diff < 3600) {
+    return `${Math.floor(diff / 60)} minutes ago`;
+  } else if (diff < 86400) {
+    return `${Math.floor(diff / 3600)} hours ago`;
+  } else if (diff < 604800) {
+    return `${Math.floor(diff / 86400)} days ago`;
+  } else {
+    return `${Math.floor(diff / 604800)} weeks ago`;
+  }
+}
 
 onMounted(() => {
-  loadStats()
+  loadRecentMatches();
+  loadStats();
 })
 </script>

@@ -446,23 +446,21 @@ async function saveFilter() {
       filters: await handleFilters()
     }
   });
-  return
   addFilter({
     composable: '$fetch',
     headers: { Authorization: apiToken },
     body: {
       name: filter.value.name,
+      userId: '',
       target: target,
+      targetType: filter.value.notificationType,
       filters: await handleFilters()
     }
   })
-  console.log('Saving filter:', filter.value)
 }
 
 async function handleFilters(): Promise<{ name: string; value: any }[]> {
   var filters: { name: string; value: any }[] = []
-
-  console.log(filter.value.zipcode)
 
   if (filter.value.zipcode != '') {
     const location = await handleSearchRadius()
@@ -482,7 +480,7 @@ async function handleFilters(): Promise<{ name: string; value: any }[]> {
   if (filter.value.commercialSeller) {
     filters.push({ name: "CommercialSeller", value: true })
   }
-  //filters.push({ name: 'SearchTerm', value: filter.value.searchValue })
+  filters.push({ name: 'SearchTerm', value: filter.value.searchValue })
   return filters
 }
 
