@@ -95,14 +95,13 @@ export const useUserStore = defineStore("user", () => {
       }
 
       const credential = GoogleAuthProvider.credentialFromResult(result);
-      let tokenen: TokenContainer = { 'authToken': credential?.accessToken }
 
       const response = await loginFirebase({
-        composable: "useAsyncData",
+        composable: "$fetch",
         body: { authToken: credential?.accessToken }
       })
       console.log(response)
-      token.value = response.data.value?.authToken ?? ""
+      token.value = response.authToken ?? ""
 
 
       return { success: true };
