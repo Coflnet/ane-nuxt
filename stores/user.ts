@@ -2,7 +2,7 @@ import { defineStore } from "pinia"
 import { ref, computed } from "vue"
 import { navigateTo } from "#app"
 import { GoogleAuthProvider, signInWithPopup, type Auth } from "firebase/auth"
-import { loginFirebase, type TokenContainer } from "~/src/api-client"
+import { loginFirebase, type Platform, type TokenContainer } from "~/src/api-client"
 import { createClient } from "@hey-api/client-nuxt"
 
 // Types
@@ -11,6 +11,20 @@ export interface User {
   name: string
   email: string
   avatar?: string
+}
+
+export interface MatchItem {
+  title: string | null | undefined;
+  marketplace: Platform | undefined;
+  price: number | undefined; matchedAt: string;
+  filter: number | undefined;
+  url: string | null | undefined;
+  image: string | null | undefined
+}
+
+export interface CachedAuctions {
+  auctions: MatchItem[];
+  timeStamp: string;
 }
 
 export interface NotificationSettings {
@@ -42,6 +56,8 @@ export const useUserStore = defineStore("user", () => {
   const isLoading = ref(false)
   const error = ref<string | null>(null)
   const token = ref<string | null>(null)
+  const cachedAuctions = ref<CachedAuctions | null>(null)
+  const cachedFilters = ref<{ [id: number]: string }>()
 
 
   const notificationSettings = ref<NotificationSettings>({
@@ -111,6 +127,25 @@ export const useUserStore = defineStore("user", () => {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  function saveAuctionCache(actions: MatchItem[]) {
+    cachedAuctions.value = { auctions: actions, timeStamp: new Date().toISOString() }
+  }
+
+  function loadAuctionCache(): [boolean, MatchItem[]] {
+    if (Date.now() - Date.parse(cachedAuctions.value?.timeStamp ?? "") > 60 * 1000) {
+      return [true, cachedAuctions.value?.auctions ?? []]
+    }
+    return [false, cachedAuctions.value?.auctions ?? []]
+  }
+
+  function saveFilterCache(actions: { [id: number]: string }) {
+    cachedFilters.value = actions
+  }
+
+  function loadFilterCache(): { [id: number]: string } {
+    return cachedFilters.value ?? {}
   }
 
   async function logout() {
@@ -346,6 +381,8 @@ export const useUserStore = defineStore("user", () => {
     token,
     notificationSettings,
     isLoadingSettings,
+    cachedFilters,
+    cachedAuctions,
 
 
     // Getters
@@ -364,6 +401,10 @@ export const useUserStore = defineStore("user", () => {
     testEmailNotification,
     toggleWebPushSubscription,
     updateProfile,
+    saveAuctionCache,
+    loadAuctionCache,
+    saveFilterCache,
+    loadFilterCache
   }
 }, {
   persist: true,

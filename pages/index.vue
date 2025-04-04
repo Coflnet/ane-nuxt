@@ -73,7 +73,7 @@
                 </td>
                 <td class="px-4 py-3 text-sm text-slate-900 dark:text-white">{{ filters[auction.filter ?? 0] }}</td>
                 <td class="px-4 py-3 text-sm font-medium text-slate-900 dark:text-white">{{ auction.price }}</td>
-                <td class="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">{{ auction.matchedAt }}</td>
+                <td class="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">{{ timeAgo(auction.matchedAt) }}</td>
                 <td class="px-4 py-3 text-sm">
                   <div class="flex items-center space-x-2 ml-2.5">
                     <a :href="auction.url ?? ''" target="_blank"
@@ -190,14 +190,7 @@ const stats = ref({
 
 const userStore = useUserStore()
 
-interface MatchItem {
-  title: string | null | undefined;
-  marketplace: Platform | undefined;
-  price: number | undefined; matchedAt: string;
-  filter: number | undefined;
-  url: string | null | undefined;
-  image: string | null | undefined
-}
+
 
 const recentMatches = ref<MatchItem[]>([])
 const filters = ref<Record<number, string>>({});
@@ -256,22 +249,25 @@ function sortTopFilers(): topFilter[] {
 
 async function loadRecentMatches() {
   const response = await getMatches({
-    query: { limit: 5 },
+    query: { limit: 6 },
     composable: "$fetch",
     headers: { Authorization: apiToken },
   })
+
 
   response.map((item) => {
     recentMatches.value.push({
       title: item.listingData?.title ?? null,
       marketplace: item.listingData?.platform,
       price: item.listingData?.price,
-      matchedAt: timeAgo(item.matchedAt ?? ""),
+      matchedAt: item.matchedAt ?? "",
       filter: item.listenerId ?? undefined,
       url: getUrl(item.listingData?.platform ?? "", item.listingData?.id ?? ""),
       image: item?.listingData?.imageUrls![0]
     });
   })
+
+  userStore.saveAuctionCache(recentMatches.value)
 }
 
 function getUrl(listing: string, id: string) {
