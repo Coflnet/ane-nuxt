@@ -114,7 +114,7 @@
               for</p>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-0">
             <div>
               <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Price Range</label>
               <div class="flex items-center space-x-2">
@@ -133,6 +133,7 @@
                 </div>
               </div>
             </div>
+
             <div>
               <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Total Cost</label>
               <div class="flex items-center space-x-2">
@@ -146,16 +147,6 @@
               <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Cost after all fees and taxes</p>
             </div>
 
-            <div>
-              <label for="currency"
-                class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Currency</label>
-              <select id="currency" v-model="filter.currency"
-                class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400">
-                <option value="$">USD ($)</option>
-                <option value="€">EUR (€)</option>
-                <option value="£">GBP (£)</option>
-              </select>
-            </div>
           </div>
 
           <div v-if="filter.marketplace === 'ebay-kleinanzeigen'" class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -331,8 +322,8 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { ArrowLeftIcon, XIcon, MessageSquareIcon, MailIcon, BellIcon } from 'lucide-vue-next'
-import { addFilter, testFilter } from '~/src/api-client'
+import { ArrowLeftIcon, XIcon, MessageSquareIcon, MailIcon, BellIcon, Filter } from 'lucide-vue-next'
+import { addFilter, getFilters, testFilter } from '~/src/api-client'
 
 const newKeyword = ref('')
 const newBlacklist = ref('')
@@ -350,6 +341,7 @@ const userStore = useUserStore()
 var apiToken = userStore.token;
 apiToken = "Bearer " + apiToken;
 
+
 export type TargetType = 'Unknown' | 'FireBase' | 'DiscordWebhook' | 'Email' | 'WhatsApp';
 const filter = ref({
   name: '',
@@ -364,9 +356,9 @@ const filter = ref({
   blacklist: [] as string[],
   minPrice: 0,
   maxPrice: 0,
-  currency: '€',
+  currency: '$',
   location: '',
-  radius: null,
+  radius: 0,
   customFields: [] as any[],
   notificationType: 'Unknown' as TargetType, // Default to none
   notificationTarget: "-"
@@ -376,6 +368,55 @@ watch([() => filter.value.searchRadius, () => filter.value.zipcode], ([newRadius
   validateRadiusAndZipcode(newRadius, newZipcode)
 }, { immediate: true })
 
+const route = useRoute()
+const id = route.query.id
+
+async function loadEditParam() {
+  if (id == "") {
+    return;
+  }
+  const response = await getFilters({
+    composable: "$fetch",
+    headers: { Authorization: apiToken },
+  })
+  response.map((i) => {
+    if (i.id ?? "" == id) {
+      filter.value.name = i.name ?? ""
+      i.filters?.map((item) => {
+        switch (item.name) {
+          case 'Radius': {
+            const [_lat, _lon, radius] = item.value?.split?.(';') ?? ""
+            filter.value.radius = Number(radius)
+            break
+          }
+          case 'ContainsKeyWord':
+            filter.value.keywords.push(item?.value!)
+            break
+          case 'NotContainsKeyWord':
+            filter.value.blacklist.push(item.value!)
+            break
+          case 'PriceRange': {
+            const [min, max] = item.value!.split('-')
+            filter.value.minPrice = Number(min)
+            filter.value.maxPrice = Number(max)
+            break
+          }
+          case 'IncludePlatforms':
+            filter.value.marketplace = item.value!.toLowerCase() === 'ebay' ? 'ebay' : 'kleinanzeigen'
+            break
+          case 'CommercialSeller':
+            filter.value.commercialSeller = Boolean(item.value)
+            break
+          case 'SearchTerm':
+            filter.value.searchValue = item.value ?? ""
+            break
+        }
+
+      })
+    }
+  })
+}
+
 function validateRadiusAndZipcode(radius: any, zipcode: string) {
   if (radius && !zipcode) {
     radiusError.value = true
@@ -384,48 +425,9 @@ function validateRadiusAndZipcode(radius: any, zipcode: string) {
   }
 }
 
-function addKeyword() {
-  if (newKeyword.value.trim()) {
-    filter.value.keywords.push(newKeyword.value.trim())
-    newKeyword.value = ''
-  }
-}
-
-function removeKeyword(index: number) {
-  filter.value.keywords.splice(index, 1)
-}
-
-
-function confirmBlacklist() {
-  const value = newBlacklist.value.trim()
-  if (value) {
-    blacklistConfirmation.value = {
-      show: true,
-      value: value
-    }
-  }
-}
-
-function addBlacklist() {
-  if (blacklistConfirmation.value.value) {
-    filter.value.blacklist.push(blacklistConfirmation.value.value)
-    newBlacklist.value = ''
-    blacklistConfirmation.value.show = false
-  }
-}
-
-function cancelBlacklist() {
-  blacklistConfirmation.value.show = false
-}
-
-function removeBlacklist(index: number) {
-  filter.value.blacklist.splice(index, 1)
-}
 
 async function saveFilter() {
-  // Check for radius error before saving
   if (radiusError.value) {
-    // Prevent form submission if there's an error
     return
   }
 
@@ -499,5 +501,45 @@ async function handleSearchRadius(): Promise<[string, string]> {
   }
   return ['', '']
 }
+
+function addKeyword() {
+  if (newKeyword.value.trim()) {
+    filter.value.keywords.push(newKeyword.value.trim())
+    newKeyword.value = ''
+  }
+}
+
+function removeKeyword(index: number) {
+  filter.value.keywords.splice(index, 1)
+}
+
+
+function confirmBlacklist() {
+  const value = newBlacklist.value.trim()
+  if (value) {
+    blacklistConfirmation.value = {
+      show: true,
+      value: value
+    }
+  }
+}
+
+function addBlacklist() {
+  if (blacklistConfirmation.value.value) {
+    filter.value.blacklist.push(blacklistConfirmation.value.value)
+    newBlacklist.value = ''
+    blacklistConfirmation.value.show = false
+  }
+}
+
+function cancelBlacklist() {
+  blacklistConfirmation.value.show = false
+}
+
+function removeBlacklist(index: number) {
+  filter.value.blacklist.splice(index, 1)
+}
+
+onMounted(() => loadEditParam())
 
 </script>

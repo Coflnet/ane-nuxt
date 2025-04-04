@@ -19,7 +19,7 @@
           <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 hidden">
             <div class="relative">
               <SearchIcon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 dark:text-slate-500"
-                size="16" />
+                :size="16" />
               <input type="text" placeholder="Search filters..."
                 class="pl-10 pr-4 py-2 w-full sm:w-64 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400" />
             </div>
@@ -42,7 +42,8 @@
                   <p class="text-sm text-slate-500 dark:text-slate-400">{{ filter.marketplace }}</p>
                 </div>
                 <div class="flex items-center space-x-1">
-                  <button class="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700" title="Edit filter">
+                  <button class="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700" title="Edit filter"
+                    @click="navigateTo(`/filters/create?id=${filter.id}`)">
                     <EditIcon class="w-4 h-4 text-slate-500 dark:text-slate-400" />
                   </button>
                 </div>
@@ -58,7 +59,7 @@
 
                 <div v-if="filter.priceRange" class="flex items-center text-sm text-slate-500 dark:text-slate-400">
                   <TagIcon class="w-4 h-4 mr-1" />
-                  <span>{{ filter.priceRange }}</span>
+                  <span>{{ handleMixMax(filter.priceRange) }}</span>
                 </div>
 
                 <div v-if="filter.location" class="flex items-center text-sm text-slate-500 dark:text-slate-400">
@@ -118,68 +119,30 @@ import { ref } from 'vue'
 import { PlusIcon, SearchIcon, EditIcon, TrashIcon, TagIcon, MapPinIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-vue-next'
 import { getFilters } from '~/src/api-client';
 
-// Mock data for filters
-const filters = ref([
+interface filterFace {
+  id: number;
+  name: string;
+  marketplace: string;
+  keywords: string[];
+  priceRange: string;
+  location: string;
+  active: boolean;
+  matchCount: number;
+}
+
+
+const filters = ref<filterFace[]>([
+
   {
     id: 1,
     name: 'Photography Equipment',
     marketplace: 'eBay',
     keywords: ['camera', 'lens', 'tripod', 'DSLR'],
     priceRange: '$100 - $500',
-    location: null,
+    location: '',
     active: true,
     matchCount: 32
   },
-  {
-    id: 2,
-    name: 'Mountain Bikes',
-    marketplace: 'eBay Kleinanzeigen',
-    keywords: ['mountain bike', 'MTB', 'hardtail', 'full suspension'],
-    priceRange: '€300 - €1000',
-    location: 'Within 50km of Berlin',
-    active: true,
-    matchCount: 18
-  },
-  {
-    id: 3,
-    name: 'Vintage Furniture',
-    marketplace: 'eBay',
-    keywords: ['mid century', 'vintage', 'retro', 'teak'],
-    priceRange: '$50 - $300',
-    location: null,
-    active: false,
-    matchCount: 24
-  },
-  {
-    id: 4,
-    name: 'Gaming Consoles',
-    marketplace: 'eBay Kleinanzeigen',
-    keywords: ['playstation', 'xbox', 'nintendo', 'console'],
-    priceRange: '€100 - €400',
-    location: 'Within 30km of Munich',
-    active: true,
-    matchCount: 15
-  },
-  {
-    id: 5,
-    name: 'Mechanical Keyboards',
-    marketplace: 'eBay',
-    keywords: ['mechanical keyboard', 'cherry mx', 'keycaps'],
-    priceRange: '$50 - $200',
-    location: null,
-    active: true,
-    matchCount: 9
-  },
-  {
-    id: 6,
-    name: 'Vinyl Records',
-    marketplace: 'eBay Kleinanzeigen',
-    keywords: ['vinyl', 'records', 'LP', '33rpm'],
-    priceRange: '€5 - €50',
-    location: 'Within 20km of Hamburg',
-    active: true,
-    matchCount: 41
-  }
 ])
 
 
@@ -201,20 +164,20 @@ async function loadFilters() {
   response.map((i) => {
     var filtersHolder = {
       radius: '',
-      keywords: [],
+      keywords: [] as string[],
       priceRange: '',
+      IncludePlatforms: ''
     }
 
     i.filters?.map((i) => {
-      if (i.name == "Radius") {
+      if (i.name == "Radius")
         return filtersHolder.radius = i.value ?? "";
-      }
-      if (i.name == "PriceRange") {
+      if (i.name == "PriceRange")
         return filtersHolder.priceRange = i.value ?? ""
-      }
-      if (i.name == "ContainsKeyWord") {
+      if (i.name == "ContainsKeyWord")
         return filtersHolder.keywords = JSON.parse(i.value ?? "")
-      }
+      if (i.name == "IncludePlatforms")
+        return filtersHolder.IncludePlatforms = i.value ?? ""
     })
 
 
@@ -222,7 +185,7 @@ async function loadFilters() {
       matchCount: 35,
       id: i.id ?? 0,
       name: i.name ?? "",
-      marketplace: i.target ?? "",
+      marketplace: filtersHolder.IncludePlatforms ?? "",
       keywords: filtersHolder.keywords,
       active: true,
       priceRange: filtersHolder.priceRange,
@@ -230,6 +193,14 @@ async function loadFilters() {
 
     })
   })
+}
+
+function handleMixMax(value: string): string {
+  if (value == "") {
+    return "";
+  }
+  const [min, max] = value.split('-')
+  return `$${min} - $${max}`
 }
 
 onMounted(() => loadFilters())
