@@ -7,8 +7,8 @@
         class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200">
         {{ keyword }}
         <button type="button" @click="removeKeyword(index)"
-          class="ml-1 text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200">
-          <XIcon class="w-4 h-4" />
+          class="ml-2 text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 mt-1.5">
+          <Icon name="tabler:trash" class="size-4 text-black"></Icon>
         </button>
       </div>
 
@@ -36,12 +36,12 @@ const newKeyword = ref('')
 
 function addKeyword() {
   if (newKeyword.value.trim()) {
-    props.filter.value.keywords.push(newKeyword.value.trim())
+    props.filter.keywords.push(newKeyword.value.trim())
     newKeyword.value = ''
   }
 }
 
 function removeKeyword(index: number) {
-  props.filter.value.keywords.splice(index, 1)
+  props.filter.keywords.splice(index, 1)
 }
 </script>

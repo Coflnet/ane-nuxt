@@ -39,9 +39,7 @@
             <AneTextField name="search-value" placeholder="e.g., Camera" label="Search Value"
               v-model="filter.searchValue" />
           </div>
-
           <FiltersKeywordFilter :filter="filter" />
-
 
           <!-- list all filters -->
           <div v-for="(option, index) in filterStore.getFilterOptions">
@@ -58,23 +56,6 @@
               :options="option.value.options" />
 
             <FiltersBlacklistFilter :filter="filter" v-if="option.name == 'NotContainsKeyWord'" />
-          </div>
-
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12">
-            <div>
-              <label for="commercial-seller"
-                class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Commercial Seller</label>
-              <div
-                class="flex items-center h-10 px-4 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700">
-                <input id="commercial-seller" v-model="filter.commercialSeller" type="checkbox"
-                  class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded" />
-                <label for="commercial-seller" class="ml-2 text-sm text-slate-900 dark:text-white">
-                  Only show commercial sellers
-                </label>
-              </div>
-              <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Filter listings from business accounts</p>
-            </div>
           </div>
 
           <!-- Updated Blacklist Section with Confirmation -->
@@ -115,7 +96,7 @@ const filter = ref({
   searchValue: '',
   totalCost: 0,
   zipcode: '',
-  searchRadius: 10,
+  searchRadius: null as number | null,
   commercialSeller: false,
   seller: '',
   keywords: [] as string[],
@@ -151,7 +132,7 @@ async function loadEditParam() {
       switch (item.name) {
         case 'Radius': {
           const [_lat, _lon, radius] = item.value?.split?.(';') ?? ""
-          filter.value.searchRadius = Number(radius)
+          filter.value.searchRadius = Number(radius ?? 0)
           break
         }
         case 'ContainsKeyWord':

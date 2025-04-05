@@ -5,7 +5,10 @@ export default defineNuxtConfig({
 
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
-  modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt', 'nuxt-vuefire'],
+  modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt', 'nuxt-vuefire', "@nuxt/icon"],
+
+  tailwindcss: { exposeConfig: true },
+
   vuefire: {
     config: {
       apiKey: "AIzaSyB8B7BaoOT_PhPJaa2peh2a_Q8VKDOb0yU",

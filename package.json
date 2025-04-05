@@ -12,6 +12,7 @@
   "dependencies": {
     "@firebase/app-types": "^0.9.3",
     "@hey-api/client-nuxt": "^0.4.0",
+    "@nuxt/icon": "^1.11.0",
     "@nuxtjs/tailwindcss": "^6.13.2",
     "@pinia/nuxt": "^0.10.1",
     "firebase": "^11.5.0",

@@ -32,13 +32,13 @@
       </div>
 
       <!-- Blacklist Items -->
-      <div class="flex flex-wrap gap-2 mt-2">
+      <div class="flex flex-row gap-2 mt-2 items-center">
         <div v-for="(keyword, index) in filter.blacklist" :key="index"
           class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-rose-100 dark:bg-rose-900 text-rose-800 dark:text-rose-200">
           {{ keyword }}
           <button type="button" @click="removeBlacklist(index)"
-            class="ml-1 text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-200">
-            <XIcon class="w-4 h-4" />
+            class="ml-2 text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-200 mt-1.5">
+            <Icon name="tabler:trash" class="size-4 text-black"></Icon>
           </button>
         </div>
       </div>
@@ -75,7 +75,7 @@ function confirmBlacklist() {
 
 function addBlacklist() {
   if (blacklistConfirmation.value.value) {
-    props.filter.value.blacklist.push(blacklistConfirmation.value.value)
+    props.filter.blacklist.push(blacklistConfirmation.value.value)
     newBlacklist.value = ''
     blacklistConfirmation.value.show = false
   }
@@ -86,7 +86,7 @@ function cancelBlacklist() {
 }
 
 function removeBlacklist(index: number) {
-  props.filter.value.blacklist.splice(index, 1)
+  props.filter.blacklist.splice(index, 1)
 }
 
 </script>

@@ -1,6 +1,6 @@
 <template>
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12">
-    <div class="flex flex-row w-full gap-x-8">
+  <div class="grid grid-cols-2 md:grid-cols-2 ">
+    <div class="flex flex-row w-full gap-x-8 pr-8">
       <div class="w-full ">
         <label for="search-radius" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Search
           Radius</label>
@@ -10,7 +10,7 @@
             radiusError ? 'border-rose-500 dark:border-rose-500' : 'border-slate-300 dark:border-slate-600'
           ]" />
         </div>
-        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Search radius around you (requires zip code)
+        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Search radius around you in KM (requires zip code)
         </p>
         <p v-if="radiusError" class="mt-1 text-xs text-rose-500">
           Please enter a zip code when using search radius
@@ -26,6 +26,19 @@
         </div>
         <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Your zip code</p>
       </div>
+    </div>
+    <div>
+      <label for="commercial-seller"
+        class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Commercial Seller</label>
+      <div
+        class="flex items-center h-10 px-4 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700">
+        <input id="commercial-seller" v-model="filter.commercialSeller" type="checkbox"
+          class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded" />
+        <label for="commercial-seller" class="ml-2 text-sm text-slate-900 dark:text-white">
+          Only show commercial sellers
+        </label>
+      </div>
+      <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Filter listings from business accounts</p>
     </div>
   </div>
 </template>
