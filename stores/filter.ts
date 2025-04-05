@@ -1,5 +1,5 @@
 import { defineStore } from "pinia"
-import { getFilters, addFilter, getOptions } from "~/src/api-client"
+import { getFilters, addFilter, getOptions, testFilter } from "~/src/api-client"
 import type { ListingListener, FilterOptions } from "~/src/api-client"
 
 
@@ -15,6 +15,10 @@ export const useFilterStore = defineStore("filter", () => {
   const filterOptions = ref<NamedOption[]>([]);
 
   const getUserFilters = computed(() => filters.value);
+  const getUserFilterById = computed(() => {
+    return (id: number) => filters.value.find((filter) => filter.id === id); // assuming your ListingListener type has an 'id' property.
+  });
+
   const getFilterOptions = computed(() => filterOptions.value);
 
   async function loadFilters() {
@@ -46,8 +50,7 @@ export const useFilterStore = defineStore("filter", () => {
     filters.value = loadedFilters;
   }
 
-  async function createFilter(filterToCreate: ListingListener) {
-
+  async function saveFilter(filterToCreate: ListingListener) {
     try {
       const user = userStore.getUser;
 
@@ -62,7 +65,12 @@ export const useFilterStore = defineStore("filter", () => {
       }
 
       const apiToken = `Bearer ${userStore.token}`;
-      console.log(`adding filter for user ${user.name} with token ${apiToken}`);
+
+      await testFilter({
+        composable: '$fetch',
+        headers: { Authorization: apiToken },
+        body: filterToCreate as any
+      });
 
       await addFilter({
         composable: '$fetch',
@@ -101,10 +109,11 @@ export const useFilterStore = defineStore("filter", () => {
     filters,
 
     getUserFilters,
+    getUserFilterById,
     getFilterOptions,
 
     loadFilters,
-    createFilter,
+    saveFilter,
     loadFilterOptions,
   }
 });

@@ -1,16 +1,31 @@
 <template>
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <div>
-      <label for="location" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Location</label>
-      <input id="location" v-model="props.filter.location" type="text" placeholder="e.g., Berlin"
-        class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400" />
-    </div>
-
-    <div>
-      <label for="radius" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Radius
-        (km)</label>
-      <input id="radius" v-model="props.filter.radius" type="number" placeholder="e.g., 50"
-        class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400" />
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12">
+    <div class="flex flex-row w-full gap-x-8">
+      <div class="w-full ">
+        <label for="search-radius" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Search
+          Radius</label>
+        <div class="flex items-center gap-2">
+          <input id="search-radius" v-model="filter.searchRadius" type="number" placeholder="e.g., 10" min="0" :class="[
+            'w-full px-4 py-2 rounded-lg border bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400',
+            radiusError ? 'border-rose-500 dark:border-rose-500' : 'border-slate-300 dark:border-slate-600'
+          ]" />
+        </div>
+        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Search radius around you (requires zip code)
+        </p>
+        <p v-if="radiusError" class="mt-1 text-xs text-rose-500">
+          Please enter a zip code when using search radius
+        </p>
+      </div>
+      <div class="w-full">
+        <label for="zip-code" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Zip-code</label>
+        <div class="flex items-center gap-2">
+          <input id="search-radius" v-model="filter.zipcode" type="text" placeholder="e.g., xxxxx" min="0" :class="[
+            'w-full px-4 py-2 rounded-lg border bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400',
+            radiusError ? 'border-rose-500 dark:border-rose-500' : 'border-slate-300 dark:border-slate-600'
+          ]" />
+        </div>
+        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Your zip code</p>
+      </div>
     </div>
   </div>
 </template>
@@ -20,6 +35,21 @@ const props = defineProps({
   filter: {
     type: Object,
     required: true
-  }
+  },
 })
+
+const radiusError = ref(false);
+
+watch([() => props.filter.searchRadius, () => props.filter.zipcode], ([newRadius, newZipcode]) => {
+  validateRadiusAndZipcode(newRadius, newZipcode)
+}, { immediate: true })
+
+function validateRadiusAndZipcode(radius: any, zipcode: string) {
+  if (radius && !zipcode) {
+    radiusError.value = true
+  } else {
+    radiusError.value = false
+  }
+}
+
 </script>

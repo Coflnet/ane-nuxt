@@ -3,7 +3,7 @@
     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Keywords</label>
     <div
       class="flex flex-wrap items-center gap-2 p-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700">
-      <div v-for="(keyword, index) in props.filter.keywords" :key="index"
+      <div v-for="(keyword, index) in filter.keywords" :key="index"
         class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200">
         {{ keyword }}
         <button type="button" @click="removeKeyword(index)"

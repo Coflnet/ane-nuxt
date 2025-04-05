@@ -6,8 +6,10 @@
         <ArrowLeftIcon class="w-4 h-4 mr-1" />
         Back to filters
       </NuxtLink>
-      <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Create Filter</h1>
-      <p class="mt-2 text-slate-500 dark:text-slate-400">Set up a new auction search filter</p>
+      <h1 class="text-3xl font-bold text-slate-900 dark:text-white">{{ isNewFilter ? "Create Filter" : "Edit Filter" }}
+      </h1>
+      <p class="mt-2 text-slate-500 dark:text-slate-400">{{ isNewFilter ? "Set up a new auction search filter"
+        : "Updateyour existing filter" }}</p>
     </div>
 
     <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden">
@@ -38,8 +40,6 @@
               v-model="filter.searchValue" />
           </div>
 
-
-          <!-- Keyword Input -->
           <FiltersKeywordFilter :filter="filter" />
 
 
@@ -61,6 +61,25 @@
           </div>
 
 
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12">
+            <div>
+              <label for="commercial-seller"
+                class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Commercial Seller</label>
+              <div
+                class="flex items-center h-10 px-4 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700">
+                <input id="commercial-seller" v-model="filter.commercialSeller" type="checkbox"
+                  class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded" />
+                <label for="commercial-seller" class="ml-2 text-sm text-slate-900 dark:text-white">
+                  Only show commercial sellers
+                </label>
+              </div>
+              <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Filter listings from business accounts</p>
+            </div>
+          </div>
+
+          <!-- Updated Blacklist Section with Confirmation -->
+
+          <!-- Notification Channels section -->
           <div class="flex items-center justify-end space-x-4 pt-6 border-t border-slate-200 dark:border-slate-700">
             <NuxtLink to="/filters"
               class="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
@@ -68,7 +87,7 @@
             </NuxtLink>
             <button type="submit" @click="saveFilter()"
               class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
-              Create Filter
+              {{ isNewFilter ? "Create Filter" : "Update Filter" }}
             </button>
           </div>
         </form>
@@ -78,21 +97,25 @@
 </template>
 
 <script setup lang="ts">
-import { ArrowLeftIcon, XIcon } from 'lucide-vue-next'
-import type { ListingListener } from '~/src/api-client';
+import { ArrowLeftIcon } from 'lucide-vue-next'
 
-
-const userStore = useUserStore();
 const filterStore = useFilterStore();
 
-type NotificationType = 'discord' | 'email' | 'FireBase';
+const route = useRoute()
+
+export type TargetType = 'Unknown' | 'FireBase' | 'DiscordWebhook' | 'Email' | 'WhatsApp';
+
+const isNewFilter = computed(() => {
+  return route.query.id == "" || route.query.id == undefined
+})
 
 const filter = ref({
   name: '',
   marketplace: '',
   searchValue: '',
   totalCost: 0,
-  searchRadius: null,
+  zipcode: '',
+  searchRadius: 10,
   commercialSeller: false,
   seller: '',
   keywords: [] as string[],
@@ -101,52 +124,94 @@ const filter = ref({
   maxPrice: 100,
   currency: '€',
   location: '',
-  radius: null,
   customFields: [] as any[],
-  notificationType: 'none' as NotificationType, // Default to none
-  notificationTarget: {
-    'discord': '',
-    'email': '',
-    'FireBase': 'FireBase'
-  }
+  notificationType: 'Unknown', // Default to none
+  notificationTarget: "-"
 })
 
+const radiusError = ref(false)
 
-async function saveFilter() {
+
+async function loadEditParam() {
+  if (isNewFilter.value) {
+    return;
+  }
 
   try {
-    var target = ""
-    if (filter.value.notificationType != 'discord') {
-      target = filter.value.notificationTarget[filter.value.notificationType]
-    }
-    console.log(handleFilters())
-    console.log(navigator.geolocation)
+    const activeFilter = filterStore.getUserFilterById(Number.parseInt(route.query.id as string));
 
-    const userId = userStore.getUser?.id
-    if (!userId) {
-      console.error("User ID not found")
-      return
+    if (!activeFilter?.filters) {
+      console.error("Filter not found");
+      return;
     }
 
-    const listingListener: ListingListener = {
-      name: filter.value.name,
-      userId: userId,
-      filters: handleFilters(),
-      target: target,
-    }
+    filter.value.name = activeFilter.name ?? ""
 
-    await filterStore.createFilter(listingListener)
-    console.log("created filter")
-
+    activeFilter.filters.forEach(item => {
+      switch (item.name) {
+        case 'Radius': {
+          const [_lat, _lon, radius] = item.value?.split?.(';') ?? ""
+          filter.value.searchRadius = Number(radius)
+          break
+        }
+        case 'ContainsKeyWord':
+          filter.value.keywords.push(item?.value!)
+          break
+        case 'NotContainsKeyWord':
+          filter.value.blacklist.push(item.value!)
+          break
+        case 'PriceRange': {
+          const [min, max] = item.value!.split('-')
+          filter.value.minPrice = Number(min)
+          filter.value.maxPrice = Number(max)
+          break
+        }
+        case 'IncludePlatforms':
+          filter.value.marketplace = item.value!.toLowerCase() === 'ebay' ? 'ebay' : 'kleinanzeigen'
+          break
+        case 'CommercialSeller':
+          filter.value.commercialSeller = Boolean(item.value)
+          break
+        case 'SearchTerm':
+          filter.value.searchValue = item.value ?? ""
+          break
+      }
+    })
   } catch (e) {
     console.error(e)
   }
-
 }
 
-function handleFilters(): { name: string; value: any }[] {
+
+
+async function saveFilter() {
+  if (radiusError.value) {
+    return
+  }
+
+  var target = filter.value.notificationTarget
+  if (filter.value.notificationType == 'FireBase') {
+    filter.value.notificationTarget = "-";
+  }
+
+  const filterToCreate = {
+    name: "",
+    userId: '',
+    target: target,
+    targetType: filter.value.notificationType as TargetType,
+    filters: await handleFilters()
+  }
+
+  await filterStore.saveFilter(filterToCreate)
+}
+
+async function handleFilters(): Promise<{ name: string; value: any }[]> {
   var filters: { name: string; value: any }[] = []
 
+  if (filter.value.zipcode != '') {
+    const location = await handleSearchRadius()
+    filters.push({ name: 'Radius', value: `${location[0]};${location[1]};${filter.value.searchRadius}` })
+  }
   filter.value.keywords.map((i) => { filters.push({ name: "ContainsKeyWord", value: i }) })
   filter.value.blacklist.map((i) => { filters.push({ name: "NotContainsKeyWord", value: i }) })
   if (filter.value.minPrice != 0 || filter.value.maxPrice) {
@@ -155,19 +220,35 @@ function handleFilters(): { name: string; value: any }[] {
   if (filter.value.marketplace != "") {
     filters.push({
       name: "IncludePlatforms",
-      // dont ask me akwav uses 305 
-      value: filter.value.marketplace == 'ebay' ? '305' : 'kleinanzeigen'
+      value: filter.value.marketplace == 'ebay' ? 'Ebay' : 'Kleinanzeigen'
     })
   }
   if (filter.value.commercialSeller) {
     filters.push({ name: "CommercialSeller", value: true })
   }
-
+  filters.push({ name: 'SearchTerm', value: filter.value.searchValue })
   return filters
 }
 
+async function handleSearchRadius(): Promise<[string, string]> {
+  // If you are looking at this... I am sorry 
+  try {
+    const response = await fetch('https://ipapi.co/json/');
+    const data = await response.json();
+    const url = `https://nominatim.openstreetmap.org/search?postalcode=${filter.value.zipcode}&country=${data.country_name}&format=json`;
+    const response2 = await fetch(url);
+    const data2 = await response2.json();
+    console.log(data2, "hi")
+    return [data2.lat, data2.lon]
+  } catch (error) {
+    console.error('Error fetching country:', error);
+  }
+  return ['', '']
+}
+
 onMounted(async () => {
-  await filterStore.loadFilterOptions();
-  console.log(filterStore.getFilterOptions)
+  await Promise.allSettled([filterStore.loadFilterOptions(), filterStore.loadFilters()])
+  loadEditParam();
 })
+
 </script>

@@ -2,7 +2,7 @@
   <div
     class="flex items-start p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/50">
     <div class="flex items-center h-5">
-      <input id="discord-notification" v-model="props.filter.notificationType" type="radio" value="discord"
+      <input id="discord-notification" v-model="props.filter.notificationType" type="radio" value="DiscordWebhook"
         class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300" />
     </div>
     <label for="discord-notification" class="ml-3 flex flex-col">
@@ -16,8 +16,8 @@
           </p>
         </div>
       </div>
-      <div v-if="props.filter.notificationType === 'discord'" class="mt-3 ml-11">
-        <input v-model="props.filter.notificationTarget.discord" type="text" placeholder="Enter Discord webhook URL"
+      <div v-if="props.filter.notificationType === 'DiscordWebhook'" class="mt-3 ml-11">
+        <input v-model="props.filter.notificationTarget" type="text" placeholder="Enter Discord webhook URL"
           class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400" />
       </div>
     </label>

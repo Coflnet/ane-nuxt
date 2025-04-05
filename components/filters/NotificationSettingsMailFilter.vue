@@ -2,7 +2,7 @@
   <div
     class="flex items-start p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/50">
     <div class="flex items-center h-5">
-      <input id="email-notification" v-model="props.filter.notificationType" type="radio" value="email"
+      <input id="email-notification" v-model="filter.notificationType" type="radio" value="Email"
         class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300" />
     </div>
     <label for="email-notification" class="ml-3 flex flex-col">
@@ -12,11 +12,12 @@
         </div>
         <div>
           <p class="font-medium text-slate-900 dark:text-white">Email</p>
-          <p class="text-xs text-slate-500 dark:text-slate-400">Send notifications to your email address</p>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Send notifications to your email address
+          </p>
         </div>
       </div>
-      <div v-if="props.filter.notificationType === 'email'" class="mt-3 ml-11">
-        <input v-model="props.filter.notificationTarget.email" type="email" placeholder="Enter email address"
+      <div v-if="filter.notificationType === 'Email'" class="mt-3 ml-11">
+        <input v-model="filter.notificationTarget" type="email" placeholder="Enter email address"
           class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400" />
       </div>
     </label>

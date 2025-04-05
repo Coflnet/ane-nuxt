@@ -1,7 +1,7 @@
 <template>
-  <!-- Updated Blacklist Section with Confirmation -->
   <div>
-    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Blacklist Keywords</label>
+    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Blacklist
+      Keywords</label>
     <div class="space-y-3">
       <div class="flex items-center gap-2">
         <input v-model="newBlacklist" @keydown.enter.prevent="confirmBlacklist" type="text"
