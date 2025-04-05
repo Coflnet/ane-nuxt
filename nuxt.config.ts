@@ -1,3 +1,5 @@
+import { appCheck } from "firebase-admin";
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
 
@@ -16,6 +18,10 @@ export default defineNuxtConfig({
     auth: {
       enabled: true
     },
+    appCheck: {
+      debug: process.env.NODE_ENV !== 'production',
+      isTokenAutoRefreshEnabled: true,
+    }
   },
 
 })

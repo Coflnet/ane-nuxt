@@ -71,6 +71,53 @@ export const useUserStore = defineStore("user", () => {
   const getUser = computed(() => user.value)
   const getNotificationSettings = computed(() => notificationSettings.value)
 
+  async function loadUser() {
+    try {
+      isLoading.value = true;
+      error.value = null;
+
+      // check the current user
+      const googleUser = useCurrentUser();
+      if (!googleUser) {
+        // google auth
+        const provider = new GoogleAuthProvider();
+        const auth = useFirebaseAuth();
+
+        // auth does not exist on the server
+        if (!auth) {
+          return;
+        }
+
+        const result = await signInWithPopup(auth, provider);
+        const loggedInUser = result.user;
+
+        if (loggedInUser) {
+          user.value = {
+            id: loggedInUser.uid,
+            name: loggedInUser.displayName ?? "",
+            email: loggedInUser.email ?? "",
+            avatar: loggedInUser.photoURL ?? "",
+          };
+          isAuthenticated.value = true;
+        } else {
+          throw new Error("User not found");
+        }
+
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const response = await loginFirebase({
+          composable: "useAsyncData",
+          body: { authToken: credential?.accessToken }
+        })
+        token.value = response.data.value?.authToken ?? ""
+      }
+    } catch (e) {
+      console.error("Error loading user:", e);
+      error.value = "Failed to load user data. Please try again.";
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   async function loginWithGoogle(clientAuth: Auth) {
     isLoading.value = true
     error.value = null
@@ -355,6 +402,7 @@ export const useUserStore = defineStore("user", () => {
     getNotificationSettings,
 
     // Actions
+    loadUser,
     loginWithGoogle,
     logout,
     checkAuth,
