@@ -181,7 +181,7 @@ import { getMatches, type Platform } from '~/src/api-client';
 const stats = ref({
   activeFilters: 0,
   newFilters: 3,
-  matchedAuctions: 87,
+  matchedAuctions: 0,
   newMatches: 14,
   notificationsSent: 65,
   notificationperHour: 0,
@@ -212,16 +212,19 @@ var apiToken = userStore.token;
 apiToken = "Bearer " + apiToken;
 
 async function loadStats() {
-  const response = filterStore.getUserFilters;
-  stats.value.activeFilters = response.length
-
   // TODO: fix this when after is added 
   var yesterday = new Date(new Date().getTime() - (24 * 60 * 60 * 1000));
   const responseMatches = await getMatches({
-    query: {},
+    query: { limit: 50 },
     composable: "$fetch",
     headers: { Authorization: apiToken },
   })
+  const response = filterStore.getUserFilters;
+  stats.value.activeFilters = response.length
+
+  var matches = 0;
+  filterStore.getUserFilters.map((i) => { matches += i.matchCount ?? 0 })
+  stats.value.matchedAuctions = matches
 
   responseMatches.map((i) => {
     if (!topFilters.value.hasOwnProperty(i.listenerId ?? "")) {
@@ -233,13 +236,11 @@ async function loadStats() {
     }
     topFilters.value[String(i.listenerId)].matches += 1
   })
-  console.log(topFilters.value)
 
   stats.value.notificationperHour = responseMatches.length / 24
 }
 
 function sortTopFilers(): topFilter[] {
-  console.log("hi hello")
   const array = Object.values(topFilters.value);
 
   const sortedArray = array.sort((a: topFilter, b: topFilter) => a.matches - b.matches);

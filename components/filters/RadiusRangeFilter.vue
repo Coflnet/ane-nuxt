@@ -13,15 +13,16 @@
         <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Search radius around you in KM (requires zip code)
         </p>
         <p v-if="radiusError" class="mt-1 text-xs text-rose-500">
-          Please enter a zip code when using search radius
+          {{ radiusErrorMessage }}
         </p>
+
       </div>
       <div class="w-full">
         <label for="zip-code" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Zip-code</label>
         <div class="flex items-center gap-2">
           <input id="search-radius" v-model="filter.zipcode" type="text" placeholder="e.g., xxxxx" min="0" :class="[
             'w-full px-4 py-2 rounded-lg border bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400',
-            radiusError ? 'border-rose-500 dark:border-rose-500' : 'border-slate-300 dark:border-slate-600'
+            radiusError && filter.marketplace != 'ebay' ? 'border-rose-500 dark:border-rose-500' : 'border-slate-300 dark:border-slate-600'
           ]" />
         </div>
         <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Your zip code</p>
@@ -44,6 +45,14 @@
 </template>
 
 <script setup lang='ts'>
+const radiusErrorMessage = computed(() => {
+  console.log(props.filter.marketplace)
+  if (!radiusError) return ''
+  return props.filter.marketplace === 'ebay'
+    ? 'Search radius does not work with Ebay'
+    : 'Please enter a zip code when using search radius'
+})
+
 const props = defineProps({
   filter: {
     type: Object,

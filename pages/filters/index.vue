@@ -37,18 +37,21 @@
                   <h3 class="font-medium text-lg text-slate-900 dark:text-white">{{ filter.name }}</h3>
                   <p class="text-sm text-slate-500 dark:text-slate-400">{{ filter.marketplace }}</p>
                 </div>
-                <div class="flex items-center space-x-1">
-                  <button class="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700" title="Edit filter"
-                    @click="navigateTo(`/filters/create?id=${filter.id}`)">
-                    <EditIcon class="w-4 h-4 text-slate-500 dark:text-slate-400" />
-                  </button>
-                </div>
+                <div class="flex flex-row gap-x-1">
+                  <div class="flex items-center space-x-1">
+                    <button class="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700" title="Edit filter"
+                      @click="navigateTo(`/filters/create?id=${filter.id}`)">
+                      <EditIcon class="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                    </button>
+                  </div>
 
-                <div class="flex items-center space-x-1">
-                  <button class="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700" title="Delete filter"
-                    @click="navigateTo(`/filters/create?id=${filter.id}`)">
-                    <TrashIcon class="w-4 h-4 text-slate-500 dark:text-slate-400" />
-                  </button>
+                  <div class="flex items-center space-x-1">
+                    <button class="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700" title="Delete filter"
+                      @click="deleteFilterId(filter.id)">
+                      <TrashIcon class="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                    </button>
+                  </div>
+
                 </div>
 
               </div>
@@ -120,6 +123,7 @@
 
 <script setup lang="ts">
 import { SearchIcon, EditIcon, TrashIcon, TagIcon, MapPinIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-vue-next'
+import { deleteFilter } from '~/src/api-client';
 
 interface filterFace {
   id: number;
@@ -131,6 +135,9 @@ interface filterFace {
   active: boolean;
   matchCount: number;
 }
+
+const userStore = useUserStore()
+var apiToken = `Bearer ${userStore.token}`;
 
 const filterStore = useFilterStore();
 
@@ -149,15 +156,20 @@ const filters = computed(() => {
         return filtersHolder.radius = i.value ?? "";
       if (i.name == "PriceRange")
         return filtersHolder.priceRange = i.value ?? ""
-      if (i.name == "ContainsKeyWord")
+      if (i.name == "ContainsKeyWord") {
+        // TODO: remove this
+        if (typeof i.value == 'string') {
+          return;
+        }
         return filtersHolder.keywords = JSON.parse(i.value ?? "")
+      }
       if (i.name == "IncludePlatforms")
         return filtersHolder.IncludePlatforms = i.value ?? ""
     })
 
 
     return {
-      matchCount: 0,
+      matchCount: i.matchCount ?? 0,
       id: i.id ?? 0,
       name: i.name ?? "",
       marketplace: filtersHolder.IncludePlatforms ?? "",
@@ -165,7 +177,6 @@ const filters = computed(() => {
       active: true,
       priceRange: filtersHolder.priceRange,
       location: filtersHolder.radius
-
     }
   })
 
@@ -179,6 +190,16 @@ function handleMixMax(value: string): string {
   const [min, max] = value.split('-')
   return `$${min} - $${max}`
 }
+
+const deleteFilterId = async (id: number) => {
+  await deleteFilter({
+    path: { id: id },
+    composable: "$fetch",
+    headers: { Authorization: apiToken },
+  })
+  await filterStore.loadFilters();
+}
+
 
 onMounted(() => {
   filterStore.loadFilters();

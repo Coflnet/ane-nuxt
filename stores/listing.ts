@@ -36,6 +36,35 @@ export const useListingStore = defineStore("listing", () => {
     });
   }
 
+  async function loadMoreMatches(loadedItems: MatchItem[]): Promise<[boolean, MatchItem[]]> {
+    const apiToken = `Bearer ${userStore.token}`;
+
+    const response = await getMatches({
+      query: { limit: 10, before: loadedItems.at(-1)?.matchedAt },
+      composable: "$fetch",
+      headers: { Authorization: apiToken },
+    })
+
+    response.map((item) => {
+      loadedItems.push({
+        title: item.listingData?.title ?? null,
+        marketplace: item.listingData?.platform,
+        price: item.listingData?.price,
+        matchedAt: item.matchedAt ?? "",
+        filter: item.listenerId ?? undefined,
+        url: getUrl(item.listingData?.platform ?? "", item.listingData?.id ?? ""),
+        image: item?.listingData?.imageUrls![0]
+      });
+    })
+
+    if (response.length == 0) {
+      return [false, loadedItems]
+    }
+
+    return [true, loadedItems]
+
+  }
+
   function getUrl(listing: string, id: string) {
     if (listing === 'Ebay') {
       if (navigator.language == "de") {
@@ -52,6 +81,7 @@ export const useListingStore = defineStore("listing", () => {
   return {
     recentMatches,
 
-    loadMatches
+    loadMatches,
+    loadMoreMatches
   }
 })

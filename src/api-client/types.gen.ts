@@ -55,6 +55,7 @@ export type ListingListener = {
     filters?: Array<FilterInfo> | null;
     target?: string | null;
     name?: string | null;
+    matchCount?: number;
 };
 
 export type Platform = 'Unknown' | 'Ebay' | 'Kleinanzeigen' | 'Marktplaats' | 'Willhaben' | 'Shpock' | 'MarktDe';

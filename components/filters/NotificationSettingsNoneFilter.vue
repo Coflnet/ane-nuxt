@@ -2,7 +2,7 @@
   <div
     class="flex items-center p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/50">
     <div class="flex items-center h-5">
-      <input id="none-notification" v-model="filter.notificationType" type="radio" value="none"
+      <input id="none-notification" v-model="filter.notificationType" type="radio" value="Unknown"
         class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300" />
     </div>
     <label for="none-notification" class="ml-3 flex items-center">
@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang='ts'>
-const props = defineProps({
+defineProps({
   filter: {
     type: Object,
     required: true

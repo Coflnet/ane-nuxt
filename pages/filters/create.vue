@@ -28,7 +28,7 @@
                 class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
                 required>
                 <option value="">Select a marketplace</option>
-                <option value="ebay">eBay</option>
+                <option value="ebay">eBay</option>;
                 <option value="kleinanzeigen">eBay Kleinanzeigen</option>
               </select>
             </div>
@@ -58,6 +58,7 @@
             <FiltersBlacklistFilter :filter="filter" v-if="option.name == 'NotContainsKeyWord'" />
           </div>
 
+          <NotificationSettingsFilter :filter="filter"></NotificationSettingsFilter>
           <!-- Updated Blacklist Section with Confirmation -->
 
           <!-- Notification Channels section -->
@@ -66,7 +67,7 @@
               class="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
               Cancel
             </NuxtLink>
-            <button type="submit" @click="saveFilter()"
+            <button type="submit"
               class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
               {{ isNewFilter ? "Create Filter" : "Update Filter" }}
             </button>
@@ -79,6 +80,7 @@
 
 <script setup lang="ts">
 import { ArrowLeftIcon } from 'lucide-vue-next'
+import NotificationSettingsFilter from '~/components/filters/NotificationSettingsFilter.vue';
 
 const filterStore = useFilterStore();
 
@@ -106,8 +108,8 @@ const filter = ref({
   currency: '€',
   location: '',
   customFields: [] as any[],
-  notificationType: 'Unknown', // Default to none
-  notificationTarget: "-"
+  notificationType: 'Unknown',
+  notificationTarget: ""
 })
 
 const radiusError = ref(false)
@@ -170,44 +172,48 @@ async function saveFilter() {
     return
   }
 
-  var target = filter.value.notificationTarget
-  if (filter.value.notificationType == 'FireBase') {
-    filter.value.notificationTarget = "-";
+  var rawFilter = toRaw(filter.value);
+  var target = rawFilter.notificationTarget
+  if (rawFilter.notificationType == 'FireBase') {
+    rawFilter.notificationTarget = "-";
   }
 
   const filterToCreate = {
-    name: "",
+    name: rawFilter.name,
     userId: '',
     target: target,
-    targetType: filter.value.notificationType as TargetType,
+    targetType: rawFilter.notificationType as TargetType,
     filters: await handleFilters()
   }
 
   await filterStore.saveFilter(filterToCreate)
+  navigateTo("/")
 }
 
 async function handleFilters(): Promise<{ name: string; value: any }[]> {
+  var rawFilter = toRaw(filter.value);
   var filters: { name: string; value: any }[] = []
 
-  if (filter.value.zipcode != '') {
-    const location = await handleSearchRadius()
-    filters.push({ name: 'Radius', value: `${location[0]};${location[1]};${filter.value.searchRadius}` })
+  if (rawFilter.minPrice != 0 || rawFilter.maxPrice) {
+    filters.push({ name: "PriceRange", value: `${Number(rawFilter.minPrice)}-${Number(rawFilter.maxPrice)}` })
   }
-  filter.value.keywords.map((i) => { filters.push({ name: "ContainsKeyWord", value: i }) })
-  filter.value.blacklist.map((i) => { filters.push({ name: "NotContainsKeyWord", value: i }) })
-  if (filter.value.minPrice != 0 || filter.value.maxPrice) {
-    filters.push({ name: "PriceRange", value: `${Number(filter.value.minPrice)}-${Number(filter.value.maxPrice)}` })
-  }
-  if (filter.value.marketplace != "") {
+  if (rawFilter.marketplace != "") {
     filters.push({
       name: "IncludePlatforms",
-      value: filter.value.marketplace == 'ebay' ? 'Ebay' : 'Kleinanzeigen'
+      value: rawFilter.marketplace == 'ebay' ? 'Ebay' : 'Kleinanzeigen'
     })
   }
-  if (filter.value.commercialSeller) {
+  if (rawFilter.commercialSeller) {
     filters.push({ name: "CommercialSeller", value: true })
   }
-  filters.push({ name: 'SearchTerm', value: filter.value.searchValue })
+  if (rawFilter.zipcode != '' && rawFilter.marketplace != 'ebay') {
+    const location = await handleSearchRadius()
+    filters.push({ name: 'Radius', value: `${location[0]};${location[1]};${rawFilter.searchRadius}` })
+  }
+
+  filters.push({ name: 'SearchTerm', value: rawFilter.searchValue })
+  filters.push({ name: "ContainsKeyWord", value: JSON.stringify(rawFilter.keywords) });
+  filters.push({ name: "NotContainsKeyWord", value: JSON.stringify(rawFilter.blacklist) });
   return filters
 }
 
@@ -216,11 +222,10 @@ async function handleSearchRadius(): Promise<[string, string]> {
   try {
     const response = await fetch('https://ipapi.co/json/');
     const data = await response.json();
-    const url = `https://nominatim.openstreetmap.org/search?postalcode=${filter.value.zipcode}&country=${data.country_name}&format=json`;
-    const response2 = await fetch(url);
-    const data2 = await response2.json();
-    console.log(data2, "hi")
-    return [data2.lat, data2.lon]
+    // const url = `https://nominatim.openstreetmap.org/search?postalcode=${filter.value.zipcode}&country=${data.country_name}&format=json`;
+    // const response2 = await fetch(url);
+    // const data2 = await response2.json();
+    return [data.latitude, data.longitude]
   } catch (error) {
     console.error('Error fetching country:', error);
   }

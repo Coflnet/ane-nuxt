@@ -41,6 +41,7 @@ export const useFilterStore = defineStore("filter", () => {
       composable: '$fetch',
       headers: { Authorization: apiToken },
     })
+    console.log(loadedFilters)
 
     if (!loadedFilters) {
       console.error("No filters found");
