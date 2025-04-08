@@ -4,7 +4,6 @@
     <nav class="container mx-auto px-6 py-4">
       <div class="flex justify-between items-center">
         <div class="flex items-center">
-          <AlertCircle class="h-6 w-6 mr-2" />
           <span class="text-xl font-bold">NimDing</span>
         </div>
         <div class="hidden md:flex space-x-8">
@@ -12,23 +11,22 @@
           <a href="#how-it-works" class="hover:text-slate-300 transition">How It Works</a>
           <a href="#pricing" class="hover:text-slate-300 transition">Pricing</a>
         </div>
-        <button class="bg-slate-600 hover:bg-slate-700 px-4 py-2 rounded-lg font-medium transition">
-          Sign Up Free
-        </button>
+        <NuxtLink to="/register" class="bg-slate-600 hover:bg-slate-700 px-4 py-2 rounded-lg font-medium transition">
+          Sign up Free
+        </NuxtLink>
+
       </div>
     </nav>
 
     <!-- Hero Section -->
     <section class="container mx-auto px-6 py-16 md:py-24">
       <div class="flex flex-col md:flex-row items-center">
-        <div class="md:w-1/2 mb-10 md:mb-0">
+        <div class="md:w-1/2 mb-10 md:mb-0 mr-8">
           <h1 class="text-4xl md:text-5xl font-bold leading-tight mb-6">
             Never Miss a <span class="text-slate-400">Deal</span> Again
           </h1>
           <p class="text-lg md:text-xl mb-8 text-slate-100">
-            Create custom alerts and filters for eBay and other marketplaces. Buy low, sell high, and maximize your
-            profits.
-          </p>
+            Create custom alerts and filters for eBay and other marketplaces. Buy items below market value </p>
           <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
             <button class="bg-slate-600 hover:bg-slate-700 px-6 py-3 rounded-lg font-medium text-lg transition">
               Get Started
@@ -170,7 +168,7 @@
             </div>
           </div>
           <p class="text-slate-200">
-            "DealAlert has completely changed how I source vintage items. I've found rare pieces at 60% below market
+            "NimDing has completely changed how I source vintage items. I've found rare pieces at 60% below market
             value because I was notified the moment they were listed."
           </p>
         </div>
@@ -194,7 +192,7 @@
             </div>
           </div>
           <p class="text-slate-200">
-            "I've made over $5,000 in profit in just three months using DealAlert. The advanced filters let me zero in
+            "I've saved $3,000 in just three months using NimDing. The advanced filters let me zero in
             on exactly what I'm looking for, and the real-time alerts give me the edge over other buyers."
           </p>
         </div>
@@ -207,79 +205,86 @@
         Simple, Transparent <span class="text-slate-400">Pricing</span>
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="bg-slate-900/50 p-6 rounded-lg border border-slate-800 hover:border-slate-600 transition">
-          <h3 class="text-xl font-bold mb-2">Free</h3>
-          <p class="text-3xl font-bold mb-6">$0<span class="text-sm font-normal text-slate-300">/month</span></p>
-          <ul class="mb-8 space-y-3">
-            <li class="flex items-center">
-              <Check class="h-5 w-5 text-green-400 mr-2" />
-              <span>3 active filters</span>
-            </li>
-            <li class="flex items-center">
-              <Check class="h-5 w-5 text-green-400 mr-2" />
-              <span>Email notifications</span>
-            </li>
-            <li class="flex items-center">
-              <Check class="h-5 w-5 text-green-400 mr-2" />
-              <span>Basic filter options</span>
-            </li>
-          </ul>
+        <div
+          class="bg-slate-900/50 p-6 rounded-lg border border-slate-800 hover:border-slate-600 transition flex flex-col justify-between">
+          <div>
+            <h3 class="text-xl font-bold mb-2">Free</h3>
+            <p class="text-3xl font-bold mb-6">$0<span class="text-sm font-normal text-slate-300">/month</span></p>
+            <ul class="mb-8 space-y-3">
+              <li class="flex items-center">
+                <Check class="h-5 w-5 text-green-400 mr-2" />
+                <span>3 active filters</span>
+              </li>
+              <li class="flex items-center">
+                <Check class="h-5 w-5 text-green-400 mr-2" />
+                <span>Email, Discord & push notifications</span>
+              </li>
+              <li class="flex items-center">
+                <Check class="h-5 w-5 text-green-400 mr-2" />
+                <span>30 minute delay</span>
+              </li>
+            </ul>
+          </div>
           <button class="w-full bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg font-medium transition">
             Get Started
           </button>
         </div>
-        <div class="bg-slate-800 p-6 rounded-lg border-2 border-slate-500 transform md:-translate-y-4 relative">
-          <div
-            class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-slate-500 px-4 py-1 rounded-full text-sm font-bold">
-            Most Popular
+        <div
+          class="bg-slate-800 p-6 rounded-lg border-2 border-slate-500 transform md:-translate-y-4 relative flex flex-col justify-between">
+          <div>
+            <div
+              class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-slate-500 px-4 py-1 rounded-full text-sm font-bold">
+              Most Popular
+            </div>
+            <h3 class="text-xl font-bold mb-2">Collectors</h3>
+            <p class="text-3xl font-bold mb-6">$9.99<span class="text-sm font-normal text-slate-300">/month</span></p>
+            <ul class="mb-8 space-y-3">
+              <li class="flex items-center">
+                <Check class="h-5 w-5 text-green-400 mr-2" />
+                <span>20 active filters</span>
+              </li>
+              <li class="flex items-center">
+                <Check class="h-5 w-5 text-green-400 mr-2" />
+                <span>Email, Discord & push notifications</span>
+              </li>
+              <li class="flex items-center">
+                <Check class="h-5 w-5 text-green-400 mr-2" />
+                <span>Within 10 minute delay</span>
+              </li>
+            </ul>
           </div>
-          <h3 class="text-xl font-bold mb-2">Pro</h3>
-          <p class="text-3xl font-bold mb-6">$9.99<span class="text-sm font-normal text-slate-300">/month</span></p>
-          <ul class="mb-8 space-y-3">
-            <li class="flex items-center">
-              <Check class="h-5 w-5 text-green-400 mr-2" />
-              <span>20 active filters</span>
-            </li>
-            <li class="flex items-center">
-              <Check class="h-5 w-5 text-green-400 mr-2" />
-              <span>Email, SMS & push notifications</span>
-            </li>
-            <li class="flex items-center">
-              <Check class="h-5 w-5 text-green-400 mr-2" />
-              <span>Advanced filter options</span>
-            </li>
-            <li class="flex items-center">
-              <Check class="h-5 w-5 text-green-400 mr-2" />
-              <span>Price history data</span>
-            </li>
-          </ul>
+
           <button class="w-full bg-slate-500 hover:bg-slate-600 px-4 py-2 rounded-lg font-medium transition">
-            Start 7-Day Free Trial
+            Get Started
           </button>
         </div>
-        <div class="bg-slate-900/50 p-6 rounded-lg border border-slate-800 hover:border-slate-600 transition">
-          <h3 class="text-xl font-bold mb-2">Business</h3>
-          <p class="text-3xl font-bold mb-6">$24.99<span class="text-sm font-normal text-slate-300">/month</span></p>
-          <ul class="mb-8 space-y-3">
-            <li class="flex items-center">
-              <Check class="h-5 w-5 text-green-400 mr-2" />
-              <span>Unlimited active filters</span>
-            </li>
-            <li class="flex items-center">
-              <Check class="h-5 w-5 text-green-400 mr-2" />
-              <span>Priority notifications</span>
-            </li>
-            <li class="flex items-center">
-              <Check class="h-5 w-5 text-green-400 mr-2" />
-              <span>Market analysis tools</span>
-            </li>
-            <li class="flex items-center">
-              <Check class="h-5 w-5 text-green-400 mr-2" />
-              <span>API access</span>
-            </li>
-          </ul>
+        <div
+          class="bg-slate-900/50 p-6 rounded-lg border border-slate-800 hover:border-slate-600 transition flex flex-col justify-between">
+          <div>
+            <h3 class="text-xl font-bold mb-2">Flippers</h3>
+            <p class="text-3xl font-bold mb-6">$69.69<span class="text-sm font-normal text-slate-300">/month</span></p>
+            <ul class="mb-8 space-y-3">
+              <li class="flex items-center">
+                <Check class="h-5 w-5 text-green-400 mr-2" />
+                <span>500 active filters</span>
+              </li>
+              <li class="flex items-center">
+                <Check class="h-5 w-5 text-green-400 mr-2" />
+                <span>1-2 minute delay</span>
+              </li>
+              <li class="flex items-center">
+                <Check class="h-5 w-5 text-green-400 mr-2" />
+                <span>Email notifications</span>
+              </li>
+              <li class="flex items-center">
+                <Check class="h-5 w-5 text-green-400 mr-2" />
+                <span>Price calculation</span>
+              </li>
+
+            </ul>
+          </div>
           <button class="w-full bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg font-medium transition">
-            Contact Sales
+            Coming soon
           </button>
         </div>
       </div>
@@ -294,9 +299,10 @@
         <p class="text-lg md:text-xl mb-8 max-w-2xl mx-auto">
           Join thousands of smart shoppers and resellers who are saving money and making profits with DealAlert.
         </p>
-        <button class="bg-white text-slate-800 hover:bg-slate-200 px-8 py-3 rounded-lg font-medium text-lg transition">
+        <NuxtLink to="/register"
+          class="bg-white text-slate-800 hover:bg-slate-200 px-8 py-3 rounded-lg font-medium text-lg transition">
           Sign Up Free
-        </button>
+        </NuxtLink>
         <p class="mt-4 text-slate-200">
           No credit card required. Start with our free plan today.
         </p>
@@ -309,8 +315,7 @@
         <div class="flex flex-col md:flex-row justify-between mb-8">
           <div class="mb-8 md:mb-0">
             <div class="flex items-center mb-4">
-              <AlertCircle class="h-6 w-6 mr-2" />
-              <span class="text-xl font-bold">DealAlert</span>
+              <span class="text-xl font-bold">NimDing</span>
             </div>
             <p class="text-slate-300 max-w-xs">
               The smart way to find deals and make profits on online marketplaces.

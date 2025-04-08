@@ -10,6 +10,8 @@ export const useListingStore = defineStore("listing", () => {
       return;
     }
 
+    recentMatches.value = [];
+
     const apiToken = `Bearer ${userStore.token}`;
 
     const response = await getMatches({
