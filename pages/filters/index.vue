@@ -46,10 +46,7 @@
                   </div>
 
                   <div class="flex items-center space-x-1">
-                    <button class="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700" title="Delete filter"
-                      @click="deleteFilterId(filter.id)">
-                      <TrashIcon class="w-4 h-4 text-slate-500 dark:text-slate-400" />
-                    </button>
+                    <FilterCardDelete :itemId="filter.id"></FilterCardDelete>
                   </div>
 
                 </div>
@@ -68,11 +65,11 @@
                   <TagIcon class="w-4 h-4 mr-1" />
                   <span>{{ handleMixMax(filter.priceRange) }}</span>
                 </div>
-
                 <div v-if="filter.location" class="flex items-center text-sm text-slate-500 dark:text-slate-400">
                   <MapPinIcon class="w-4 h-4 mr-1" />
-                  <span>{{ filter.location }}</span>
+                  <span>{{ handleLocation(filter.location) }}</span>
                 </div>
+
               </div>
 
               <div class="flex items-center justify-between pt-3 border-t border-slate-200 dark:border-slate-700">
@@ -84,7 +81,7 @@
                   <span class="text-sm text-slate-500 dark:text-slate-400">{{ filter.matchCount }} matches</span>
                 </div>
                 <NuxtLink :to="`/auctions?filter=${filter.id}`"
-                  class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
+                  class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline hidden">
                   View matches
                 </NuxtLink>
               </div>
@@ -123,6 +120,7 @@
 
 <script setup lang="ts">
 import { SearchIcon, EditIcon, TrashIcon, TagIcon, MapPinIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-vue-next'
+import FilterCardDelete from '~/components/filters/FilterCardDelete.vue';
 import { deleteFilter } from '~/src/api-client';
 
 interface filterFace {
@@ -135,9 +133,6 @@ interface filterFace {
   active: boolean;
   matchCount: number;
 }
-
-const userStore = useUserStore()
-var apiToken = `Bearer ${userStore.token}`;
 
 const filterStore = useFilterStore();
 
@@ -191,14 +186,14 @@ function handleMixMax(value: string): string {
   return `$${min} - $${max}`
 }
 
-const deleteFilterId = async (id: number) => {
-  await deleteFilter({
-    path: { id: id },
-    composable: "$fetch",
-    headers: { Authorization: apiToken },
-  })
-  await filterStore.loadFilters();
+function handleLocation(value: string): string {
+  if (value == "") {
+    return "";
+  }
+  const [_lon, _lat, radius] = value.split(';')
+  return `${radius} KM`
 }
+
 
 
 onMounted(() => {

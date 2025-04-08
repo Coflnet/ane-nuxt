@@ -13,17 +13,18 @@
         <div class="flex items-center space-x-4">
 
           <template v-if="userStore.isLoggedIn">
-            <NuxtLink to="/"
+            <NuxtLink to="/overview"
               class="text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400">Home
             </NuxtLink>
+
             <NuxtLink to="/filters"
-              class="text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400">Filters
+              class="text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 bg-transparent">
+              Filters
             </NuxtLink>
+
             <NuxtLink to="/auctions"
-              class="text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400">Auctions
-            </NuxtLink>
-            <NuxtLink to="/notifications"
-              class="text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400">Notifications
+              class="text-slate-400 dark:text-slate-200 hover:text-slate-100 dark:hover:text-indigo-400 bg-indigo-700 hover:bg-indigo-700 px-2 py-1.5 rounded-md">
+              Auctions
             </NuxtLink>
 
             <div class="relative" ref="profileMenuRef" v-if="loggedIn">
@@ -35,19 +36,20 @@
               </button>
 
               <div v-if="isProfileMenuOpen"
-                class="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-md shadow-lg py-1 z-10 border border-slate-200 dark:border-slate-700">
+                class="absolute right-0 mt-2 w-60 bg-white dark:bg-slate-800 rounded-md shadow-lg py-1 z-10 border border-slate-200 dark:border-slate-700">
                 <div class="px-4 py-2 border-b border-slate-200 dark:border-slate-700">
                   <p class="text-sm font-medium text-slate-900 dark:text-white">{{ userStore.user?.name }}</p>
                   <p class="text-xs text-slate-500 dark:text-slate-400">{{ userStore.user?.email }}</p>
                 </div>
+
                 <NuxtLink to="/settings"
-                  class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
-                  Settings</NuxtLink>
-                <NuxtLink to="/notifications"
-                  class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
-                  Notification Settings</NuxtLink>
+                  class="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 h-10">
+                  <Icon name="tabler:settings" class="w-4 h-4" />
+                  Settings
+                </NuxtLink>
                 <button @click="logout"
-                  class="block w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
+                  class="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 h-10">
+                  <Icon name="tabler:logout-2" class="w-4 h-4" />
                   Sign out
                 </button>
               </div>

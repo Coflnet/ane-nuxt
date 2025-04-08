@@ -16,7 +16,8 @@ export interface User {
 export interface MatchItem {
   title: string | null | undefined;
   marketplace: Platform | undefined;
-  price: number | undefined; matchedAt: string;
+  price: number | undefined;
+  matchedAt: string;
   filter: number | undefined;
   url: string | null | undefined;
   image: string | null | undefined

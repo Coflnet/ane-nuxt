@@ -27,7 +27,7 @@ export const useListingStore = defineStore("listing", () => {
         matchedAt: item.matchedAt ?? "",
         filter: item.listenerId ?? undefined,
         url: getUrl(item.listingData?.platform ?? "", item.listingData?.id ?? ""),
-        image: item?.listingData?.imageUrls![0]
+        image: item?.listingData?.imageUrls?.[0] ?? ""
       });
     })
 
@@ -40,7 +40,7 @@ export const useListingStore = defineStore("listing", () => {
     const apiToken = `Bearer ${userStore.token}`;
 
     const response = await getMatches({
-      query: { limit: 10, before: loadedItems.at(-1)?.matchedAt },
+      query: { limit: 21, before: loadedItems.at(-1)?.matchedAt },
       composable: "$fetch",
       headers: { Authorization: apiToken },
     })
@@ -53,9 +53,10 @@ export const useListingStore = defineStore("listing", () => {
         matchedAt: item.matchedAt ?? "",
         filter: item.listenerId ?? undefined,
         url: getUrl(item.listingData?.platform ?? "", item.listingData?.id ?? ""),
-        image: item?.listingData?.imageUrls![0]
+        image: item?.listingData?.imageUrls?.[0] ?? ""
       });
     })
+
 
     if (response.length == 0) {
       return [false, loadedItems]

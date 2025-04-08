@@ -60,7 +60,7 @@ async function loginWithGoogle() {
     return;
   }
   if (await userStore.loginWithGoogle(auth)) {
-    navigateTo("/");
+    navigateTo("/overview");
   }
 }
 </script>

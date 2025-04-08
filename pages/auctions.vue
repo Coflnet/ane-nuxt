@@ -13,7 +13,13 @@
           <div v-for="(auction, index) in loadedAuctions" :key="index"
             class="border border-slate-200 dark:border-slate-700 rounded-lg  hover:shadow-md transition-shadow">
             <div class="relative">
-              <img :src="auction.image ?? ''" alt="Auction thumbnail" class="w-full h-48 object-cover" />
+              <img :src="auction.image ?? ''" alt="Auction thumbnail" class="w-full h-48 object-cover"
+                :class="auction.image == '' ? 'hidden' : ''" />
+              <div :class="auction.image == '' ? '' : 'hidden'" class="h-48 items-center flex flex-col justify-center">
+                <SearchXIcon class="w-16 h-16 text-slate-400 mx-auto mb-4 mt-3" />
+                <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-1">This auction contains no image</h3>
+
+              </div>
               <div class="absolute top-2 right-2">
                 <span
                   class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
@@ -72,23 +78,23 @@ const listingStore = useListingStore()
 const selectedFilter = ref('all')
 const sortOption = ref('newest')
 const loadedAuctions = ref<MatchItem[]>([])
-const page = ref(1)
 const loading = ref(false)
 const finished = ref(false)
 
 const container = ref<HTMLElement | null>(null)
 
 async function loadMore() {
-  console.log('loading more')
-  if (loading.value || finished.value) return
+  if (loading.value || finished.value) {
+    return
+  }
   loading.value = true
 
   const [isNewAuctions, newAuctions] = await listingStore.loadMoreMatches(loadedAuctions.value)
 
-  if (!isNewAuctions || newAuctions.length === 0) {
+  if (!isNewAuctions) {
     finished.value = true
   } else {
-    loadedAuctions.value.push(...newAuctions)
+    loadedAuctions.value = newAuctions
   }
 
   loading.value = false

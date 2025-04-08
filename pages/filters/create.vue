@@ -107,6 +107,7 @@ const filter = ref({
   maxPrice: 100,
   currency: '€',
   location: '',
+  id: 0,
   customFields: [] as any[],
   notificationType: 'Unknown',
   notificationTarget: ""
@@ -121,7 +122,11 @@ async function loadEditParam() {
   }
 
   try {
-    const activeFilter = filterStore.getUserFilterById(Number.parseInt(route.query.id as string));
+    const cachedFilters = filterStore.getUserFilters;
+    const currentId = Number(route.query.id ?? 0);
+
+    let activeFilter = cachedFilters.find(i => Number(i.id ?? 0) === currentId)
+      ?? filterStore.getUserFilterById(currentId);
 
     if (!activeFilter?.filters) {
       console.error("Filter not found");
@@ -129,6 +134,7 @@ async function loadEditParam() {
     }
 
     filter.value.name = activeFilter.name ?? ""
+    filter.value.id = activeFilter.id ?? 0
 
     activeFilter.filters.forEach(item => {
       switch (item.name) {
@@ -181,13 +187,15 @@ async function saveFilter() {
   const filterToCreate = {
     name: rawFilter.name,
     userId: '',
+    id: filter.value.id,
     target: target,
     targetType: rawFilter.notificationType as TargetType,
     filters: await handleFilters()
   }
 
+
   await filterStore.saveFilter(filterToCreate)
-  navigateTo("/")
+  navigateTo("/overview")
 }
 
 async function handleFilters(): Promise<{ name: string; value: any }[]> {
