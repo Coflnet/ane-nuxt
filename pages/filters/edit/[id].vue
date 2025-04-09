@@ -81,7 +81,7 @@
                   <div class="relative">
                     <span
                       class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 dark:text-slate-400">{{
-                      filter.currency }}</span>
+                        filter.currency }}</span>
                     <input v-model="filter.minPrice" type="number" placeholder="Min"
                       class="w-full pl-8 pr-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400" />
                   </div>
@@ -89,7 +89,7 @@
                   <div class="relative">
                     <span
                       class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 dark:text-slate-400">{{
-                      filter.currency }}</span>
+                        filter.currency }}</span>
                     <input v-model="filter.maxPrice" type="number" placeholder="Max"
                       class="w-full pl-8 pr-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400" />
                   </div>
@@ -234,14 +234,14 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { ArrowLeftIcon, XIcon, MessageSquareIcon, MailIcon, BellIcon } from 'lucide-vue-next'
-import { useFiltersStore } from '~/stores/filters'
+import { useFilterStore } from '~/stores/filter'
 
 // Get the route and filter ID
 const route = useRoute()
 const filterId = parseInt(route.params.id)
 
 // Get the filters store
-const filtersStore = useFiltersStore()
+const filtersStore = useFilterStore()
 
 // Local state
 const isLoading = ref(true)
@@ -319,4 +319,3 @@ async function updateFilter() {
   }
 }
 </script>
-
