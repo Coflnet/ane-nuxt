@@ -26,11 +26,6 @@ export default defineNuxtConfig({
     },
     auth: {
       enabled: true
-    },
-    appCheck: {
-      debug: process.env.NODE_ENV !== 'production',
-      isTokenAutoRefreshEnabled: true,
     }
-  },
-
+  }
 })
