@@ -9,6 +9,8 @@ export default defineNuxtConfig({
 
   tailwindcss: { exposeConfig: true },
 
+  ssr: true,
+
   heyApi: {
     config: {
       input: "https://ane.coflnet.com/api/openapi/v1/openapi.json"
