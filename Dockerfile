@@ -15,4 +15,4 @@ COPY . .
 # Build the Nuxt app
 RUN pnpm run build
 
-CMD ["pnpm", "run", "dev"]
+CMD ["pnpm", "run", "dev", "--host"]
