@@ -27,13 +27,13 @@
                 </a>
               </li>
               <li>
-                <a href="#"
+                <a href="https://ane.coflnet.com/api/index.html"
                   class="text-sm text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400">
                   API Reference
                 </a>
               </li>
               <li>
-                <a href="#"
+                <a href="https://discord.gg/vdjgMWDDzW"
                   class="text-sm text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400">
                   Support
                 </a>
@@ -51,13 +51,13 @@
                 </a>
               </li>
               <li>
-                <a href="#"
+                <a href="https://coflnet.com/privacy"
                   class="text-sm text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400">
                   Privacy
                 </a>
               </li>
               <li>
-                <a href="#"
+                <a href="https://coflnet.com/terms-of-service"
                   class="text-sm text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400">
                   Terms
                 </a>
@@ -69,7 +69,7 @@
 
       <div
         class="mt-8 pt-6 border-t border-slate-200 dark:border-slate-700 text-center text-sm text-slate-500 dark:text-slate-400">
-        &copy; {{ new Date().getFullYear() }} Advanced Notification Engine. All rights reserved.
+        &copy; {{ new Date().getFullYear() }} Coflnet GMH. All rights reserved.
       </div>
     </div>
   </footer>

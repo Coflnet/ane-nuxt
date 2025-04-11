@@ -10,7 +10,7 @@ heroWidget3,Listed 3 minutes ago, ""
 heroWidget4,Mechanical Keyboard, ""
 heroWidget5,Listed 17 minutes ago, ""
 heroWidget6,Listed 17 minutes ago, ""
-dealHunters,Deal Hunters, ""
+dealHunters," Deal Hunters", ""
 informWidget,Real-time Alerts, ""
 tools,Powerful Tools for , ""
 informFooter,Get instant notifications when items matching your criteria are listed. Be the first to snag that deal., ""
@@ -32,7 +32,7 @@ vinCol,Vintage Collector, ""
 vinColDesc,"NimDing has completely changed how I source vintage items. I've found rare pieces at 60% below market value because I was notified the moment they were listed."
 resSeller, Reseller
 resellerDesc,"I've saved $3,000 in just three months using NimDing. The advanced filters let me zero in on exactly what I'm looking for, and the real-time alerts give me the edge over other buyers.", ""
-simpleTran,"Simple, Transparent", ""
+simpleTran,"Simple, Transparent ", ""
 price,Pricing, ""
 actfil,3 active filters, ""
 pushNotif,"Email, Discord & push notifications",""
@@ -51,7 +51,7 @@ joinno,No credit card required. Start with our free plan today.
 smart,The smart way to find deals and make profits on online marketplaces.
 privacy,Privacy
 terms,Terms
-rights,© 2025 Coflnet. All rights reserved.
+rights,© 2025 Coflnet GMH. All rights reserved.
 dash,Dashboard
 monitor,Monitor your auction filters and notifications
 create,Create Filter
