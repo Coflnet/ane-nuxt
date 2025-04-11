@@ -1,0 +1,130 @@
+Key,"en",de
+signup,Sign up Free, ""
+landingHero1, Never Miss a, ""
+landingHero2, Deal, ""
+landingHero3, Again, ""
+landingFooter, Create custom alerts and filters for eBay and other marketplaces. Buy items below market value, ""
+heroWidget1, New Alert Match!, ""
+heroWidget2, Vintage Camera Lens, ""
+heroWidget3, Listed 3 minutes ago, ""
+heroWidget4, Mechanical Keyboard, ""
+heroWidget5, Listed 17 minutes ago, ""
+heroWidget6, Listed 17 minutes ago, ""
+dealHunters, Deal Hunters, ""
+informWidget, Real-time Alerts, ""
+tools, Powerful Tools for , ""
+informFooter, Get instant notifications when items matching your criteria are listed. Be the first to snag that deal., ""
+informFooter2, Create complex filters with multiple conditions. Filter by price, condition, seller rating, and more., ""
+informFooter3, See historical price data and trends to identify the best buying and selling opportunities., ""
+informWidget2, Advanced Filters, ""
+informWidget3, Market Analysis, ""
+how, How, ""
+works, Works, ""
+createFiler, Create Your Filters, ""
+custumFilter, Set up custom filters for the items you're looking for. Specify price ranges, keywords, and conditions., ""
+notif, Get Notified, ""
+revInst, Receive instant alerts when matching items are listed. Choose from email, discord, or push notifications., ""
+bs, Buy & Save, ""
+befirst, Be the first to purchase underpriced items and save money on things you want , ""
+whatour,What Our, ""
+usersay,Users Say, ""
+vinCol,Vintage Collector, ""
+vinColDesc,"NimDing has completely changed how I source vintage items. I've found rare pieces at 60% below market value because I was notified the moment they were listed."
+resSeller, Reseller
+resellerDesc,"I've saved $3,000 in just three months using NimDing. The advanced filters let me zero in on exactly what I'm looking for, and the real-time alerts give me the edge over other buyers.", ""
+simpleTran,Simple, Transparent, ""
+price,Pricing, ""
+actfil,3 active filters, ""
+pushNotif,Email, Discord & push notifications,""
+30delay,30 minute delay
+getStarted,Get Started, ""
+mospol,Most Popular
+20act,20 active filters
+10delay,Within 10 minute delay
+500act,500 active filters
+12del,1-2 minute delay
+priceCalc,Price calculation
+soon,Coming soon
+ready,Ready to Start Finding Deals?
+joint,Join thousands of smart shoppers and resellers who are saving money and making profits with DealAlert.
+joinno,No credit card required. Start with our free plan today.
+smart,The smart way to find deals and make profits on online marketplaces.
+privacy,Privacy
+terms,Terms
+rights,© 2025 Coflnet. All rights reserved.
+dash,Dashboard
+monitor,Monitor your auction filters and notifications
+create,Create Filter
+act,Active Filters
+totalM,Total Matched Auctions
+apr,Auctions per hour
+recen,Recent Matches
+topF,Top Filters
+notChan,Notification Channels
+con2Chan,Connected to 2 channels
+email,Email
+webp,Web Push
+browNot,Browser notifications
+setup,Setup Required
+welcom,Welcome to ANE
+signinAc,Sign in to your account
+cwg,Continue with Google
+moreOpt,More options coming soon
+tos,Terms of Service
+pp,Privacy Policy
+sellSoul,By signing in, you agree to our 
+and,and
+dhac,Don't have an account?
+signup,Sign up
+registerHead,Start tracking auctions today
+signupGoog,Sign up with Google
+already,Already have an account? 
+signinNormal,Sign in
+createAcco, Create Account
+filt,Filters
+manFilt,Manage your auction search filters
+youFilt,Your Filters
+backFilt,Back to filters
+crflt,Create Filter
+editFilt,Edit Filter
+setnew,Set up a new auction search filter
+setUp,Update your existing filter
+filterName, filter-name
+nameEg,e.g., Photography Equipment
+filName,Filter Name
+market,Marketplace
+selcMark,Select a marketplace
+srchval,search-value
+srchPlace,e.g., Camera
+srchVal,Search Value
+kewor,KeyWords
+addKey,Add keywords that describe what you're looking for
+add,Add
+blackke,Blacklist Keywords
+tobla, to blacklist?
+conf,Confirm
+canc,Cancel
+addblak,Add keywords to exclude from search results
+priceRan,Price Range
+totalCost,Total Cost
+maxCo,Max cost after all fees and taxes
+del, Delete
+confdel,Are you sure you want to delete this item? This action cannot be undone.
+cofdelt,Confirm Deletion
+radi,Search radius around you in KM (requires zip code)
+searradi,Search Radius
+zip,Zip-code
+yourZip,Your Zip Code
+comsel,Commercial Seller
+oncomsel,Only show commercial sellers
+filbus,Filter listings from business accounts
+seanoE,Search radius does not work with Ebay
+notiChan,Notification Channels
+none,None
+noNot,Don't send any notifications
+emailTe,Send notifications to your email address
+enterEma,Enter your email address
+discrdNo,Send notifications to your Discord channel
+discordWeb,Enter Discord webhook URL
+webPush,Web Push
+sendBrow,Send browser push notifications

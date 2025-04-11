@@ -79,7 +79,6 @@ export const useFilterStore = defineStore("filter", () => {
         body: filterToCreate as any
       })
 
-      console.log(`filters: ${JSON.stringify(filters)}`)
     } catch (e) {
       console.error("Error adding filter", e);
       throw e;

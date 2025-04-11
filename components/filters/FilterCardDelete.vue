@@ -16,7 +16,7 @@
             @click.stop>
             <div class="flex items-center justify-between mb-5">
               <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-                Confirm Deletion
+                {{ $t('cofdelt') }}
               </h3>
               <button @click="isModalOpen = false" class="text-gray-400 hover:text-gray-500 focus:outline-none">
                 <Icon name="x" class="w-5 h-5" />
@@ -25,18 +25,18 @@
 
             <div class="mb-6">
               <p class="text-gray-600 dark:text-gray-300">
-                Are you sure you want to delete this item? This action cannot be undone.
+                {{ $t('confdel') }}
               </p>
             </div>
 
             <div class="flex justify-end space-x-3">
               <button @click="isModalOpen = false"
                 class="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md transition-colors">
-                Cancel
+                {{ $t('canc') }}
               </button>
               <button @click="deleteFilterId"
                 class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors">
-                Delete
+                {{ $t('del') }}
               </button>
             </div>
           </div>

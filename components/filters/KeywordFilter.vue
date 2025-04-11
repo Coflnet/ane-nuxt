@@ -1,6 +1,6 @@
 <template>
   <div>
-    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Keywords</label>
+    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ $t('kewor') }}</label>
     <div
       class="flex flex-wrap items-center gap-2 p-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700">
       <div v-for="(keyword, index) in filter.keywords" :key="index"
@@ -18,8 +18,7 @@
           class="w-full px-3 py-1 border-0 bg-transparent text-slate-900 dark:text-white focus:outline-none focus:ring-0" />
       </div>
     </div>
-    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Add keywords that describe what you're looking
-      for</p>
+    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ $t('addKey') }}</p>
   </div>
 
 </template>

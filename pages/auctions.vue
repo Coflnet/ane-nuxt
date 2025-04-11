@@ -2,8 +2,8 @@
   <div class="overflow-auto min-h-[100vh] max-h-[calc(100vh-4rem)]" ref="container">
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
       <div>
-        <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Matched Auctions</h1>
-        <p class="mt-2 text-slate-500 dark:text-slate-400">Auctions that match your filters</p>
+        <h1 class="text-3xl font-bold text-slate-900 dark:text-white">{{ $t('matchAuc') }}</h1>
+        <p class="mt-2 text-slate-500 dark:text-slate-400">{{ $t('aucFil') }}</p>
       </div>
     </div>
 
@@ -17,7 +17,7 @@
                 :class="auction.image == '' ? 'hidden' : ''" />
               <div :class="auction.image == '' ? '' : 'hidden'" class="h-48 items-center flex flex-col justify-center">
                 <SearchXIcon class="w-16 h-16 text-slate-400 mx-auto mb-4 mt-3" />
-                <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-1">This auction contains no image</h3>
+                <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-1">{{ $t('noImg') }}</h3>
 
               </div>
               <div class="absolute top-2 right-2">
@@ -34,12 +34,12 @@
               </div>
 
               <div class="flex items-center justify-between mb-3">
-                <p class="font-bold text-xl text-slate-900 dark:text-white">{{ auction.price }}</p>
+                <p class="font-bold text-xl text-slate-900 dark:text-white">${{ auction.price }}</p>
               </div>
 
               <div class="flex items-center justify-between pt-3 border-t border-slate-200 dark:border-slate-700">
                 <div>
-                  <span class="text-sm text-slate-500 dark:text-slate-400">Matched filter:</span>
+                  <span class="text-sm text-slate-500 dark:text-slate-400">{{ $t('matchFilter') }}</span>
                   <span class="ml-1 text-sm font-medium text-indigo-600 dark:text-indigo-400">{{ auction.matchedAt
                     }}</span>
                 </div>
@@ -55,12 +55,12 @@
 
         <div v-if="loadedAuctions.length === 0 && !loading" class="py-12 text-center">
           <SearchXIcon class="w-16 h-16 text-slate-400 mx-auto mb-4" />
-          <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-1">No auctions found</h3>
-          <p class="text-slate-500 dark:text-slate-400">Try adjusting your filters or check back later</p>
+          <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-1">{{ $t('noAu') }}</h3>
+          <p class="text-slate-500 dark:text-slate-400">{{ $t('filAdj') }}</p>
         </div>
 
         <div v-if="loading" class="text-center text-sm text-slate-500 py-6">
-          Loading more auctions...
+          {{ $t('loadmo') }}
         </div>
       </div>
     </div>

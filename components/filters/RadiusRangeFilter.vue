@@ -2,15 +2,17 @@
   <div class="grid grid-cols-2 md:grid-cols-2 ">
     <div class="flex flex-row w-full gap-x-8 pr-8">
       <div class="w-full ">
-        <label for="search-radius" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Search
-          Radius</label>
+        <label for="search-radius" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+          {{ $t('searradi') }}
+        </label>
         <div class="flex items-center gap-2">
           <input id="search-radius" v-model="filter.searchRadius" type="number" placeholder="e.g., 10" min="0" :class="[
             'w-full px-4 py-2 rounded-lg border bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400',
             radiusError ? 'border-rose-500 dark:border-rose-500' : 'border-slate-300 dark:border-slate-600'
           ]" />
         </div>
-        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Search radius around you in KM (requires zip code)
+        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
+          {{ $t('radi') }}
         </p>
         <p v-if="radiusError" class="mt-1 text-xs text-rose-500">
           {{ radiusErrorMessage }}
@@ -18,28 +20,29 @@
 
       </div>
       <div class="w-full">
-        <label for="zip-code" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Zip-code</label>
+        <label for="zip-code" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ $t('zel') }}
+        </label>
         <div class="flex items-center gap-2">
           <input id="search-radius" v-model="filter.zipcode" type="text" placeholder="e.g., xxxxx" min="0" :class="[
             'w-full px-4 py-2 rounded-lg border bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400',
             radiusError && filter.marketplace != 'ebay' ? 'border-rose-500 dark:border-rose-500' : 'border-slate-300 dark:border-slate-600'
           ]" />
         </div>
-        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Your zip code</p>
+        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ $t('yourZip') }}</p>
       </div>
     </div>
     <div>
-      <label for="commercial-seller"
-        class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Commercial Seller</label>
+      <label for="commercial-seller" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{
+        $t('comsel') }}</label>
       <div
         class="flex items-center h-10 px-4 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700">
         <input id="commercial-seller" v-model="filter.commercialSeller" type="checkbox"
           class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded" />
         <label for="commercial-seller" class="ml-2 text-sm text-slate-900 dark:text-white">
-          Only show commercial sellers
+          {{ $t('oncomsel') }}
         </label>
       </div>
-      <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Filter listings from business accounts</p>
+      <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ $t('filbus') }}</p>
     </div>
   </div>
 </template>

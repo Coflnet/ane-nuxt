@@ -1,7 +1,6 @@
 <template>
   <div>
-    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Blacklist
-      Keywords</label>
+    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ $t('blackke') }}</label>
     <div class="space-y-3">
       <div class="flex items-center gap-2">
         <input v-model="newBlacklist" @keydown.enter.prevent="confirmBlacklist" type="text"
@@ -9,7 +8,7 @@
           class="flex-grow px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400" />
         <button type="button" @click="confirmBlacklist"
           class="px-4 py-2 bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-200 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500 transition-colors">
-          Add
+          {{ $t('add') }}
         </button>
       </div>
 
@@ -17,16 +16,15 @@
       <div v-if="blacklistConfirmation.show"
         class="p-3 bg-slate-100 dark:bg-slate-700 rounded-lg border border-slate-300 dark:border-slate-600">
         <p class="text-sm text-slate-700 dark:text-slate-300 mb-2">
-          Add "<span class="font-medium">{{ blacklistConfirmation.value }}</span>" to blacklist?
-        </p>
+          {{ $t('add') }} "<span class="font-medium">{{ blacklistConfirmation.value }}</span>" {{ $t('tobla') }} </p>
         <div class="flex gap-2">
           <button type="button" @click="addBlacklist"
             class="px-3 py-1 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors text-sm">
-            Confirm
+            {{ $t('conf') }}
           </button>
           <button type="button" @click="cancelBlacklist"
             class="px-3 py-1 bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-200 rounded-md hover:bg-slate-300 dark:hover:bg-slate-500 transition-colors text-sm">
-            Cancel
+            {{ $t('canc') }}
           </button>
         </div>
       </div>
@@ -43,7 +41,8 @@
         </div>
       </div>
     </div>
-    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Add keywords to exclude from search results</p>
+    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ $t('addblak') }}
+    </p>
   </div>
 </template>
 

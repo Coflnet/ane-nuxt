@@ -4,12 +4,11 @@
       <NuxtLink to="/filters"
         class="inline-flex items-center text-sm text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 mb-4">
         <ArrowLeftIcon class="w-4 h-4 mr-1" />
-        Back to filters
+        {{ $t('backFilt') }}
       </NuxtLink>
-      <h1 class="text-3xl font-bold text-slate-900 dark:text-white">{{ isNewFilter ? "Create Filter" : "Edit Filter" }}
+      <h1 class="text-3xl font-bold text-slate-900 dark:text-white">{{ isNewFilter ? $t('crflt') : $t('editFilt') }}
       </h1>
-      <p class="mt-2 text-slate-500 dark:text-slate-400">{{ isNewFilter ? "Set up a new auction search filter"
-        : "Updateyour existing filter" }}</p>
+      <p class="mt-2 text-slate-500 dark:text-slate-400">{{ isNewFilter ? $t('setnew') : $t('setUp') }}</p>
     </div>
 
     <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden">
@@ -17,17 +16,17 @@
         <form @submit.prevent="saveFilter" class="space-y-6">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <AneTextField name="filter-name" placeholder="e.g., Photography Equipment" label="Filter Name"
+              <AneTextField :name="$t('filterName')" :placeholder="$t('nameEg')" :label="$t('filName')"
                 v-model="filter.name" />
             </div>
 
             <div>
-              <label for="marketplace"
-                class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Marketplace</label>
+              <label for="marketplace" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{
+                $t('market') }}</label>
               <select id="marketplace" v-model="filter.marketplace"
                 class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
                 required>
-                <option value="">Select a marketplace</option>
+                <option value="">{{ $t('selcMark') }}</option>
                 <option value="ebay">eBay</option>;
                 <option value="kleinanzeigen">eBay Kleinanzeigen</option>
               </select>
@@ -36,7 +35,7 @@
 
           <!-- Search Value Field -->
           <div>
-            <AneTextField name="search-value" placeholder="e.g., Camera" label="Search Value"
+            <AneTextField :name="$t('srchval')" :placeholder="$t('srchPlace')" :label="$t('srchVal')"
               v-model="filter.searchValue" />
           </div>
           <FiltersKeywordFilter :filter="filter" />

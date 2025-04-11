@@ -2,20 +2,20 @@
   <div>
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
       <div>
-        <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Dashboard</h1>
-        <p class="mt-2 text-slate-500 dark:text-slate-400">Monitor your auction filters and notifications</p>
+        <h1 class="text-3xl font-bold text-slate-900 dark:text-white">{{ $t('dash') }}</h1>
+        <p class="mt-2 text-slate-500 dark:text-slate-400">{{ $t('monitor') }}</p>
       </div>
       <NuxtLink to="/filters/create"
         class="mt-4 md:mt-0 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center space-x-2">
         <PlusIcon class="w-5 h-5" />
-        <span>Create Filter</span>
+        <span>{{ $t('create') }}</span>
       </NuxtLink>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 ">
       <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-medium text-slate-900 dark:text-white">Active Filters</h3>
+          <h3 class="text-lg font-medium text-slate-900 dark:text-white">{{ $t('act') }}</h3>
           <div class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center">
             <FilterIcon class="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
           </div>
@@ -26,7 +26,7 @@
 
       <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-medium text-slate-900 dark:text-white">Total Matched Auctions</h3>
+          <h3 class="text-lg font-medium text-slate-900 dark:text-white">{{ $t('totalM') }}</h3>
           <div class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
             <TagIcon class="w-5 h-5 text-purple-600 dark:text-purple-400" />
           </div>
@@ -36,7 +36,7 @@
 
       <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-medium text-slate-900 dark:text-white">Auctions per hour</h3>
+          <h3 class="text-lg font-medium text-slate-900 dark:text-white">{{ $t('apr') }}</h3>
           <div class="w-10 h-10 rounded-full bg-rose-100 dark:bg-rose-900 flex items-center justify-center">
             <BellIcon class="w-5 h-5 text-rose-600 dark:text-rose-400" />
           </div>
@@ -47,7 +47,7 @@
 
     <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden mb-8">
       <div class="p-6">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Recent Matches</h2>
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-4">{{ $t('recen') }}</h2>
         <div class="overflow-x-auto">
           <table class="w-full">
             <thead>
@@ -92,7 +92,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Top Filters</h2>
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-4">{{ $t('topF') }}</h2>
         <div class="space-y-4">
           <div v-for="(filter, index) in sortTopFilers()" :key="index" class="flex items-center justify-between">
             <div class="flex items-center space-x-3">
@@ -111,7 +111,7 @@
       </div>
 
       <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Notification Channels</h2>
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-4">{{ $t('notChan') }}</h2>
         <div class="space-y-4">
           <div class="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-700">
             <div class="flex items-center space-x-3">
@@ -120,7 +120,7 @@
               </div>
               <div>
                 <p class="font-medium text-slate-900 dark:text-white">Discord</p>
-                <p class="text-xs text-slate-500 dark:text-slate-400">Connected to 2 channels</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400">{{ $t('con2Chan') }}</p>
               </div>
             </div>
             <div class="flex items-center">
@@ -137,7 +137,7 @@
                 <MailIcon class="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
               </div>
               <div>
-                <p class="font-medium text-slate-900 dark:text-white">Email</p>
+                <p class="font-medium text-slate-900 dark:text-white">{{ $t('email') }}</p>
                 <p class="text-xs text-slate-500 dark:text-slate-400">user@example.com</p>
               </div>
             </div>
@@ -155,14 +155,14 @@
                 <BellIcon class="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
               </div>
               <div>
-                <p class="font-medium text-slate-900 dark:text-white">Web Push</p>
-                <p class="text-xs text-slate-500 dark:text-slate-400">Browser notifications</p>
+                <p class="font-medium text-slate-900 dark:text-white">{{ $t('webp') }}</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400">{{ $t('browNot') }}</p>
               </div>
             </div>
             <div class="flex items-center">
               <span
                 class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
-                Setup Required
+                {{ $t('setup') }}
               </span>
             </div>
           </div>
@@ -217,7 +217,6 @@ async function loadStats() {
   getAverageMatchesPerHour(listingStore.recentMatches)
 
   var matches = 0;
-  console.log(filterStore.getUserFilters)
   filterStore.getUserFilters.map((i) => {
     matches += i.matchCount ?? 0
     if (!topFilters.value.hasOwnProperty(i.id ?? "")) {

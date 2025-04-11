@@ -2,8 +2,8 @@
   <div>
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
       <div>
-        <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Filters</h1>
-        <p class="mt-2 text-slate-500 dark:text-slate-400">Manage your auction search filters</p>
+        <h1 class="text-3xl font-bold text-slate-900 dark:text-white">{{ $t('filt') }}</h1>
+        <p class="mt-2 text-slate-500 dark:text-slate-400">{{ $t('manFilt') }}</p>
       </div>
       <FiltersCreateFilterButton />
     </div>
@@ -11,7 +11,7 @@
     <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden mb-6">
       <div class="p-6">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-          <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-4 md:mb-0">Your Filters</h2>
+          <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-4 md:mb-0">{{ $t('yourFilt') }}</h2>
           <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 hidden">
             <div class="relative">
               <SearchIcon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 dark:text-slate-500"

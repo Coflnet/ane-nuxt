@@ -5,16 +5,30 @@ export default defineNuxtConfig({
     compatibilityVersion: 4,
   },
   devtools: { enabled: true },
-  modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt', 'nuxt-vuefire', "@nuxt/icon", "@hey-api/nuxt"],
-
-  tailwindcss: { exposeConfig: true },
-
-  ssr: true,
-
+  modules: [
+    '@nuxtjs/tailwindcss',
+    '@pinia/nuxt',
+    'nuxt-vuefire',
+    "@nuxt/icon",
+    "nuxt-translation-manager",
+    '@nuxtjs/i18n',
+    "@hey-api/nuxt",
+  ],
   heyApi: {
     config: {
       input: "https://ane.coflnet.com/api/openapi/v1/openapi.json"
     }
+  },
+
+  ssr: true,
+
+  tailwindcss: { exposeConfig: true },
+
+  i18n: {
+    locales: [{ code: 'en', name: 'English', file: 'en.json' },
+    { code: 'de', name: 'Deutsch', file: 'de.json' }],
+    defaultLocale: 'en',
+    langDir: "../locales/",
   },
 
   vuefire: {
