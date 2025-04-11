@@ -1,41 +1,41 @@
 Key,"en",de
-signup,Sign up Free, ""
-landingHero1, Never Miss a, ""
+signup,Sign up Free,
+landingHero1, Never Miss a,
 landingHero2, Deal, ""
 landingHero3, Again, ""
-landingFooter, Create custom alerts and filters for eBay and other marketplaces. Buy items below market value, ""
-heroWidget1, New Alert Match!, ""
-heroWidget2, Vintage Camera Lens, ""
-heroWidget3, Listed 3 minutes ago, ""
-heroWidget4, Mechanical Keyboard, ""
-heroWidget5, Listed 17 minutes ago, ""
-heroWidget6, Listed 17 minutes ago, ""
-dealHunters, Deal Hunters, ""
-informWidget, Real-time Alerts, ""
-tools, Powerful Tools for , ""
-informFooter, Get instant notifications when items matching your criteria are listed. Be the first to snag that deal., ""
-informFooter2, Create complex filters with multiple conditions. Filter by price, condition, seller rating, and more., ""
-informFooter3, See historical price data and trends to identify the best buying and selling opportunities., ""
-informWidget2, Advanced Filters, ""
-informWidget3, Market Analysis, ""
-how, How, ""
-works, Works, ""
-createFiler, Create Your Filters, ""
-custumFilter, Set up custom filters for the items you're looking for. Specify price ranges, keywords, and conditions., ""
-notif, Get Notified, ""
-revInst, Receive instant alerts when matching items are listed. Choose from email, discord, or push notifications., ""
-bs, Buy & Save, ""
+landingFooter,Create custom alerts and filters for eBay and other marketplaces. Buy items below market value, ""
+heroWidget1,New Alert Match!, ""
+heroWidget2,Vintage Camera Lens, ""
+heroWidget3,Listed 3 minutes ago, ""
+heroWidget4,Mechanical Keyboard, ""
+heroWidget5,Listed 17 minutes ago, ""
+heroWidget6,Listed 17 minutes ago, ""
+dealHunters,Deal Hunters, ""
+informWidget,Real-time Alerts, ""
+tools,Powerful Tools for , ""
+informFooter,Get instant notifications when items matching your criteria are listed. Be the first to snag that deal., ""
+informFooter2,Create complex filters with multiple conditions. Filter by price condition seller rating and more., ""
+informFooter3,See historical price data and trends to identify the best buying and selling opportunities., ""
+informWidget2,Advanced Filters, ""
+informWidget3,Market Analysis, ""
+how,How, ""
+works,Works, ""
+createFiler,Create Your Filters, ""
+custumFilter,Set up custom filters for the items you're looking for. Specify price ranges keywords and conditions., ""
+notif,Get Notified, ""
+revInst,Receive instant alerts when matching items are listed. Choose from email discord or push notifications., ""
+bs,Buy & Save, ""
 befirst, Be the first to purchase underpriced items and save money on things you want , ""
 whatour,What Our, ""
 usersay,Users Say, ""
 vinCol,Vintage Collector, ""
 vinColDesc,"NimDing has completely changed how I source vintage items. I've found rare pieces at 60% below market value because I was notified the moment they were listed."
 resSeller, Reseller
-resellerDesc,"I've saved $3,000 in just three months using NimDing. The advanced filters let me zero in on exactly what I'm looking for, and the real-time alerts give me the edge over other buyers.", ""
-simpleTran,Simple, Transparent, ""
+resellerDesc,"I've saved $3000 in just three months using NimDing. The advanced filters let me zero in on exactly what I'm looking for and the real-time alerts give me the edge over other buyers.", ""
+simpleTran,Simple Transparent, ""
 price,Pricing, ""
 actfil,3 active filters, ""
-pushNotif,Email, Discord & push notifications,""
+pushNotif,Email Discord & push notifications,""
 30delay,30 minute delay
 getStarted,Get Started, ""
 mospol,Most Popular
@@ -72,7 +72,7 @@ cwg,Continue with Google
 moreOpt,More options coming soon
 tos,Terms of Service
 pp,Privacy Policy
-sellSoul,By signing in, you agree to our 
+sellSoul,By signing in you agree to our 
 and,and
 dhac,Don't have an account?
 signup,Sign up
@@ -95,7 +95,7 @@ filName,Filter Name
 market,Marketplace
 selcMark,Select a marketplace
 srchval,search-value
-srchPlace,e.g., Camera
+srchPlace,e.g. Camera
 srchVal,Search Value
 kewor,KeyWords
 addKey,Add keywords that describe what you're looking for
