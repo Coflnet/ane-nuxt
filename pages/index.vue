@@ -77,7 +77,7 @@
     <!-- Features Section -->
     <section id="features" class="container mx-auto px-6 py-16 md:py-24">
       <h2 class="text-3xl md:text-4xl font-bold text-center mb-16">
-        {{ $t('tools') }}<span class="text-slate-400">{{ $t('dealHunters') }}</span>
+        {{ $t('tools') }} <span class="text-slate-400">{{ $t('dealHunters') }}</span>
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 
