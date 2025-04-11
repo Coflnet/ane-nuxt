@@ -66,5 +66,4 @@ async function loginWithGoogle() {
   }
 }
 
-onMounted(() => console.log(userStore.getUser))
 </script>

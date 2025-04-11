@@ -67,12 +67,4 @@ async function loginWithGoogle() {
   }
 }
 
-function signinRedir() {
-  if (userStore.isLoggedIn) {
-    navigateTo("/overview")
-  }
-}
-
-onMounted(signinRedir())
-
 </script>
