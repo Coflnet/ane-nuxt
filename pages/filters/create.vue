@@ -163,6 +163,9 @@ async function loadEditParam() {
         case 'SearchTerm':
           filter.value.searchValue = item.value ?? ""
           break
+        case 'TotalCost':
+          filter.value.maxPrice = Number(item.value)
+          break
       }
     })
   } catch (e) {
@@ -192,7 +195,6 @@ async function saveFilter() {
     filters: await handleFilters()
   }
 
-
   await filterStore.saveFilter(filterToCreate)
   navigateTo("/overview")
 }
@@ -219,8 +221,12 @@ async function handleFilters(): Promise<{ name: string; value: any }[]> {
   }
 
   filters.push({ name: 'SearchTerm', value: rawFilter.searchValue })
-  filters.push({ name: "ContainsKeyWord", value: JSON.stringify(rawFilter.keywords) });
-  filters.push({ name: "NotContainsKeyWord", value: JSON.stringify(rawFilter.blacklist) });
+  if (rawFilter.maxPrice != 0) {
+    filters.push({ name: 'TotalCost', value: rawFilter.maxPrice })
+  }
+
+  filters.push({ name: "ContainsKeyWord", value: rawFilter.keywords.join(',') });
+  filters.push({ name: "NotContainsKeyWord", value: rawFilter.blacklist.join(',') });
   return filters
 }
 

@@ -20,7 +20,7 @@
 
       </div>
       <div class="w-full">
-        <label for="zip-code" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ $t('zel') }}
+        <label for="zip-code" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ $t('zip') }}
         </label>
         <div class="flex items-center gap-2">
           <input id="search-radius" v-model="filter.zipcode" type="text" placeholder="e.g., xxxxx" min="0" :class="[

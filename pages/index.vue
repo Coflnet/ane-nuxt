@@ -197,7 +197,7 @@
             </div>
           </div>
           <p class="text-slate-200">
-            {{ $t('resSeller') }}
+            {{ $t('resellerDesc') }}
           </p>
         </div>
       </div>
@@ -340,9 +340,9 @@
                 <li><a href="#" class="text-slate-300 hover:text-white transition">Contact</a></li>
               </ul>
             </div>
-            <div class="flex flex-row">
+            <div>
               <h4 class=" font-bold mb-4">Legal</h4>
-              <ul class="space-y-2 flex">
+              <ul class="space-y-2 ">
                 <li><a href="https://coflnet.com/privacy" class="text-slate-300 hover:text-white transition">{{
                   $t('privacy') }}</a>
                 </li>

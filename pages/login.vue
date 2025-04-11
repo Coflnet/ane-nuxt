@@ -30,8 +30,9 @@
           </div>
 
           <div class="text-center text-sm text-slate-500 dark:text-slate-400">
-            <p> {{ $t('sellSoul') }}<a href="#" class="text-indigo-600 dark:text-indigo-400 hover:underline">{{
-              $t('tos') }}</a> {{ $t('and') }} <a href="#"
+            <p> {{ $t('sellSoul') }}<a href="https://coflnet.com/terms-of-service"
+                class="text-indigo-600 dark:text-indigo-400 hover:underline">{{
+                  $t('tos') }}</a> {{ $t('and') }} <a href="https://coflnet.com/privacy"
                 class="text-indigo-600 dark:text-indigo-400 hover:underline"> {{
                   $t('pp') }}</a>.</p>
           </div>

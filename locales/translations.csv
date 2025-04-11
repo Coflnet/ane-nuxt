@@ -72,9 +72,9 @@ cwg,Continue with Google
 moreOpt,More options coming soon
 tos,Terms of Service
 pp,Privacy Policy
-sellSoul,"By signing in, you agree to our",
+sellSoul,"By signing in, you agree to our ",
 and,and
-dhac,Don't have an account?
+dhac,Don't have an account? ,
 signup,Sign up
 registerHead,Start tracking auctions today
 signupGoog,Sign up with Google
@@ -83,7 +83,7 @@ signinNormal,Sign in
 createAcco, Create Account
 filt,Filters
 manFilt,Manage your auction search filters
-youFilt,Your Filters
+yourFilt,Your Filters
 backFilt,Back to filters
 crflt,Create Filter
 editFilt,Edit Filter
@@ -128,3 +128,7 @@ discrdNo,Send notifications to your Discord channel
 discordWeb,Enter Discord webhook URL
 webPush,Web Push
 sendBrow,Send browser push notifications
+matchAuc,Matched Auctions
+aucFil,Auctions that mached your filters
+noAu,No Auctions found
+filAdj,Try adjusting your filter settings
