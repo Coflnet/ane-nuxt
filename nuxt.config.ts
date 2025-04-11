@@ -1,4 +1,7 @@
+import i18nConfig from "./i18n.config";
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
+
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   future: {
@@ -18,18 +21,20 @@ export default defineNuxtConfig({
     config: {
       input: "https://ane.coflnet.com/api/openapi/v1/openapi.json"
     }
+
   },
-
   ssr: true,
-
   tailwindcss: { exposeConfig: true },
 
-  i18n: {
-    locales: [{ code: 'en', name: 'English', file: 'en.json' },
-    { code: 'de', name: 'Deutsch', file: 'de.json' }],
+  i18n: ({
+    locales: [
+      { code: 'en', name: 'English', file: 'en.json' },
+      { code: 'de', name: 'Deutsch', file: 'de.json' }
+    ],
     defaultLocale: 'en',
-    langDir: "../locales/",
-  },
+    langDir: "../locales/", // Adjust path if your config file is in a subdirectory
+    lazy: true,
+  }),
 
   vuefire: {
     config: {
