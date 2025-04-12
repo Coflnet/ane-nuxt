@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex items-center p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/50">
+    class="flex items-center p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/50 hidden">
     <div class="flex items-center h-5">
       <input id="push-notification" v-model="filter.notificationType" type="radio" value="FireBase"
         class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300" />

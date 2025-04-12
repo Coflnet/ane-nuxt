@@ -149,7 +149,7 @@
             </div>
           </div>
 
-          <div class="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-700">
+          <div class="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-700 hidden">
             <div class="flex items-center space-x-3">
               <div class="w-10 h-10 rounded-md bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center">
                 <BellIcon class="w-5 h-5 text-indigo-600 dark:text-indigo-400" />

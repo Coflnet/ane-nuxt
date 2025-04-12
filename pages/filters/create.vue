@@ -26,8 +26,8 @@
               <select id="marketplace" v-model="filter.marketplace"
                 class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
                 required>
-                <option value="">{{ $t('selcMark') }}</option>
-                <option value="ebay">eBay</option>;
+                <option value="all">{{ $t('allMarket') }}</option>
+                <option value="Ebay">eBay</option>;
                 <option value="kleinanzeigen">eBay Kleinanzeigen</option>
               </select>
             </div>
@@ -93,7 +93,7 @@ const isNewFilter = computed(() => {
 
 const filter = ref({
   name: '',
-  marketplace: '',
+  marketplace: 'all',
   searchValue: '',
   totalCost: 0,
   zipcode: '',
@@ -155,7 +155,7 @@ async function loadEditParam() {
           break
         }
         case 'IncludePlatforms':
-          filter.value.marketplace = item.value!.toLowerCase() === 'ebay' ? 'ebay' : 'kleinanzeigen'
+          filter.value.marketplace = item.value!.toLowerCase()
           break
         case 'CommercialSeller':
           filter.value.commercialSeller = Boolean(item.value)
@@ -187,7 +187,7 @@ async function saveFilter() {
   }
 
   const filterToCreate = {
-    name: rawFilter.name,
+    name: rawFilter.name == "" ? rawFilter.searchValue : rawFilter.name,
     userId: '',
     id: filter.value.id,
     target: target,
@@ -206,10 +206,10 @@ async function handleFilters(): Promise<{ name: string; value: any }[]> {
   if (rawFilter.minPrice != 0 || rawFilter.maxPrice || rawFilter.maxPrice == 0) {
     filters.push({ name: "PriceRange", value: `${Number(rawFilter.minPrice)}-${Number(rawFilter.maxPrice)}` })
   }
-  if (rawFilter.marketplace != "") {
+  if (rawFilter.marketplace != "all") {
     filters.push({
       name: "IncludePlatforms",
-      value: rawFilter.marketplace == 'ebay' ? 'Ebay' : 'Kleinanzeigen'
+      value: rawFilter.marketplace
     })
   }
   if (rawFilter.commercialSeller) {
