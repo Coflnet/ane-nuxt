@@ -241,8 +241,8 @@ function getAverageMatchesPerHour(matches: MatchItem[]) {
   var timestamps = matches.map(m => new Date(m.matchedAt));
 
   timestamps.sort((a, b) => a.getTime() - b.getTime());
-  const first = timestamps[0].getTime();
-  const last = timestamps[timestamps.length - 1].getTime();
+  const first = timestamps[0]!.getTime();
+  const last = timestamps[timestamps.length - 1]!.getTime();
 
   const hours = (last - first) / (1000 * 60 * 60);
   const safeHours = hours == 0 ? 1 : hours;

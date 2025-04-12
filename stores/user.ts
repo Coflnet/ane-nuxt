@@ -167,6 +167,7 @@ export const useUserStore = defineStore("user", () => {
       console.log(response)
       token.value = response.authToken ?? ""
 
+      isAuthenticated.value = true
 
       return { success: true };
     } catch (err) {
