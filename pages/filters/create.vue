@@ -222,7 +222,7 @@ async function handleFilters(): Promise<{ name: string; value: any }[]> {
 
   filters.push({ name: 'SearchTerm', value: rawFilter.searchValue })
   if (rawFilter.totalCost != 0) {
-    filters.push({ name: 'TotalCost', value: rawFilter.totalCost })
+    filters.push({ name: 'TotalCost', value: `${rawFilter.totalCost}` })
   }
 
   filters.push({ name: "ContainsKeyWord", value: rawFilter.keywords.join(',') });
