@@ -235,10 +235,11 @@ async function handleSearchRadius(): Promise<[string, string]> {
   try {
     const response = await fetch('https://ipapi.co/json/');
     const data = await response.json();
-    // const url = `https://nominatim.openstreetmap.org/search?postalcode=${filter.value.zipcode}&country=${data.country_name}&format=json`;
-    // const response2 = await fetch(url);
-    // const data2 = await response2.json();
-    return [data.latitude, data.longitude]
+    const url = `https://nominatim.openstreetmap.org/search?postalcode=${filter.value.zipcode}&country=${data.country_name}&format=json`;
+    const response2 = await fetch(url);
+    const data2 = await response2.json();
+    console.log(data2)
+    return [data2[0].lat, data2[0].lon]
   } catch (error) {
     console.error('Error fetching country:', error);
   }
