@@ -15,4 +15,5 @@ COPY . .
 # Build the Nuxt app
 RUN pnpm run build
 
-CMD ["pnpm", "run", "dev", "--host"]
+CMD ["node", ".output/server/index.mjs"]
+
