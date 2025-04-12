@@ -138,15 +138,22 @@ async function loadEditParam() {
     activeFilter.filters.forEach(item => {
       switch (item.name) {
         case 'Radius': {
-          const [_lat, _lon, radius] = item.value?.split?.(';') ?? ""
+          const [_lat, _lon, radius, zipcode] = item.value?.split?.(';') ?? ""
           filter.value.searchRadius = Number(radius ?? 0)
+          filter.value.zipcode = zipcode ?? ""
           break
         }
         case 'ContainsKeyWord':
-          filter.value.keywords.push(item?.value!)
+          if (item.value == "") break;
+          item?.value?.split(',').forEach((keyword: string) => {
+            filter.value.keywords.push(keyword)
+          })
           break
         case 'NotContainsKeyWord':
-          filter.value.blacklist.push(item.value!)
+          if (item.value == "") break;
+          item?.value?.split(',').forEach((keyword: string) => {
+            filter.value.blacklist.push(keyword)
+          })
           break
         case 'PriceRange': {
           const [min, max] = item.value!.split('-')
@@ -217,7 +224,7 @@ async function handleFilters(): Promise<{ name: string; value: any }[]> {
   }
   if (rawFilter.zipcode != '' && rawFilter.marketplace != 'ebay') {
     const location = await handleSearchRadius()
-    filters.push({ name: 'Radius', value: `${location[0]};${location[1]};${rawFilter.searchRadius}` })
+    filters.push({ name: 'Radius', value: `${location[0]};${location[1]};${rawFilter.searchRadius};${rawFilter.zipcode}` })
   }
 
   filters.push({ name: 'SearchTerm', value: rawFilter.searchValue })
@@ -238,7 +245,6 @@ async function handleSearchRadius(): Promise<[string, string]> {
     const url = `https://nominatim.openstreetmap.org/search?postalcode=${filter.value.zipcode}&country=${data.country_name}&format=json`;
     const response2 = await fetch(url);
     const data2 = await response2.json();
-    console.log(data2)
     return [data2[0].lat, data2[0].lon]
   } catch (error) {
     console.error('Error fetching country:', error);
