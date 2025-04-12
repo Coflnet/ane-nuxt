@@ -133,3 +133,5 @@ aucFil,Auctions that mached your filters
 noAu,No Auctions found
 filAdj,Try adjusting your filter settings
 allMarket,All Marketplaces
+invalidDiscordWebhook,Please enter a valid Discord webhook URL
+invalidEmail,Please enter a valid email address

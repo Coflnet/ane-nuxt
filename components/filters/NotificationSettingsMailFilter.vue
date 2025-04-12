@@ -16,18 +16,57 @@
         </div>
       </div>
       <div v-if="filter.notificationType === 'Email'" class="mt-3 ml-11">
-        <input v-model="filter.notificationTarget" type="email" :placeholder="$t('enterEma')"
-          class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400" />
+        <input v-model="emailAddress" type="email" :placeholder="$t('enterEma')"
+          class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+          @blur="validateEmail" />
+        <p v-if="!isValidEmail && emailAddress" class="mt-1 text-sm text-red-500">
+          {{ $t('invalidEmail') || 'Please enter a valid email address' }}
+        </p>
       </div>
     </label>
   </div>
 </template>
 
 <script setup lang='ts'>
+import { ref, watch } from 'vue'
+import { MailIcon } from 'lucide-vue-next'
+
 const props = defineProps({
   filter: {
     type: Object,
     required: true
   }
 })
+
+const emailAddress = ref(props.filter.notificationTarget || '')
+const isValidEmail = ref(true)
+
+const validateEmail = () => {
+  if (!emailAddress.value) {
+    isValidEmail.value = true
+    return
+  }
+  const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+  isValidEmail.value = emailPattern.test(emailAddress.value)
+
+  if (isValidEmail.value) {
+    props.filter.notificationTarget = emailAddress.value
+  }
+}
+
+watch(emailAddress, (newValue) => {
+  if (newValue) {
+    validateEmail()
+  } else {
+    isValidEmail.value = true
+    props.filter.notificationTarget = ''
+  }
+})
+
+watch(() => props.filter.notificationTarget, (newValue) => {
+  if (newValue !== emailAddress.value) {
+    emailAddress.value = newValue || ''
+    validateEmail()
+  }
+}, { immediate: true })
 </script>

@@ -17,18 +17,57 @@
         </div>
       </div>
       <div v-if="props.filter.notificationType === 'DiscordWebhook'" class="mt-3 ml-11">
-        <input v-model="props.filter.notificationTarget" type="text" :placeholder="$t('discordWeb')"
-          class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400" />
+        <input v-model="webhookUrl" type="text" :placeholder="$t('discordWeb')"
+          class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+          @blur="validateWebhook" />
+        <p v-if="!isValidWebhook && webhookUrl" class="mt-1 text-sm text-red-500">
+          {{ $t('invalidDiscordWebhook') || 'Please enter a valid Discord webhook URL' }}
+        </p>
       </div>
     </label>
   </div>
 </template>
 
 <script setup lang='ts'>
+import { ref, watch } from 'vue'
+import { MessageSquareIcon } from 'lucide-vue-next'
+
 const props = defineProps({
   filter: {
     type: Object,
     required: true
   }
 })
+
+const webhookUrl = ref(props.filter.notificationTarget || '')
+const isValidWebhook = ref(true)
+
+const validateWebhook = () => {
+  if (!webhookUrl.value) {
+    isValidWebhook.value = true
+    return
+  }
+  const discordWebhookPattern = /^https:\/\/(discord\.com|discordapp\.com)\/api\/webhooks\/[0-9]{17,19}\/[a-zA-Z0-9_-]+$/
+  isValidWebhook.value = discordWebhookPattern.test(webhookUrl.value)
+
+  if (isValidWebhook.value) {
+    props.filter.notificationTarget = webhookUrl.value
+  }
+}
+
+watch(webhookUrl, (newValue) => {
+  if (newValue) {
+    validateWebhook()
+  } else {
+    isValidWebhook.value = true
+    props.filter.notificationTarget = ''
+  }
+})
+
+watch(() => props.filter.notificationTarget, (newValue) => {
+  if (newValue !== webhookUrl.value) {
+    webhookUrl.value = newValue || ''
+    validateWebhook()
+  }
+}, { immediate: true })
 </script>

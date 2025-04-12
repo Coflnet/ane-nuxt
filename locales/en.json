@@ -60,6 +60,8 @@
   "informWidget": "Real-time Alerts",
   "informWidget2": "Advanced Filters",
   "informWidget3": "Market Analysis",
+  "invalidDiscordWebhook": "Please enter a valid Discord webhook URL",
+  "invalidEmail": "Please enter a valid email address",
   "joinno": "No credit card required. Start with our free plan today.",
   "joint": "Join thousands of smart shoppers and resellers who are saving money and making profits with DealAlert.",
   "kewor": "KeyWords",
