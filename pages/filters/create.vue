@@ -44,7 +44,6 @@
           <div v-for="(option, index) in filterStore.getFilterOptions">
 
             <!-- Price Range -->
-            <FiltersPriceRangeFilter :filter="filter" v-if="option.name == 'TotalCost'" />
 
             <!-- Radius -->
             <FiltersRadiusRangeFilter :filter="filter" v-if="option.name == 'Radius'" />
@@ -247,7 +246,7 @@ async function handleFilters(): Promise<{ name: string; value: any }[]> {
   if (rawFilter.keywords.length != 0)
     filters.push({ name: "ContainsKeyWord", value: rawFilter.keywords.join(',') });
 
-  if (rawFilter.blacklist.length != 0)
+  if (rawFilter.blacklist.length == 0)
     filters.push({ name: "NotContainsKeyWord", value: rawFilter.blacklist.join(',') });
   return filters
 }

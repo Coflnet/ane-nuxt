@@ -21,6 +21,7 @@
       </div>
     </div>
 
+
     <div>
       <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ $t('totalCost') }}</label>
       <div class="flex items-center space-x-2">
