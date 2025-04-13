@@ -67,12 +67,6 @@ export const useFilterStore = defineStore("filter", () => {
 
       const apiToken = `Bearer ${userStore.token}`;
 
-      await testFilter({
-        composable: '$fetch',
-        headers: { Authorization: apiToken },
-        body: filterToCreate as any
-      });
-
       await addFilter({
         composable: '$fetch',
         headers: { Authorization: apiToken },

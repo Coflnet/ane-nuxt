@@ -3,6 +3,7 @@
     class="flex items-start p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/50">
     <div class="flex items-center h-5">
       <input id="email-notification" v-model="filter.notificationType" type="radio" value="Email"
+        @click="filter.notificationTarget = userStore.notificationSettings.email.address"
         class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300" />
     </div>
     <label for="email-notification" class="ml-3 flex flex-col">
@@ -30,6 +31,8 @@
 <script setup lang='ts'>
 import { ref, watch } from 'vue'
 import { MailIcon } from 'lucide-vue-next'
+
+const userStore = useUserStore()
 
 const props = defineProps({
   filter: {

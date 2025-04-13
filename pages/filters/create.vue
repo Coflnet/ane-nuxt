@@ -82,6 +82,7 @@ import { ArrowLeftIcon } from 'lucide-vue-next'
 import NotificationSettingsFilter from '~/components/filters/NotificationSettingsFilter.vue';
 
 const filterStore = useFilterStore();
+const userStore = useUserStore();
 
 const route = useRoute()
 
@@ -171,7 +172,8 @@ async function loadEditParam() {
           filter.value.searchValue = item.value ?? ""
           break
         case 'TotalCost':
-          filter.value.maxPrice = Number(item.value)
+          const [min, _max] = item.value!.split('-')
+          filter.value.totalCost = Number(min)
           break
       }
     })
@@ -193,6 +195,14 @@ async function saveFilter() {
     rawFilter.notificationTarget = "-";
   }
 
+  if (rawFilter.notificationType == 'DiscordWebhook') {
+    userStore.notificationSettings.discord.webhookUrl = rawFilter.notificationTarget
+  }
+
+  if (rawFilter.notificationType == 'Email') {
+    userStore.notificationSettings.email.address = rawFilter.notificationTarget
+  }
+
   const filterToCreate = {
     name: rawFilter.name == "" ? rawFilter.searchValue : rawFilter.name,
     userId: '',
@@ -202,7 +212,9 @@ async function saveFilter() {
     filters: await handleFilters()
   }
 
+  console.log(filterToCreate)
   await filterStore.saveFilter(filterToCreate)
+  return;
   navigateTo("/overview")
 }
 
@@ -229,11 +241,14 @@ async function handleFilters(): Promise<{ name: string; value: any }[]> {
 
   filters.push({ name: 'SearchTerm', value: rawFilter.searchValue })
   if (rawFilter.totalCost != 0) {
-    filters.push({ name: 'TotalCost', value: `${rawFilter.totalCost}` })
+    filters.push({ name: 'TotalCost', value: `${rawFilter.totalCost}-${rawFilter.totalCost}` })
   }
 
-  filters.push({ name: "ContainsKeyWord", value: rawFilter.keywords.join(',') });
-  filters.push({ name: "NotContainsKeyWord", value: rawFilter.blacklist.join(',') });
+  if (rawFilter.keywords.length != 0)
+    filters.push({ name: "ContainsKeyWord", value: rawFilter.keywords.join(',') });
+
+  if (rawFilter.blacklist.length != 0)
+    filters.push({ name: "NotContainsKeyWord", value: rawFilter.blacklist.join(',') });
   return filters
 }
 

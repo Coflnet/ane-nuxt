@@ -254,8 +254,8 @@ export const useUserStore = defineStore("user", () => {
   }
 
   async function fetchNotificationSettings() {
-    isLoadingSettings.value = true
 
+    return;
     try {
       // In a real implementation, this would call the API
       // const { data } = await useFetch('/api/user/notification-settings')
