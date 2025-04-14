@@ -112,17 +112,19 @@ async function loginWithGoogle() {
   }
 }
 
-async function aslijhlasjkg() {
+async function checkLogin() {
   const userStore = useUserStore();
   await userStore.loadUser();
-  console.log(userStore.isAuthenticated)
-  console.log(userStore.user)
-  console.log(userStore.isLoggedIn, "lskghjlajg")
+  if (userStore.isAuthenticated)
+    navigateTo("/overview")
+
 }
 
-aslijhlasjkg()
 
 definePageMeta({
   layout: 'landing'
 })
+
+onMounted(checkLogin())
+
 </script>
