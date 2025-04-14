@@ -27,7 +27,9 @@ export default defineNuxtConfig({
   tailwindcss: { exposeConfig: true },
 
   icon: {
-    serverBundle: 'local'
+    serverBundle: {
+      remote: 'jsdelivr', // 'unpkg' or 'github-raw', or a custom function
+    }
   },
 
   i18n: ({
