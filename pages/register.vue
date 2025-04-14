@@ -117,14 +117,12 @@ async function checkLogin() {
   await userStore.loadUser();
   if (userStore.isAuthenticated)
     navigateTo("/overview")
-
 }
-
 
 definePageMeta({
   layout: 'landing'
 })
 
-onMounted(checkLogin())
+onMounted(() => { checkLogin() })
 
 </script>
