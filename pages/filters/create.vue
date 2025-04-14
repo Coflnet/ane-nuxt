@@ -213,7 +213,6 @@ async function saveFilter() {
 
   console.log(filterToCreate)
   await filterStore.saveFilter(filterToCreate)
-  return;
   navigateTo("/overview")
 }
 
