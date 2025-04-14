@@ -27,9 +27,7 @@ export default defineNuxtConfig({
   tailwindcss: { exposeConfig: true },
 
   icon: {
-    clientBundle: {
-      scan: true
-    }
+    serverBundle: 'local'
   },
 
   i18n: ({
