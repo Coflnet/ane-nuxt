@@ -70,7 +70,9 @@ const deleteFilterId = async () => {
     composable: "$fetch",
     headers: { Authorization: apiToken },
   })
+  push.success("Filter successfully deleted");
   await filterStore.loadFilters();
+  isModalOpen.value = false;
 }
 
 

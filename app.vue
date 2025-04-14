@@ -1,9 +1,16 @@
 <template>
+
+
   <div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
     <NuxtLayout>
       <NuxtPage />
+      <Notivue v-slot="item">
+        <Notification :item="item" :theme="slateTheme" />
+      </Notivue>
     </NuxtLayout>
+
   </div>
+
 </template>
 
 <script setup>

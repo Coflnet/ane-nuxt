@@ -178,6 +178,7 @@ async function loadEditParam() {
     })
   } catch (e) {
     console.error(e)
+    push.error(`We ran into issue\n ${e}`)
   }
 }
 
@@ -213,6 +214,7 @@ async function saveFilter() {
 
   console.log(filterToCreate)
   await filterStore.saveFilter(filterToCreate)
+  push.success("Filter successfully saved");
   navigateTo("/overview")
 }
 
@@ -261,6 +263,7 @@ async function handleSearchRadius(): Promise<[string, string]> {
     return [data2[0].lat, data2[0].lon]
   } catch (error) {
     console.error('Error fetching country:', error);
+    push.error(`We ran into issue\n ${error}`)
   }
   return ['', '']
 }

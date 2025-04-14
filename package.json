@@ -24,6 +24,7 @@
     "firebase-functions": "^6.3.2",
     "jose": "^6.0.10",
     "lucide-vue-next": "^0.485.0",
+    "notivue": "^2.4.5",
     "nuxt": "^3.16.2",
     "nuxt-translation-manager": "^1.1.1",
     "nuxt-vuefire": "^1.0.5",

@@ -16,15 +16,27 @@ export default defineNuxtConfig({
     "nuxt-translation-manager",
     '@nuxtjs/i18n',
     "@hey-api/nuxt",
+    "notivue/nuxt",
   ],
+
   heyApi: {
     config: {
       input: "https://ane.coflnet.com/api/openapi/v1/openapi.json"
     }
 
   },
+
   ssr: true,
   tailwindcss: { exposeConfig: true },
+
+  css: [
+    'notivue/notification.css',
+    'notivue/animations.css'
+  ],
+
+  notivue: {
+    position: "top-right"
+  },
 
   icon: {
     serverBundle: {
