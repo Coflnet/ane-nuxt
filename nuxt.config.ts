@@ -26,6 +26,11 @@ export default defineNuxtConfig({
   ssr: true,
   tailwindcss: { exposeConfig: true },
 
+  icon: {
+    mode: 'css',
+    cssLayer: 'base'
+  },
+
   i18n: ({
     locales: [
       { code: 'en', name: 'English', file: 'en.json' },
