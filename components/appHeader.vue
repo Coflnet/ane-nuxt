@@ -30,7 +30,7 @@
             <div class="relative" ref="profileMenuRef" v-if="loggedIn">
               <button @click="toggleProfileMenu"
                 class="flex items-center space-x-1 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400">
-                <img :src="userStore.user?.avatar ?? ''" alt="Profile" class="w-8 h-8 rounded-full" />
+                <img :src="userStore.user?.photoURL ?? ''" alt="Profile" class="w-8 h-8 rounded-full" />
                 <ChevronDownIcon v-if="!isProfileMenuOpen" class="w-4 h-4" />
                 <ChevronUpIcon v-else class="w-4 h-4" />
               </button>
@@ -38,7 +38,7 @@
               <div v-if="isProfileMenuOpen"
                 class="absolute right-0 mt-2 w-60 bg-white dark:bg-slate-800 rounded-md shadow-lg py-1 z-10 border border-slate-200 dark:border-slate-700">
                 <div class="px-4 py-2 border-b border-slate-200 dark:border-slate-700">
-                  <p class="text-sm font-medium text-slate-900 dark:text-white">{{ userStore.user?.name }}</p>
+                  <p class="text-sm font-medium text-slate-900 dark:text-white">{{ userStore.user?.displayName }}</p>
                   <p class="text-xs text-slate-500 dark:text-slate-400">{{ userStore.user?.email }}</p>
                 </div>
 
