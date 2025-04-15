@@ -99,6 +99,7 @@
   "revInst": "\"Receive instant alerts when matching items are listed. Choose from email, discord, or push notifications.\"",
   "rights": "© 2025 Coflnet GMH. All rights reserved.",
   "seanoE": "Search radius does not work with Ebay",
+  "searNoEbay": "Search radius does not work with Ebay",
   "searradi": "Search Radius",
   "selcMark": "Select a marketplace",
   "sellSoul": "By signing in, you agree to our",
@@ -133,5 +134,6 @@
   "works": "Works",
   "yourFilt": "Your Filters",
   "yourZip": "Your Zip Code",
-  "zip": "Zip-code"
+  "zip": "Zip-code",
+  "zipCodePlease": "Please enter a zip code when using search radius"
 }

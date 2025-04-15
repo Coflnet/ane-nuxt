@@ -1,6 +1,6 @@
 <template>
   <div>
-    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ $t('blackke') }}</label>
+    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ }}</label>
     <div class="space-y-3">
       <div class="flex items-center gap-2">
         <input v-model="newBlacklist" @keydown.enter.prevent="confirmBlacklist" type="text"
@@ -41,7 +41,7 @@
         </div>
       </div>
     </div>
-    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ $t('addblak') }}
+    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ }}
     </p>
   </div>
 </template>

@@ -1,84 +1,44 @@
 <template>
-  <div>
-    <div class="mb-8">
-      <NuxtLink to="/filters"
-        class="inline-flex items-center text-sm text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 mb-4">
-        <ArrowLeftIcon class="w-4 h-4 mr-1" />
-        {{ $t('backFilt') }}
-      </NuxtLink>
-      <h1 class="text-3xl font-bold text-slate-900 dark:text-white">{{ isNewFilter ? $t('crflt') : $t('editFilt') }}
-      </h1>
-      <p class="mt-2 text-slate-500 dark:text-slate-400">{{ isNewFilter ? $t('setnew') : $t('setUp') }}</p>
-    </div>
-
-    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden">
-      <div class="p-6">
-        <form @submit.prevent="saveFilter" class="space-y-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <AneTextField :name="$t('filterName')" :placeholder="$t('nameEg')" :label="$t('filName')"
-                v-model="filter.name" />
-            </div>
-
-            <div>
-              <label for="marketplace" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{
-                $t('market') }}</label>
-              <select id="marketplace" v-model="filter.marketplace"
-                class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
-                required>
-                <option value="all">{{ $t('allMarket') }}</option>
-                <option value="Ebay">eBay</option>;
-                <option value="kleinanzeigen">eBay Kleinanzeigen</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Search Value Field -->
-          <div>
-            <AneTextField :name="$t('srchval')" :placeholder="$t('srchPlace')" :label="$t('srchVal')"
-              v-model="filter.searchValue" />
-          </div>
-          <FiltersKeywordFilter :filter="filter" />
-
-          <!-- list all filters -->
-          <div v-for="(option, index) in filterStore.getFilterOptions">
-
-            <!-- Price Range -->
-
-            <!-- Radius -->
-            <FiltersRadiusRangeFilter :filter="filter" v-if="option.name == 'Radius'" />
-
-            <!-- Kleinanzeigen Kategorie -->
-            <FiltersKleinanzeigenCategoryFilter :filter="filter"
-              v-if="option.name === 'KleinanzeigenKategorie' && filter.marketplace == 'kleinanzeigen'"
-              :options="option.value.options" />
-
-            <FiltersBlacklistFilter :filter="filter" v-if="option.name == 'NotContainsKeyWord'" />
-          </div>
-
-          <NotificationSettingsFilter :filter="filter"></NotificationSettingsFilter>
-          <!-- Updated Blacklist Section with Confirmation -->
-
-          <!-- Notification Channels section -->
-          <div class="flex items-center justify-end space-x-4 pt-6 border-t border-slate-200 dark:border-slate-700">
-            <NuxtLink to="/filters"
-              class="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
-              Cancel
-            </NuxtLink>
-            <button type="submit"
-              class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
-              {{ isNewFilter ? "Create Filter" : "Update Filter" }}
-            </button>
-          </div>
-        </form>
+  <CreateHeader :is-new-filter="isNewFilter" />
+  <UiDefaultContainer class="mb-6 p-6">
+    <form @submit.prevent="saveFilter" class="space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <AneTextField :name="$t('filterName')" :placeholder="$t('nameEg')" :label="$t('filName')"
+          v-model="filter.name" />
+        <MarketplaceDropDown></MarketplaceDropDown>
       </div>
-    </div>
-  </div>
+
+      <AneTextField :name="$t('srchval')" :placeholder="$t('srchPlace')" :label="$t('srchVal')"
+        v-model="filter.searchValue" />
+
+      <FiltersKeywordFilter :model-value="filter.keywords" :label="$t('kewor')" :footer="$t('addKey')" />
+      <FiltersKeywordFilter :model-value="filter.blacklist" :label="$t('blackke')" :footer="$t('addblak')" />
+
+
+      <!-- Dont worry about this, this whole system needs to get reworked by akwav -->
+      <div v-for="(option, _index) in filterStore.getFilterOptions">
+        <!-- Kleinanzeigen Kategorie -->
+        <FiltersKleinanzeigenCategoryFilter :filter="filter"
+          v-if="option.name === 'KleinanzeigenKategorie' && filter.marketplace == 'kleinanzeigen'"
+          :options="option.value.options" />
+
+      </div>
+
+      <FiltersRadiusRangeFilter :filter="filter" />
+      <NotificationSettingsFilter :filter="filter"></NotificationSettingsFilter>
+
+      <ConfirmCreation :is-new-filter="isNewFilter" />
+    </form>
+  </UiDefaultContainer>
+
 </template>
 
 <script setup lang="ts">
 import { ArrowLeftIcon } from 'lucide-vue-next'
 import NotificationSettingsFilter from '~/components/filters/NotificationSettingsFilter.vue';
+import CreateHeader from './create/CreateHeader.vue';
+import MarketplaceDropDown from './create/MarketplaceDropDown.vue';
+import ConfirmCreation from './create/ConfirmCreation.vue';
 
 const filterStore = useFilterStore();
 const userStore = useUserStore();
