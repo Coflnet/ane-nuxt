@@ -12,6 +12,7 @@
     <HeaderLinkButton link="/register" name="Sign up" :highlight="false" />
   </div>
 
+
 </template>
 
 <script setup lang="ts">
