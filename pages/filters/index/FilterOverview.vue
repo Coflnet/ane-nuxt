@@ -1,0 +1,72 @@
+<template>
+  <UiDefaultContainer class="p-6">
+    <UiHeaderLabel :label="$t('yourFilt')" />
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-5">
+      <div v-for="(filter, index) in filters" :key="index"
+        class="border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+        <div class="p-4">
+          <FilterOverviewItem :filter="filter" />
+        </div>
+      </div>
+    </div>
+  </UiDefaultContainer>
+
+</template>
+
+<script setup lang="ts">
+import { UiHeaderLabel } from '#components';
+import FilterOverviewItem from './FilterOverviewItem.vue';
+
+const filterStore = useFilterStore();
+
+const filters = computed(() => {
+  const response = filterStore.getUserFilters;
+  let res: filterFace[] = response.map((i) => {
+    var filtersHolder = {
+      radius: '',
+      keywords: [] as string[],
+      priceRange: '',
+      IncludePlatforms: ''
+    }
+
+    i.filters?.map((i) => {
+      if (i.name == "Radius")
+        return filtersHolder.radius = i.value ?? "";
+      if (i.name == "PriceRange")
+        return filtersHolder.priceRange = i.value ?? ""
+      if (i.name == "ContainsKeyWord") {
+        // TODO: remove this
+        if (typeof i.value == 'string') {
+          return;
+        }
+        return filtersHolder.keywords = JSON.parse(i.value ?? "")
+      }
+      if (i.name == "IncludePlatforms")
+        return filtersHolder.IncludePlatforms = i.value ?? ""
+    })
+
+
+    return {
+      matchCount: i.matchCount ?? 0,
+      id: i.id ?? 0,
+      name: i.name ?? "",
+      marketplace: filtersHolder.IncludePlatforms ?? "",
+      keywords: filtersHolder.keywords,
+      active: true,
+      priceRange: filtersHolder.priceRange,
+      location: filtersHolder.radius
+    }
+  })
+
+  return res;
+})
+
+
+
+
+onMounted(() => {
+  filterStore.loadFilters();
+});
+
+</script>

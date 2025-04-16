@@ -12,11 +12,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { BellIcon, FilterIcon, TagIcon, ExternalLinkIcon, HeartIcon, MessageSquareIcon, MailIcon, PlusIcon, List } from 'lucide-vue-next'
-import { getMatches, type Platform } from '~/src/api-client';
 import OverviewHeader from './overview/OverviewHeader.vue';
 import OverviewStats from './overview/OverviewStats.vue';
-import TableHeader from './overview/TableHeader.vue';
 import RecentMatchTable from './overview/RecentMatchTable.vue';
 import TopFilters from './overview/TopFilters.vue';
 import NotificationChannels from './overview/NotificationChannels.vue';

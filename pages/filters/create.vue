@@ -17,11 +17,9 @@
 
       <!-- Dont worry about this, this whole system needs to get reworked by akwav -->
       <div v-for="(option, _index) in filterStore.getFilterOptions">
-        <!-- Kleinanzeigen Kategorie -->
         <FiltersKleinanzeigenCategoryFilter :filter="filter"
           v-if="option.name === 'KleinanzeigenKategorie' && filter.marketplace == 'kleinanzeigen'"
           :options="option.value.options" />
-
       </div>
 
       <FiltersRadiusRangeFilter :filter="filter" />
@@ -34,7 +32,6 @@
 </template>
 
 <script setup lang="ts">
-import { ArrowLeftIcon } from 'lucide-vue-next'
 import NotificationSettingsFilter from '~/components/filters/NotificationSettingsFilter.vue';
 import CreateHeader from './create/CreateHeader.vue';
 import MarketplaceDropDown from './create/MarketplaceDropDown.vue';

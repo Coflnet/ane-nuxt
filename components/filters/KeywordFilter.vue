@@ -1,6 +1,6 @@
 <template>
   <div>
-    <HeaderLabel :label="label" />
+    <CreateHeaderLabel :label="label" />
     <UiDefaultInputBox class="p-2">
       <div v-for="(keyword, index) in modelValue" :key="index"
         class="inline-flex items-center px-3 py-4 rounded-md text-sm font-medium bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200">
@@ -23,7 +23,9 @@
 </template>
 
 <script setup lang='ts'>
-import HeaderLabel from '~/pages/filters/create/HeaderLabel.vue'
+import Create from '~/pages/filters/create.vue'
+import CreateHeaderLabel from '~/pages/filters/create/CreateHeaderLabel.vue'
+
 
 var modelValue = defineModel<String[]>()
 defineProps({ label: String, footer: String })
