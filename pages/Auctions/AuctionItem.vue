@@ -1,6 +1,6 @@
 <template>
   <div class="relative">
-    <img :src="auction.image ?? ''" alt="Auction thumbnail" class="w-full h-48 object-cover"
+    <img :src="auction.image ?? ''" alt="Auction thumbnail" class="w-full h-48 object-cover rounded-t-lg"
       :class="auction.image == '' ? 'hidden' : ''" />
     <div :class="auction.image == '' ? '' : 'hidden'" class="h-48 items-center flex flex-col justify-center">
       <Icon name="tabler:search" class="w-16 h-16 text-slate-400 mx-auto mb-4 mt-3" />

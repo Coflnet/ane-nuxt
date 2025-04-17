@@ -22,7 +22,6 @@ import { UiDefaultContainer } from '#components'
 import AuctionItem from './Auctions/AuctionItem.vue'
 
 const listingStore = useListingStore()
-const filterStore = useFilterStore()
 
 const loadedAuctions = ref<MatchItem[]>([])
 const loading = ref(false)
@@ -49,7 +48,7 @@ async function loadMore() {
 onMounted(async () => {
   await listingStore.loadMatches()
   loadedAuctions.value = listingStore.recentMatches
-  useInfiniteScroll(window, loadMore, { distance: 100 })
+  useInfiniteScroll(window, loadMore, { distance: 300 })
 })
 
 </script>
