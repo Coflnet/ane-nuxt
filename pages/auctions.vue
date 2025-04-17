@@ -22,6 +22,7 @@ import { UiDefaultContainer } from '#components'
 import AuctionItem from './Auctions/AuctionItem.vue'
 
 const listingStore = useListingStore()
+const filterStore = useFilterStore()
 
 const loadedAuctions = ref<MatchItem[]>([])
 const loading = ref(false)

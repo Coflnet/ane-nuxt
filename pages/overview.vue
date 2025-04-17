@@ -100,5 +100,6 @@ function sortTopFilers(): topFilter[] {
 onMounted(async () => {
   await Promise.allSettled([filterStore.loadFilters(), listingStore.loadMatches()]);
   loadStats();
+  filterStore.loadFilters()
 })
 </script>

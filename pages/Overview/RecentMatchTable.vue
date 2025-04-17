@@ -15,7 +15,8 @@
               </div>
             </div>
           </td>
-          <td class="px-4 py-3 text-sm text-slate-900 dark:text-white">{{ filters.getUserFilters[auction.filter ?? 0] }}
+          <td class="px-4 py-3 text-sm text-slate-900 dark:text-white">{{ filters.getSimplifiedFilters[auction.filter ??
+            0] }}
           </td>
           <td class="px-4 py-3 text-sm font-medium text-slate-900 dark:text-white">{{ auction.price }}</td>
           <td class="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">{{ timeAgo(auction.matchedAt) }}</td>
