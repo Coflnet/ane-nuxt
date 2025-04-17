@@ -137,4 +137,6 @@ invalidDiscordWebhook,Please enter a valid Discord webhook URL
 invalidEmail,Please enter a valid email address
 searNoEbay,Search radius does not work with Ebay
 zipCodePlease,Please enter a zip code when using search radius
-loadmo,Loading more auctions...
+loadmo,Loading more auctionscreaetAcc
+register,Register
+createYuAcc,Create your account

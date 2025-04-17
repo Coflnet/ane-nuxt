@@ -1,7 +1,7 @@
 import { defineStore } from "pinia"
 import { ref, computed } from "vue"
 import { navigateTo } from "#app"
-import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, type Auth } from "firebase/auth"
+import { createUserWithEmailAndPassword, fetchSignInMethodsForEmail, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, type Auth } from "firebase/auth"
 import { loginFirebase, type Platform, type TokenContainer } from "~/src/api-client"
 
 // Types
@@ -177,13 +177,12 @@ export const useUserStore = defineStore("user", () => {
     }
   }
 
-  async function signInWithEmailPassword(clientAuth: Auth, email: string, password: string) {
+  async function signInWithEmailPassword(clientAuth: Auth, email: string, password: string, isLogin: boolean) {
     isLoading.value = true
     error.value = null
-    console.log(clientAuth)
 
     try {
-      const result = await createUserWithEmailAndPassword(clientAuth, email, password)
+      const result = isLogin ? await createUserWithEmailAndPassword(clientAuth, email, password) : await signInWithEmailAndPassword(clientAuth, email, password)
       const loggedInUser = result.user;
 
       if (loggedInUser) {
@@ -194,7 +193,6 @@ export const useUserStore = defineStore("user", () => {
           avatar: loggedInUser.photoURL ?? "",
         };
         isAuthenticated.value = true;
-
         await fetchNotificationSettings();
       }
       return { success: true };

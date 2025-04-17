@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen flex flex-col ">
-    <LoginHeader />
-    <LoginContainer />
+    <LoginHeader :is-login="true" />
+    <LoginContainer :is-login="true" />
   </div>
 </template>
 

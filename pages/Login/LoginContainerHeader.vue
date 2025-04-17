@@ -5,9 +5,13 @@
       <Icon name="tabler:bell" class="size-8 text-white" />
     </div>
     <h1 class="mt-4 text-2xl font-bold text-slate-900 dark:text-white">
-      {{ $t('createAcco') || 'Create Account' }}
+      {{ isLogin ? $t('signinNormal') : $t('register') }}
     </h1>
-    <p class="mt-2 text-slate-500 dark:text-slate-400">{{ $t('signinAc') }} </p>
+    <p class="mt-2 text-slate-500 dark:text-slate-400">{{ isLogin ? $t('signinAc') : $t('createYuAcc') }} </p>
   </div>
 
 </template>
+
+<script setup>
+defineProps({ isLogin: Boolean })
+</script>

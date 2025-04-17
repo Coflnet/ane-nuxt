@@ -9,7 +9,8 @@
       </nav>
 
       <div class="flex items-center space-x-4">
-        <HeaderLinkButton link="/login" name="Sign in" :highlight="true" class="px-3" />
+        <HeaderLinkButton link="/login" :name="isLogin ? $t('signinNormal') : $t('register')" :highlight="true"
+          class="px-3" />
       </div>
     </div>
   </header>
@@ -19,4 +20,5 @@
 <script setup lang="ts">
 import HeaderLinkButton from '~/components/AppHeader.vue/HeaderLinkButton.vue';
 
+defineProps({ isLogin: Boolean })
 </script>
