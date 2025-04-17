@@ -3,11 +3,11 @@
     <CreateHeaderLabel :label="label" />
     <UiDefaultInputBox class="p-2">
       <div v-for="(keyword, index) in modelValue" :key="index"
-        class="inline-flex items-center px-3 py-4 rounded-md text-sm font-medium bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200">
+        class="inline-flex items-center px-3 py-2 rounded-md text-sm font-medium bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200">
         {{ keyword }}
         <button type="button" @click="removeKeyword(index)"
-          class="ml-2 text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 mt-1.5">
-          <Icon name="tabler:trash" class="size-4 text-black"></Icon>
+          class="ml-2 text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 mt-1.5 ">
+          <Icon name="tabler:trash" class="size-4 text-black" />
         </button>
       </div>
 
@@ -23,8 +23,7 @@
 </template>
 
 <script setup lang='ts'>
-import Create from '~/pages/filters/create.vue'
-import CreateHeaderLabel from '~/pages/filters/create/CreateHeaderLabel.vue'
+import CreateHeaderLabel from '~/pages/Filters/Create/CreateHeaderLabel.vue'
 
 
 var modelValue = defineModel<String[]>()

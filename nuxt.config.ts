@@ -1,4 +1,3 @@
-import i18nConfig from "./i18n.config";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 

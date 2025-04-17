@@ -12,7 +12,7 @@
 
         <nav
           class="hidden md:flex items-center space-x-6 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-          <NuxtLink to="/" class="">
+          <NuxtLink to="/#features" class="">
             {{ $t('features') }}
           </NuxtLink>
           <NuxtLink to="/">

@@ -18,9 +18,8 @@
         </div>
       </div>
       <div v-if="props.filter.notificationType === 'DiscordWebhook'" class="mt-3 ml-11">
-        <input v-model="webhookUrl" type="text" :placeholder="$t('discordWeb')"
-          class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
-          @blur="validateWebhook" />
+        <AneTextField type="string" :placeholder="$t('discordWeb')" v-model="webhookUrl"
+          :radiusError="!isValidWebhook && webhookUrl" />
         <p v-if="!isValidWebhook && webhookUrl" class="mt-1 text-sm text-red-500">
           {{ $t('invalidDiscordWebhook') || 'Please enter a valid Discord webhook URL' }}
         </p>
