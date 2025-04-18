@@ -4,8 +4,8 @@
     <button @click="toggleProfileMenu"
       class="flex items-center space-x-1 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400">
       <img :src="userStore.user?.avatar ?? ''" alt="Profile" class="w-8 h-8 rounded-full" />
-      <ChevronDownIcon v-if="!isProfileMenuOpen" class="w-4 h-4" />
-      <ChevronUpIcon v-else class="w-4 h-4" />
+      <Icon name="tabler:chevron-down" v-if="!isProfileMenuOpen"/>
+      <Icon v-else name="tabler:chevron-up" />
     </button>
 
     <div v-if="isProfileMenuOpen"
@@ -15,11 +15,11 @@
         <p class="text-xs text-slate-500 dark:text-slate-400">{{ userStore.user?.email }}</p>
       </div>
 
-      <button @click="logout"
-        class="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 h-10">
-        <Icon name="tabler:logout-2" class="w-4 h-4" />
-        Sign out
-      </button>
+      <UiTextButton @onClick="logout" class="m-1 mt-2">
+        <Icon name="tabler:logout-2" class="w-4 h-4 mr-2" />
+        {{$t('signOut')}}
+      </UiTextButton>
+ 
     </div>
   </div>
 

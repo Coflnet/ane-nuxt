@@ -2,23 +2,21 @@
   <ClientOnly>
     <div class="flex flex-row">
       <div v-if="userStore.isLoggedIn" class="flex flex-row space-x-3 items-center">
-
-        <HeaderLinkButton link="/overview" name="Home" :highlight="false" />
-        <HeaderLinkButton link="/filters" name="Filters" :highlight="false" />
-        <HeaderLinkButton link="/auctions" name="Auctions" :highlight="true" />
+        <UiTextButton @on-click="navigateTo('/overview')">{{ $t('appHeaderHome') }}</UiTextButton>
+        <UiTextButton @on-click="navigateTo('/filters')">{{ $t('appHeaderFilters') }}</UiTextButton>
+        <UiButton :primary="true" @on-click="navigateTo('/auctions')">{{ $t('appHeaderAuctions') }}</UiButton>
 
         <HeaderProfileDropdown />
       </div>
       <div v-else>
-        <HeaderLinkButton link="/login" name="Log in" :highlight="true" />
-        <HeaderLinkButton link="/register" name="Sign up" :highlight="false" />
+        <UiTextButton @on-click="navigateTo('/login')">{{ $t('signIn') }}</UiTextButton>
+        <UiButton :primary="true" @on-click="navigateTo('/register')">{{ $t('register') }}</UiButton>
       </div>
     </div>
   </ClientOnly>
 </template>
 
 <script setup lang="ts">
-import HeaderLinkButton from './HeaderLinkButton.vue';
 import HeaderProfileDropdown from './HeaderProfileDropdown.vue';
 
 const userStore = useUserStore()

@@ -1,8 +1,7 @@
 <template>
-
-  <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6">
-    <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-4">{{ $t('topF') }}</h2>
-    <div class="space-y-4">
+  <UiDefaultContainer class="p-6">
+    <UiHeaderLabel :label="$t('topF')" />
+    <div class="space-y-4 mt-4">
       <div v-for="(filter, index) in sortTopFilers()" :key="index" class="flex items-center justify-between">
         <div class="flex items-center space-x-3">
           <div
@@ -10,27 +9,32 @@
             {{ index + 1 }}
           </div>
           <div>
-            <p class="font-medium text-slate-900 dark:text-white">{{ filter.name }}</p>
+
+            <UiFooterLabel :label="filter.name" :white="true" />
+            <UiFooterLabel :label="filter.keywords.join(', ')" />
+            <p class="font-medium text-slate-900 dark:text-white">{{ }}</p>
             <p class="text-xs text-slate-500 dark:text-slate-400">{{ filter.keywords.join(', ') }}</p>
           </div>
         </div>
-        <p class="text-sm font-medium text-slate-900 dark:text-white">{{ filter.matches }} matches</p>
+
+        <UiFooterLabel :label="`${filter.matches} ${$t('matches')}`" :white="true" :xs="true" />
       </div>
     </div>
-  </div>
+  </UiDefaultContainer>
 
 </template>
 
 <script setup lang="ts">
 
+
 const props = defineProps<{
-  topFilters: Record<string, topFilter>
+  topFilters: Record<string, TopFilter>
 }>()
 
-function sortTopFilers(): topFilter[] {
+function sortTopFilers(): TopFilter[] {
   const array = Object.values(props.topFilters);
 
-  const sortedArray = array.sort((a: topFilter, b: topFilter) => b.matches - a.matches);
+  const sortedArray = array.sort((a: TopFilter, b: TopFilter) => b.matches - a.matches);
   return sortedArray
 }
 

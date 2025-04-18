@@ -2,17 +2,19 @@
   <CreateHeader :is-new-filter="isNewFilter" />
   <UiDefaultContainer class="mb-6 p-6">
     <form @submit.prevent="saveFilter" class="space-y-6">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <AneTextField :name="$t('filterName')" :placeholder="$t('nameEg')" :label="$t('filName')"
-          v-model="filter.name" />
-        <MarketplaceDropDown></MarketplaceDropDown>
-      </div>
+      <UiGrid :grid-size="2">
+        <UiInput :name="$t('filterName')" :placeholder="$t('nameEg')" :label="$t('filterName')" v-model="filter.name" />
+        <MarketplaceDropDown />
+      </UiGrid>
 
-      <AneTextField :name="$t('srchval')" :placeholder="$t('srchPlace')" :label="$t('srchVal')"
+
+      <UiInput :name="$t('searchValue')" :placeholder="$t('cameraEg')" :label="$t('searchValue')"
         v-model="filter.searchValue" />
 
-      <FiltersKeywordFilter :model-value="filter.keywords" :label="$t('kewor')" :footer="$t('addKey')" />
-      <FiltersKeywordFilter :model-value="filter.blacklist" :label="$t('blackke')" :footer="$t('addblak')" />
+      <FiltersKeywordFilter :model-value="filter.keywords" :label="$t('keywords')" :footer="$t('addKeyDescription')"
+        :place-holder="$t('addKeywordPressEnter')" />
+      <FiltersKeywordFilter :model-value="filter.blacklist" :label="$t('blackKeywords')"
+        :footer="$t('addblacklistKeywords')" :place-holder="$t('addBlackListPressEnter')" />
 
 
       <!-- Dont worry about this, this whole system needs to get reworked by akwav -->
@@ -170,6 +172,7 @@ async function saveFilter() {
   }
 
   console.log(filterToCreate)
+  return;
   await filterStore.saveFilter(filterToCreate)
   push.success("Filter successfully saved");
   navigateTo("/overview")

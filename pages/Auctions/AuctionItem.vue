@@ -4,7 +4,7 @@
       :class="auction.image == '' ? 'hidden' : ''" />
     <div :class="auction.image == '' ? '' : 'hidden'" class="h-48 items-center flex flex-col justify-center">
       <Icon name="tabler:search" class="w-16 h-16 text-slate-400 mx-auto mb-4 mt-3" />
-      <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-1">{{ $t('noImg') }}</h3>
+      <UiHeaderLabel :label="$t('noImageForAuction')" />
 
     </div>
     <div class="absolute top-2 right-2">
@@ -21,7 +21,7 @@
     </div>
 
     <div class="flex items-center justify-between mb-3">
-      <p class="font-bold text-xl text-slate-900 dark:text-white">${{ auction.price }}</p>
+      <UiHeaderLabel :label="`$${auction.price}`" />
     </div>
 
     <div class="flex items-center justify-between pt-3 border-t border-slate-200 dark:border-slate-700">
@@ -33,7 +33,7 @@
       <a :href="auction.url ?? ''" target="_blank"
         class="inline-flex items-center text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200">
         View
-        <Icon name="tabler:external-link"></Icon>
+        <Icon name="tabler:external-link" />
       </a>
     </div>
   </div>
@@ -41,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import { Icon } from '#components';
+import { Icon, UiHeaderLabel } from '#components';
 
 const filterStore = useFilterStore()
 defineProps<{ auction: MatchItem }>()

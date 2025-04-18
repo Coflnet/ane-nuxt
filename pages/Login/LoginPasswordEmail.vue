@@ -1,15 +1,16 @@
 <template>
-  <AneTextField type="email" placeholder="Email" v-model="email" :radiusError="emailPassError" />
-  <AneTextField type="password" placeholder="Password" v-model="password" class="mt-3" :radiusError="emailPassError" />
-  <ForgotPassword />
-  <button @click="login" class="mt-4 w-full bg-indigo-600 rounded-lg py-2 text-white font-medium">
-    {{ isLogin ? 'Sign in' : 'Register' }}
-  </button>
+  <UiInput type="email" :placeholder="$t('email')" v-model="email" :radiusError="emailPassError" />
+  <UiInput type="password" :placeholder="$t('password')" v-model="password" class="mt-3"
+    :radiusError="emailPassError" />
+  <div class="flex justify-end mt-1.5 mb-3">
+    <a href="/forgot-password" class="text-blue-600 text-sm">{{ $t('forgotPassword') }}</a>
+  </div>
+  <UiButton @click="login" class="w-full text-center" :primary="true">
+    {{ isLogin ? $t("signIn") : $t('register') }}
+  </UiButton>
 </template>
 
 <script setup lang="ts">
-import { AneTextField } from '#components';
-import ForgotPassword from './ForgotPassword.vue';
 const email = ref('');
 const password = ref('');
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6">
+  <UiDefaultContainer class="p-6">
     <div class="flex items-center justify-between mb-4">
       <h3 class="text-lg font-medium text-slate-900 dark:text-white">{{ label }}</h3>
       <div class="w-10 h-10 rounded-full flex items-center justify-center" :class="iconColorCircle">
@@ -7,12 +7,10 @@
       </div>
     </div>
     <p class="text-3xl font-bold text-slate-900 dark:text-white">{{ stat }}</p>
-  </div>
-
+  </UiDefaultContainer>
 </template>
 
 <script setup lang="ts">
-
 
 defineProps({
   stat: String,

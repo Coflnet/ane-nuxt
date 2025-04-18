@@ -8,5 +8,6 @@
 </template>
 
 <script setup lang="ts">
-const headers = ['Auction', 'Filter', 'Price', 'Matched', 'Actions']
+const { t } = useI18n()
+const headers = [t('auction'), t('filter'), t('price'), t('matched'), t('actions')]
 </script>

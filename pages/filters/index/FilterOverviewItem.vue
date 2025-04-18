@@ -8,12 +8,8 @@
         :class="filter.active ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-200'">
         {{ filter.active ? 'Active' : 'Paused' }}
       </span>
-      <span class="text-sm text-slate-500 dark:text-slate-400">{{ filter.matchCount }} matches</span>
+      <span class="text-sm text-slate-500 dark:text-slate-400">{{ filter.matchCount }} {{ $t('matches') }}</span>
     </div>
-    <NuxtLink :to="`/auctions?filter=${filter.id}`"
-      class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline hidden">
-      View matches
-    </NuxtLink>
   </div>
 
 </template>
@@ -23,7 +19,7 @@ import FilterItemSettings from './FilterItemSettings.vue';
 import FilterItemHeader from './FilterItemHeader.vue';
 
 
-defineProps<{ filter: filterFace }>()
+defineProps<{ filter: FilterFace }>()
 
 
 </script>

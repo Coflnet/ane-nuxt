@@ -1,32 +1,31 @@
 <template>
+  <!-- The grid component does not want to work this -->
   <div class="grid grid-cols-2 md:grid-cols-4 gap-x-8 ">
     <div>
-      <AneTextField v-model="filter.searchRadius" :label="$t('searradi')" type="number" placeholder="e.g., 10"
-        :footer="$t('radi')" :radiusError="radiusError" />
+      <UiInput v-model="filter.searchRadius" :label="$t('searchRadius')" type="number" :placeholder="$t('radiusEq')"
+        :footer="$t('searchRadiusAroundYou')" :radiusError="radiusError" />
       <p v-if="radiusError" class="mt-1 text-xs text-rose-500">{{ radiusErrorMessage }} </p>
     </div>
 
-    <AneTextField v-model="filter.zipcode" :label="$t('zip')" type="number" placeholder="e.g., xxxxx"
+    <UiInput v-model="filter.zipcode" :label="$t('zipCode')" type="number" :placeholder="$t('zipCodeEq')"
       :footer="$t('yourZip')" :radiusError="radiusError" />
 
     <div class="flex items-center mb-4 space-x-2 col-span-2">
-      <AneTextField v-model="filter.minPrice" :label="$t('priceRan')" type="number" placeholder="" />
+      <UiInput v-model="filter.minPrice" :label="$t('priceRange')" type="number" placeholder="" />
       <span class="text-slate-500 dark:text-slate-400 mt-3.5">-</span>
-      <AneTextField v-model="filter.maxPrice" class="mt-5" type="number" placeholder="0" />
+      <UiInput v-model="filter.maxPrice" class="mt-5" type="number" placeholder="0" />
     </div>
-
   </div>
 </template>
 
 <script setup lang='ts'>
-import { AneTextField } from '#components';
 
 const { t } = useI18n();
 const radiusErrorMessage = computed(() => {
   console.log(props.filter.marketplace)
   if (!radiusError) return ''
   return props.filter.marketplace === 'ebay'
-    ? t('searNoEbay')
+    ? t('searchRadiusRequiresEbay')
     : t('zipCodePlease')
 })
 
@@ -43,13 +42,12 @@ watch([() => props.filter.searchRadius, () => props.filter.zipcode], ([newRadius
   validateRadiusAndZipcode(newRadius, newZipcode)
 }, { immediate: true })
 
-// Validate if the user has inputed a zip code along with the radius as the user location is required
+// no zip code with radius entred bad
 function validateRadiusAndZipcode(radius: any, zipcode: string) {
   if (radius && !zipcode) {
     radiusError.value = true
-  } else {
-    radiusError.value = false
   }
+  radiusError.value = false
 }
 
 </script>

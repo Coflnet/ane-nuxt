@@ -6,10 +6,9 @@
     </div>
     <div class="flex flex-row gap-x-1">
       <div class="flex items-center space-x-1">
-        <button class="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700" title="Edit filter"
-          @click="navigateTo(`/filters/create?id=${filter.id}`)">
-          <EditIcon class="w-4 h-4 text-slate-500 dark:text-slate-400" />
-        </button>
+        <UiTextButton @on-click="navigateTo(`/filters/create?id=${filter.id}`)">
+          <UiIcon name="tabler:edit" />
+        </UiTextButton>
       </div>
       <div class="flex items-center space-x-1">
         <FilterCardDelete :itemId="filter.id" />
@@ -19,7 +18,10 @@
 </template>
 
 <script setup lang="ts">
+import FilterCardDelete from '~/components/filters/FilterCardDelete.vue';
 
-defineProps<{ filter: filterFace }>()
+
+
+defineProps<{ filter: FilterFace }>()
 
 </script>

@@ -1,10 +1,9 @@
 <template>
-  <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-4 md:mb-0">
+  <p class=" font-bold text-slate-900 dark:text-white mb-4 md:mb-0" :class="xl ? 'text-3xl' : 'text-xl'">
     {{ label }}
-  </h2>
-
+  </p>
 </template>
 
 <script setup lang="ts">
-defineProps({ label: String })
+defineProps({ label: String, xl: Boolean })
 </script>

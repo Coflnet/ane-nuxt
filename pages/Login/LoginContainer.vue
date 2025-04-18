@@ -10,8 +10,6 @@
 
     <SwitchLoginForm :is-login="isLogin" />
   </main>
-
-
 </template>
 
 <script setup lang="ts">

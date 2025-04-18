@@ -1,10 +1,10 @@
-interface topFilter {
+interface TopFilter {
   name: string;
   matches: number;
   keywords: string[];
 }
 
-interface filterFace {
+interface FilterFace {
   id: number;
   name: string;
   marketplace: string;

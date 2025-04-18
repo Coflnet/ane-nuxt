@@ -13,15 +13,15 @@
         </div>
         <div>
           <p class="font-medium text-slate-900 dark:text-white">Discord</p>
-          <p class="text-xs text-slate-500 dark:text-slate-400">{{ $t('discrdNo') }}
+          <p class="text-xs text-slate-500 dark:text-slate-400">{{ $t('sendDiscordNotifications') }}
           </p>
         </div>
       </div>
       <div v-if="props.filter.notificationType === 'DiscordWebhook'" class="mt-3 ml-11">
-        <AneTextField type="string" :placeholder="$t('discordWeb')" v-model="webhookUrl"
+        <UiInput type="string" :placeholder="$t('discordWebHookUrl')" v-model="webhookUrl"
           :radiusError="!isValidWebhook && webhookUrl" />
         <p v-if="!isValidWebhook && webhookUrl" class="mt-1 text-sm text-red-500">
-          {{ $t('invalidDiscordWebhook') || 'Please enter a valid Discord webhook URL' }}
+          {{ $t('invalidDiscordWebhook') }}
         </p>
       </div>
     </label>

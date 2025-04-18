@@ -1,5 +1,8 @@
 <template>
-  <AuctionsHeader />
+  <div class="mb-8">
+    <UiHeaderLabel :label="$t('matchedAuctions')" />
+    <UiFooterLabel :label="$t('auctionMatchedToFilters')" />
+  </div>
   <UiDefaultContainer class="p-6">
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <div v-for="(auction, index) in loadedAuctions" :key="index"
@@ -16,7 +19,6 @@
 import { ref, onMounted } from 'vue'
 import { useInfiniteScroll } from '@vueuse/core'
 import { useListingStore } from '@/stores/listing'
-import AuctionsHeader from './Auctions/AuctionsHeader.vue'
 import AuctionsLoadingState from './Auctions/AuctionsLoadingState.vue'
 import { UiDefaultContainer } from '#components'
 import AuctionItem from './Auctions/AuctionItem.vue'

@@ -13,11 +13,11 @@
         </div>
         <div>
           <p class="font-medium text-slate-900 dark:text-white">{{ $t('email') }}</p>
-          <p class="text-xs text-slate-500 dark:text-slate-400">{{ $t('emailTe') }} </p>
+          <p class="text-xs text-slate-500 dark:text-slate-400">{{ $t('sendNotificationsToEmail') }} </p>
         </div>
       </div>
       <div v-if="filter.notificationType === 'Email'" class="mt-3 ml-11">
-        <AneTextField type="string" :placeholder="$t('enterEma')" v-model="emailAddress"
+        <UiInput type="string" :placeholder="$t('enterEmailAddress')" v-model="emailAddress"
           :radiusError="!isValidEmail && emailAddress" />
         <p v-if="!isValidEmail && emailAddress" class="mt-1 text-sm text-red-500">
           {{ $t('invalidEmail') || 'Please enter a valid email address' }}

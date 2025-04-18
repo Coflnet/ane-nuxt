@@ -1,6 +1,6 @@
 <template>
   <UiDefaultContainer class="mb-6 p-6">
-    <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-4">{{ $t('recen') }}</h2>
+    <UiHeaderLabel :label="$t('dashboard')" class="mb-4" />
     <table class="w-full">
       <TableHeader />
       <tbody>
@@ -11,7 +11,7 @@
               <img :src="auction.image ?? ''" alt="Auction thumbnail" class="w-10 h-10 rounded-md object-cover" />
               <div>
                 <p class="font-medium">{{ auction.title }}</p>
-                <p class="text-xs text-slate-500 dark:text-slate-400">{{ auction.marketplace }}</p>
+                <UiFooterLabel :label="auction.marketplace" :xs="true" />
               </div>
             </div>
           </td>
@@ -36,6 +36,7 @@
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n();
 import TableHeader from './TableHeader.vue';
 
 const listingStore = useListingStore()
@@ -46,12 +47,12 @@ function timeAgo(timestamp: string): string {
   const past = new Date(timestamp);
   const diff = (now.getTime() - past.getTime()) / 1000;
   if (diff < 900) {
-    return "Just now";
-  } else if (diff < 3600) {
+    return t('justnow');
+  } if (diff < 3600) {
     return `${Math.floor(diff / 60)} minutes ago`;
-  } else if (diff < 86400) {
+  } if (diff < 86400) {
     return `${Math.floor(diff / 3600)} hours ago`;
-  } else if (diff < 604800) {
+  } if (diff < 604800) {
     return `${Math.floor(diff / 86400)} days ago`;
   } else {
     return `${Math.floor(diff / 604800)} weeks ago`;

@@ -1,18 +1,30 @@
 <template>
-  <OverviewHeader />
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+    <div>
+      <h1>
+        <UiHeaderLabel :label="$t('dashboard')" :xl="true" />
+      </h1>
+      <UiFooterLabel :label="$t('monitorAuctionAndFilters')" />
+    </div>
+    <UiButton @on-click="navigateTo('/filters/create')" :primary="true">
+      <Icon name="tabler:plus" class="size-5" />
+      <span class="mr-1">{{ $t('createFilter') }}</span>
+    </UiButton>
+  </div>
+
   <OverviewStats :filterCount="filterCount" :matchedAuctions="stats.matchedAuctions"
-    :notificationperHour="stats.notificationperHour"></OverviewStats>
+    :notificationperHour="stats.notificationperHour" />
 
   <RecentMatchTable />
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+  <UiGrid :grid-size="2">
     <TopFilters :top-filters="topFilters" />
     <NotificationChannels />
-  </div>
+  </UiGrid>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import OverviewHeader from './Overview/OverviewHeader.vue';
 import OverviewStats from './Overview/OverviewStats.vue';
 import RecentMatchTable from './Overview/RecentMatchTable.vue';
 import TopFilters from './Overview/TopFilters.vue';

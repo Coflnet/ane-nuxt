@@ -4,14 +4,14 @@
       class="w-16 h-16 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mx-auto">
       <Icon name="tabler:bell" class="size-8 text-white" />
     </div>
-    <h1 class="mt-4 text-2xl font-bold text-slate-900 dark:text-white">
-      {{ isLogin ? $t('signinNormal') : $t('register') }}
-    </h1>
-    <p class="mt-2 text-slate-500 dark:text-slate-400">{{ isLogin ? $t('signinAc') : $t('createYuAcc') }} </p>
+    <HeaderLabel :label="isLogin ? $t('signIn') : $t('register')" class="mt-2" :xl="true"></HeaderLabel>
+    <UiFooterLabel :label="isLogin ? $t('signintoAccount') : $t('createAccount')" />
   </div>
 
 </template>
 
 <script setup>
+import HeaderLabel from '~/components/ui/HeaderLabel.vue';
+
 defineProps({ isLogin: Boolean })
 </script>
