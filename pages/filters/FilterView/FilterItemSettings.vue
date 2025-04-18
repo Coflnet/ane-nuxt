@@ -9,11 +9,11 @@
 
     <div v-if="filter.priceRange" class="flex items-center text-sm text-slate-500 dark:text-slate-400">
       <TagIcon class="w-4 h-4 mr-1" />
-      <span>{{ handleMixMax(filter.priceRange) }}</span>
+      <span>{{ handleMixMaxString(filter.priceRange) }}</span>
     </div>
     <div v-if="filter.location" class="flex items-center text-sm text-slate-500 dark:text-slate-400">
       <MapPinIcon class="w-4 h-4 mr-1" />
-      <span>{{ handleLocation(filter.location) }}</span>
+      <span>{{ handleLocationString(filter.location) }}</span>
     </div>
   </div>
 </template>
@@ -22,16 +22,16 @@
 import { MapPinIcon, TagIcon } from 'lucide-vue-next';
 
 
-defineProps<{ filter: filterFace }>()
+defineProps<{ filter: FilterFace }>()
 
-function handleMixMax(value: string): string {
+function handleMixMaxString(value: string): string {
   if (value == "")
     return "";
   const [min, max] = value.split('-')
   return `$${min} - $${max}`
 }
 
-function handleLocation(value: string): string {
+function handleLocationString(value: string): string {
   if (value == "")
     return "";
   const [_lon, _lat, radius] = value.split(';')

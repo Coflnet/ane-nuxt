@@ -26,8 +26,6 @@
 </template>
 
 <script setup lang="ts">
-import { UiHeaderLabel } from '#components';
-import HeaderLabel from '~/components/ui/HeaderLabel.vue';
 import FilterOverviewItem from './index/FilterOverviewItem.vue';
 
 const filterStore = useFilterStore();

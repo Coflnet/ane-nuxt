@@ -15,9 +15,8 @@
 </template>
 
 <script setup lang="ts">
-import FilterItemHeader from '../FilterView/FilterItemHeader.vue';
-import FilterItemSettings from '../FilterView/FilterItemSettings.vue';
-
+import FilterItemSettings from './FilterItemSettings.vue';
+import FilterItemHeader from './FilterItemHeader.vue';
 
 
 defineProps<{ filter: FilterFace }>()

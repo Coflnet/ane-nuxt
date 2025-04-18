@@ -47,7 +47,7 @@ function timeAgo(timestamp: string): string {
   const past = new Date(timestamp);
   const diff = (now.getTime() - past.getTime()) / 1000;
   if (diff < 900) {
-    return t('justnow');
+    return t('justNow');
   } if (diff < 3600) {
     return `${Math.floor(diff / 60)} minutes ago`;
   } if (diff < 86400) {
