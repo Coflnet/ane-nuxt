@@ -14,6 +14,12 @@ export const useFilterStore = defineStore("filter", () => {
   const filters = ref<ListingListener[]>([]);
   const filterOptions = ref<NamedOption[]>([]);
 
+  const getSimplifiedFilters = computed(() => {
+    let simplifiedFilters: { [id: string]: string } = {};
+    filters.value.map((i) => simplifiedFilters[i.id ?? ""] = i.name ?? "");
+    return simplifiedFilters;
+  })
+
   const getUserFilters = computed(() => filters.value);
   const getUserFilterById = computed(() => {
     return (id: number) => filters.value.find((filter) => filter.id === id); // assuming your ListingListener type has an 'id' property.
@@ -35,13 +41,12 @@ export const useFilterStore = defineStore("filter", () => {
     }
 
     const apiToken = `Bearer ${userStore.token}`;
-    console.log(`loading filters for user ${user.name} with token ${apiToken}`);
 
     const loadedFilters = await getFilters({
       composable: '$fetch',
       headers: { Authorization: apiToken },
     })
-    console.log(loadedFilters)
+
 
     if (!loadedFilters) {
       console.error("No filters found");
@@ -105,6 +110,7 @@ export const useFilterStore = defineStore("filter", () => {
     getUserFilters,
     getUserFilterById,
     getFilterOptions,
+    getSimplifiedFilters,
 
     loadFilters,
     saveFilter,

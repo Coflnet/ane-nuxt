@@ -1,4 +1,3 @@
-import i18nConfig from "./i18n.config";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 
@@ -43,6 +42,7 @@ export default defineNuxtConfig({
       remote: 'jsdelivr', // 'unpkg' or 'github-raw', or a custom function
     }
   },
+
 
   i18n: ({
     locales: [

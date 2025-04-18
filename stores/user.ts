@@ -1,9 +1,8 @@
 import { defineStore } from "pinia"
 import { ref, computed } from "vue"
 import { navigateTo } from "#app"
-import { GoogleAuthProvider, signInWithPopup, type Auth } from "firebase/auth"
+import { createUserWithEmailAndPassword, fetchSignInMethodsForEmail, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, type Auth } from "firebase/auth"
 import { loginFirebase, type Platform, type TokenContainer } from "~/src/api-client"
-import { createClient } from "@hey-api/client-nuxt"
 
 // Types
 export interface User {
@@ -172,6 +171,33 @@ export const useUserStore = defineStore("user", () => {
       return { success: true };
     } catch (err) {
       error.value = "Failed to login. Please try again.";
+      return { success: false, error: error.value };
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function signInWithEmailPassword(clientAuth: Auth, email: string, password: string, isLogin: boolean) {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      const result = isLogin ? await createUserWithEmailAndPassword(clientAuth, email, password) : await signInWithEmailAndPassword(clientAuth, email, password)
+      const loggedInUser = result.user;
+
+      if (loggedInUser) {
+        user.value = {
+          id: loggedInUser.uid,
+          name: loggedInUser.displayName ?? "",
+          email: loggedInUser.email ?? "",
+          avatar: loggedInUser.photoURL ?? "",
+        };
+        isAuthenticated.value = true;
+        await fetchNotificationSettings();
+      }
+      return { success: true };
+    } catch (err) {
+      error.value = `${err}`;
       return { success: false, error: error.value };
     } finally {
       isLoading.value = false;
@@ -454,7 +480,8 @@ export const useUserStore = defineStore("user", () => {
     saveAuctionCache,
     loadAuctionCache,
     saveFilterCache,
-    loadFilterCache
+    loadFilterCache,
+    signInWithEmailPassword,
   }
 }, {
   persist: true,
