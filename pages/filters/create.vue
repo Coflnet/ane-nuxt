@@ -4,7 +4,11 @@
     <form @submit.prevent="saveFilter" class="space-y-6">
       <UiGrid :grid-size="2">
         <UiInput :name="$t('filterName')" :placeholder="$t('nameEg')" :label="$t('filterName')" v-model="filter.name" />
-        <MarketplaceDropDown />
+        <UiDropdown id="marketplace" :model-value="filter.marketplace" :options="[
+          { value: 'all', label: $t('allMarket') },
+          { value: 'Ebay', label: 'eBay' },
+          { value: 'kleinanzeigen', label: 'eBay Kleinanzeigen' },
+        ]" :label="$t('marketplace')" />
       </UiGrid>
 
 
@@ -36,7 +40,6 @@
 <script setup lang="ts">
 import NotificationSettingsFilter from '~/components/filters/NotificationSettingsFilter.vue';
 import CreateHeader from './Create/CreateHeader.vue';
-import MarketplaceDropDown from './Create/MarketplaceDropDown.vue';
 import ConfirmCreation from './Create/ConfirmCreation.vue';
 
 const filterStore = useFilterStore();

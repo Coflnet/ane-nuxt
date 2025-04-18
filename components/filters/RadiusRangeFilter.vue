@@ -22,7 +22,6 @@
 
 const { t } = useI18n();
 const radiusErrorMessage = computed(() => {
-  console.log(props.filter.marketplace)
   if (!radiusError) return ''
   return props.filter.marketplace === 'ebay'
     ? t('searchRadiusRequiresEbay')

@@ -1,18 +1,18 @@
 Key,"en",de
-neverMissA,Never Miss a
+neverMissA,Never Miss a,
 deal, Deal
 again, Again
-createCustomAlerts,Create custom alerts and filters for eBay and other marketplaces. Buy items below market value,
-newAlert,New Alert Match!,
-vintageCameraLens,Vintage Camera Lens,
-listed3MinutesAgo,Listed 3 minutes ago,
+createCustomAlerts,Create custom alerts and filters for eBay and other marketplaces. Buy items below market value
+newAlert,New Alert Match!
+vintageCameraLens,Vintage Camera Lens
+listed3MinutesAgo,Listed 3 minutes ago
 mechanicalKeyboard,Mechanical Keyboard,
 listed17MinutesAgo,Listed 17 minutes ago,
 market150,Market 150+,
 market120,Market 120+
-dealHunters," Deal Hunters",
-realTimeAlerts,Real-time Alerts,
-powerfulTools,Powerful Tools for ,
+dealHunters, Deal Hunters,
+realTimeAlerts,Real-time Alerts
+powerfulTools,Powerful Tools for
 instantNotifications,Get instant notifications when items matching your criteria are listed. Be the first to snag that deal.,
 complexFilters,"Create complex filters with multiple conditions. Filter by price, condition, seller rating, and more.", 
 viewHistoricalData,See historical price data and trends to identify the best buying and selling opportunities.,
@@ -148,7 +148,6 @@ active,Active
 matches,Matches
 addKeywordPressEnter,Add keyword and press Enter
 addBlackListPressEnter,Add blacklist and press Enter
-zipCodeEq,e.g., xxxxx
-radiusEq,e.g., 10
+zipCodeEq,"e.g., xxxxx"
+radiusEq,"e.g., 10"
 updateFilter,Update Filter
-
