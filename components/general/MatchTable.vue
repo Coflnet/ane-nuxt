@@ -38,7 +38,6 @@
 </template>
 
 <script setup lang="ts">
-const { t } = useI18n();
 import type { Listing } from '~/src/api-client';
 import humanizeDuration from 'humanize-duration'
 
@@ -62,6 +61,7 @@ function imageUrl(auction: MatchItem | Listing): string {
 }
 
 const filters = useFilterStore()
+const listingStore = useListingStore()
 
 function timeAgo(auction: MatchItem | Listing): string {
   let timestamp = '';
@@ -78,7 +78,7 @@ function timeAgo(auction: MatchItem | Listing): string {
 
   const str = humanizeDuration(t, {
     units: ["d", "h", "m"],
-    largest: 2,
+    largest: 1,
     round: true,
     language: 'de',
     fallbacks: ['en', 'de']
@@ -107,6 +107,12 @@ function url(auction: MatchItem | Listing): string {
   if ('url' in auction && auction.url) {
     return auction.url;
   }
+
+  const constructedUrl = listingStore.constructListingUrl(auction);
+  if (constructedUrl) {
+    return constructedUrl;
+  }
+
   return ''
 }
 
