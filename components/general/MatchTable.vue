@@ -83,10 +83,6 @@ function timeAgo(auction: MatchItem | Listing): string {
     language: 'de',
     fallbacks: ['en', 'de']
   })
-  console.log(timestamp)
-  console.log({ past })
-  console.log(t)
-  console.log(str)
   return str
 }
 

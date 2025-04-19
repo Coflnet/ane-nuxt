@@ -97,7 +97,6 @@ async function testFilter() {
     const res = await filterStore.testFilter(f);
     if (res) {
       matches.value = res;
-      console.log({ res })
     }
   } catch (e) {
     console.error(e);
@@ -180,8 +179,6 @@ async function saveFilter() {
   const f = await filterToCreate()
   if (!f)
     return
-
-  console.log(f)
   return;
   await filterStore.saveFilter(filterToCreate)
   push.success("Filter successfully saved");
