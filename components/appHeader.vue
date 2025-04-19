@@ -10,6 +10,5 @@
 </template>
 
 <script setup lang="ts">
-import NavButton from './AppHeader.vue/NavButton.vue';
 
 </script>
