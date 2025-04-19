@@ -68,6 +68,14 @@ export const useListingStore = defineStore("listing", () => {
 
   }
 
+  function constructListingUrl(listing: Listing): string | null {
+    if (!listing.platform)
+      return null;
+    if (!listing.id)
+      return null;
+    return getUrl(listing.platform, listing.id);
+  }
+
   function getUrl(listing: string, id: string) {
     if (listing === 'Ebay') {
       if (navigator.language == "de") {
@@ -83,6 +91,7 @@ export const useListingStore = defineStore("listing", () => {
 
   return {
     recentMatches,
+    constructListingUrl,
 
     loadMatches,
     loadMoreMatches
