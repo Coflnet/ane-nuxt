@@ -32,15 +32,16 @@
       <NotificationSettingsFilter :filter="filter"></NotificationSettingsFilter>
 
       <ConfirmCreation :is-new-filter="isNewFilter" />
+
     </form>
   </UiDefaultContainer>
 
+  <GeneralMatchTable :matches />
 </template>
 
 <script setup lang="ts">
-import NotificationSettingsFilter from '~/components/filters/NotificationSettingsFilter.vue';
-import CreateHeader from './Create/CreateHeader.vue';
-import ConfirmCreation from './Create/ConfirmCreation.vue';
+import type { ListingListener } from '~/src/api-client';
+import { debounce } from 'lodash';
 
 const filterStore = useFilterStore();
 const userStore = useUserStore();
@@ -52,6 +53,8 @@ export type TargetType = 'Unknown' | 'FireBase' | 'DiscordWebhook' | 'Email' | '
 const isNewFilter = computed(() => {
   return route.query.id == "" || route.query.id == undefined
 })
+
+const matches = ref<Listing[]>([])
 
 const filter = ref({
   name: '',
@@ -73,6 +76,34 @@ const filter = ref({
   notificationType: 'Unknown',
   notificationTarget: ""
 })
+
+watch(filter, (_) => {
+  debouncedTestFilter()
+}, { deep: true })
+
+const debouncedTestFilter = debounce(async () => {
+  await testFilter()
+}, 500)
+
+async function testFilter() {
+
+  try {
+
+    const f = await filterToCreate()
+    if (!f) {
+      push.error("Please fill out all required fields")
+      return
+    }
+    const res = await filterStore.testFilter(f);
+    if (res) {
+      matches.value = res;
+      console.log({ res })
+    }
+  } catch (e) {
+    console.error(e);
+    matches.value = [];
+  }
+}
 
 const radiusError = ref(false)
 
@@ -145,10 +176,21 @@ async function loadEditParam() {
 }
 
 
-
 async function saveFilter() {
-  if (radiusError.value) {
+  const f = await filterToCreate()
+  if (!f)
     return
+
+  console.log(f)
+  return;
+  await filterStore.saveFilter(filterToCreate)
+  push.success("Filter successfully saved");
+  navigateTo("/overview")
+}
+
+async function filterToCreate(): Promise<ListingListener | null> {
+  if (radiusError.value) {
+    return null;
   }
 
   var rawFilter = toRaw(filter.value);
@@ -174,11 +216,7 @@ async function saveFilter() {
     filters: await handleFilters()
   }
 
-  console.log(filterToCreate)
-  return;
-  await filterStore.saveFilter(filterToCreate)
-  push.success("Filter successfully saved");
-  navigateTo("/overview")
+  return filterToCreate;
 }
 
 async function handleFilters(): Promise<{ name: string; value: any }[]> {
