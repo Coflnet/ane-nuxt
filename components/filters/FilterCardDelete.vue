@@ -33,11 +33,7 @@ import { UiButton } from '#components';
 import { ref } from 'vue';
 import { deleteFilter } from '~/src/api-client';
 
-interface Props {
-  itemId: number;
-}
-
-const props = defineProps<Props>();
+const props = defineProps({ itemId: Number });
 
 const userStore = useUserStore()
 var apiToken = `Bearer ${userStore.token}`;
@@ -49,7 +45,7 @@ const isModalOpen = ref(false);
 
 const deleteFilterId = async () => {
   await deleteFilter({
-    path: { id: props.itemId },
+    path: { id: props.itemId ?? 0 },
     composable: "$fetch",
     headers: { Authorization: apiToken },
   })

@@ -10,10 +10,7 @@
 </template>
 
 <script setup lang='ts'>
-const props = defineProps({
-  filter: {
-    type: Object,
-    required: true
-  }
-})
+import type { Filter } from '~/types/FilterType';
+
+const props = defineProps<{ filter: Filter }>()
 </script>

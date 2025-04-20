@@ -31,15 +31,11 @@
 <script setup lang='ts'>
 import { ref, watch } from 'vue'
 import { MessageSquareIcon } from 'lucide-vue-next'
+import type { Filter } from '~/types/FilterType';
 
 const userStore = useUserStore()
 
-const props = defineProps({
-  filter: {
-    type: Object,
-    required: true
-  }
-})
+const props = defineProps<{ filter: Filter }>()
 
 const webhookUrl = ref(props.filter.notificationTarget || '')
 const isValidWebhook = ref(true)

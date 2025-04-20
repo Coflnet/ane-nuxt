@@ -122,7 +122,7 @@
           <div class="bg-slate-800 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
             <span class="text-2xl font-bold">1</span>
           </div>
-          <h3 class="text-xl font-bold mb-3">{{ $t('createYourFilter') }}</h3>
+          <h3 class="text-xl font-bold mb-3">{{ $t('createFilter') }}</h3>
           <p class="text-slate-200">
             {{ $t('customFilter') }}
           </p>

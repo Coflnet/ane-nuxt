@@ -3,12 +3,12 @@
   <div class="grid grid-cols-2 md:grid-cols-4 gap-x-8 ">
     <div>
       <UiInput v-model="filter.searchRadius" :label="$t('searchRadius')" type="number" :placeholder="$t('radiusEq')"
-        :footer="$t('searchRadiusAroundYou')" :radiusError="radiusError" />
+        :footer="$t('searchRadiusAroundYou')" :error="radiusError" />
       <p v-if="radiusError" class="mt-1 text-xs text-rose-500">{{ radiusErrorMessage }} </p>
     </div>
 
     <UiInput v-model="filter.zipcode" :label="$t('zipCode')" type="number" :placeholder="$t('zipCodeEq')"
-      :footer="$t('yourZip')" :radiusError="radiusError" />
+      :footer="$t('yourZip')" :error="radiusError" />
 
     <div class="flex items-center mb-4 space-x-2 col-span-2">
       <UiInput v-model="filter.minPrice" :label="$t('priceRange')" type="number" placeholder="" />
@@ -19,7 +19,6 @@
 </template>
 
 <script setup lang='ts'>
-
 const { t } = useI18n();
 const radiusErrorMessage = computed(() => {
   if (!radiusError) return ''
@@ -45,6 +44,7 @@ watch([() => props.filter.searchRadius, () => props.filter.zipcode], ([newRadius
 function validateRadiusAndZipcode(radius: any, zipcode: string) {
   if (radius && !zipcode) {
     radiusError.value = true
+    return;
   }
   radiusError.value = false
 }

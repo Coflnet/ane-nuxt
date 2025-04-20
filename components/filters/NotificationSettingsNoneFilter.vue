@@ -18,10 +18,6 @@
 </template>
 
 <script setup lang='ts'>
-defineProps({
-  filter: {
-    type: Object,
-    required: true
-  }
-})
+import type { Filter } from '~/types/FilterType';
+defineProps<{ filter: Filter }>()
 </script>

@@ -26,7 +26,9 @@
 </template>
 
 <script setup lang="ts">
-import FilterOverviewItem from './index/FilterOverviewItem.vue';
+import type { FilterFace } from '~/types/FilterType';
+import FilterOverviewItem from './FilterView/FilterOverviewItem.vue';
+
 
 const filterStore = useFilterStore();
 

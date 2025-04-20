@@ -1,6 +1,6 @@
 <template>
   <div>
-    <CreateHeaderLabel :label="label" />
+    <UiHeaderLabel :label="label ?? ''" :sm="true" :accent="true" />
     <UiDefaultInputBox class="p-2">
       <div v-for="(keyword, index) in keywords" :key="index"
         class="inline-flex items-center px-3 py-2 rounded-md text-sm font-medium bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200">
@@ -21,7 +21,6 @@
 </template>
 
 <script setup lang='ts'>
-import CreateHeaderLabel from '~/pages/filters/Create/CreateHeaderLabel.vue'
 
 
 var keywords = defineModel<String[]>()

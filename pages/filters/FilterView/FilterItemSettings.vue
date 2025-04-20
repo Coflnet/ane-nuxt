@@ -20,6 +20,7 @@
 
 <script setup lang="ts">
 import { MapPinIcon, TagIcon } from 'lucide-vue-next';
+import type { FilterFace } from '~/types/FilterType';
 
 
 defineProps<{ filter: FilterFace }>()

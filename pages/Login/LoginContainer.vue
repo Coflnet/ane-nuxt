@@ -8,7 +8,13 @@
       <LoginPolicy />
     </UiDefaultContainer>
 
-    <SwitchLoginForm :is-login="isLogin" />
+    <UiFooterLabel class="mt-4">
+      {{ isLogin ? $t('dontHaveAccount') : $t('alreadyHaveAccount') }}
+      <NuxtLink :to="isLogin ? '/register' : '/login'"
+        class="text-indigo-600 dark:text-indigo-400 hover:underline ml-1">
+        {{ isLogin ? $t('signUp') : $t('signIn') }}
+      </NuxtLink>
+    </UiFooterLabel>
   </main>
 </template>
 
@@ -18,7 +24,6 @@ import LoginContainerHeader from './LoginContainerHeader.vue';
 import LoginPasswordEmail from './LoginPasswordEmail.vue';
 import LoginPolicy from './LoginPolicy.vue';
 import LoginWithGoogleButton from './LoginWithGoogleButton.vue';
-import SwitchLoginForm from './SwitchLoginForm.vue';
 
 defineProps({ isLogin: Boolean })
 

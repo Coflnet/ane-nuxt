@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-
+import type { TopFilter } from '~/types/FilterType';
 
 const props = defineProps<{
   topFilters: Record<string, TopFilter>

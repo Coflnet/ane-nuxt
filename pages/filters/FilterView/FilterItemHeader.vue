@@ -1,8 +1,8 @@
 <template>
   <div class="flex items-start justify-between mb-3">
     <div>
-      <h3 class="font-medium text-lg text-slate-900 dark:text-white">{{ filter.name }}</h3>
-      <p class="text-sm text-slate-500 dark:text-slate-400">{{ filter.marketplace }}</p>
+      <UiHeaderLabel :label="filter.name"></UiHeaderLabel>
+      <UiFooterLabel :label="filter.marketplace || 'Ebay'" :xs="true" />
     </div>
     <div class="flex flex-row gap-x-1">
       <div class="flex items-center space-x-1">
@@ -19,8 +19,7 @@
 
 <script setup lang="ts">
 import FilterCardDelete from '~/components/filters/FilterCardDelete.vue';
-
-
+import type { FilterFace } from '~/types/FilterType';
 
 defineProps<{ filter: FilterFace }>()
 
