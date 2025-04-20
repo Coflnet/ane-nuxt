@@ -26,7 +26,8 @@
 </template>
 
 <script setup lang="ts">
-import FilterOverviewItem from './index/FilterOverviewItem.vue';
+import FilterOverviewItem from './FilterView/FilterOverviewItem.vue';
+
 
 const filterStore = useFilterStore();
 
