@@ -30,15 +30,12 @@
 <script setup lang='ts'>
 import { ref, watch } from 'vue'
 import { MailIcon } from 'lucide-vue-next'
+import type { Filter } from '~/types/FilterType';
 
 const userStore = useUserStore()
 
-const props = defineProps({
-  filter: {
-    type: Object,
-    required: true
-  }
-})
+
+const props = defineProps<{ filter: Filter }>()
 
 const emailAddress = ref(props.filter.notificationTarget || '')
 const isValidEmail = ref(true)

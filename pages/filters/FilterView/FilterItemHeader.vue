@@ -19,6 +19,7 @@
 
 <script setup lang="ts">
 import FilterCardDelete from '~/components/filters/FilterCardDelete.vue';
+import type { FilterFace } from '~/types/FilterType';
 
 defineProps<{ filter: FilterFace }>()
 

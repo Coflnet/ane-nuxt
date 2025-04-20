@@ -5,7 +5,7 @@
       'w-full px-4 py-2 rounded-lg border bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400',
       error ? 'border-rose-500 dark:border-rose-500' : 'border-slate-300 dark:border-slate-600'
     ]" />
-    <FooterLabel :label="footer" :xs="true" />
+    <FooterLabel v-if="!error" :label="footer" :xs="true" />
   </div>
 </template>
 

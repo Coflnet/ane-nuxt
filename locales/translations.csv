@@ -151,3 +151,4 @@ addBlackListPressEnter,Add blacklist and press Enter
 zipCodeEq,"e.g., xxxxx"
 radiusEq,"e.g., 10"
 updateFilter,Update Filter
+searchKeywords,Search Keywords

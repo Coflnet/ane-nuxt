@@ -15,8 +15,8 @@
       <UiInput :name="$t('searchValue')" :placeholder="$t('cameraEg')" :label="$t('searchValue')"
         v-model="filter.searchValue" />
 
-      <FiltersKeywordFilter :model-value="filter.keywords" :label="$t('keywords')" :footer="$t('addKeyDescription')"
-        :place-holder="$t('addKeywordPressEnter')" />
+      <FiltersKeywordFilter :model-value="filter.keywords" :label="$t('searchKeywords')"
+        :footer="$t('addKeyDescription')" :place-holder="$t('addKeywordPressEnter')" />
       <FiltersKeywordFilter :model-value="filter.blacklist" :label="$t('blackKeywords')"
         :footer="$t('addblacklistKeywords')" :place-holder="$t('addBlackListPressEnter')" />
 
@@ -41,19 +41,19 @@
 import NotificationSettingsFilter from '~/components/filters/NotificationSettingsFilter.vue';
 import CreateHeader from './Create/CreateHeader.vue';
 import ConfirmCreation from './Create/ConfirmCreation.vue';
+import type { Filter } from '~/types/FilterType';
 
 const filterStore = useFilterStore();
 const userStore = useUserStore();
 
 const route = useRoute()
 
-export type TargetType = 'Unknown' | 'FireBase' | 'DiscordWebhook' | 'Email' | 'WhatsApp';
 
 const isNewFilter = computed(() => {
   return route.query.id == "" || route.query.id == undefined
 })
 
-const filter = ref({
+const filter = ref<Filter>({
   name: '',
   marketplace: 'all',
   searchValue: '',
@@ -69,7 +69,6 @@ const filter = ref({
   currency: '€',
   location: '',
   id: 0,
-  customFields: [] as any[],
   notificationType: 'Unknown',
   notificationTarget: ""
 })
@@ -174,8 +173,7 @@ async function saveFilter() {
     filters: await handleFilters()
   }
 
-  console.log(filterToCreate)
-  return;
+
   await filterStore.saveFilter(filterToCreate)
   push.success("Filter successfully saved");
   navigateTo("/overview")
