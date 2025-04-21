@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import LoginContainer from './Login/LoginContainer.vue';
+import LoginContainer from './login/LoginContainer.vue';
 
 async function checkLogin() {
   const userStore = useUserStore();

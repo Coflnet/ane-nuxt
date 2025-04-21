@@ -19,9 +19,9 @@
 import { ref, onMounted } from 'vue'
 import { useInfiniteScroll } from '@vueuse/core'
 import { useListingStore } from '@/stores/listing'
-import AuctionsLoadingState from './Auctions/AuctionsLoadingState.vue'
+import AuctionsLoadingState from './AuctionsLoadingState.vue'
 import { UiDefaultContainer } from '#components'
-import AuctionItem from './Auctions/AuctionItem.vue'
+import AuctionItem from './AuctionItem.vue'
 
 const listingStore = useListingStore()
 

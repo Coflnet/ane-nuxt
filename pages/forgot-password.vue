@@ -3,7 +3,7 @@
     <main class="flex-1 flex flex-col items-center justify-center px-4 py-8 mb-8 ">
       <UiDefaultContainer class="p-6 max-w-md py-4 w-full px-12">
         <div class="text-center my-8">
-          <HeaderLabel :label="$t('forgotPassword')" class="mb-2" />
+          <UiHeaderLabel :label="$t('forgotPassword')" class="mb-2" />
         </div>
 
         <UiInput type="email" :placeholder="$t('email')" v-model="email" />

@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import LoginContainer from './Login/LoginContainer.vue';
+import LoginContainer from './LoginContainer.vue';
 
 definePageMeta({
   layout: 'landing'

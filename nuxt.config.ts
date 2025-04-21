@@ -39,7 +39,7 @@ export default defineNuxtConfig({
 
   icon: {
     serverBundle: {
-      remote: 'jsdelivr', // 'unpkg' or 'github-raw', or a custom function
+      remote: 'jsdelivr',
     }
   },
 
@@ -50,7 +50,7 @@ export default defineNuxtConfig({
       { code: 'de', name: 'Deutsch', file: 'de.json' }
     ],
     defaultLocale: 'en',
-    langDir: "../locales/", // Adjust path if your config file is in a subdirectory
+    langDir: "../locales/",
     lazy: true,
   }),
 

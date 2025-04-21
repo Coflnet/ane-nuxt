@@ -25,10 +25,10 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import OverviewStats from './Overview/OverviewStats.vue';
-import RecentMatchTable from './Overview/RecentMatchTable.vue';
-import TopFilters from './Overview/TopFilters.vue';
-import NotificationChannels from './Overview/NotificationChannels.vue';
+import OverviewStats from './OverviewStats.vue';
+import RecentMatchTable from './RecentMatchTable.vue';
+import TopFilters from './TopFilters.vue';
+import NotificationChannels from './NotificationChannels.vue';
 
 const stats = ref({
   activeFilters: 0,
