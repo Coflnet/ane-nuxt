@@ -41,10 +41,13 @@
 import NotificationSettingsFilter from '~/components/filters/NotificationSettingsFilter.vue';
 import CreateHeader from './Create/CreateHeader.vue';
 import ConfirmCreation from './Create/ConfirmCreation.vue';
+import { getMessaging, getToken } from 'firebase/messaging'
+import { useFirebaseApp } from 'vuefire'
 import type { Filter } from '~/types/FilterType';
 
 const filterStore = useFilterStore();
 const userStore = useUserStore();
+const firebaseApp = useFirebaseApp()
 
 const route = useRoute()
 
@@ -145,6 +148,7 @@ async function loadEditParam() {
 
 
 
+
 async function saveFilter() {
   if (radiusError.value) {
     return
@@ -153,7 +157,7 @@ async function saveFilter() {
   var rawFilter = toRaw(filter.value);
   var target = rawFilter.notificationTarget
   if (rawFilter.notificationType == 'FireBase') {
-    rawFilter.notificationTarget = "-";
+    rawFilter.notificationTarget = await connectPushNotifications()
   }
 
   if (rawFilter.notificationType == 'DiscordWebhook') {
@@ -227,6 +231,13 @@ async function handleSearchRadius(): Promise<[string, string]> {
     push.error(`We ran into issue\n ${error}`)
   }
   return ['', '']
+}
+
+async function connectPushNotifications(): Promise<string> {
+  const messaging = getMessaging(firebaseApp);
+  // vapid key is meant to be public
+  const token = await getToken(messaging, { vapidKey: 'BC2o4A75_oGlbklpFN4iVXjdZE3lg6Qci7EZg0NrsRAKyKmySam77NrlUAodBAzKhTECJGj-rgfdbQ0qzWUh9nU' })
+  return token
 }
 
 onMounted(async () => {

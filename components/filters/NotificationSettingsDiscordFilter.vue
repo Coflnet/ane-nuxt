@@ -4,7 +4,8 @@
     predefinedValue: userStore.notificationSettings.discord.webhookUrl,
     name: 'Discord',
     placeholder: $t('discordWebHookUrl'),
-    icon: 'tabler:brand-discord'
+    icon: 'tabler:brand-discord',
+    textInput: true
   }" :messages="{
     error: $t('invalidDiscordWebhook'),
     footer: $t('sendDiscordNotifications')

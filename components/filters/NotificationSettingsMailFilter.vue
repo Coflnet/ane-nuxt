@@ -4,7 +4,8 @@
     predefinedValue: userStore.notificationSettings.email.address,
     name: $t('email'),
     placeholder: $t('enterEmailAddress'),
-    icon: 'tabler:mail'
+    icon: 'tabler:mail',
+    textInput: true
   }" :messages="{
     error: $t('invalidEmail'),
     footer: $t('sendDiscordNotifications')

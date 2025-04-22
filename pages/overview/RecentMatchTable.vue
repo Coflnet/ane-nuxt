@@ -18,7 +18,9 @@
           <td class="px-4 py-3 text-sm text-slate-900 dark:text-white">{{ filters.getSimplifiedFilters[auction.filter ??
             0] }}
           </td>
-          <td class="px-4 py-3 text-sm font-medium text-slate-900 dark:text-white">{{ auction.price }}</td>
+          <td class="px-4 py-3 text-sm font-medium text-slate-900 dark:text-white">{{ $t('dollarSign') }}{{
+            auction.price
+          }}</td>
           <td class="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">{{ timeAgo(auction.matchedAt) }}</td>
           <td class="px-4 py-3 text-sm">
             <div class="flex items-center space-x-2 ml-2.5">
@@ -46,7 +48,7 @@ function timeAgo(timestamp: string): string {
   const now = new Date();
   const past = new Date(timestamp);
   const diff = (now.getTime() - past.getTime()) / 1000;
-  if (diff < 900) {
+  if (diff < 160) {
     return t('justNow');
   } if (diff < 3600) {
     return `${Math.floor(diff / 60)} minutes ago`;

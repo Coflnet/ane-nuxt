@@ -4,6 +4,7 @@
     <div class="space-y-4 mt-4">
       <FiltersNotificationSettingsDiscordFilter :filter="props.filter" />
       <FiltersNotificationSettingsMailFilter :filter="props.filter" />
+      <FiltersNotificationSettingsWebPushFilter :filter="props.filter" />
       <FiltersNotificationSettingsNoneFilter :filter="props.filter" />
     </div>
   </div>
