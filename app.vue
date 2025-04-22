@@ -1,6 +1,4 @@
 <template>
-
-
   <div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
     <NuxtLayout>
       <NuxtPage />
@@ -14,7 +12,7 @@
 </template>
 
 <script setup>
-import { onMessage } from 'firebase/messaging'
+import { getMessaging, onMessage } from 'firebase/messaging'
 // App-wide setup
 useHead({
   title: 'ANE - Advanced Notification Engine',
@@ -23,26 +21,38 @@ useHead({
   ],
 })
 
-onMounted(() => {
-  const { $messaging } = useNuxtApp()
+onMounted(async () => {
+  await nextTick()
+  if (import.meta.server) return;
 
-  if (!$messaging) return
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('firebase-messaging-sw.js')
+      .then(reg => {
+        console.log(`Service Worker Registration (Scope: ${reg.scope})`);
+      })
+      .catch(error => {
+        const msg = `Service Worker Error (${error})`;
+        console.error(msg);
+      });
+  } else {
+    console.warn('Service Worker not available');
+  }
+  const firebaseApp = useFirebaseApp()
+  const messaging = getMessaging(firebaseApp)
 
-  onMessage($messaging, (payload) => {
-    if (import.meta.server)
-      return
+  if (!messaging) {
+    console.error('Firebase Messaging not initialized!');
+    return;
+  }
 
-    const notification = payload.notification
+  onMessage(messaging, (payload) => {
+    const notification = payload.notification;
 
-    console.log("got a noti")
     if (Notification.permission === 'granted' && notification?.title) {
-      console.log("sent notification")
       new Notification(notification.title, {
         body: notification.body,
-        icon: '/icon.png', // optional
-      })
+      });
     }
-
-  })
-})
+  });
+});
 </script>

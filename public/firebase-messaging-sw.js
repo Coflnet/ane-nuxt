@@ -10,9 +10,15 @@ firebase.initializeApp({
   appId: "1:625983368920:web:04af5415ef9a54d14331ad"
 })
 
+
+console.log('Service worker loaded')
+
 const messaging = firebase.messaging()
 
+console.log(messaging)
+
 messaging.onBackgroundMessage(payload => {
+  console.log("starting")
   const { title, body } = payload.notification
   console.log('Background message received', payload)
   self.registration.showNotification(title, {
@@ -20,3 +26,4 @@ messaging.onBackgroundMessage(payload => {
     icon: '/icon.png',
   })
 })
+

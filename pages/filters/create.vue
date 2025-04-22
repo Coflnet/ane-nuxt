@@ -7,7 +7,7 @@
         <UiDropdown id="marketplace" :model-value="filter.marketplace" :options="[
           { value: 'all', label: $t('allMarket') },
           { value: 'Ebay', label: 'eBay' },
-          { value: 'kleinanzeigen', label: 'eBay Kleinanzeigen' },
+          { value: 'Kleinanzeigen', label: 'Kleinanzeigen' },
         ]" :label="$t('marketplace')" />
       </UiGrid>
 
@@ -100,6 +100,7 @@ async function loadEditParam() {
     filter.value.name = activeFilter.name ?? ""
     filter.value.id = activeFilter.id ?? 0
 
+
     activeFilter.filters.forEach(item => {
       switch (item.name) {
         case 'Radius': {
@@ -127,7 +128,11 @@ async function loadEditParam() {
           break
         }
         case 'IncludePlatforms':
-          filter.value.marketplace = item.value!.toLowerCase()
+          if (["Ebay", "Kleinanzeigen"].includes(item.value!)) {
+            filter.value.marketplace = item.value!.toLowerCase()
+            break;
+          }
+          filter.value.marketplace = "all"
           break
         case 'CommercialSeller':
           filter.value.commercialSeller = Boolean(item.value)
@@ -147,9 +152,6 @@ async function loadEditParam() {
   }
 }
 
-
-
-
 async function saveFilter() {
   if (radiusError.value) {
     return
@@ -158,7 +160,7 @@ async function saveFilter() {
   savingFilter.value = true
 
   var rawFilter = toRaw(filter.value);
-  var target = rawFilter.notificationTarget
+
   if (rawFilter.notificationType == 'FireBase') {
     rawFilter.notificationTarget = await connectPushNotifications()
   }
@@ -175,12 +177,13 @@ async function saveFilter() {
     name: rawFilter.name == "" ? rawFilter.searchValue : rawFilter.name,
     userId: '',
     id: filter.value.id,
-    target: target,
+    target: rawFilter.notificationTarget,
     targetType: rawFilter.notificationType as TargetType,
     filters: await handleFilters()
   }
 
 
+  console.log(filterToCreate)
   await filterStore.saveFilter(filterToCreate)
   push.success("Filter successfully saved");
   navigateTo("/overview")
@@ -197,6 +200,11 @@ async function handleFilters(): Promise<{ name: string; value: any }[]> {
     filters.push({
       name: "IncludePlatforms",
       value: rawFilter.marketplace
+    })
+  } else {
+    filters.push({
+      name: "IncludePlatforms",
+      value: "Ebay,Kleinanzeigen"
     })
   }
   if (rawFilter.commercialSeller) {

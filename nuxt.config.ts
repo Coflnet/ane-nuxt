@@ -1,6 +1,8 @@
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 
+import { messaging } from "firebase-admin";
+
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   future: {
@@ -63,8 +65,12 @@ export default defineNuxtConfig({
       messagingSenderId: "625983368920",
       appId: "1:625983368920:web:04af5415ef9a54d14331ad"
     },
+    messaging: {
+      enabled: true,
+    },
     auth: {
       enabled: true
-    }
+    },
+
   }
 })
