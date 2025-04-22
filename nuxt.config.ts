@@ -34,7 +34,7 @@ export default defineNuxtConfig({
   ],
 
   notivue: {
-    position: "top-right"
+    position: "top-right",
   },
 
   icon: {

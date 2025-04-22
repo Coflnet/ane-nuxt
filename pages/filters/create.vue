@@ -31,7 +31,7 @@
       <FiltersRadiusRangeFilter :filter="filter" />
       <NotificationSettingsFilter :filter="filter"></NotificationSettingsFilter>
 
-      <ConfirmCreation :is-new-filter="isNewFilter" />
+      <ConfirmCreation :is-new-filter="isNewFilter" :saving="savingFilter" />
     </form>
   </UiDefaultContainer>
 
@@ -48,6 +48,7 @@ import type { Filter } from '~/types/FilterType';
 const filterStore = useFilterStore();
 const userStore = useUserStore();
 const firebaseApp = useFirebaseApp()
+const savingFilter = ref(false)
 
 const route = useRoute()
 
@@ -154,6 +155,8 @@ async function saveFilter() {
     return
   }
 
+  savingFilter.value = true
+
   var rawFilter = toRaw(filter.value);
   var target = rawFilter.notificationTarget
   if (rawFilter.notificationType == 'FireBase') {
@@ -228,6 +231,7 @@ async function handleSearchRadius(): Promise<[string, string]> {
     return [data2[0].lat, data2[0].lon]
   } catch (error) {
     console.error('Error fetching country:', error);
+    savingFilter.value = false
     push.error(`We ran into issue\n ${error}`)
   }
   return ['', '']

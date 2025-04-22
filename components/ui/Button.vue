@@ -1,7 +1,13 @@
 <template>
-  <button :type="type ?? 'button'" @click="emit('onClick')" :class="buttonClasses"
+  <button :type="type ?? 'button'" @click="emit('onClick')" :class="buttonClasses" :disabled="!!proccessing"
     class="mt-4 md:mt-0 px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 justify-center">
-    <slot />
+    <div class="relative flex justify-center items-center">
+      <div class="flex space-x-2 items-center" :class="proccessing ? 'opacity-0 pointer-events-none' : 'opacity-100'">
+        <slot />
+      </div>
+      <UiIcon v-if="proccessing" name="svg-spinners:90-ring-with-bg"
+        class="size-6 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+    </div>
   </button>
 </template>
 
@@ -9,7 +15,7 @@
 
 const emit = defineEmits(['onClick'])
 
-const props = defineProps<{ warning?: Boolean, primary?: Boolean, type?: 'button' | 'submit' | 'reset' | undefined }>()
+const props = defineProps<{ warning?: Boolean, primary?: Boolean, type?: 'button' | 'submit' | 'reset' | undefined, proccessing?: Boolean }>()
 
 const buttonClasses = computed(() => {
   if (props.warning)

@@ -18,7 +18,7 @@
 
             <div class="flex justify-end space-x-3 mt-6">
               <UiButton @on-click="isModalOpen = false">{{ $t('cancel') }}</UiButton>
-              <UiButton @on-click="deleteFilterId" :warning="true">{{ $t('delete') }}</UiButton>
+              <UiButton @on-click="deleteFilterId" :warning="true" :proccessing="deleting">{{ $t('delete') }}</UiButton>
             </div>
           </UiDefaultContainer>
 
@@ -29,7 +29,6 @@
 </template>
 
 <script setup lang="ts">
-import { UiButton } from '#components';
 import { ref } from 'vue';
 import { deleteFilter } from '~/src/api-client';
 
@@ -38,20 +37,22 @@ const props = defineProps({ itemId: Number });
 const userStore = useUserStore()
 var apiToken = `Bearer ${userStore.token}`;
 const filterStore = useFilterStore();
+const deleting = ref(false);
 
 
-// State
 const isModalOpen = ref(false);
 
 const deleteFilterId = async () => {
+  deleting.value = true;
   await deleteFilter({
     path: { id: props.itemId ?? 0 },
     composable: "$fetch",
     headers: { Authorization: apiToken },
   })
-  push.success("Filter successfully deleted");
   await filterStore.loadFilters();
+  push.success("Filter successfully deleted");
   isModalOpen.value = false;
+  deleting.value = false;
 }
 
 
