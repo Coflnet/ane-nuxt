@@ -4,9 +4,9 @@
     <form @submit.prevent="saveFilter" class="space-y-6">
       <UiGrid :grid-size="2">
         <UiInput :name="$t('filterName')" :placeholder="$t('nameEg')" :label="$t('filterName')" v-model="filter.name" />
-        <UiDropdown id="marketplace" :model-value="filter.marketplace" :options="[
+        <UiDropdown id="marketplace" v-model="filter.marketplace" :options="[
           { value: 'all', label: $t('allMarket') },
-          { value: 'Ebay', label: 'eBay' },
+          { value: 'Ebay', label: 'Ebay' },
           { value: 'Kleinanzeigen', label: 'Kleinanzeigen' },
         ]" :label="$t('marketplace')" />
       </UiGrid>
@@ -99,7 +99,7 @@ async function loadEditParam() {
 
     filter.value.name = activeFilter.name ?? ""
     filter.value.id = activeFilter.id ?? 0
-
+    filter.value.notificationType = activeFilter.targetType ?? "Unknown"
 
     activeFilter.filters.forEach(item => {
       switch (item.name) {
@@ -128,8 +128,9 @@ async function loadEditParam() {
           break
         }
         case 'IncludePlatforms':
+          console.log(item.value)
           if (["Ebay", "Kleinanzeigen"].includes(item.value!)) {
-            filter.value.marketplace = item.value!.toLowerCase()
+            filter.value.marketplace = item.value!
             break;
           }
           filter.value.marketplace = "all"
@@ -183,7 +184,6 @@ async function saveFilter() {
   }
 
 
-  console.log(filterToCreate)
   await filterStore.saveFilter(filterToCreate)
   push.success("Filter successfully saved");
   navigateTo("/overview")
@@ -196,6 +196,7 @@ async function handleFilters(): Promise<{ name: string; value: any }[]> {
   if (rawFilter.minPrice != 0 || rawFilter.maxPrice || rawFilter.maxPrice == 0) {
     filters.push({ name: "PriceRange", value: `${Number(rawFilter.minPrice)}-${Number(rawFilter.maxPrice)}` })
   }
+  console.log(rawFilter.marketplace)
   if (rawFilter.marketplace != "all") {
     filters.push({
       name: "IncludePlatforms",

@@ -2,7 +2,7 @@
   <div class="flex justify-between items-start mb-8">
     <div>
       <h1>
-        <HeaderLabel :label="$t('filters')" :xl="true" />
+        <UiHeaderLabel :label="$t('filters')" :xl="true" />
       </h1>
       <UiFooterLabel :label="$t('manageFilters')"></UiFooterLabel>
     </div>
