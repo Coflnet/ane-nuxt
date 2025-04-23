@@ -1,7 +1,7 @@
 <template>
   <div v-if="noAuctions" class="py-12 text-center">
-    <Icon name="tabler:Search" class="size-9" />
-    <HeaderLabel :label="$t('noAuctions')" />
+    <Icon name="tabler:search" class="size-9 text-white" />
+    <UiHeaderLabel :label="$t('noAuctions')" />
     <UiFooterLabel :label="$t('tryAdjustedFilters')" />
   </div>
 
@@ -14,7 +14,6 @@
 
 <script setup lang="ts">
 import { Icon } from '#components';
-import HeaderLabel from '~/components/ui/HeaderLabel.vue';
 
 defineProps({ noAuctions: Boolean, loading: Boolean })
 </script>

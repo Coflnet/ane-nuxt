@@ -15,7 +15,7 @@ export const useListingStore = defineStore("listing", () => {
     const apiToken = `Bearer ${userStore.token}`;
 
     const response = await getMatches({
-      query: { limit: 10 },
+      query: { limit: 6 },
       composable: "$fetch",
       headers: { Authorization: apiToken },
     })

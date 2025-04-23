@@ -4,10 +4,10 @@
     <form @submit.prevent="saveFilter" class="space-y-6">
       <UiGrid :grid-size="2">
         <UiInput :name="$t('filterName')" :placeholder="$t('nameEg')" :label="$t('filterName')" v-model="filter.name" />
-        <UiDropdown id="marketplace" :model-value="filter.marketplace" :options="[
+        <UiDropdown id="marketplace" v-model="filter.marketplace" :options="[
           { value: 'all', label: $t('allMarket') },
-          { value: 'Ebay', label: 'eBay' },
-          { value: 'kleinanzeigen', label: 'eBay Kleinanzeigen' },
+          { value: 'Ebay', label: 'Ebay' },
+          { value: 'Kleinanzeigen', label: 'Kleinanzeigen' },
         ]" :label="$t('marketplace')" />
       </UiGrid>
 
@@ -31,8 +31,7 @@
       <FiltersRadiusRangeFilter :filter="filter" />
       <NotificationSettingsFilter :filter="filter"></NotificationSettingsFilter>
 
-      <ConfirmCreation :is-new-filter="isNewFilter" />
-
+      <ConfirmCreation :is-new-filter="isNewFilter" :saving="savingFilter" />
     </form>
   </UiDefaultContainer>
 
@@ -46,11 +45,15 @@ import { debounce } from 'lodash';
 import NotificationSettingsFilter from '~/components/filters/NotificationSettingsFilter.vue';
 import CreateHeader from './Create/CreateHeader.vue';
 import ConfirmCreation from './Create/ConfirmCreation.vue';
+import { getMessaging, getToken } from 'firebase/messaging'
+import { useFirebaseApp } from 'vuefire'
 import type { Filter } from '~/types/FilterType';
 
 
 const filterStore = useFilterStore();
 const userStore = useUserStore();
+const firebaseApp = useFirebaseApp()
+const savingFilter = ref(false)
 
 const route = useRoute()
 
@@ -131,6 +134,7 @@ async function loadEditParam() {
 
     filter.value.name = activeFilter.name ?? ""
     filter.value.id = activeFilter.id ?? 0
+    filter.value.notificationType = activeFilter.targetType ?? "Unknown"
 
     activeFilter.filters.forEach(item => {
       switch (item.name) {
@@ -159,7 +163,12 @@ async function loadEditParam() {
           break
         }
         case 'IncludePlatforms':
-          filter.value.marketplace = item.value!.toLowerCase()
+          console.log(item.value)
+          if (["Ebay", "Kleinanzeigen"].includes(item.value!)) {
+            filter.value.marketplace = item.value!
+            break;
+          }
+          filter.value.marketplace = "all"
           break
         case 'CommercialSeller':
           filter.value.commercialSeller = Boolean(item.value)
@@ -179,7 +188,6 @@ async function loadEditParam() {
   }
 }
 
-
 async function saveFilter() {
   const f = await filterToCreate()
   if (!f)
@@ -195,10 +203,12 @@ async function filterToCreate(): Promise<ListingListener | null> {
     return null;
   }
 
+  savingFilter.value = true
+
   var rawFilter = toRaw(filter.value);
-  var target = rawFilter.notificationTarget
+
   if (rawFilter.notificationType == 'FireBase') {
-    rawFilter.notificationTarget = "-";
+    rawFilter.notificationTarget = await connectPushNotifications()
   }
 
   if (rawFilter.notificationType == 'DiscordWebhook') {
@@ -213,11 +223,11 @@ async function filterToCreate(): Promise<ListingListener | null> {
     name: rawFilter.name == "" ? rawFilter.searchValue : rawFilter.name,
     userId: '',
     id: filter.value.id,
-    target: target,
+    target: rawFilter.notificationTarget,
     targetType: rawFilter.notificationType as TargetType,
     filters: await handleFilters()
   }
-  
+
   await filterStore.saveFilter(filterToCreate)
   push.success("Filter successfully saved");
   navigateTo("/overview")
@@ -230,10 +240,16 @@ async function handleFilters(): Promise<{ name: string; value: any }[]> {
   if (rawFilter.minPrice != 0 || rawFilter.maxPrice || rawFilter.maxPrice == 0) {
     filters.push({ name: "PriceRange", value: `${Number(rawFilter.minPrice)}-${Number(rawFilter.maxPrice)}` })
   }
+  console.log(rawFilter.marketplace)
   if (rawFilter.marketplace != "all") {
     filters.push({
       name: "IncludePlatforms",
       value: rawFilter.marketplace
+    })
+  } else {
+    filters.push({
+      name: "IncludePlatforms",
+      value: "Ebay,Kleinanzeigen"
     })
   }
   if (rawFilter.commercialSeller) {
@@ -268,9 +284,17 @@ async function handleSearchRadius(): Promise<[string, string]> {
     return [data2[0].lat, data2[0].lon]
   } catch (error) {
     console.error('Error fetching country:', error);
+    savingFilter.value = false
     push.error(`We ran into issue\n ${error}`)
   }
   return ['', '']
+}
+
+async function connectPushNotifications(): Promise<string> {
+  const messaging = getMessaging(firebaseApp);
+  // vapid key is meant to be public
+  const token = await getToken(messaging, { vapidKey: 'BC2o4A75_oGlbklpFN4iVXjdZE3lg6Qci7EZg0NrsRAKyKmySam77NrlUAodBAzKhTECJGj-rgfdbQ0qzWUh9nU' })
+  return token
 }
 
 onMounted(async () => {

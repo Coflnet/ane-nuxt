@@ -25,6 +25,11 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import OverviewStats from './OverviewStats.vue';
+import RecentMatchTable from './RecentMatchTable.vue';
+import TopFilters from './TopFilters.vue';
+import NotificationChannels from './NotificationChannels.vue';
+import type { TopFilter } from '~/types/FilterType';
 
 const stats = ref({
   activeFilters: 0,
@@ -36,7 +41,6 @@ const stats = ref({
   notificationChannels: 3
 })
 
-const userStore = useUserStore()
 const filterStore = useFilterStore()
 const listingStore = useListingStore()
 
@@ -45,16 +49,7 @@ const filterCount = computed(() => {
 })
 
 
-interface topFilter {
-  name: string;
-  matches: number;
-  keywords: string[];
-}
-
-const topFilters = ref<{ [id: string]: topFilter }>({})
-
-var apiToken = userStore.token;
-apiToken = "Bearer " + apiToken;
+const topFilters = ref<{ [id: string]: TopFilter }>({})
 
 
 async function loadStats() {
@@ -96,14 +91,6 @@ function getAverageMatchesPerHour(matches: MatchItem[]) {
   stats.value.notificationperHour = Math.round(matches.length / safeHours);
   return
 }
-
-function sortTopFilers(): topFilter[] {
-  const array = Object.values(topFilters.value);
-  const sortedArray = array.sort((a: topFilter, b: topFilter) => b.matches - a.matches);
-  return sortedArray
-}
-
-
 
 onMounted(async () => {
   await Promise.allSettled([filterStore.loadFilters(), listingStore.loadMatches()]);

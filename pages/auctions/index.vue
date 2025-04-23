@@ -19,14 +19,14 @@
 import { ref, onMounted } from 'vue'
 import { useInfiniteScroll } from '@vueuse/core'
 import { useListingStore } from '@/stores/listing'
-import AuctionsLoadingState from './Auctions/AuctionsLoadingState.vue'
+import AuctionsLoadingState from './AuctionsLoadingState.vue'
 import { UiDefaultContainer } from '#components'
-import AuctionItem from './Auctions/AuctionItem.vue'
+import AuctionItem from './AuctionItem.vue'
 
 const listingStore = useListingStore()
 
 const loadedAuctions = ref<MatchItem[]>([])
-const loading = ref(false)
+const loading = ref(true)
 const finished = ref(false)
 
 
@@ -51,6 +51,7 @@ onMounted(async () => {
   await listingStore.loadMatches()
   loadedAuctions.value = listingStore.recentMatches
   useInfiniteScroll(window, loadMore, { distance: 300 })
+  loading.value = false
 })
 
 </script>

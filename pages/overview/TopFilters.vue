@@ -35,7 +35,7 @@ function sortTopFilers(): TopFilter[] {
   const array = Object.values(props.topFilters);
 
   const sortedArray = array.sort((a: TopFilter, b: TopFilter) => b.matches - a.matches);
-  return sortedArray
+  return sortedArray.slice(0, 4)
 }
 
 </script>
