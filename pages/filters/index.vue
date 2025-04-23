@@ -15,12 +15,13 @@
   <UiDefaultContainer class="p-6">
     <UiHeaderLabel :label="$t('yourFilters')" />
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-5">
+    <UiGrid :grid-size="3" class="mt-4">
       <div v-for="(filter, index) in filters" :key="index"
-        class="border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden hover:shadow-md transition-shadow p-4">
+        class="border border-slate-700 rounded-lg overflow-hidden hover:shadow-md transition-shadow p-4">
         <FilterOverviewItem :filter="filter" />
       </div>
-    </div>
+    </UiGrid>
+
   </UiDefaultContainer>
 
 </template>

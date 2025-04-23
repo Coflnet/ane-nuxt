@@ -10,7 +10,7 @@
 
         <div class="flex items-center justify-center min-h-screen p-4">
           <UiDefaultContainer @click.stop class="max-w-md transform p-6">
-            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+            <h3 class="text-lg font-medium text-gray-100 mb-2">
               {{ $t('confirmDeletion') }}
             </h3>
 

@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen flex flex-col ">
-    <header class="w-full py-4 px-6 bg-white dark:bg-slate-800 shadow-sm">
+    <header class="w-full py-4 px-6 bg-slate-800 shadow-sm">
       <div class="max-w-7xl mx-auto flex items-center justify-between">
         <UiLogo location="/" />
         <nav class="hidden md:flex items-center space-x-6 ">

@@ -9,7 +9,7 @@
     </div>
     <div class="absolute top-2 right-2">
       <span
-        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
+        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-900 text-indigo-200">
         {{ auction.marketplace }}
       </span>
     </div>
@@ -17,24 +17,24 @@
 
   <div class="p-4">
     <div class="flex items-start justify-between mb-2">
-      <h3 class="font-medium text-lg text-slate-900 dark:text-white line-clamp-2">{{ auction.title }}</h3>
+      <h3 class="font-medium text-lg text-white line-clamp-2">{{ auction.title }}</h3>
     </div>
 
     <div class="flex items-center justify-between mb-3">
       <UiHeaderLabel :label="`$${auction.price}`" />
     </div>
 
-    <div class="flex items-center justify-between pt-3 border-t border-slate-200 dark:border-slate-700">
+    <div class="flex items-center justify-between pt-3 border-t border-slate-700">
       <div>
-        <span class="text-sm text-slate-500 dark:text-slate-400">{{ $t('matchFilter') }}</span>
-        <span class="ml-1 text-sm font-medium text-indigo-600 dark:text-indigo-400">{{
+        <span class="text-sm text-slate-400">{{ $t('matchFilter') }}</span>
+        <span class="ml-1 text-sm font-medium text-indigo-400">{{
           filterStore.getSimplifiedFilters[auction.filter ?? 0] }}</span>
       </div>
-      <a :href="auction.url ?? ''" target="_blank"
-        class="inline-flex items-center text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200">
-        View
-        <Icon name="tabler:external-link" />
-      </a>
+      <UiTextButton @on-click="navigateTo(auction.url ?? '')" :link="true">
+        {{ $t('view') }}
+        <Icon name="tabler:external-link" class="ml-1" />
+      </UiTextButton>
+
     </div>
   </div>
 

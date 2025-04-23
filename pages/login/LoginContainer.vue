@@ -3,17 +3,16 @@
     <UiDefaultContainer class="p-6 max-w-md py-8">
       <LoginContainerHeader :is-login="isLogin" />
       <LoginPasswordEmail :is-login="isLogin" />
-      <div class="w-full border-t border-slate-200 dark:border-slate-700 my-7"></div>
+      <div class="w-full border-t border-slate-700 my-7" />
       <LoginWithGoogleButton />
       <LoginPolicy />
     </UiDefaultContainer>
 
-    <UiFooterLabel class="mt-4">
+    <UiFooterLabel class="mt-4 flex">
       {{ isLogin ? $t('dontHaveAccount') : $t('alreadyHaveAccount') }}
-      <NuxtLink :to="isLogin ? '/register' : '/login'"
-        class="text-indigo-600 dark:text-indigo-400 hover:underline ml-1">
+      <UiTextButton @on-click="navigateTo(isLogin ? '/register' : '/login')" :link="true" class="ml-1">
         {{ isLogin ? $t('signUp') : $t('signIn') }}
-      </NuxtLink>
+      </UiTextButton>
     </UiFooterLabel>
   </main>
 </template>

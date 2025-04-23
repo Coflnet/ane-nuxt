@@ -1,13 +1,13 @@
 <template>
   <UiGrid :grid-size="3" class="mb-6">
-    <StatContainer :stat="String(filterCount)" iconColorCircle="bg-indigo-100 dark:bg-indigo-900"
-      iconColor="text-indigo-600 dark:text-indigo-400" icon="tabler:filter" :label="$t('activeFilters')" />
+    <StatContainer :stat="String(filterCount)" iconColorCircle="bg-indigo-900" iconColor="text-indigo-400"
+      icon="tabler:filter" :label="$t('activeFilters')" />
 
-    <StatContainer :stat="String(matchedAuctions)" iconColorCircle="bg-purple-100 dark:bg-purple-900"
-      iconColor="text-purple-600 dark:text-purple-400" icon="tabler:tag" :label="$t('totalMatchedAuctions')" />
+    <StatContainer :stat="String(matchedAuctions)" iconColorCircle="bg-purple-900" iconColor="text-purple-400"
+      icon="tabler:tag" :label="$t('totalMatchedAuctions')" />
 
-    <StatContainer :stat="String(notificationperHour)" iconColorCircle="bg-rose-100 dark:bg-rose-900"
-      iconColor="text-rose-600 dark:text-rose-400" icon="tabler:bell" :label="$t('auctionsPerHour')" />
+    <StatContainer :stat="String(notificationperHour)" iconColorCircle="bg-rose-900" iconColor="text-rose-400"
+      icon="tabler:bell" :label="$t('auctionsPerHour')" />
   </UiGrid>
 
 </template>

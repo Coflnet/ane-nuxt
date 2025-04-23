@@ -6,7 +6,7 @@
   <UiDefaultContainer class="p-6">
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <div v-for="(auction, index) in loadedAuctions" :key="index"
-        class="border border-slate-200 dark:border-slate-700 rounded-lg  hover:shadow-md transition-shadow">
+        class="border border-slate-700 rounded-lg  hover:shadow-md transition-shadow">
         <AuctionItem :auction="auction" />
       </div>
     </div>
