@@ -21,6 +21,11 @@
           {{ messages.error }}
         </p>
       </div>
+      <div v-if="filter.notificationType === 'FireBase'" class="mt-2">
+        <button @click="checkPushNotificationPermissions" class="btn btn-primary">
+          Enable Browser Notifications
+        </button>
+      </div>
     </label>
   </DefaultInputBox>
 </template>
@@ -60,5 +65,30 @@ function itemSelected() {
   }
   emit('itemSelected');
 }
+
+function checkPushNotificationPermissions() {
+  if (import.meta.server)
+    return false;
+
+  if (!('Notification' in window)) {
+    push.error("This browser does not support push notifications");
+    return;
+  }
+
+  console.log('Requesting persmissions')
+  Notification.requestPermission().then((permission) => {
+    if (permission === 'granted') {
+      console.log('Notification permission granted');
+    } else {
+      console.warn('Permission not granted:', permission);
+      push.error(`Permission not granted. Please check your browser settings.${permission}`);
+      push.error(permission);
+    }
+  }).catch((err) => {
+    console.error('Error while requesting permission:', err);
+    push.error(`Error requesting permission. Please try again.${err}`);
+  });
+}
+
 
 </script>

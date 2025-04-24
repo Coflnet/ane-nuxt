@@ -13,15 +13,12 @@ firebase.initializeApp({
 const messaging = firebase.messaging();
 console.log('Firebase messaging initialized in service worker');
 
-// Handle background messages
 messaging.onBackgroundMessage(payload => {
-  console.log("Background message received", payload);
-
   const { title, body, icon } = payload.notification || {};
   const data = payload.data || {};
 
   console.log("Notification data", data);
-  self.registration.showNotification("hihihihi", {
+  self.registration.showNotification(title, {
     body: body || '',
     icon: icon || '/icon.png',
     data: {
