@@ -15,20 +15,16 @@
   <OverviewStats :filterCount="filterCount" :matchedAuctions="stats.matchedAuctions"
     :notificationperHour="stats.notificationperHour" />
 
-  <GeneralMatchTable :matches="listingStore.recentMatches" />
-
+  <OverviewRecentMatchTable :matches="listingStore.recentMatches" />
   <UiGrid :grid-size="2">
-    <TopFilters :top-filters="topFilters" />
-    <NotificationChannels />
+    <OverviewTopFilters :top-filters="topFilters" />
+    <OverviewNotificationChannels />
   </UiGrid>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import OverviewStats from './OverviewStats.vue';
-import RecentMatchTable from './RecentMatchTable.vue';
-import TopFilters from './TopFilters.vue';
-import NotificationChannels from './NotificationChannels.vue';
+
 import type { TopFilter } from '~/types/FilterType';
 
 const stats = ref({

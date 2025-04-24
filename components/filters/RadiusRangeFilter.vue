@@ -12,7 +12,7 @@
 
     <div class="flex items-center mb-4 space-x-2 col-span-2">
       <UiInput v-model="filter.minPrice" :label="$t('priceRange')" type="number" placeholder="" />
-      <span class="text-slate-500 dark:text-slate-400 mt-3.5">-</span>
+      <span class="text-slate-400 mt-3.5">-</span>
       <UiInput v-model="filter.maxPrice" class="mt-5" type="number" placeholder="0" />
     </div>
   </div>

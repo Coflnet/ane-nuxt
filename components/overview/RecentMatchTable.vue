@@ -5,8 +5,8 @@
       <TableHeader />
       <tbody>
         <tr v-for="(auction, index) in listingStore.recentMatches" :key="index"
-          class="border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50">
-          <td class="px-4 py-3 text-sm text-slate-900 dark:text-white">
+          class="border-b border-slate-700 hover:bg-slate-700/50">
+          <td class="px-4 py-3 text-sm text-white">
             <div class="flex items-center space-x-3">
               <img :src="auction.image ?? ''" alt="Auction thumbnail" class="w-10 h-10 rounded-md object-cover" />
               <div>
@@ -15,17 +15,17 @@
               </div>
             </div>
           </td>
-          <td class="px-4 py-3 text-sm text-slate-900 dark:text-white">{{ filters.getSimplifiedFilters[auction.filter ??
+          <td class="px-4 py-3 text-sm text-white">{{ filters.getSimplifiedFilters[auction.filter ??
             0] }}
           </td>
-          <td class="px-4 py-3 text-sm font-medium text-slate-900 dark:text-white">{{ $t('dollarSign') }}{{
+          <td class="px-4 py-3 text-sm font-medium text-white">{{ $t('dollarSign') }}{{
             auction.price
-          }}</td>
-          <td class="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">{{ timeAgo(auction.matchedAt) }}</td>
+            }}</td>
+          <td class="px-4 py-3 text-sm text-slate-400">{{ timeAgo(auction.matchedAt) }}</td>
           <td class="px-4 py-3 text-sm">
             <div class="flex items-center space-x-2 ml-2.5">
-              <a :href="auction.url ?? ''" target="_blank"
-                class="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700" title="View auction">
+              <a :href="auction.url ?? ''" target="_blank" class="p-1 rounded-md hover:bg-slate-700"
+                title="View auction">
                 <Icon name="tabler:external-link" class="size-5 text-slate-400" />
               </a>
 

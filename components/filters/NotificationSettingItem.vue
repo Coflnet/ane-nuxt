@@ -7,12 +7,12 @@
     </div>
     <label :for="config.notificationType" class="ml-3 flex">
       <div class="flex items-center">
-        <div class="w-8 h-8 rounded-md bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center mr-3">
-          <Icon :name="config.icon" class="size-6 text-indigo-600 dark:text-indigo-400" />
+        <div class="w-8 h-8 rounded-md bg-indigo-900 flex items-center justify-center mr-3">
+          <Icon :name="config.icon" class="size-6 text-indigo-400" />
         </div>
         <div>
-          <p class="font-medium text-slate-900 dark:text-white">{{ config.name }}</p>
-          <p class="text-xs text-slate-500 dark:text-slate-400">{{ messages.footer }}</p>
+          <p class="font-medium text-white">{{ config.name }}</p>
+          <p class="text-xs text-slate-400">{{ messages.footer }}</p>
         </div>
       </div>
       <div v-if="filter.notificationType === config.notificationType && config.textInput" class="ml-11 mt-2">
