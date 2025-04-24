@@ -1,6 +1,7 @@
-import i18nConfig from "./i18n.config";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
+
+import { messaging } from "firebase-admin";
 
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
@@ -35,14 +36,15 @@ export default defineNuxtConfig({
   ],
 
   notivue: {
-    position: "top-right"
+    position: "top-right",
   },
 
   icon: {
     serverBundle: {
-      remote: 'jsdelivr', // 'unpkg' or 'github-raw', or a custom function
+      remote: 'jsdelivr',
     }
   },
+
 
   i18n: ({
     locales: [
@@ -50,7 +52,7 @@ export default defineNuxtConfig({
       { code: 'de', name: 'Deutsch', file: 'de.json' }
     ],
     defaultLocale: 'en',
-    langDir: "../locales/", // Adjust path if your config file is in a subdirectory
+    langDir: "../locales/",
     lazy: true,
   }),
 
@@ -63,8 +65,12 @@ export default defineNuxtConfig({
       messagingSenderId: "625983368920",
       appId: "1:625983368920:web:04af5415ef9a54d14331ad"
     },
+    messaging: {
+      enabled: true,
+    },
     auth: {
       enabled: true
-    }
+    },
+
   }
 })

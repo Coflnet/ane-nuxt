@@ -1,97 +1,61 @@
 <template>
-  <div>
-    <div class="mb-8">
-      <NuxtLink to="/filters"
-        class="inline-flex items-center text-sm text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 mb-4">
-        <ArrowLeftIcon class="w-4 h-4 mr-1" />
-        {{ $t('backFilt') }}
-      </NuxtLink>
-      <h1 class="text-3xl font-bold text-slate-900 dark:text-white">{{ isNewFilter ? $t('crflt') : $t('editFilt') }}
-      </h1>
-      <p class="mt-2 text-slate-500 dark:text-slate-400">{{ isNewFilter ? $t('setnew') : $t('setUp') }}</p>
-    </div>
+  <FiltersCreateHeader :is-new-filter="isNewFilter" />
+  <UiDefaultContainer class="mb-6 p-6">
+    <form @submit.prevent="saveFilter" class="space-y-6">
+      <UiGrid :grid-size="2">
+        <UiInput :name="$t('filterName')" :placeholder="$t('nameEg')" :label="$t('filterName')" v-model="filter.name" />
+        <UiDropdown id="marketplace" v-model="filter.marketplace" :options="[
+          { value: 'all', label: $t('allMarket') },
+          { value: 'Ebay', label: 'Ebay' },
+          { value: 'Kleinanzeigen', label: 'Kleinanzeigen' },
+        ]" :label="$t('marketplace')" />
+      </UiGrid>
 
-    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden">
-      <div class="p-6">
-        <form @submit.prevent="saveFilter" class="space-y-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <AneTextField :name="$t('filterName')" :placeholder="$t('nameEg')" :label="$t('filName')"
-                v-model="filter.name" />
-            </div>
 
-            <div>
-              <label for="marketplace" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{
-                $t('market') }}</label>
-              <select id="marketplace" v-model="filter.marketplace"
-                class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
-                required>
-                <option value="all">{{ $t('allMarket') }}</option>
-                <option value="Ebay">eBay</option>;
-                <option value="kleinanzeigen">eBay Kleinanzeigen</option>
-              </select>
-            </div>
-          </div>
+      <UiInput :name="$t('searchValue')" :placeholder="$t('cameraEg')" :label="$t('searchValue')"
+        v-model="filter.searchValue" />
 
-          <!-- Search Value Field -->
-          <div>
-            <AneTextField :name="$t('srchval')" :placeholder="$t('srchPlace')" :label="$t('srchVal')"
-              v-model="filter.searchValue" />
-          </div>
-          <FiltersKeywordFilter :filter="filter" />
+      <FiltersKeywordFilter :model-value="filter.keywords" :label="$t('searchKeywords')"
+        :footer="$t('addKeyDescription')" :place-holder="$t('addKeywordPressEnter')" />
+      <FiltersKeywordFilter :model-value="filter.blacklist" :label="$t('blackKeywords')"
+        :footer="$t('addblacklistKeywords')" :place-holder="$t('addBlackListPressEnter')" />
 
-          <!-- list all filters -->
-          <div v-for="(option, index) in filterStore.getFilterOptions">
 
-            <!-- Price Range -->
-
-            <!-- Radius -->
-            <FiltersRadiusRangeFilter :filter="filter" v-if="option.name == 'Radius'" />
-
-            <!-- Kleinanzeigen Kategorie -->
-            <FiltersKleinanzeigenCategoryFilter :filter="filter"
-              v-if="option.name === 'KleinanzeigenKategorie' && filter.marketplace == 'kleinanzeigen'"
-              :options="option.value.options" />
-
-            <FiltersBlacklistFilter :filter="filter" v-if="option.name == 'NotContainsKeyWord'" />
-          </div>
-
-          <NotificationSettingsFilter :filter="filter"></NotificationSettingsFilter>
-          <!-- Updated Blacklist Section with Confirmation -->
-
-          <!-- Notification Channels section -->
-          <div class="flex items-center justify-end space-x-4 pt-6 border-t border-slate-200 dark:border-slate-700">
-            <NuxtLink to="/filters"
-              class="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
-              Cancel
-            </NuxtLink>
-            <button type="submit"
-              class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
-              {{ isNewFilter ? "Create Filter" : "Update Filter" }}
-            </button>
-          </div>
-        </form>
+      <!-- Dont worry about this, this whole system needs to get reworked by akwav -->
+      <div v-for="(option, _index) in filterStore.getFilterOptions">
+        <FiltersKleinanzeigenCategoryFilter :filter="filter"
+          v-if="option.name === 'KleinanzeigenKategorie' && filter.marketplace == 'kleinanzeigen'"
+          :options="option.value.options" />
       </div>
-    </div>
-  </div>
+
+      <FiltersRadiusRangeFilter :filter="filter" />
+      <NotificationSettingsFilter :filter="filter"></NotificationSettingsFilter>
+
+      <FiltersCreateConfirmCreation :is-new-filter="isNewFilter" :saving="savingFilter" />
+    </form>
+  </UiDefaultContainer>
+
 </template>
 
 <script setup lang="ts">
-import { ArrowLeftIcon } from 'lucide-vue-next'
 import NotificationSettingsFilter from '~/components/filters/NotificationSettingsFilter.vue';
+import { getMessaging, getToken } from 'firebase/messaging'
+import { useFirebaseApp } from 'vuefire'
+import type { Filter } from '~/types/FilterType';
 
 const filterStore = useFilterStore();
 const userStore = useUserStore();
+const firebaseApp = useFirebaseApp()
+const savingFilter = ref(false)
 
 const route = useRoute()
 
-export type TargetType = 'Unknown' | 'FireBase' | 'DiscordWebhook' | 'Email' | 'WhatsApp';
 
 const isNewFilter = computed(() => {
   return route.query.id == "" || route.query.id == undefined
 })
 
-const filter = ref({
+const filter = ref<Filter>({
   name: '',
   marketplace: 'all',
   searchValue: '',
@@ -107,7 +71,6 @@ const filter = ref({
   currency: '€',
   location: '',
   id: 0,
-  customFields: [] as any[],
   notificationType: 'Unknown',
   notificationTarget: ""
 })
@@ -134,6 +97,7 @@ async function loadEditParam() {
 
     filter.value.name = activeFilter.name ?? ""
     filter.value.id = activeFilter.id ?? 0
+    filter.value.notificationType = activeFilter.targetType ?? "Unknown"
 
     activeFilter.filters.forEach(item => {
       switch (item.name) {
@@ -162,7 +126,12 @@ async function loadEditParam() {
           break
         }
         case 'IncludePlatforms':
-          filter.value.marketplace = item.value!.toLowerCase()
+          console.log(item.value)
+          if (["Ebay", "Kleinanzeigen"].includes(item.value!)) {
+            filter.value.marketplace = item.value!
+            break;
+          }
+          filter.value.marketplace = "all"
           break
         case 'CommercialSeller':
           filter.value.commercialSeller = Boolean(item.value)
@@ -182,17 +151,17 @@ async function loadEditParam() {
   }
 }
 
-
-
 async function saveFilter() {
   if (radiusError.value) {
     return
   }
 
+  savingFilter.value = true
+
   var rawFilter = toRaw(filter.value);
-  var target = rawFilter.notificationTarget
+
   if (rawFilter.notificationType == 'FireBase') {
-    rawFilter.notificationTarget = "-";
+    rawFilter.notificationTarget = await connectPushNotifications()
   }
 
   if (rawFilter.notificationType == 'DiscordWebhook') {
@@ -207,12 +176,12 @@ async function saveFilter() {
     name: rawFilter.name == "" ? rawFilter.searchValue : rawFilter.name,
     userId: '',
     id: filter.value.id,
-    target: target,
+    target: rawFilter.notificationTarget,
     targetType: rawFilter.notificationType as TargetType,
     filters: await handleFilters()
   }
 
-  console.log(filterToCreate)
+
   await filterStore.saveFilter(filterToCreate)
   push.success("Filter successfully saved");
   navigateTo("/overview")
@@ -225,10 +194,16 @@ async function handleFilters(): Promise<{ name: string; value: any }[]> {
   if (rawFilter.minPrice != 0 || rawFilter.maxPrice || rawFilter.maxPrice == 0) {
     filters.push({ name: "PriceRange", value: `${Number(rawFilter.minPrice)}-${Number(rawFilter.maxPrice)}` })
   }
+  console.log(rawFilter.marketplace)
   if (rawFilter.marketplace != "all") {
     filters.push({
       name: "IncludePlatforms",
       value: rawFilter.marketplace
+    })
+  } else {
+    filters.push({
+      name: "IncludePlatforms",
+      value: "Ebay,Kleinanzeigen"
     })
   }
   if (rawFilter.commercialSeller) {
@@ -263,9 +238,17 @@ async function handleSearchRadius(): Promise<[string, string]> {
     return [data2[0].lat, data2[0].lon]
   } catch (error) {
     console.error('Error fetching country:', error);
+    savingFilter.value = false
     push.error(`We ran into issue\n ${error}`)
   }
   return ['', '']
+}
+
+async function connectPushNotifications(): Promise<string> {
+  const messaging = getMessaging(firebaseApp);
+  // vapid key is meant to be public
+  const token = await getToken(messaging, { vapidKey: 'BC2o4A75_oGlbklpFN4iVXjdZE3lg6Qci7EZg0NrsRAKyKmySam77NrlUAodBAzKhTECJGj-rgfdbQ0qzWUh9nU' })
+  return token
 }
 
 onMounted(async () => {
