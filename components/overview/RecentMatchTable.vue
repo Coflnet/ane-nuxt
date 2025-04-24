@@ -21,7 +21,7 @@
           </td>
           <td class="px-4 py-3 text-sm font-medium text-white">{{ $t('dollarSign') }}{{
             auction.price
-          }}</td>
+            }}</td>
           <td class="px-4 py-3 text-sm font-medium text-white" v-if="description(auction)">{{
             description(auction) }}</td>
           <td class="px-4 py-3 text-sm font-medium text-white"> {{ timeAgo(auction) }}</td>
@@ -40,7 +40,6 @@
 </template>
 
 <script setup lang="ts">
-const { t } = useI18n();
 import humanizeDuration from 'humanize-duration'
 
 const props = defineProps({
@@ -99,7 +98,7 @@ function timeAgo(auction: MatchItem | Listing): string {
     units: ["d", "h", "m"],
     largest: 1,
     round: true,
-    language: 'de',
+    language: navigator.language?.startsWith('de') ? 'de' : 'en',
     fallbacks: ['en', 'de']
   })
   return str
