@@ -11,13 +11,11 @@ firebase.initializeApp({
 });
 
 const messaging = firebase.messaging();
-console.log('Firebase messaging initialized in service worker');
 
 messaging.onBackgroundMessage(payload => {
   const { title, body, icon } = payload.notification || {};
   const data = payload.data || {};
 
-  console.log("Notification data", data);
   self.registration.showNotification(title, {
     body: body || '',
     icon: icon || '/icon.png',
@@ -34,21 +32,16 @@ messaging.onBackgroundMessage(payload => {
 
 
 self.addEventListener('notificationclick', event => {
-  console.log('Notification clicked', event);
-
   const clickedNotification = event.notification;
   const notificationData = clickedNotification.data;
 
   clickedNotification.close();
 
-  let urlToOpen = '/';
 
   if (event.action === 'view') {
     urlToOpen = notificationData.FCM_MSG.data.link || '/auctions';
-    console.log('View Auction action clicked, opening URL:', urlToOpen);
   } else {
     urlToOpen = '/overview';
-    console.log('Notification body clicked, opening URL:', urlToOpen);
   }
 
   event.waitUntil(clients.openWindow(urlToOpen));
