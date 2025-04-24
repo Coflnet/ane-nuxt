@@ -2,30 +2,32 @@
   <UiDefaultContainer class="mb-6 p-6">
     <UiHeaderLabel :label="$t('dashboard')" class="mb-4" />
     <table class="w-full">
-      <TableHeader />
+      <OverviewTableHeader />
       <tbody>
-        <tr v-for="(auction, index) in listingStore.recentMatches" :key="index"
+        <tr v-for="(auction, index) in props.matches" :key="index"
           class="border-b border-slate-700 hover:bg-slate-700/50">
           <td class="px-4 py-3 text-sm text-white">
             <div class="flex items-center space-x-3">
-              <img :src="auction.image ?? ''" alt="Auction thumbnail" class="w-10 h-10 rounded-md object-cover" />
+              <img :src="imageUrl(auction)" alt="Auction thumbnail" class="w-10 h-10 rounded-md object-cover" />
               <div>
                 <p class="font-medium">{{ auction.title }}</p>
-                <UiFooterLabel :label="auction.marketplace" :xs="true" />
+                <UiFooterLabel v-if="'marketplace' in auction" :label="auction.marketplace" :xs="true" />
               </div>
             </div>
           </td>
-          <td class="px-4 py-3 text-sm text-white">{{ filters.getSimplifiedFilters[auction.filter ??
+          <td class="px-4 py-3 text-sm font-medium text-white" v-if="'filter' in auction">{{
+            filters.getSimplifiedFilters[auction.filter ??
             0] }}
           </td>
           <td class="px-4 py-3 text-sm font-medium text-white">{{ $t('dollarSign') }}{{
             auction.price
-            }}</td>
-          <td class="px-4 py-3 text-sm text-slate-400">{{ timeAgo(auction.matchedAt) }}</td>
+          }}</td>
+          <td class="px-4 py-3 text-sm font-medium text-white" v-if="description(auction)">{{
+            description(auction) }}</td>
+          <td class="px-4 py-3 text-sm font-medium text-white"> {{ timeAgo(auction) }}</td>
           <td class="px-4 py-3 text-sm">
             <div class="flex items-center space-x-2 ml-2.5">
-              <a :href="auction.url ?? ''" target="_blank" class="p-1 rounded-md hover:bg-slate-700"
-                title="View auction">
+              <a :href="url(auction)" target="_blank" class="p-1 rounded-md hover:bg-slate-700" title="View auction">
                 <Icon name="tabler:external-link" class="size-5 text-slate-400" />
               </a>
 
@@ -39,25 +41,80 @@
 
 <script setup lang="ts">
 const { t } = useI18n();
-import TableHeader from './TableHeader.vue';
+import humanizeDuration from 'humanize-duration'
 
-const listingStore = useListingStore()
+const props = defineProps({
+  matches: {
+    type: Object as PropType<Array<MatchItem> | Array<Listing>>,
+    required: true
+  },
+})
+
 const filters = useFilterStore()
+const listingStore = useListingStore()
 
-function timeAgo(timestamp: string): string {
-  const now = new Date();
-  const past = new Date(timestamp);
-  const diff = (now.getTime() - past.getTime()) / 1000;
-  if (diff < 160) {
-    return t('justNow');
-  } if (diff < 3600) {
-    return `${Math.floor(diff / 60)} minutes ago`;
-  } if (diff < 86400) {
-    return `${Math.floor(diff / 3600)} hours ago`;
-  } if (diff < 604800) {
-    return `${Math.floor(diff / 86400)} days ago`;
-  } else {
-    return `${Math.floor(diff / 604800)} weeks ago`;
+function imageUrl(auction: MatchItem | Listing): string {
+  if ('image' in auction && auction.image) {
+    return auction.image;
   }
+
+  if ('imageUrls' in auction && auction.imageUrls) {
+    return auction.imageUrls[0] ?? '';
+  }
+
+  return ''
+}
+
+function description(auction: MatchItem | Listing): string {
+  if ('descriptionShort' in auction && auction.descriptionShort) {
+    if (auction.descriptionShort.length > 100) {
+      return auction.descriptionShort.substring(0, 100) + '...';
+    }
+    return auction.descriptionShort;
+  }
+
+  if ('description' in auction && auction.description) {
+    if (auction.description.length > 100) {
+      return auction.description.substring(0, 100) + '...';
+    }
+    return auction.description;
+  }
+  return '';
+}
+
+function timeAgo(auction: MatchItem | Listing): string {
+  let timestamp = '';
+
+  if ('matchedAt' in auction && auction.matchedAt) {
+    timestamp = auction.matchedAt;
+  } else if ('createdAt' in auction && auction.createdAt) {
+    timestamp = auction.createdAt;
+  } else if ('foundAt' in auction && auction.foundAt) {
+    timestamp = auction.foundAt;
+  }
+  const past = new Date(timestamp);
+  const t = Math.round(new Date().getTime() - past.getTime())
+
+  const str = humanizeDuration(t, {
+    units: ["d", "h", "m"],
+    largest: 1,
+    round: true,
+    language: 'de',
+    fallbacks: ['en', 'de']
+  })
+  return str
+}
+
+function url(auction: MatchItem | Listing): string {
+  if ('url' in auction && auction.url) {
+    return auction.url;
+  }
+
+  const constructedUrl = listingStore.constructListingUrl(auction);
+  if (constructedUrl) {
+    return constructedUrl;
+  }
+
+  return ''
 }
 </script>

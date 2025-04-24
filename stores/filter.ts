@@ -1,5 +1,5 @@
 import { defineStore } from "pinia"
-import { getFilters, addFilter, getOptions, testFilter } from "~/src/api-client"
+import { getFilters, addFilter, getOptions, testFilter as callTestFilter } from "~/src/api-client"
 import type { ListingListener, FilterOptions } from "~/src/api-client"
 
 
@@ -84,6 +84,34 @@ export const useFilterStore = defineStore("filter", () => {
     }
   }
 
+  async function testFilter(filter: ListingListener): Promise<Listing[] | null> {
+    try {
+      const user = userStore.getUser;
+
+      if (!user) {
+        console.error("No user found, can not test filter");
+        return null;
+      }
+
+      if (!userStore.token) {
+        console.error("No token found, can not test filter");
+        return null;
+      }
+
+      const apiToken = `Bearer ${userStore.token}`;
+      const listings = await callTestFilter({
+        composable: '$fetch',
+        headers: { Authorization: apiToken },
+        body: filter as any
+      })
+
+      return listings;
+    } catch (e) {
+      console.error("Error testing filter", e);
+      throw e;
+    }
+  }
+
   async function loadFilterOptions() {
     try {
       const options = await getOptions({
@@ -114,6 +142,7 @@ export const useFilterStore = defineStore("filter", () => {
 
     loadFilters,
     saveFilter,
+    testFilter,
     loadFilterOptions,
   }
 });
