@@ -3,6 +3,18 @@ self.addEventListener('notificationclick', event => {
   const clickedNotification = event.notification;
   const notificationData = clickedNotification.data;
 
+  if (!notificationData.action) {
+    // main image clicked instead of button
+    var url = '';
+    if (event.notification.data.toString().startsWith("http"))
+      url = event.notification.data;
+    else
+      url = event.notification.data.FCM_MSG?.data?.link ?? event.notification.data.link;
+    event.waitUntil(clients.openWindow(url));
+    event.notification.close();
+    return;
+  }
+
   if (event.action === 'view') {
     urlToOpen = notificationData.FCM_MSG.data.link || '/auctions';
   }
