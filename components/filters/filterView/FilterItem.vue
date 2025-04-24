@@ -1,7 +1,6 @@
 <template>
-  <FilterItemHeader :filter="filter" />
-  <FilterItemSettings :filter="filter" />
-
+  <FiltersFilterViewItemHeader :filter="filter" />
+  <FiltersFilterViewItemSettings :filter="filter" />
   <div class="flex items-center justify-between pt-3 border-t border-slate-700">
     <div class="flex items-center space-x-2">
       <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
@@ -15,12 +14,6 @@
 </template>
 
 <script setup lang="ts">
-import FilterItemSettings from './FilterItemSettings.vue';
-import FilterItemHeader from './FilterItemHeader.vue';
 import type { FilterFace } from '~/types/FilterType';
-
-
 defineProps<{ filter: FilterFace }>()
-
-
 </script>

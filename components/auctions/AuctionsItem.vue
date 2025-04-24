@@ -30,10 +30,10 @@
         <span class="ml-1 text-sm font-medium text-indigo-400">{{
           filterStore.getSimplifiedFilters[auction.filter ?? 0] }}</span>
       </div>
-      <UiTextButton @on-click="navigateTo(auction.url ?? '')" :link="true">
+      <UiLinkLabel :href="auction.url ?? ''">
         {{ $t('view') }}
         <Icon name="tabler:external-link" class="ml-1" />
-      </UiTextButton>
+      </UiLinkLabel>
 
     </div>
   </div>

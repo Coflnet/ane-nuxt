@@ -18,7 +18,7 @@
     <UiGrid :grid-size="3" class="mt-4">
       <div v-for="(filter, index) in filters" :key="index"
         class="border border-slate-700 rounded-lg overflow-hidden hover:shadow-md transition-shadow p-4">
-        <FilterOverviewItem :filter="filter" />
+        <FiltersFilterViewFilterItem :filter="filter" />
       </div>
     </UiGrid>
 
@@ -28,7 +28,6 @@
 
 <script setup lang="ts">
 import type { FilterFace } from '~/types/FilterType';
-import FilterOverviewItem from './FilterView/FilterOverviewItem.vue';
 
 
 const filterStore = useFilterStore();

@@ -10,19 +10,15 @@
 
     <UiFooterLabel class="mt-4 flex">
       {{ isLogin ? $t('dontHaveAccount') : $t('alreadyHaveAccount') }}
-      <UiTextButton @on-click="navigateTo(isLogin ? '/register' : '/login')" :link="true" class="ml-1">
+      <UiLinkLabel :href="isLogin ? '/register' : '/login'" class="ml-1">
         {{ isLogin ? $t('signUp') : $t('signIn') }}
-      </UiTextButton>
+      </UiLinkLabel>
     </UiFooterLabel>
   </main>
 </template>
 
 <script setup lang="ts">
 import { UiDefaultContainer } from '#components';
-import LoginContainerHeader from './LoginContainerHeader.vue';
-import LoginPasswordEmail from './LoginPasswordEmail.vue';
-import LoginPolicy from './LoginPolicy.vue';
-import LoginWithGoogleButton from './LoginWithGoogleButton.vue';
 
 defineProps({ isLogin: Boolean })
 

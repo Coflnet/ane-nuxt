@@ -10,7 +10,7 @@
         </nav>
 
         <div class="flex items-center space-x-4">
-          <UiButton @on-click="navigateTo('/register')" :primary="true">{{ $t('register') }}</UiButton>
+          <UiButton @on-click="navigateTo('/login')" :primary="true">{{ $t('signIn') }}</UiButton>
         </div>
       </div>
     </header>
@@ -19,7 +19,6 @@
 </template>
 
 <script setup lang="ts">
-import LoginContainer from './login/LoginContainer.vue';
 
 async function checkLogin() {
   const userStore = useUserStore();

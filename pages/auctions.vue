@@ -7,7 +7,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <div v-for="(auction, index) in loadedAuctions" :key="index"
         class="border border-slate-700 rounded-lg  hover:shadow-md transition-shadow">
-        <AuctionItem :auction="auction" />
+        <AuctionsItem :auction="auction" />
       </div>
     </div>
     <AuctionsLoadingState :no-auctions="loadedAuctions.length === 0 && !loading" :loading="loading" />
@@ -19,9 +19,7 @@
 import { ref, onMounted } from 'vue'
 import { useInfiniteScroll } from '@vueuse/core'
 import { useListingStore } from '@/stores/listing'
-import AuctionsLoadingState from './AuctionsLoadingState.vue'
-import { UiDefaultContainer } from '#components'
-import AuctionItem from './AuctionItem.vue'
+
 
 const listingStore = useListingStore()
 

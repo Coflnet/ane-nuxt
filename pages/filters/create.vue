@@ -1,5 +1,5 @@
 <template>
-  <CreateHeader :is-new-filter="isNewFilter" />
+  <FiltersCreateHeader :is-new-filter="isNewFilter" />
   <UiDefaultContainer class="mb-6 p-6">
     <form @submit.prevent="saveFilter" class="space-y-6">
       <UiGrid :grid-size="2">
@@ -31,7 +31,7 @@
       <FiltersRadiusRangeFilter :filter="filter" />
       <NotificationSettingsFilter :filter="filter"></NotificationSettingsFilter>
 
-      <ConfirmCreation :is-new-filter="isNewFilter" :saving="savingFilter" />
+      <FiltersCreateConfirmCreation :is-new-filter="isNewFilter" :saving="savingFilter" />
     </form>
   </UiDefaultContainer>
 
@@ -39,8 +39,6 @@
 
 <script setup lang="ts">
 import NotificationSettingsFilter from '~/components/filters/NotificationSettingsFilter.vue';
-import CreateHeader from './Create/CreateHeader.vue';
-import ConfirmCreation from './Create/ConfirmCreation.vue';
 import { getMessaging, getToken } from 'firebase/messaging'
 import { useFirebaseApp } from 'vuefire'
 import type { Filter } from '~/types/FilterType';
