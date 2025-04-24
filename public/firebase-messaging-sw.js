@@ -1,3 +1,22 @@
+
+self.addEventListener('notificationclick', event => {
+  const clickedNotification = event.notification;
+  const notificationData = clickedNotification.data;
+
+  if (event.action === 'view') {
+    urlToOpen = notificationData.FCM_MSG.data.link || '/auctions';
+  }
+  if (event.action == 'edit') {
+    urlToOpen = notificationData.FCM_MSG.data?.id ? "https://ane.dealsfilters/create?id=" + notificationData.FCM_MSG.data.id : 'https://ane.deals/filters';
+  } else {
+    urlToOpen = '/overview';
+  }
+
+  event.waitUntil(clients.openWindow(urlToOpen));
+  clickedNotification.close();
+});
+
+
 importScripts('https://www.gstatic.com/firebasejs/11.0.1/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/11.0.1/firebase-messaging-compat.js');
 
@@ -12,37 +31,3 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-messaging.onBackgroundMessage(payload => {
-  const { title, body, icon } = payload.notification || {};
-  const data = payload.data || {};
-
-  self.registration.showNotification(title, {
-    body: body || '',
-    icon: icon || '/icon.png',
-    data: {
-      ...data,
-      FCM_MSG: payload
-    },
-    actions: [
-      { action: 'view', title: 'View Auction' },
-      { action: 'edit', title: 'Edit Auction' }
-    ]
-  });
-});
-
-
-self.addEventListener('notificationclick', event => {
-  const clickedNotification = event.notification;
-  const notificationData = clickedNotification.data;
-
-  clickedNotification.close();
-
-
-  if (event.action === 'view') {
-    urlToOpen = notificationData.FCM_MSG.data.link || '/auctions';
-  } else {
-    urlToOpen = '/overview';
-  }
-
-  event.waitUntil(clients.openWindow(urlToOpen));
-});
