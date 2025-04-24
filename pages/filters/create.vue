@@ -35,7 +35,7 @@
     </form>
   </UiDefaultContainer>
 
-  <GeneralMatchTable :matches />
+  <OverviewRecentMatchTable :matches />
 </template>
 
 <script setup lang="ts">
@@ -187,21 +187,24 @@ async function loadEditParam() {
 }
 
 async function saveFilter() {
-  const f = await filterToCreate()
-  if (!f)
-    return
-  return;
-  await filterStore.saveFilter(filterToCreate)
-  push.success("Filter successfully saved");
-  navigateTo("/overview")
+  try {
+    savingFilter.value = true
+    const f = await filterToCreate()
+    if (!f)
+      return
+    await filterStore.saveFilter(f)
+    push.success("Filter successfully saved");
+    navigateTo("/overview")
+  } catch (e) {
+    savingFilter.value = false
+    push.error(`We ran into issue`)
+  }
 }
 
 async function filterToCreate(): Promise<ListingListener | null> {
   if (radiusError.value) {
     return null;
   }
-
-  savingFilter.value = true
 
   var rawFilter = toRaw(filter.value);
 
@@ -226,9 +229,7 @@ async function filterToCreate(): Promise<ListingListener | null> {
     filters: await handleFilters()
   }
 
-  await filterStore.saveFilter(filterToCreate)
-  push.success("Filter successfully saved");
-  navigateTo("/overview")
+  return filterToCreate;
 }
 
 async function handleFilters(): Promise<{ name: string; value: any }[]> {
