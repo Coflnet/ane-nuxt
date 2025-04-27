@@ -32,7 +32,7 @@ vintageCollector,Vintage Collector,Vintage Collector
 vintageCollectorDecription,"NimDing has completely changed how I source vintage items. I've found rare pieces at 60% below market value because I was notified the moment they were listed.","NimDing has completely changed how I source vintage items. I've found rare pieces at 60% below market value because I was notified the moment they were listed."
 reseller, Reseller, Reseller
 resellerDesciption,"I've saved $3,000 in just three months using NimDing. The advanced filters let me zero in on exactly what I'm looking for, and the real-time alerts give me the edge over other buyers.", ","I've saved $3,000 in just three months using NimDing. The advanced filters let me zero in on exactly what I'm looking for, and the real-time alerts give me the edge over other buyers.", "
-simpleTransparent,"Simple, Transparent ","Simple, Transparent "
+simpleTransparent,"Simple, Transparent,","Simple, Transparent "
 pricing,Pricing,Pricing
 free,Free,Free
 month,/month,/month
@@ -160,3 +160,8 @@ apiRef,API Reference,API Reference
 advancedNotification,Advanced Notification Engine for auction marketplaces,Advanced Notification Engine for auction marketplaces
 view,View,View 
 login,Login,Login
+subscriptions,Subscriptions
+cancelSubscriptionSuc,Canceling subscription was successful,Canceling subscription was successful
+planUpdated,Plan updated successfully,Plan updated successfully
+confirmCancelSub,Are you sure you want to cancel your subscription?,Are you sure you want to cancel your subscription?
+confirmCancel,Confirm Cancel,Confirm Cancel
