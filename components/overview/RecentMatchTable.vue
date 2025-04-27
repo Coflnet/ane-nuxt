@@ -1,6 +1,6 @@
 <template>
   <UiDefaultContainer class="mb-6 p-6">
-    <UiHeaderLabel :label="$t('dashboard')" class="mb-4" />
+    <UiHeaderLabel :label="props.title" class="mb-4" />
     <table class="w-full">
       <OverviewTableHeader />
       <tbody>
@@ -21,7 +21,7 @@
           </td>
           <td class="px-4 py-3 text-sm font-medium text-white">{{ $t('dollarSign') }}{{
             auction.price
-            }}</td>
+          }}</td>
           <td class="px-4 py-3 text-sm font-medium text-white" v-if="description(auction)">{{
             description(auction) }}</td>
           <td class="px-4 py-3 text-sm font-medium text-white"> {{ timeAgo(auction) }}</td>
@@ -47,6 +47,10 @@ const props = defineProps({
     type: Object as PropType<Array<MatchItem> | Array<Listing>>,
     required: true
   },
+  title: {
+    type: String,
+    default: 'Recent Matches'
+  }
 })
 
 const filters = useFilterStore()
@@ -86,11 +90,12 @@ function timeAgo(auction: MatchItem | Listing): string {
 
   if ('matchedAt' in auction && auction.matchedAt) {
     timestamp = auction.matchedAt;
-  } else if ('createdAt' in auction && auction.createdAt) {
-    timestamp = auction.createdAt;
   } else if ('foundAt' in auction && auction.foundAt) {
     timestamp = auction.foundAt;
+  } else if ('createdAt' in auction && auction.createdAt) {
+    timestamp = auction.createdAt;
   }
+
   const past = new Date(timestamp);
   const t = Math.round(new Date().getTime() - past.getTime())
 
