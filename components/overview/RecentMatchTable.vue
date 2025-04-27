@@ -90,11 +90,12 @@ function timeAgo(auction: MatchItem | Listing): string {
 
   if ('matchedAt' in auction && auction.matchedAt) {
     timestamp = auction.matchedAt;
-  } else if ('createdAt' in auction && auction.createdAt) {
-    timestamp = auction.createdAt;
   } else if ('foundAt' in auction && auction.foundAt) {
     timestamp = auction.foundAt;
+  } else if ('createdAt' in auction && auction.createdAt) {
+    timestamp = auction.createdAt;
   }
+
   const past = new Date(timestamp);
   const t = Math.round(new Date().getTime() - past.getTime())
 
