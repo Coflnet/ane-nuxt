@@ -1,7 +1,7 @@
 import { defineStore } from "pinia"
 import { ref, computed } from "vue"
 import { navigateTo } from "#app"
-import { createUserWithEmailAndPassword, fetchSignInMethodsForEmail, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, type Auth } from "firebase/auth"
+import { createUserWithEmailAndPassword, fetchSignInMethodsForEmail, GoogleAuthProvider, signInAnonymously, signInWithEmailAndPassword, signInWithPopup, type Auth } from "firebase/auth"
 import { loginFirebase, type Platform, type TokenContainer } from "~/src/api-client"
 
 // Types
@@ -53,6 +53,7 @@ export const useUserStore = defineStore("user", () => {
   // State
   const user = ref<User | null>(null)
   const isAuthenticated = ref(false)
+  const isAnonymous = ref(false);
   const isLoading = ref(false)
   const error = ref<string | null>(null)
   const token = ref<string | null>(null)
@@ -86,23 +87,20 @@ export const useUserStore = defineStore("user", () => {
   const isLoggedIn = computed(() => isAuthenticated.value)
   const getUser = computed(() => user.value)
   const getNotificationSettings = computed(() => notificationSettings.value)
+  const isUserAnonymous = computed(() => isAnonymous.value)
 
   async function loadUser() {
     try {
       isLoading.value = true;
       error.value = null;
 
-      // check the current user
       const googleUser = useCurrentUser();
       if (!googleUser) {
-        // google auth
         const provider = new GoogleAuthProvider();
         const auth = useFirebaseAuth();
 
-        // auth does not exist on the server
-        if (!auth) {
+        if (!auth)
           return;
-        }
 
         const result = await signInWithPopup(auth, provider);
         const loggedInUser = result.user;
@@ -138,7 +136,6 @@ export const useUserStore = defineStore("user", () => {
     isLoading.value = true
     error.value = null
 
-    console.log("fuck this shit")
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(clientAuth, provider);
@@ -153,8 +150,6 @@ export const useUserStore = defineStore("user", () => {
         };
         isAuthenticated.value = true;
 
-
-        await fetchNotificationSettings();
       }
 
       const credential = GoogleAuthProvider.credentialFromResult(result);
@@ -193,7 +188,6 @@ export const useUserStore = defineStore("user", () => {
           avatar: loggedInUser.photoURL ?? "",
         };
         isAuthenticated.value = true;
-        await fetchNotificationSettings();
       }
       return { success: true };
     } catch (err) {
@@ -224,8 +218,6 @@ export const useUserStore = defineStore("user", () => {
   }
 
   async function logout() {
-    // In a real implementation, this would call the API
-    // await useFetch('/api/auth/logout', { method: 'POST' })
 
     user.value = null
     isAuthenticated.value = false
@@ -235,24 +227,25 @@ export const useUserStore = defineStore("user", () => {
     navigateTo("/login")
   }
 
-  async function checkAuth() {
-    // In a real implementation, this would validate the token with the API
-    // For demo purposes, we'll just set a mock user
+  async function checkAuth(clientAuth: Auth) {
+    if (isAuthenticated.value)
+      return;
 
-    // Simulate a valid session for demo
-    user.value = {
-      id: "",
-      name: "John Doe",
-      email: "john@example.com",
-      avatar: "/placeholder.svg?height=100&width=100",
+    try {
+      const signInResult = await signInAnonymously(clientAuth)
+      const accessToken = await signInResult.user.getIdTokenResult();
+
+      const response = await loginFirebase({
+        composable: "$fetch",
+        body: { authToken: accessToken.token }
+      })
+      token.value = response.authToken ?? ""
+
+      isAuthenticated.value = true
+      isAnonymous.value = true
+    } catch (error) {
+      console.error("Error checking authentication:", error)
     }
-    isAuthenticated.value = true
-    token.value = "mock_token"
-
-    // Load notification settings
-    await fetchNotificationSettings()
-
-    return true
   }
 
   // Notification settings methods
@@ -279,172 +272,6 @@ export const useUserStore = defineStore("user", () => {
     }
   }
 
-  async function fetchNotificationSettings() {
-
-    return;
-    try {
-      // In a real implementation, this would call the API
-      // const { data } = await useFetch('/api/user/notification-settings')
-
-      // For now, simulate fetching settings
-      await new Promise((resolve) => setTimeout(resolve, 500))
-
-      // Mock data
-      notificationSettings.value = {
-        discord: {
-          enabled: true,
-          webhookUrl: "https://discord.com/api/webhooks/example",
-          channelName: "#auction-alerts",
-          format: "detailed",
-        },
-        email: {
-          enabled: true,
-          address: user.value?.email || "user@example.com",
-          frequency: "instant",
-        },
-        webPush: {
-          enabled: false,
-          subscribed: false,
-          notifyNewMatches: true,
-          notifyPriceChanges: true,
-          notifyEndingSoon: true,
-        },
-      }
-
-      return { success: true }
-    } catch (err) {
-      console.error("Error fetching notification settings:", err)
-      return { success: false, error: "Failed to load notification settings" }
-    } finally {
-      isLoadingSettings.value = false
-    }
-  }
-
-  async function updateNotificationSettings(settings: NotificationSettings) {
-    isLoadingSettings.value = true
-
-    try {
-      // In a real implementation, this would call the API
-      // const { data } = await useFetch('/api/user/notification-settings', {
-      //   method: 'PUT',
-      //   body: settings
-      // })
-
-      // For now, simulate updating settings
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      // Update local state
-      notificationSettings.value = settings
-
-      return { success: true }
-    } catch (err) {
-      console.error("Error updating notification settings:", err)
-      return { success: false, error: "Failed to update notification settings" }
-    } finally {
-      isLoadingSettings.value = false
-    }
-  }
-
-  async function testDiscordWebhook() {
-    if (!notificationSettings.value.discord.webhookUrl) {
-      return { success: false, error: "Webhook URL is required" }
-    }
-
-    try {
-      // In a real implementation, this would call the API
-      // const { data } = await useFetch('/api/notifications/test-discord', {
-      //   method: 'POST',
-      //   body: { webhookUrl: notificationSettings.value.discord.webhookUrl }
-      // })
-
-      // For now, simulate testing webhook
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-
-      return { success: true, message: "Test message sent to Discord successfully!" }
-    } catch (err) {
-      console.error("Error testing Discord webhook:", err)
-      return { success: false, error: "Failed to send test message to Discord" }
-    }
-  }
-
-  async function testEmailNotification() {
-    if (!notificationSettings.value.email.address) {
-      return { success: false, error: "Email address is required" }
-    }
-
-    try {
-      // In a real implementation, this would call the API
-      // const { data } = await useFetch('/api/notifications/test-email', {
-      //   method: 'POST',
-      //   body: { email: notificationSettings.value.email.address }
-      // })
-
-      // For now, simulate sending test email
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-
-      return {
-        success: true,
-        message: `Test email sent to ${notificationSettings.value.email.address} successfully!`,
-      }
-    } catch (err) {
-      console.error("Error sending test email:", err)
-      return { success: false, error: "Failed to send test email" }
-    }
-  }
-
-  async function toggleWebPushSubscription() {
-    try {
-      // In a real implementation, this would handle browser push notification permissions
-      // and subscribe/unsubscribe from the push service
-
-      // For now, just toggle the state
-      notificationSettings.value.webPush.subscribed = !notificationSettings.value.webPush.subscribed
-
-      return {
-        success: true,
-        subscribed: notificationSettings.value.webPush.subscribed,
-        message: notificationSettings.value.webPush.subscribed
-          ? "Successfully subscribed to web push notifications!"
-          : "Successfully unsubscribed from web push notifications.",
-      }
-    } catch (err) {
-      console.error("Error toggling web push subscription:", err)
-      return { success: false, error: "Failed to update web push subscription" }
-    }
-  }
-
-  async function updateProfile(profileData: Partial<User>) {
-    isLoading.value = true
-    error.value = null
-
-    try {
-      // In a real implementation, this would call the API
-      // const { data } = await useFetch('/api/user/profile', {
-      //   method: 'PUT',
-      //   body: profileData
-      // })
-
-      // For now, simulate updating profile
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      // Update user data
-      if (user.value) {
-        user.value = { ...user.value, ...profileData }
-      }
-
-      // If email was updated, also update it in notification settings
-      if (profileData.email && notificationSettings.value.email.enabled) {
-        notificationSettings.value.email.address = profileData.email
-      }
-
-      return { success: true }
-    } catch (err) {
-      error.value = "Failed to update profile. Please try again."
-      return { success: false, error: error.value }
-    } finally {
-      isLoading.value = false
-    }
-  }
 
   // Return all state, getters, and actions
   return {
@@ -454,7 +281,6 @@ export const useUserStore = defineStore("user", () => {
     isLoading,
     error,
     token,
-    notificationSettings,
     isLoadingSettings,
     cachedFilters,
     cachedAuctions,
@@ -464,19 +290,13 @@ export const useUserStore = defineStore("user", () => {
     isLoggedIn,
     getUser,
     getNotificationSettings,
+    isUserAnonymous,
 
     // Actions
     loadUser,
     loginWithGoogle,
     logout,
     checkAuth,
-    resetNotificationSettings,
-    fetchNotificationSettings,
-    updateNotificationSettings,
-    testDiscordWebhook,
-    testEmailNotification,
-    toggleWebPushSubscription,
-    updateProfile,
     saveAuctionCache,
     loadAuctionCache,
     saveFilterCache,
