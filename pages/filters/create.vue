@@ -35,7 +35,7 @@
     </form>
   </UiDefaultContainer>
 
-  <OverviewRecentMatchTable :matches />
+  <OverviewRecentMatchTable :matches :title="$t('auctionMatchedToFilters')" v-if="matches.length > 0" />
 </template>
 
 <script setup lang="ts">
