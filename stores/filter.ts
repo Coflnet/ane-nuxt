@@ -28,12 +28,6 @@ export const useFilterStore = defineStore("filter", () => {
   const getFilterOptions = computed(() => filterOptions.value);
 
   async function loadFilters() {
-    const user = userStore.getUser;
-
-    if (!user) {
-      console.error("No user found, can not load filters");
-      return;
-    }
 
     if (!userStore.token) {
       console.error("No token found, can not load filters");
@@ -58,12 +52,6 @@ export const useFilterStore = defineStore("filter", () => {
 
   async function saveFilter(filterToCreate: ListingListener) {
     try {
-      const user = userStore.getUser;
-
-      if (!user) {
-        console.error("No user found, can not add filter");
-        return;
-      }
 
       if (!userStore.token) {
         console.error("No token found, can not add filter");
@@ -86,13 +74,6 @@ export const useFilterStore = defineStore("filter", () => {
 
   async function testFilter(filter: ListingListener): Promise<Listing[] | null> {
     try {
-      const user = userStore.getUser;
-
-      if (!user) {
-        console.error("No user found, can not test filter");
-        return null;
-      }
-
       if (!userStore.token) {
         console.error("No token found, can not test filter");
         return null;

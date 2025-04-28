@@ -1,8 +1,10 @@
 import { defineStore } from "pinia"
 import { ref, computed } from "vue"
 import { navigateTo } from "#app"
-import { createUserWithEmailAndPassword, fetchSignInMethodsForEmail, GoogleAuthProvider, signInAnonymously, signInWithEmailAndPassword, signInWithPopup, type Auth } from "firebase/auth"
+import { createUserWithEmailAndPassword, EmailAuthCredential, EmailAuthProvider, fetchSignInMethodsForEmail, GoogleAuthProvider, linkWithCredential, linkWithPopup, signInAnonymously, signInWithEmailAndPassword, signInWithPopup, updateProfile, type Auth, type UserCredential } from "firebase/auth"
 import { loginFirebase, type Platform, type TokenContainer } from "~/src/api-client"
+import { FirebaseError } from "firebase/app"
+
 
 // Types
 export interface User {
@@ -50,7 +52,10 @@ export interface NotificationSettings {
 
 // Define the store using the setup style
 export const useUserStore = defineStore("user", () => {
+
+  const { t } = useI18n()
   // State
+  //
   const user = ref<User | null>(null)
   const isAuthenticated = ref(false)
   const isAnonymous = ref(false);
@@ -84,62 +89,33 @@ export const useUserStore = defineStore("user", () => {
 
   const isLoadingSettings = ref(false)
 
-  const isLoggedIn = computed(() => isAuthenticated.value)
+  const isLoggedIn = computed(() => isAuthenticated.value && !isAnonymous.value)
   const getUser = computed(() => user.value)
   const getNotificationSettings = computed(() => notificationSettings.value)
   const isUserAnonymous = computed(() => isAnonymous.value)
 
-  async function loadUser() {
-    try {
-      isLoading.value = true;
-      error.value = null;
-
-      const googleUser = useCurrentUser();
-      if (!googleUser) {
-        const provider = new GoogleAuthProvider();
-        const auth = useFirebaseAuth();
-
-        if (!auth)
-          return;
-
-        const result = await signInWithPopup(auth, provider);
-        const loggedInUser = result.user;
-
-        if (loggedInUser) {
-          user.value = {
-            id: loggedInUser.uid,
-            name: loggedInUser.displayName ?? "",
-            email: loggedInUser.email ?? "",
-            avatar: loggedInUser.photoURL ?? "",
-          };
-          isAuthenticated.value = true;
-        } else {
-          throw new Error("User not found");
-        }
-
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        const response = await loginFirebase({
-          composable: "useAsyncData",
-          body: { authToken: credential?.accessToken }
-        })
-        token.value = response.data.value?.authToken ?? ""
-      }
-    } catch (e) {
-      console.error("Error loading user:", e);
-      error.value = "Failed to load user data. Please try again.";
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  async function loginWithGoogle(clientAuth: Auth) {
+  async function loginWithGoogle(clientAuth: Auth, login: Boolean): Promise<{ success: boolean; error?: string | null }> {
     isLoading.value = true
     error.value = null
 
+    console.log(isAnonymous)
+    if (isAnonymous.value && !login) {
+      const upgrade = await upgradeUserAccount(clientAuth, new GoogleAuthProvider())
+      if (upgrade) {
+        return { success: true };
+      }
+      console.log("returning this ")
+      isAnonymous.value = true
+      return { success: false, error: t("thatEmnailInUse") }
+    }
+
     try {
+
       const provider = new GoogleAuthProvider();
+
       const result = await signInWithPopup(clientAuth, provider);
       const loggedInUser = result.user;
+
 
       if (loggedInUser) {
         user.value = {
@@ -149,7 +125,6 @@ export const useUserStore = defineStore("user", () => {
           avatar: loggedInUser.photoURL ?? "",
         };
         isAuthenticated.value = true;
-
       }
 
       const credential = GoogleAuthProvider.credentialFromResult(result);
@@ -158,25 +133,61 @@ export const useUserStore = defineStore("user", () => {
         composable: "$fetch",
         body: { authToken: credential?.accessToken }
       })
-      console.log(response)
+
       token.value = response.authToken ?? ""
 
       isAuthenticated.value = true
 
       return { success: true };
     } catch (err) {
-      error.value = "Failed to login. Please try again.";
-      return { success: false, error: error.value };
-    } finally {
-      isLoading.value = false;
+      return { success: false, error: "Failed to login. Please try again." };
     }
   }
+
+  async function upgradeUserAccount(clientAuth: Auth, loginData: GoogleAuthProvider | EmailAuthCredential): Promise<Boolean> {
+    try {
+      let result: UserCredential;
+      if (loginData instanceof GoogleAuthProvider) {
+        result = await linkWithPopup(clientAuth.currentUser!, loginData);
+      } else {
+        result = await linkWithCredential(clientAuth.currentUser!, loginData);
+      }
+      const loggedInUser = result.user;
+      const providerData = loggedInUser.providerData[0];
+      if (providerData) {
+        await updateProfile(loggedInUser, {
+          displayName: providerData.displayName,
+          photoURL: providerData.photoURL,
+        });
+      }
+      await loggedInUser.reload();
+
+      user.value = {
+        id: loggedInUser.uid,
+        name: loggedInUser.displayName ?? "",
+        email: loggedInUser.email ?? "",
+        avatar: loggedInUser.photoURL ?? "",
+      };
+      isAuthenticated.value = true;
+      isAnonymous.value = false;
+      return true
+    } catch (error) {
+      console.error("Error upgrading user account:", error);
+      return false
+    }
+  }
+
 
   async function signInWithEmailPassword(clientAuth: Auth, email: string, password: string, isLogin: boolean) {
     isLoading.value = true
     error.value = null
 
     try {
+      if (isAnonymous && !isLogin) {
+        const credential = EmailAuthProvider.credential(email, password);
+        upgradeUserAccount(clientAuth, credential)
+        return { success: true }
+      }
       const result = isLogin ? await createUserWithEmailAndPassword(clientAuth, email, password) : await signInWithEmailAndPassword(clientAuth, email, password)
       const loggedInUser = result.user;
 
@@ -195,6 +206,7 @@ export const useUserStore = defineStore("user", () => {
       return { success: false, error: error.value };
     } finally {
       isLoading.value = false;
+      return { success: true }
     }
   }
 
@@ -218,11 +230,12 @@ export const useUserStore = defineStore("user", () => {
   }
 
   async function logout() {
+    // In a real implementation, this would call the API
+    // await useFetch('/api/auth/logout', { method: 'POST' })
 
     user.value = null
     isAuthenticated.value = false
     token.value = null
-    resetNotificationSettings()
 
     navigateTo("/login")
   }
@@ -248,29 +261,6 @@ export const useUserStore = defineStore("user", () => {
     }
   }
 
-  // Notification settings methods
-  function resetNotificationSettings() {
-    notificationSettings.value = {
-      discord: {
-        enabled: false,
-        webhookUrl: "",
-        channelName: "",
-        format: "detailed",
-      },
-      email: {
-        enabled: true,
-        address: user.value?.email || "",
-        frequency: "instant",
-      },
-      webPush: {
-        enabled: false,
-        subscribed: false,
-        notifyNewMatches: true,
-        notifyPriceChanges: true,
-        notifyEndingSoon: true,
-      },
-    }
-  }
 
 
   // Return all state, getters, and actions
@@ -283,6 +273,7 @@ export const useUserStore = defineStore("user", () => {
     token,
     isLoadingSettings,
     cachedFilters,
+    notificationSettings,
     cachedAuctions,
 
 
@@ -293,7 +284,6 @@ export const useUserStore = defineStore("user", () => {
     isUserAnonymous,
 
     // Actions
-    loadUser,
     loginWithGoogle,
     logout,
     checkAuth,

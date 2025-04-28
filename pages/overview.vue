@@ -89,6 +89,8 @@ function getAverageMatchesPerHour(matches: MatchItem[]) {
 }
 
 onMounted(async () => {
+  await useUserStore().checkAuth(useFirebaseAuth()!);
+  console.log(useUserStore().isUserAnonymous)
   await Promise.allSettled([filterStore.loadFilters(), listingStore.loadMatches()]);
   loadStats();
   filterStore.loadFilters()

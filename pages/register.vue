@@ -20,17 +20,9 @@
 
 <script setup lang="ts">
 
-async function checkLogin() {
-  const userStore = useUserStore();
-  await userStore.loadUser();
-  if (userStore.isAuthenticated)
-    navigateTo("/overview")
-}
 
 definePageMeta({
   layout: 'landing'
 })
-
-onMounted(() => { checkLogin() })
 
 </script>
