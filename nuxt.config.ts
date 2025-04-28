@@ -1,8 +1,3 @@
-
-// https://nuxt.com/docs/api/configuration/nuxt-config
-
-import { messaging } from "firebase-admin";
-
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   future: {
