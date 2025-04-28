@@ -62,6 +62,7 @@ const isNewFilter = computed(() => {
 
 
 const matches = ref<Listing[]>([])
+var filterTest = 0;
 
 const filter = ref<Filter>({
   name: '',
@@ -84,6 +85,7 @@ const filter = ref<Filter>({
 })
 
 watch(filter, (_) => {
+  console.log("Filter changed")
   debouncedTestFilter()
 }, { deep: true })
 
@@ -92,6 +94,8 @@ const debouncedTestFilter = debounce(async () => {
 }, 500)
 
 async function testFilter() {
+  filterTest++
+  var currentTest = filterTest
 
   try {
 
@@ -102,7 +106,10 @@ async function testFilter() {
     }
     const res = await filterStore.testFilter(f);
     if (res) {
-      matches.value = res;
+      if (currentTest != filterTest) {
+        return
+      }
+      matches.value = res.reverse();
     }
   } catch (e) {
     console.error(e);
@@ -267,7 +274,7 @@ async function handleFilters(): Promise<{ name: string; value: any }[]> {
   if (rawFilter.keywords.length != 0)
     filters.push({ name: "ContainsKeyWord", value: rawFilter.keywords.join(',') });
 
-  if (rawFilter.blacklist.length == 0)
+  if (rawFilter.blacklist.length != 0)
     filters.push({ name: "NotContainsKeyWord", value: rawFilter.blacklist.join(',') });
   return filters
 }
