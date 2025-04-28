@@ -160,3 +160,4 @@ apiRef,API Reference,API Reference
 advancedNotification,Advanced Notification Engine for auction marketplaces,Advanced Notification Engine for auction marketplaces
 view,View,View 
 login,Login,Login
+thatEmnailInUse,That email is already in use. either use a different email or login instead of registering

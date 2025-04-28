@@ -8,10 +8,9 @@
           $t('appHeaderFilters') }}
         </UiTextButton>
         <UiButton :primary="true" @on-click="navigateTo('/auctions')">{{ $t('appHeaderAuctions') }}</UiButton>
-
-        <HeaderProfileDropdown />
+        <AppHeaderProfileDropdown v-if="userStore.isLoggedIn" />
       </div>
-      <div v-else>
+      <div v-if="!userStore.isLoggedIn" class="flex ml-5 space-x-3">
         <UiTextButton @on-click="navigateTo('/login')">{{ $t('signIn') }}</UiTextButton>
         <UiButton :primary="true" @on-click="navigateTo('/register')">{{ $t('register') }}</UiButton>
       </div>
@@ -20,7 +19,6 @@
 </template>
 
 <script setup lang="ts">
-import HeaderProfileDropdown from './HeaderProfileDropdown.vue';
 
 const userStore = useUserStore()
 
