@@ -32,7 +32,7 @@ vintageCollector,Vintage Collector,Vintage Collector
 vintageCollectorDecription,"NimDing has completely changed how I source vintage items. I've found rare pieces at 60% below market value because I was notified the moment they were listed.","NimDing has completely changed how I source vintage items. I've found rare pieces at 60% below market value because I was notified the moment they were listed."
 reseller, Reseller, Reseller
 resellerDesciption,"I've saved $3,000 in just three months using NimDing. The advanced filters let me zero in on exactly what I'm looking for, and the real-time alerts give me the edge over other buyers.", ","I've saved $3,000 in just three months using NimDing. The advanced filters let me zero in on exactly what I'm looking for, and the real-time alerts give me the edge over other buyers.", "
-simpleTransparent,"Simple, Transparent ","Simple, Transparent "
+simpleTransparent,"Simple, Transparent,","Simple, Transparent "
 pricing,Pricing,Pricing
 free,Free,Free
 month,/month,/month
@@ -44,14 +44,18 @@ mostPopular,Most Popular,Most Popular
 20ActiveFilters,20 active filters,20 active filters
 10MinuteDelay,Within 10 minute delay,Within 10 minute delay
 500activeFilters,500 active filters,500 active filters
-flippers,Flippers,Flippers
+flippers,Flipper,Flipper
 2MinuteDelay,1-2 minute delay,1-2 minute delay
 priceCalculation,Price calculation,Price calculation
 comingSoon,Coming soon,Coming soon
+forBestOfBestFlippers,For the best of the best flippers,For the best of the best flippers
+buyThingsCheaper,Great for buy the items you want for cheaper,Great for buy the items you want for cheaper price
+greatTryingAne,Great for trying out ANE,Great for trying out ANE
 startFindingDeals,Ready to Start Finding Deals?,Ready to Start Finding Deals?
 joinThousandsSmartShoppers,Join thousands of smart shoppers and resellers who are saving money and making profits with DealAlert.,Join thousands of smart shoppers and resellers who are saving money and making profits with DealAlert.
 joinFreeToday,No credit card or email required. Start with our free plan today.,No credit card or email required. Start with our free plan today.
 smartWayToFindDeals,The smart way to find deals and make profits on online marketplaces.,The smart way to find deals and make profits on online marketplaces.
+pro,Pro,Pro
 privacy,Privacy,Privacy
 terms,Terms,Terms
 rights,© 2025 Coflnet GMH. All rights reserved.,© 2025 Coflnet GMH. All rights reserved.
@@ -161,3 +165,13 @@ advancedNotification,Advanced Notification Engine for auction marketplaces,Advan
 view,View,View 
 login,Login,Login
 thatEmnailInUse,That email is already in use. either use a different email or login instead of registering
+subscriptions,Subscriptions
+cancelSubscriptionSuc,Canceling subscription was successful,Canceling subscription was successful
+planUpdated,Plan updated successfully,Plan updated successfully
+confirmCancelSub,Are you sure you want to cancel your subscription?,Are you sure you want to cancel your subscription?
+confirmCancel,Confirm Cancel,Confirm Cancel
+current,Current,Current
+currentPlan,Current Plan,Current Plan
+selectPlan,Select Plan,Select Plan
+upgrade,Upgrade,Upgrade
+downgrade,DownGrade,DownGrade

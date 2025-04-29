@@ -18,6 +18,10 @@
           <Icon name="tabler:logout-2" class="w-4 h-4 mr-2" />
           {{ $t('signOut') }}
         </UiTextButton>
+        <UiTextButton @on-click="navigateTo('/subscriptions')" class="m-1 mt-2">
+          <Icon name="tabler:calendar-week" class="w-4 h-4 mr-2" />
+          {{ $t('subscriptions') }}
+        </UiTextButton>
       </div>
     </transition>
   </div>
