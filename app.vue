@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+  <div class="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800">
     <NuxtLayout>
       <NuxtPage />
       <Notivue v-slot="item">
