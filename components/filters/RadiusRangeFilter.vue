@@ -2,13 +2,13 @@
   <!-- The grid component does not want to work this -->
   <div class="grid grid-cols-2 md:grid-cols-4 gap-x-8 ">
     <div>
-      <UiInput v-model="filter.searchRadius" :label="$t('searchRadius')" type="number" :placeholder="$t('radiusEq')"
-        :footer="$t('searchRadiusAroundYou')" :error="radiusError" />
+      <UiInput test-id="search-radius-input" v-model="filter.searchRadius" :label="$t('searchRadius')" type="number"
+        :placeholder="$t('radiusEq')" :footer="$t('searchRadiusAroundYou')" :error="radiusError" />
       <p v-if="radiusError" class="mt-1 text-xs text-rose-500">{{ radiusErrorMessage }} </p>
     </div>
 
-    <UiInput v-model="filter.zipcode" :label="$t('zipCode')" type="number" :placeholder="$t('zipCodeEq')"
-      :footer="$t('yourZip')" :error="radiusError" />
+    <UiInput test-id="zip-code-input" v-model="filter.zipcode" :label="$t('zipCode')" type="number"
+      :placeholder="$t('zipCodeEq')" :footer="$t('yourZip')" :error="radiusError" />
 
     <div class="flex items-center mb-4 space-x-2 col-span-2">
       <UiInput v-model="filter.minPrice" :label="$t('priceRange')" type="number" placeholder="" />

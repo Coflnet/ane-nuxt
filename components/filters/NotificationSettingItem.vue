@@ -1,9 +1,9 @@
 <template>
   <DefaultInputBox class="flex items-center p-4" :accent="true">
     <div class="flex items-center flex-col h-full justify-center">
-      <input :id="config.notificationType" v-model="filter.notificationType" type="radio"
-        :value="config.notificationType" @click="itemSelected()"
-        class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300" />
+      <input :id="config.notificationType" v-model="filter.notificationType"
+        :data-testid="`notification-type-${config.name}`" type="radio" :value="config.notificationType"
+        @click="itemSelected()" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300" />
     </div>
     <label :for="config.notificationType" class="ml-3 flex">
       <div class="flex items-center">
@@ -16,7 +16,8 @@
         </div>
       </div>
       <div v-if="filter.notificationType === config.notificationType && config.textInput" class="ml-11 mt-2">
-        <UiInput type="string" :placeholder="config.placeholder" v-model="model" :error="validation!.error" />
+        <UiInput :test-id="`notification-input-${config.name}`" type="string" :placeholder="config.placeholder"
+          v-model="model" :error="validation!.error" />
         <p v-if="validation!.error" class="mt-1 text-sm text-red-500">
           {{ messages.error }}
         </p>

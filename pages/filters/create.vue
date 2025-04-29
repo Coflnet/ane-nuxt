@@ -3,7 +3,8 @@
   <UiDefaultContainer class="mb-6 p-6">
     <form @submit.prevent="saveFilter" class="space-y-6">
       <UiGrid :grid-size="2">
-        <UiInput :name="$t('filterName')" :placeholder="$t('nameEg')" :label="$t('filterName')" v-model="filter.name" />
+        <UiInput test-id="filter-name-input" :name="$t('filterName')" :placeholder="$t('nameEg')"
+          :label="$t('filterName')" v-model="filter.name" />
         <UiDropdown id="marketplace" v-model="filter.marketplace" :options="[
           { value: 'all', label: $t('allMarket') },
           { value: 'Ebay', label: 'Ebay' },
@@ -12,8 +13,8 @@
       </UiGrid>
 
 
-      <UiInput :name="$t('searchValue')" :placeholder="$t('cameraEg')" :label="$t('searchValue')"
-        v-model="filter.searchValue" />
+      <UiInput test-id="search-value-input" :name="$t('searchValue')" :placeholder="$t('cameraEg')"
+        :label="$t('searchValue')" v-model="filter.searchValue" />
 
       <FiltersKeywordFilter :model-value="filter.keywords" :label="$t('searchKeywords')"
         :footer="$t('addKeyDescription')" :place-holder="$t('addKeywordPressEnter')" />
@@ -29,7 +30,7 @@
       </div>
 
       <FiltersRadiusRangeFilter :filter="filter" />
-      <NotificationSettingsFilter :filter="filter"></NotificationSettingsFilter>
+      <FiltersNotificationSettingsFilter :filter="filter"></FiltersNotificationSettingsFilter>
 
       <FiltersCreateConfirmCreation :is-new-filter="isNewFilter" :saving="savingFilter" />
     </form>
@@ -42,7 +43,6 @@
 
 import type { ListingListener } from '~/src/api-client';
 import { debounce } from 'lodash';
-import NotificationSettingsFilter from '~/components/filters/NotificationSettingsFilter.vue';
 import { getMessaging, getToken } from 'firebase/messaging'
 import { useFirebaseApp } from 'vuefire'
 import type { Filter } from '~/types/FilterType';
@@ -199,6 +199,9 @@ async function saveFilter() {
     const f = await filterToCreate()
     if (!f)
       return
+    if (!savingFilter)
+      return
+
     await filterStore.saveFilter(f)
     push.success("Filter successfully saved");
     navigateTo("/overview")
@@ -236,6 +239,8 @@ async function filterToCreate(): Promise<ListingListener | null> {
     filters: await handleFilters()
   }
 
+  console.log(filterToCreate)
+
   return filterToCreate;
 }
 
@@ -264,6 +269,7 @@ async function handleFilters(): Promise<{ name: string; value: any }[]> {
   if (rawFilter.zipcode != '' && rawFilter.marketplace != 'ebay') {
     const location = await handleSearchRadius()
     filters.push({ name: 'Radius', value: `${location[0]};${location[1]};${rawFilter.searchRadius};${rawFilter.zipcode}` })
+    console.log(filters)
   }
 
   filters.push({ name: 'SearchTerm', value: rawFilter.searchValue })
@@ -287,6 +293,14 @@ async function handleSearchRadius(): Promise<[string, string]> {
     const url = `https://nominatim.openstreetmap.org/search?postalcode=${filter.value.zipcode}&country=${data.country_name}&format=json`;
     const response2 = await fetch(url);
     const data2 = await response2.json();
+
+    // the api returns nothing if its not a valid zip code
+    if (data2.length == 0) {
+      push.error("Please enter a valid zip code")
+      console.error("No data found for this zip code")
+      savingFilter.value = false
+      return ['', '']
+    }
     return [data2[0].lat, data2[0].lon]
   } catch (error) {
     console.error('Error fetching country:', error);

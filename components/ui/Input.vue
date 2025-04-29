@@ -1,7 +1,7 @@
 <template>
   <div class="w-full">
     <UiHeaderLabel :label="label ?? ''" :sm="true" :accent="true" />
-    <input :id="name" :type="type" :placeholder="props.placeholder ?? ''" v-model="model" :class="[
+    <input :data-testid="testId" :id="name" :type="type" :placeholder="props.placeholder ?? ''" v-model="model" :class="[
       'w-full px-4 py-2 rounded-lg border bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-400',
       error ? 'border-rose-500' : 'border-slate-600'
     ]" />
@@ -19,6 +19,7 @@ const props = defineProps({
   label: String,
   footer: String,
   error: Boolean,
+  testId: String
 })
 
 const model = defineModel()

@@ -6,7 +6,7 @@
       </h1>
       <UiFooterLabel :label="$t('manageFilters')"></UiFooterLabel>
     </div>
-    <UiButton @on-click="navigateTo('/filters/create')" :primary="true">
+    <UiButton test-id="create-filter-button-nav" @on-click="navigateTo('/filters/create')" :primary="true">
       <Icon name="tabler:plus" class="size-5" />
       <span class="mr-1">{{ $t('createFilter') }}</span>
     </UiButton>

@@ -1,6 +1,6 @@
 <template>
   <div class="items-center">
-    <button @click="isModalOpen = true" class="mt-0.5 ml-1">
+    <button data-testid="open-filter-delete-menu" @click="isModalOpen = true" class="mt-0.5 ml-1">
       <UiIcon name="tabler:trash" />
     </button>
 
@@ -18,7 +18,8 @@
 
             <div class="flex justify-end space-x-3 mt-6">
               <UiButton @on-click="isModalOpen = false">{{ $t('cancel') }}</UiButton>
-              <UiButton @on-click="deleteFilterId" :warning="true" :proccessing="deleting">{{ $t('delete') }}</UiButton>
+              <UiButton test-id="confirm-delete-filter" @on-click="deleteFilterId" :warning="true"
+                :proccessing="deleting">{{ $t('delete') }}</UiButton>
             </div>
           </UiDefaultContainer>
 

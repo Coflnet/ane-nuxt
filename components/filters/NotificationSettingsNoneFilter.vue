@@ -6,7 +6,6 @@
     </div>
     <label for="none-notification" class="ml-3 flex items-center">
       <div class="w-8 h-8 rounded-md bg-slate-800 flex items-center justify-center mr-3">
-        <XIcon class="w-5 h-5 text-slate-400" />
       </div>
       <div>
         <p class="font-medium text-white">{{ $t('none') }}</p>

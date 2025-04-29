@@ -4,7 +4,7 @@
       class="px-4 py-2 rounded-lg border border-slate-600 text-slate-300 hover:bg-slate-700 transition-colors">
       {{ $t('cancel') }}
     </NuxtLink>
-    <UiButton :primary="true" type="submit" :proccessing="saving">
+    <UiButton test-id="filter-create-filter-button" :primary="true" type="submit" :proccessing="saving">
       {{ isNewFilter ? $t('createFilter') : $t('updateFilter') }}
     </UiButton>
   </div>
