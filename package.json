@@ -19,7 +19,6 @@
     "@nuxtjs/i18n": "^9.5.3",
     "@nuxtjs/tailwindcss": "^6.13.2",
     "@pinia/nuxt": "^0.9.0",
-    "@playwright/test": "^1.52.0",
     "@types/humanize-duration": "^3.27.4",
     "@vueuse/core": "^13.0.0",
     "firebase": "^11.5.0",
@@ -35,7 +34,6 @@
     "nuxt-vuefire": "^1.0.5",
     "pinia": "^2.3.1",
     "pinia-plugin-persistedstate": "^4.2.0",
-    "playwright-core": "^1.52.0",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0",
     "vuefire": "^3.2.1"
