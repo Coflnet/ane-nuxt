@@ -1,8 +1,10 @@
 import { defineStore } from "pinia"
 import { ref, computed } from "vue"
 import { navigateTo } from "#app"
-import { createUserWithEmailAndPassword, fetchSignInMethodsForEmail, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, type Auth } from "firebase/auth"
+import { createUserWithEmailAndPassword, EmailAuthCredential, EmailAuthProvider, fetchSignInMethodsForEmail, GoogleAuthProvider, linkWithCredential, linkWithPopup, signInAnonymously, signInWithEmailAndPassword, signInWithPopup, updateProfile, type Auth, type UserCredential } from "firebase/auth"
 import { loginFirebase, type Platform, type TokenContainer } from "~/src/api-client"
+import { FirebaseError } from "firebase/app"
+
 
 // Types
 export interface User {
@@ -50,9 +52,13 @@ export interface NotificationSettings {
 
 // Define the store using the setup style
 export const useUserStore = defineStore("user", () => {
+
+  const { t } = useI18n()
   // State
+  //
   const user = ref<User | null>(null)
   const isAuthenticated = ref(false)
+  const isAnonymous = ref(false);
   const isLoading = ref(false)
   const error = ref<string | null>(null)
   const token = ref<string | null>(null)
@@ -83,66 +89,33 @@ export const useUserStore = defineStore("user", () => {
 
   const isLoadingSettings = ref(false)
 
-  const isLoggedIn = computed(() => isAuthenticated.value)
+  const isLoggedIn = computed(() => isAuthenticated.value && !isAnonymous.value)
   const getUser = computed(() => user.value)
   const getNotificationSettings = computed(() => notificationSettings.value)
+  const isUserAnonymous = computed(() => isAnonymous.value)
 
-  async function loadUser() {
-    try {
-      isLoading.value = true;
-      error.value = null;
-
-      // check the current user
-      const googleUser = useCurrentUser();
-      if (!googleUser) {
-        // google auth
-        const provider = new GoogleAuthProvider();
-        const auth = useFirebaseAuth();
-
-        // auth does not exist on the server
-        if (!auth) {
-          return;
-        }
-
-        const result = await signInWithPopup(auth, provider);
-        const loggedInUser = result.user;
-
-        if (loggedInUser) {
-          user.value = {
-            id: loggedInUser.uid,
-            name: loggedInUser.displayName ?? "",
-            email: loggedInUser.email ?? "",
-            avatar: loggedInUser.photoURL ?? "",
-          };
-          isAuthenticated.value = true;
-        } else {
-          throw new Error("User not found");
-        }
-
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        const response = await loginFirebase({
-          composable: "useAsyncData",
-          body: { authToken: credential?.accessToken }
-        })
-        token.value = response.data.value?.authToken ?? ""
-      }
-    } catch (e) {
-      console.error("Error loading user:", e);
-      error.value = "Failed to load user data. Please try again.";
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  async function loginWithGoogle(clientAuth: Auth) {
+  async function loginWithGoogle(clientAuth: Auth, login: Boolean): Promise<{ success: boolean; error?: string | null }> {
     isLoading.value = true
     error.value = null
 
-    console.log("fuck this shit")
+    console.log(isAnonymous)
+    if (isAnonymous.value && !login) {
+      const upgrade = await upgradeUserAccount(clientAuth, new GoogleAuthProvider())
+      if (upgrade) {
+        return { success: true };
+      }
+      console.log("returning this ")
+      isAnonymous.value = true
+      return { success: false, error: t("thatEmnailInUse") }
+    }
+
     try {
+
       const provider = new GoogleAuthProvider();
+
       const result = await signInWithPopup(clientAuth, provider);
       const loggedInUser = result.user;
+
 
       if (loggedInUser) {
         user.value = {
@@ -152,9 +125,6 @@ export const useUserStore = defineStore("user", () => {
           avatar: loggedInUser.photoURL ?? "",
         };
         isAuthenticated.value = true;
-
-
-        await fetchNotificationSettings();
       }
 
       const credential = GoogleAuthProvider.credentialFromResult(result);
@@ -163,25 +133,61 @@ export const useUserStore = defineStore("user", () => {
         composable: "$fetch",
         body: { authToken: credential?.accessToken }
       })
-      console.log(response)
+
       token.value = response.authToken ?? ""
 
       isAuthenticated.value = true
 
       return { success: true };
     } catch (err) {
-      error.value = "Failed to login. Please try again.";
-      return { success: false, error: error.value };
-    } finally {
-      isLoading.value = false;
+      return { success: false, error: "Failed to login. Please try again." };
     }
   }
+
+  async function upgradeUserAccount(clientAuth: Auth, loginData: GoogleAuthProvider | EmailAuthCredential): Promise<Boolean> {
+    try {
+      let result: UserCredential;
+      if (loginData instanceof GoogleAuthProvider) {
+        result = await linkWithPopup(clientAuth.currentUser!, loginData);
+      } else {
+        result = await linkWithCredential(clientAuth.currentUser!, loginData);
+      }
+      const loggedInUser = result.user;
+      const providerData = loggedInUser.providerData[0];
+      if (providerData) {
+        await updateProfile(loggedInUser, {
+          displayName: providerData.displayName,
+          photoURL: providerData.photoURL,
+        });
+      }
+      await loggedInUser.reload();
+
+      user.value = {
+        id: loggedInUser.uid,
+        name: loggedInUser.displayName ?? "",
+        email: loggedInUser.email ?? "",
+        avatar: loggedInUser.photoURL ?? "",
+      };
+      isAuthenticated.value = true;
+      isAnonymous.value = false;
+      return true
+    } catch (error) {
+      console.error("Error upgrading user account:", error);
+      return false
+    }
+  }
+
 
   async function signInWithEmailPassword(clientAuth: Auth, email: string, password: string, isLogin: boolean) {
     isLoading.value = true
     error.value = null
 
     try {
+      if (isAnonymous && !isLogin) {
+        const credential = EmailAuthProvider.credential(email, password);
+        upgradeUserAccount(clientAuth, credential)
+        return { success: true }
+      }
       const result = isLogin ? await createUserWithEmailAndPassword(clientAuth, email, password) : await signInWithEmailAndPassword(clientAuth, email, password)
       const loggedInUser = result.user;
 
@@ -193,7 +199,6 @@ export const useUserStore = defineStore("user", () => {
           avatar: loggedInUser.photoURL ?? "",
         };
         isAuthenticated.value = true;
-        await fetchNotificationSettings();
       }
       return { success: true };
     } catch (err) {
@@ -201,6 +206,7 @@ export const useUserStore = defineStore("user", () => {
       return { success: false, error: error.value };
     } finally {
       isLoading.value = false;
+      return { success: true }
     }
   }
 
@@ -230,221 +236,32 @@ export const useUserStore = defineStore("user", () => {
     user.value = null
     isAuthenticated.value = false
     token.value = null
-    resetNotificationSettings()
 
     navigateTo("/login")
   }
 
-  async function checkAuth() {
-    // In a real implementation, this would validate the token with the API
-    // For demo purposes, we'll just set a mock user
-
-    // Simulate a valid session for demo
-    user.value = {
-      id: "",
-      name: "John Doe",
-      email: "john@example.com",
-      avatar: "/placeholder.svg?height=100&width=100",
-    }
-    isAuthenticated.value = true
-    token.value = "mock_token"
-
-    // Load notification settings
-    await fetchNotificationSettings()
-
-    return true
-  }
-
-  // Notification settings methods
-  function resetNotificationSettings() {
-    notificationSettings.value = {
-      discord: {
-        enabled: false,
-        webhookUrl: "",
-        channelName: "",
-        format: "detailed",
-      },
-      email: {
-        enabled: true,
-        address: user.value?.email || "",
-        frequency: "instant",
-      },
-      webPush: {
-        enabled: false,
-        subscribed: false,
-        notifyNewMatches: true,
-        notifyPriceChanges: true,
-        notifyEndingSoon: true,
-      },
-    }
-  }
-
-  async function fetchNotificationSettings() {
-
-    return;
-    try {
-      // In a real implementation, this would call the API
-      // const { data } = await useFetch('/api/user/notification-settings')
-
-      // For now, simulate fetching settings
-      await new Promise((resolve) => setTimeout(resolve, 500))
-
-      // Mock data
-      notificationSettings.value = {
-        discord: {
-          enabled: true,
-          webhookUrl: "https://discord.com/api/webhooks/example",
-          channelName: "#auction-alerts",
-          format: "detailed",
-        },
-        email: {
-          enabled: true,
-          address: user.value?.email || "user@example.com",
-          frequency: "instant",
-        },
-        webPush: {
-          enabled: false,
-          subscribed: false,
-          notifyNewMatches: true,
-          notifyPriceChanges: true,
-          notifyEndingSoon: true,
-        },
-      }
-
-      return { success: true }
-    } catch (err) {
-      console.error("Error fetching notification settings:", err)
-      return { success: false, error: "Failed to load notification settings" }
-    } finally {
-      isLoadingSettings.value = false
-    }
-  }
-
-  async function updateNotificationSettings(settings: NotificationSettings) {
-    isLoadingSettings.value = true
+  async function checkAuth(clientAuth: Auth) {
+    if (isAuthenticated.value)
+      return;
 
     try {
-      // In a real implementation, this would call the API
-      // const { data } = await useFetch('/api/user/notification-settings', {
-      //   method: 'PUT',
-      //   body: settings
-      // })
+      const signInResult = await signInAnonymously(clientAuth)
+      const accessToken = await signInResult.user.getIdTokenResult();
 
-      // For now, simulate updating settings
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      const response = await loginFirebase({
+        composable: "$fetch",
+        body: { authToken: accessToken.token }
+      })
+      token.value = response.authToken ?? ""
 
-      // Update local state
-      notificationSettings.value = settings
-
-      return { success: true }
-    } catch (err) {
-      console.error("Error updating notification settings:", err)
-      return { success: false, error: "Failed to update notification settings" }
-    } finally {
-      isLoadingSettings.value = false
+      isAuthenticated.value = true
+      isAnonymous.value = true
+    } catch (error) {
+      console.error("Error checking authentication:", error)
     }
   }
 
-  async function testDiscordWebhook() {
-    if (!notificationSettings.value.discord.webhookUrl) {
-      return { success: false, error: "Webhook URL is required" }
-    }
 
-    try {
-      // In a real implementation, this would call the API
-      // const { data } = await useFetch('/api/notifications/test-discord', {
-      //   method: 'POST',
-      //   body: { webhookUrl: notificationSettings.value.discord.webhookUrl }
-      // })
-
-      // For now, simulate testing webhook
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-
-      return { success: true, message: "Test message sent to Discord successfully!" }
-    } catch (err) {
-      console.error("Error testing Discord webhook:", err)
-      return { success: false, error: "Failed to send test message to Discord" }
-    }
-  }
-
-  async function testEmailNotification() {
-    if (!notificationSettings.value.email.address) {
-      return { success: false, error: "Email address is required" }
-    }
-
-    try {
-      // In a real implementation, this would call the API
-      // const { data } = await useFetch('/api/notifications/test-email', {
-      //   method: 'POST',
-      //   body: { email: notificationSettings.value.email.address }
-      // })
-
-      // For now, simulate sending test email
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-
-      return {
-        success: true,
-        message: `Test email sent to ${notificationSettings.value.email.address} successfully!`,
-      }
-    } catch (err) {
-      console.error("Error sending test email:", err)
-      return { success: false, error: "Failed to send test email" }
-    }
-  }
-
-  async function toggleWebPushSubscription() {
-    try {
-      // In a real implementation, this would handle browser push notification permissions
-      // and subscribe/unsubscribe from the push service
-
-      // For now, just toggle the state
-      notificationSettings.value.webPush.subscribed = !notificationSettings.value.webPush.subscribed
-
-      return {
-        success: true,
-        subscribed: notificationSettings.value.webPush.subscribed,
-        message: notificationSettings.value.webPush.subscribed
-          ? "Successfully subscribed to web push notifications!"
-          : "Successfully unsubscribed from web push notifications.",
-      }
-    } catch (err) {
-      console.error("Error toggling web push subscription:", err)
-      return { success: false, error: "Failed to update web push subscription" }
-    }
-  }
-
-  async function updateProfile(profileData: Partial<User>) {
-    isLoading.value = true
-    error.value = null
-
-    try {
-      // In a real implementation, this would call the API
-      // const { data } = await useFetch('/api/user/profile', {
-      //   method: 'PUT',
-      //   body: profileData
-      // })
-
-      // For now, simulate updating profile
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      // Update user data
-      if (user.value) {
-        user.value = { ...user.value, ...profileData }
-      }
-
-      // If email was updated, also update it in notification settings
-      if (profileData.email && notificationSettings.value.email.enabled) {
-        notificationSettings.value.email.address = profileData.email
-      }
-
-      return { success: true }
-    } catch (err) {
-      error.value = "Failed to update profile. Please try again."
-      return { success: false, error: error.value }
-    } finally {
-      isLoading.value = false
-    }
-  }
 
   // Return all state, getters, and actions
   return {
@@ -454,9 +271,9 @@ export const useUserStore = defineStore("user", () => {
     isLoading,
     error,
     token,
-    notificationSettings,
     isLoadingSettings,
     cachedFilters,
+    notificationSettings,
     cachedAuctions,
 
 
@@ -464,19 +281,12 @@ export const useUserStore = defineStore("user", () => {
     isLoggedIn,
     getUser,
     getNotificationSettings,
+    isUserAnonymous,
 
     // Actions
-    loadUser,
     loginWithGoogle,
     logout,
     checkAuth,
-    resetNotificationSettings,
-    fetchNotificationSettings,
-    updateNotificationSettings,
-    testDiscordWebhook,
-    testEmailNotification,
-    toggleWebPushSubscription,
-    updateProfile,
     saveAuctionCache,
     loadAuctionCache,
     saveFilterCache,

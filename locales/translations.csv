@@ -53,7 +53,7 @@ buyThingsCheaper,Great for buy the items you want for cheaper,Great for buy the 
 greatTryingAne,Great for trying out ANE,Great for trying out ANE
 startFindingDeals,Ready to Start Finding Deals?,Ready to Start Finding Deals?
 joinThousandsSmartShoppers,Join thousands of smart shoppers and resellers who are saving money and making profits with DealAlert.,Join thousands of smart shoppers and resellers who are saving money and making profits with DealAlert.
-joinFreeToday,No credit card required. Start with our free plan today.,No credit card required. Start with our free plan today.
+joinFreeToday,No credit card or email required. Start with our free plan today.,No credit card or email required. Start with our free plan today.
 smartWayToFindDeals,The smart way to find deals and make profits on online marketplaces.,The smart way to find deals and make profits on online marketplaces.
 pro,Pro,Pro
 privacy,Privacy,Privacy
@@ -164,6 +164,7 @@ apiRef,API Reference,API Reference
 advancedNotification,Advanced Notification Engine for auction marketplaces,Advanced Notification Engine for auction marketplaces
 view,View,View 
 login,Login,Login
+thatEmnailInUse,That email is already in use. either use a different email or login instead of registering
 subscriptions,Subscriptions
 cancelSubscriptionSuc,Canceling subscription was successful,Canceling subscription was successful
 planUpdated,Plan updated successfully,Plan updated successfully

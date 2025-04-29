@@ -11,8 +11,8 @@
           <a href="#how-it-works" class="hover:text-slate-300 transition">{{ $t('howItWorks') }}</a>
           <a href="#pricing" class="hover:text-slate-300 transition">{{ $t('pricing') }}</a>
         </div>
-        <NuxtLink to="/register" class="bg-slate-600 hover:bg-slate-700 px-4 py-2 rounded-lg font-medium transition">
-          {{ $t('signUp') }}
+        <NuxtLink to="/overview" class="bg-slate-600 hover:bg-slate-700 px-4 py-2 rounded-lg font-medium transition">
+          {{ $t('getStarted') }}
         </NuxtLink>
 
       </div>
@@ -31,8 +31,9 @@
             {{ $t('createCustomAlerts') }}
           </p>
           <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-            <button class="bg-slate-600 hover:bg-slate-700 px-6 py-3 rounded-lg font-medium text-lg transition">
-              {{ $t('signUp') }}
+            <button @click="navigateTo('/overview')"
+              class="bg-slate-600 hover:bg-slate-700 px-6 py-3 rounded-lg font-medium text-lg transition">
+              {{ $t('getStarted') }}
             </button>
           </div>
         </div>
@@ -302,9 +303,9 @@
         <p class="text-lg md:text-xl mb-8 max-w-2xl mx-auto">
           {{ $t('joinThousandsSmartShoppers') }}
         </p>
-        <NuxtLink to="/register"
+        <NuxtLink to="/overview"
           class="bg-white text-slate-800 hover:bg-slate-200 px-8 py-3 rounded-lg font-medium text-lg transition">
-          {{ $t('signUp') }}
+          {{ $t('getStarted') }}
         </NuxtLink>
         <p class="mt-4 text-slate-200">
           {{ $t('joinFreeToday') }}

@@ -46,6 +46,8 @@ async function loadMore() {
 }
 
 onMounted(async () => {
+
+  await useUserStore().checkAuth(useFirebaseAuth()!);
   await listingStore.loadMatches()
   loadedAuctions.value = listingStore.recentMatches
   useInfiniteScroll(window, loadMore, { distance: 300 })
