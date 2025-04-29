@@ -25,6 +25,9 @@
         </div>
       </div>
     </Teleport>
+
+    <UiConformationPopup :footer="$t('areYouSureDeletion')" :header="$t('confirmDeletion')" :model-value="isModalOpen"
+      @confirm="deleteFilterId" />
   </div>
 </template>
 
