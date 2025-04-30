@@ -4,6 +4,7 @@ import { navigateTo } from "#app"
 import { createUserWithEmailAndPassword, EmailAuthCredential, EmailAuthProvider, fetchSignInMethodsForEmail, GoogleAuthProvider, linkWithCredential, linkWithPopup, signInAnonymously, signInWithEmailAndPassword, signInWithPopup, updateProfile, type Auth, type UserCredential } from "firebase/auth"
 import { loginFirebase, type Platform, type TokenContainer } from "~/src/api-client"
 import { FirebaseError } from "firebase/app"
+import type { ActiveSubscription } from "#hey-api"
 
 
 // Types
@@ -62,6 +63,7 @@ export const useUserStore = defineStore("user", () => {
   const token = ref<string | null>(null)
   const cachedAuctions = ref<CachedAuctions | null>(null)
   const cachedFilters = ref<{ [id: number]: string }>()
+  const currentPlan = ref<ActiveSubscription>();
 
 
   const notificationSettings = ref<NotificationSettings>({
@@ -272,6 +274,7 @@ export const useUserStore = defineStore("user", () => {
     cachedFilters,
     notificationSettings,
     cachedAuctions,
+    currentPlan,
 
 
     // Getters

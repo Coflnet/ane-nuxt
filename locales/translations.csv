@@ -44,7 +44,7 @@ mostPopular,Most Popular,Most Popular
 20ActiveFilters,20 active filters,20 active filters
 10MinuteDelay,Within 10 minute delay,Within 10 minute delay
 500activeFilters,500 active filters,500 active filters
-flippers,Flipper,Flipper
+flipper,Flipper,Flipper
 2MinuteDelay,1-2 minute delay,1-2 minute delay
 priceCalculation,Price calculation,Price calculation
 comingSoon,Coming soon,Coming soon
@@ -53,9 +53,9 @@ buyThingsCheaper,Great for buy the items you want for cheaper,Great for buy the 
 greatTryingAne,Great for trying out ANE,Great for trying out ANE
 startFindingDeals,Ready to Start Finding Deals?,Ready to Start Finding Deals?
 joinThousandsSmartShoppers,Join thousands of smart shoppers and resellers who are saving money and making profits with DealAlert.,Join thousands of smart shoppers and resellers who are saving money and making profits with DealAlert.
-joinFreeToday,No credit card or email required. Start with our free plan today.,No credit card or email required. Start with our free plan today.
+joinFreeToday,No credit card required. Start with our free plan today.,No credit card required. Start with our free plan today.
 smartWayToFindDeals,The smart way to find deals and make profits on online marketplaces.,The smart way to find deals and make profits on online marketplaces.
-pro,Pro,Pro
+collector,Collector,Collector
 privacy,Privacy,Privacy
 terms,Terms,Terms
 rights,© 2025 Coflnet GMH. All rights reserved.,© 2025 Coflnet GMH. All rights reserved.
@@ -164,7 +164,6 @@ apiRef,API Reference,API Reference
 advancedNotification,Advanced Notification Engine for auction marketplaces,Advanced Notification Engine for auction marketplaces
 view,View,View 
 login,Login,Login
-thatEmnailInUse,That email is already in use. either use a different email or login instead of registering
 subscriptions,Subscriptions
 cancelSubscriptionSuc,Canceling subscription was successful,Canceling subscription was successful
 planUpdated,Plan updated successfully,Plan updated successfully
@@ -174,4 +173,7 @@ current,Current,Current
 currentPlan,Current Plan,Current Plan
 selectPlan,Select Plan,Select Plan
 upgrade,Upgrade,Upgrade
-downgrade,DownGrade,DownGrade
+downgrade,Down Grade,Down Grade
+confirm,Confirm,Confirm
+daysLeft,Days left,days left
+endsToday,Ends today,Ends today

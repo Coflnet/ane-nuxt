@@ -13,7 +13,7 @@ export interface Plan {
   features: Feature[];
 }
 
-export type PlanId = 'basic' | 'pro' | 'enterprise';
+export type PlanId = 'basic' | 'collector' | 'enterprise';
 
 export const planPrices: { [key: string]: number } = {
   basic: 0,
@@ -36,8 +36,8 @@ export const plans: Plan[] = [
     ],
   },
   {
-    id: 'pro',
-    name: 'pro',
+    id: 'collector',
+    name: 'collector',
     price: planPrices.pro ?? 0,
     description: 'buyThingsCheaper',
     popular: true,
