@@ -52,8 +52,6 @@ export interface NotificationSettings {
 
 // Define the store using the setup style
 export const useUserStore = defineStore("user", () => {
-
-  const { t } = useI18n()
   // State
   //
   const user = ref<User | null>(null)
@@ -104,9 +102,8 @@ export const useUserStore = defineStore("user", () => {
       if (upgrade) {
         return { success: true };
       }
-      console.log("returning this ")
       isAnonymous.value = true
-      return { success: false, error: t("thatEmnailInUse") }
+      return { success: false, error: useI18n().t("thatEmnailInUse") }
     }
 
     try {

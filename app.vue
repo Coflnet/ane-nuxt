@@ -26,7 +26,7 @@ onMounted(async () => {
   if (import.meta.server) return;
 
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('firebase-messaging-sw.js')
+    navigator.serviceWorker.register('firebase-messaging-sw.js', { scope: '/' })
       .then(reg => {
         console.log(`Service Worker Registration (Scope: ${reg.scope})`);
       })

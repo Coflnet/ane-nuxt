@@ -1,7 +1,7 @@
 <template>
   <div :class="[
     'rounded-lg overflow-hidden shadow-lg transition-all duration-200 max-h-[470px]',
-    selectedPlan === plan.id ? 'ring-4 ring-indigo-500 transform scale-105' : 'hover:scale-105',
+    selectedPlan === plan.id ? 'transform scale-105' : 'hover:scale-105',
     currentPlan === plan.id ? 'border-2 border-indigo-400' : 'border border-gray-700',
   ]">
     <div class="bg-gray-800 p-6">
@@ -9,7 +9,10 @@
         <h3 class="text-xl font-bold text-white">{{ $t(plan.name) }}</h3>
         <span v-if="currentPlan === plan.id"
           class="px-3 py-1 text-xs font-medium rounded-full bg-indigo-500 text-white">
-          {{ $t('current') }}
+          <div>
+            {{ $t('currentPlan') }}
+
+          </div>
         </span>
         <span v-else-if="plan.popular" class="px-3 py-1 text-xs font-medium rounded-full bg-indigo-500 text-white">
           {{ $t('mostPopular') }}
@@ -54,15 +57,37 @@ const props = defineProps<{
   plan: Plan;
   currentPlan: PlanId | null;
   selectedPlan: PlanId | null;
+  endDate: Date | null;
 }>();
 
 defineEmits<{
   (e: 'select-plan', planId: PlanId): void;
 }>();
 
+const currentPlanText = computed(() => {
+  console.log(props.endDate)
+  if (props.endDate === null) {
+    return t('currentPlan');
+  } else {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const endDate = new Date(props.endDate);
+    endDate.setHours(0, 0, 0, 0);
+
+
+    const timeDiff = endDate.getTime() - today.getTime();
+    const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+
+    if (daysLeft === 0)
+      return t('endsToday');
+    return `${daysLeft} ${t('daysLeft')}`;
+  }
+});
+
 function getButtonText(): string {
   if (props.currentPlan === props.plan.id)
-    return t('currentPlan');
+    return currentPlanText.value;
 
   if (props.plan.available == false)
     return t('comingSoon');
