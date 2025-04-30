@@ -267,7 +267,7 @@ async function handleFilters(): Promise<{ name: string; value: any }[]> {
   if (rawFilter.keywords.length != 0)
     filters.push({ name: "ContainsKeyWord", value: rawFilter.keywords.join(',') });
 
-  if (rawFilter.blacklist.length == 0)
+  if (rawFilter.blacklist.length != 0)
     filters.push({ name: "NotContainsKeyWord", value: rawFilter.blacklist.join(',') });
   return filters
 }
