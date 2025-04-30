@@ -12,7 +12,6 @@
 </template>
 
 <script setup>
-import { getMessaging, onMessage } from 'firebase/messaging'
 // App-wide setup
 useHead({
   title: 'ANE - Advanced Notification Engine',

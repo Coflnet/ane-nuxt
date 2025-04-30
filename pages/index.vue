@@ -4,7 +4,7 @@
     <nav class="container mx-auto px-6 py-4">
       <div class="flex justify-between items-center">
         <div class="flex items-center">
-          <span class="text-xl font-bold">NimDing</span>
+          <span class="text-xl font-bold">ANE</span>
         </div>
         <div class="hidden md:flex space-x-8">
           <a href="#features" class="hover:text-slate-300 transition">{{ $t('features') }}</a>
@@ -116,7 +116,7 @@
     <!-- How It Works -->
     <section id="how-it-works" class="container mx-auto px-6 py-16 md:py-24 bg-slate-950/50 rounded-xl">
       <h2 class="text-3xl md:text-4xl font-bold text-center mb-16">
-        {{ $t('how') }} <span class="text-slate-400">NimDing</span> {{ $t('works') }}
+        {{ $t('how') }} <span class="text-slate-400">ANE</span> {{ $t('works') }}
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div class="text-center">
@@ -319,7 +319,7 @@
         <div class="flex flex-col md:flex-row justify-between mb-8">
           <div class="mb-8 md:mb-0">
             <div class="flex items-center mb-4">
-              <span class="text-xl font-bold">NimDing</span>
+              <span class="text-xl font-bold">ANE</span>
             </div>
             <p class="text-slate-300 max-w-xs">
               {{ $t('smartWayToFindDeals') }}
