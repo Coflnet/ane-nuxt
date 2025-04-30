@@ -7,8 +7,17 @@ Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduct
 Make sure to install dependencies:
 
 ```bash
-# pnpm
-pnpm install
+# npm
+npm install
+```
+
+Add a [firebase service account]('https://firebase.google.com/docs/admin/setup#initialize_the_sdk_in_non-google_environments')
+
+Create a ``.env`` file with this content
+```json
+GOOGLE_APPLICATION_CREDENTIALS=YOUR-SERVICE-ACCOUNT
+```
+```
 ```
 
 ## Development Server
@@ -16,8 +25,8 @@ pnpm install
 Start the development server on `http://localhost:3000`:
 
 ```bash
-# pnpm
-pnpm dev
+# npm
+npm run dev
 ```
 
 ## Production
@@ -26,14 +35,14 @@ Build the application for production:
 
 ```bash
 # pnpm
-pnpm build
+npm build
 ```
 
 Locally preview production build:
 
 ```bash
 # pnpm
-pnpm preview
+npm preview
 ```
 
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
