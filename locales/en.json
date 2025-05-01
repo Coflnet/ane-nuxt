@@ -185,5 +185,8 @@
   "zipCode": "Zip-code",
   "zipCodeEq": "e.g., xxxxx",
   "zipCodePlease": "Please enter a zip code when using search radius",
-  "description": "Description"
+  "description": "Description",
+  "navigation": "Navigation",
+  "language": "Language",
+  "account": "Account"
 }
