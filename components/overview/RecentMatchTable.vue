@@ -21,7 +21,7 @@
           </td>
           <td class="px-4 py-3 text-sm font-medium text-white">{{ $t('dollarSign') }}{{
             auction.price
-          }}</td>
+            }}</td>
           <td class="px-4 py-3 text-sm font-medium text-white" v-if="description(auction)">{{
             description(auction) }}</td>
           <td class="px-4 py-3 text-sm font-medium text-white"> {{ timeAgo(auction) }}</td>
