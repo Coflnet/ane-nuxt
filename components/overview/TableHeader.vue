@@ -8,5 +8,5 @@
 </template>
 
 <script setup lang="ts">
-const headers = ['auction', 'filter', 'price', 'matched', 'actions']
+defineProps<{ headers: string[] }>()
 </script>

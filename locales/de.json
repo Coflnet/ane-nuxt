@@ -160,5 +160,6 @@
   "yourZip": "Deine Postleitzahl",
   "zipCode": "Postleitzahl",
   "zipCodeEq": "z.B., 12345",
-  "zipCodePlease": "Bitte gib deine Postleitzahl ein"
+  "zipCodePlease": "Bitte gib deine Postleitzahl ein",
+  "description": "Description"
 }

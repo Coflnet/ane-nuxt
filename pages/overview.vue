@@ -15,7 +15,7 @@
   <OverviewStats :filterCount="filterCount" :matchedAuctions="stats.matchedAuctions"
     :notificationperHour="stats.notificationperHour" />
 
-  <OverviewRecentMatchTable :matches="listingStore.recentMatches" :title="$t('dashboard')" />
+  <OverviewRecentMatchTable :matches="listingStore.recentMatches" :title="$t('dashboard')" :overview="true" />
   <UiGrid :grid-size="2">
     <OverviewTopFilters :top-filters="topFilters" />
     <OverviewNotificationChannels />

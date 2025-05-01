@@ -106,7 +106,7 @@ async function testFilter() {
       // test endpoint return listing object which has no listener id (filter) and no match date
       // while recent matches return FilterMatch object 
       matches.value = res.map((i) => {
-        return { matchedAt: "", listenerId: 0, listingData: i };
+        return { matchedAt: i.foundAt, listenerId: 0, listingData: i };
       });
     }
   } catch (e) {

@@ -2,7 +2,8 @@
   <UiDefaultContainer class="mb-6 p-6">
     <UiHeaderLabel :label="props.title" class="mb-4" />
     <table class="w-full">
-      <OverviewTableHeader />
+      <OverviewTableHeader
+        :headers="overview ? ['auction', 'filter', 'price', 'matched', 'actions'] : ['auction', 'price', 'description', 'actions']" />
       <tbody>
         <tr v-for="(auction, index) in props.matches" :key="index"
           class="border-b border-slate-700 hover:bg-slate-700/50">
@@ -16,13 +17,14 @@
               </div>
             </div>
           </td>
-          <td class="px-4 py-3 text-sm font-medium text-white" v-if="'filter' in auction">{{
+          <td class="px-4 py-3 text-sm font-medium text-white" v-if="overview">{{
             filters.getSimplifiedFilters[auction.listenerId ?? 0] }}
           </td>
-          <td class="px-4 py-3 text-sm font-medium text-white">{{ $t('dollarSign') }}
-            {{ auction.listingData?.price }}
+          <td class="px-4 py-3 text-sm font-medium text-white">
+            {{ $t('dollarSign') }}{{ auction.listingData?.price }}
           </td>
-          <td class="px-4 py-3 text-sm font-medium text-white">{{ auction.listingData?.descriptionShort }}</td>
+          <td class="px-4 py-3 text-sm font-medium text-white" v-if="!overview">{{
+            auction.listingData?.descriptionShort }}</td>
           <td class="px-4 py-3 text-sm font-medium text-white"> {{ timeAgo(auction) }}</td>
           <td class="px-4 py-3 text-sm">
             <div class="flex items-center space-x-2 ml-2.5">
@@ -44,6 +46,7 @@ import humanizeDuration from 'humanize-duration'
 import type { FilterMatch } from '~/src/api-client';
 
 const props = defineProps({
+  overview: { type: Boolean },
   matches: {
     type: Array<FilterMatch>,
     required: true
@@ -51,7 +54,7 @@ const props = defineProps({
   title: {
     type: String,
     default: 'Recent Matches'
-  }
+  },
 })
 
 const filters = useFilterStore()
@@ -59,7 +62,6 @@ const listingStore = useListingStore()
 
 
 function timeAgo(auction: FilterMatch): string {
-
   const past = new Date(auction.matchedAt ?? '');
   const t = Math.round(new Date().getTime() - past.getTime())
 
