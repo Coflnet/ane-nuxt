@@ -8,26 +8,26 @@
           class="border-b border-slate-700 hover:bg-slate-700/50">
           <td class="px-4 py-3 text-sm text-white">
             <div class="flex items-center space-x-3">
-              <img :src="imageUrl(auction)" alt="Auction thumbnail" class="w-10 h-10 rounded-md object-cover" />
+              <img :src="auction.listingData?.imageUrls![0] ?? ''" alt="Auction thumbnail"
+                class="w-10 h-10 rounded-md object-cover" />
               <div>
-                <p class="font-medium">{{ auction.title }}</p>
-                <UiFooterLabel v-if="'marketplace' in auction" :label="auction.marketplace" :xs="true" />
+                <p class="font-medium">{{ auction.listingData?.title }}</p>
+                <UiFooterLabel v-if="'marketplace' in auction" :label="auction.listingData?.platform" :xs="true" />
               </div>
             </div>
           </td>
           <td class="px-4 py-3 text-sm font-medium text-white" v-if="'filter' in auction">{{
-            filters.getSimplifiedFilters[auction.filter ??
-            0] }}
+            filters.getSimplifiedFilters[auction.listenerId ?? 0] }}
           </td>
-          <td class="px-4 py-3 text-sm font-medium text-white">{{ $t('dollarSign') }}{{
-            auction.price
-          }}</td>
-          <td class="px-4 py-3 text-sm font-medium text-white" v-if="description(auction)">{{
-            description(auction) }}</td>
+          <td class="px-4 py-3 text-sm font-medium text-white">{{ $t('dollarSign') }}
+            {{ auction.listingData?.price }}
+          </td>
+          <td class="px-4 py-3 text-sm font-medium text-white">{{ auction.listingData?.descriptionShort }}</td>
           <td class="px-4 py-3 text-sm font-medium text-white"> {{ timeAgo(auction) }}</td>
           <td class="px-4 py-3 text-sm">
             <div class="flex items-center space-x-2 ml-2.5">
-              <a :href="url(auction)" target="_blank" class="p-1 rounded-md hover:bg-slate-700" title="View auction">
+              <a :href="listingStore.constructListingUrl(auction.listingData) ?? ''" target="_blank"
+                class="p-1 rounded-md hover:bg-slate-700" title="View auction">
                 <Icon name="tabler:external-link" class="size-5 text-slate-400" />
               </a>
 
@@ -41,10 +41,11 @@
 
 <script setup lang="ts">
 import humanizeDuration from 'humanize-duration'
+import type { FilterMatch } from '~/src/api-client';
 
 const props = defineProps({
   matches: {
-    type: Object as PropType<Array<MatchItem> | Array<Listing>>,
+    type: Array<FilterMatch>,
     required: true
   },
   title: {
@@ -56,47 +57,10 @@ const props = defineProps({
 const filters = useFilterStore()
 const listingStore = useListingStore()
 
-function imageUrl(auction: MatchItem | Listing): string {
-  if ('image' in auction && auction.image) {
-    return auction.image;
-  }
 
-  if ('imageUrls' in auction && auction.imageUrls) {
-    return auction.imageUrls[0] ?? '';
-  }
+function timeAgo(auction: FilterMatch): string {
 
-  return ''
-}
-
-function description(auction: MatchItem | Listing): string {
-  if ('descriptionShort' in auction && auction.descriptionShort) {
-    if (auction.descriptionShort.length > 100) {
-      return auction.descriptionShort.substring(0, 100) + '...';
-    }
-    return auction.descriptionShort;
-  }
-
-  if ('description' in auction && auction.description) {
-    if (auction.description.length > 100) {
-      return auction.description.substring(0, 100) + '...';
-    }
-    return auction.description;
-  }
-  return '';
-}
-
-function timeAgo(auction: MatchItem | Listing): string {
-  let timestamp = '';
-
-  if ('matchedAt' in auction && auction.matchedAt) {
-    timestamp = auction.matchedAt;
-  } else if ('foundAt' in auction && auction.foundAt) {
-    timestamp = auction.foundAt;
-  } else if ('createdAt' in auction && auction.createdAt) {
-    timestamp = auction.createdAt;
-  }
-
-  const past = new Date(timestamp);
+  const past = new Date(auction.matchedAt ?? '');
   const t = Math.round(new Date().getTime() - past.getTime())
 
   const str = humanizeDuration(t, {
@@ -109,16 +73,4 @@ function timeAgo(auction: MatchItem | Listing): string {
   return str
 }
 
-function url(auction: MatchItem | Listing): string {
-  if ('url' in auction && auction.url) {
-    return auction.url;
-  }
-
-  const constructedUrl = listingStore.constructListingUrl(auction);
-  if (constructedUrl) {
-    return constructedUrl;
-  }
-
-  return ''
-}
 </script>

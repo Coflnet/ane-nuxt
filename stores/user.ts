@@ -6,7 +6,6 @@ import { loginFirebase, type Platform, type TokenContainer } from "~/src/api-cli
 import { FirebaseError } from "firebase/app"
 import type { ActiveSubscription } from "#hey-api"
 
-
 // Types
 export interface User {
   id: string
@@ -26,7 +25,7 @@ export interface MatchItem {
 }
 
 export interface CachedAuctions {
-  auctions: MatchItem[];
+  auctions: FilterMatch[];
   timeStamp: string;
 }
 
@@ -209,11 +208,11 @@ export const useUserStore = defineStore("user", () => {
     }
   }
 
-  function saveAuctionCache(actions: MatchItem[]) {
+  function saveAuctionCache(actions: FilterMatch[]) {
     cachedAuctions.value = { auctions: actions, timeStamp: new Date().toISOString() }
   }
 
-  function loadAuctionCache(): [boolean, MatchItem[]] {
+  function loadAuctionCache(): [boolean, FilterMatch[]] {
     if (Date.now() - Date.parse(cachedAuctions.value?.timeStamp ?? "") > 60 * 1000) {
       return [true, cachedAuctions.value?.auctions ?? []]
     }

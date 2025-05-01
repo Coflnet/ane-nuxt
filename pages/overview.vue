@@ -24,6 +24,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import type { FilterMatch } from '~/src/api-client';
 
 import type { TopFilter } from '~/types/FilterType';
 
@@ -69,13 +70,13 @@ async function loadStats() {
 
 }
 
-function getAverageMatchesPerHour(matches: MatchItem[]) {
+function getAverageMatchesPerHour(matches: FilterMatch[]) {
   if (matches.length < 2) {
     stats.value.notificationperHour = matches.length
     return
   }
 
-  var timestamps = matches.map(m => new Date(m.matchedAt));
+  var timestamps = matches.map(m => new Date(m.matchedAt ?? ''));
 
   timestamps.sort((a, b) => a.getTime() - b.getTime());
   const first = timestamps[0]!.getTime();

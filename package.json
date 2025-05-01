@@ -39,6 +39,7 @@
     "vuefire": "^3.2.1"
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.16",
     "eslint": "^9.23.0",
     "eslint-plugin-nuxt": "^4.0.0"
   }

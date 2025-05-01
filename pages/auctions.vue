@@ -19,11 +19,12 @@
 import { ref, onMounted } from 'vue'
 import { useInfiniteScroll } from '@vueuse/core'
 import { useListingStore } from '@/stores/listing'
+import type { FilterMatch } from '~/src/api-client'
 
 
 const listingStore = useListingStore()
 
-const loadedAuctions = ref<MatchItem[]>([])
+const loadedAuctions = ref<FilterMatch[]>([])
 const loading = ref(true)
 const finished = ref(false)
 
@@ -35,6 +36,7 @@ async function loadMore() {
   loading.value = true
 
   const [isNewAuctions, newAuctions] = await listingStore.loadMoreMatches(loadedAuctions.value)
+
 
   if (!isNewAuctions) {
     finished.value = true
@@ -50,6 +52,8 @@ onMounted(async () => {
   await useUserStore().checkAuth(useFirebaseAuth()!);
   await listingStore.loadMatches()
   loadedAuctions.value = listingStore.recentMatches
+
+  console.log(listingStore.recentMatches);
   useInfiniteScroll(window, loadMore, { distance: 300 })
   loading.value = false
 })
