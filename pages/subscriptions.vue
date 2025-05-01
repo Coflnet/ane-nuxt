@@ -44,10 +44,7 @@ async function changePlan(plan: String) {
     headers: { Authorization: apiToken },
   })
 
-  console.log(url);
-
   await navigateTo(url, { external: true })
-
 }
 
 async function confirmCancelSubscription() {

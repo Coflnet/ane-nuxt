@@ -18,8 +18,6 @@ async function loginWithGoogle() {
   }
   const googleSignInRequest = await userStore.loginWithGoogle(auth, props.login)
   if (googleSignInRequest.success) {
-
-    console.log("lskjgkj")
     navigateTo("/overview");
     return;
   }
