@@ -27,7 +27,7 @@
           </div>
 
           <div>
-            <h3 class="font-medium text-white mb-2">Company</h3>
+            <h3 class="font-medium text-white mb-2">{{ $t('company') }}</h3>
             <ul class="space-y-2">
 
               <li>
@@ -46,7 +46,7 @@
       </div>
 
       <UiFooterLabel class="border-t mt-8 pt-6 border-slate-700 text-center"
-        :label="` ${new Date().getFullYear()} Coflnet GMH. All rights reserved.`" :sm="true" />
+        :label="$t('yearRights', new Date().getFullYear())" :sm="true" />
     </div>
   </footer>
 </template>

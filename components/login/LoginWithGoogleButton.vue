@@ -10,13 +10,17 @@
 const userStore = useUserStore()
 const auth = useFirebaseAuth()
 
+const props = defineProps({ login: Boolean });
+
 async function loginWithGoogle() {
   if (!auth) {
-    console.error('Firebase shit the bed');
     return;
   }
-  if (await userStore.loginWithGoogle(auth)) {
+  const googleSignInRequest = await userStore.loginWithGoogle(auth, props.login)
+  if (googleSignInRequest.success) {
     navigateTo("/overview");
+    return;
   }
+  push.error(googleSignInRequest.error ?? 'Something is very wrong')
 }
 </script>

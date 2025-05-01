@@ -73,7 +73,8 @@ const filters = computed(() => {
   return res;
 })
 
-onMounted(() => {
+onMounted(async () => {
+  await useUserStore().checkAuth(useFirebaseAuth()!);
   filterStore.loadFilters();
 });
 

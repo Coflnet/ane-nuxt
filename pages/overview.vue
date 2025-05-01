@@ -15,7 +15,7 @@
   <OverviewStats :filterCount="filterCount" :matchedAuctions="stats.matchedAuctions"
     :notificationperHour="stats.notificationperHour" />
 
-  <OverviewRecentMatchTable :matches="listingStore.recentMatches" :title="$t('dashboard')" />
+  <OverviewRecentMatchTable :matches="listingStore.recentMatches" :title="$t('dashboard')" :overview="true" />
   <UiGrid :grid-size="2">
     <OverviewTopFilters :top-filters="topFilters" />
     <OverviewNotificationChannels />
@@ -24,6 +24,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import type { FilterMatch } from '~/src/api-client';
 
 import type { TopFilter } from '~/types/FilterType';
 
@@ -69,13 +70,13 @@ async function loadStats() {
 
 }
 
-function getAverageMatchesPerHour(matches: MatchItem[]) {
+function getAverageMatchesPerHour(matches: FilterMatch[]) {
   if (matches.length < 2) {
     stats.value.notificationperHour = matches.length
     return
   }
 
-  var timestamps = matches.map(m => new Date(m.matchedAt));
+  var timestamps = matches.map(m => new Date(m.matchedAt ?? ''));
 
   timestamps.sort((a, b) => a.getTime() - b.getTime());
   const first = timestamps[0]!.getTime();
@@ -89,6 +90,7 @@ function getAverageMatchesPerHour(matches: MatchItem[]) {
 }
 
 onMounted(async () => {
+  await useUserStore().checkAuth(useFirebaseAuth()!);
   await Promise.allSettled([filterStore.loadFilters(), listingStore.loadMatches()]);
   loadStats();
   filterStore.loadFilters()

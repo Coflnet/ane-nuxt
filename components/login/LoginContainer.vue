@@ -4,7 +4,7 @@
       <LoginContainerHeader :is-login="isLogin" />
       <LoginPasswordEmail :is-login="isLogin" />
       <div class="w-full border-t border-slate-700 my-7" />
-      <LoginWithGoogleButton />
+      <LoginWithGoogleButton :login="isLogin" />
       <LoginPolicy />
     </UiDefaultContainer>
 
