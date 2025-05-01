@@ -19,6 +19,7 @@ export default defineI18nConfig(() => {
           maximumFractionDigits: 2,
         },
       },
-    }
+    },
+    fallbackLocale: 'en',
   }
 })
