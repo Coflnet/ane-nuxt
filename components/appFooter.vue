@@ -46,7 +46,7 @@
       </div>
 
       <UiFooterLabel class="border-t mt-8 pt-6 border-slate-700 text-center"
-        :label="` ${new Date().getFullYear()} Coflnet GMH. All rights reserved.`" :sm="true" />
+        :label="` ${new Date().getFullYear()} Coflnet GmbH. All rights reserved.`" :sm="true" />
     </div>
   </footer>
 </template>
