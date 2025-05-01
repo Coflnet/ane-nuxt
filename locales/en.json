@@ -1,7 +1,7 @@
 {
-  "10MinuteDelay": "Within 10 minute delay",
+  "10MinuteDelay": "Notified within 10 minute on average",
   "20ActiveFilters": "20 active filters",
-  "2MinuteDelay": "1-2 minute delay",
+  "2MinuteDelay": "1-2 minute on average",
   "30MinuteDelay": "30 minute delay",
   "3activeFilters": "3 active filters",
   "500activeFilters": "500 active filters",
@@ -128,7 +128,7 @@
   "reseller": "Reseller",
   "resellerDesciption": "I've saved $3,000 in just three months using NimDing. The advanced filters let me zero in on exactly what I'm looking for, and the real-time alerts give me the edge over other buyers.",
   "resources": "Resources",
-  "rights": "© 2025 Coflnet GMH. All rights reserved.",
+  "rights": "© 2025 Coflnet GmbH. All rights reserved.",
   "searchKeywords": "Search Keywords",
   "searchRadius": "Search Radius",
   "searchRadiusAroundYou": "Search radius around you in KM (requires zip code)",
