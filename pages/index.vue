@@ -23,9 +23,11 @@
       <div class="flex flex-col md:flex-row items-center">
         <div class="md:w-1/2 mb-10 md:mb-0 mr-8">
           <h1 class="text-4xl md:text-5xl font-bold leading-tight mb-6">
-            {{ $t('neverMissA') }} <span class="text-slate-400">{{ $t('deal') }}</span> {{ $t('again')
-            }}
-
+            <i18n-t keypath="marketingTextNeverMissADeal.text" tag="span">
+              <template v-slot:deal>
+                <span class="text-slate-400">{{ $t('marketingTextNeverMissADeal.deal') }}</span>
+              </template>
+            </i18n-t>
           </h1>
           <p class="text-lg md:text-xl mb-8 text-slate-100">
             {{ $t('createCustomAlerts') }}
@@ -49,7 +51,7 @@
                 <div class="flex justify-between items-start">
                   <div>
                     <h4 class="font-medium">{{ $t('vintageCameraLens') }}</h4>
-                    <p class="text-slate-300 text-sm">{{ $t('listed3MinutesAgo') }}</p>
+                    <p class="text-slate-300 text-sm">{{ $t('listedXMinutesAgo', 3) }}</p>
                   </div>
                   <div class="text-right">
                     <p class="text-green-400 font-bold">$85.00</p>
@@ -61,7 +63,7 @@
                 <div class="flex justify-between items-start">
                   <div>
                     <h4 class="font-medium">{{ $t('mechanicalKeyboard') }}</h4>
-                    <p class="text-slate-300 text-sm">{{ $t('listed17MinutesAgo') }}</p>
+                    <p class="text-slate-300 text-sm">{{ $t('listedXMinutesAgo', 17) }}</p>
                   </div>
                   <div class="text-right">
                     <p class="text-green-400 font-bold">$45.00</p>
@@ -78,7 +80,11 @@
     <!-- Features Section -->
     <section id="features" class="container mx-auto px-6 py-16 md:py-24">
       <h2 class="text-3xl md:text-4xl font-bold text-center mb-16">
-        {{ $t('powerfulTools') }} <span class="text-slate-400">{{ $t('dealHunters') }}</span>
+        <i18n-t keypath="marketingTextPowerTools.text" tag="span">
+          <template v-slot:dealHunter>
+            <span class="text-slate-400">{{ $t('marketingTextPowerTools.dealHunter') }}</span>
+          </template>
+        </i18n-t>
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 
@@ -198,7 +204,7 @@
             </div>
           </div>
           <p class="text-slate-200">
-            {{ $t('resellerDesciption') }}
+            {{ $t('resellerDescription', { amount: $n(3000, 'currency'), months: 3 }) }}
           </p>
         </div>
       </div>
@@ -207,20 +213,20 @@
     <!-- Pricing -->
     <section id="pricing" class="container mx-auto px-6 py-16 md:py-24">
       <h2 class="text-3xl md:text-4xl font-bold text-center mb-16">
-        {{ $t('simpleTransparent') }}<span class="text-slate-400 ml-1">{{ $t('pricing') }}</span>
+        {{ $t('simpleTransparent') }} <span class="text-slate-400"> {{ $t('pricing') }}</span>
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div
           class="bg-slate-900/50 p-6 rounded-lg border border-slate-800 hover:border-slate-600 transition flex flex-col justify-between">
           <div>
             <h3 class="text-xl font-bold mb-2">{{ $t('free') }}</h3>
-            <p class="text-3xl font-bold mb-6">$0<span class="text-sm font-normal text-slate-300">{{ $t('month')
-                }}</span>
+            <p class="text-3xl font-bold mb-6">$0
+              <span class="text-sm font-normal text-slate-300">{{ $t('month') }}</span>
             </p>
             <ul class="mb-8 space-y-3">
               <li class="flex items-center">
                 <Check class="h-5 w-5 text-green-400 mr-2" />
-                <span> {{ $t('3activeFilters') }}</span>
+                <span> {{ $t('XactiveFilters', 30) }}</span>
               </li>
               <li class="flex items-center">
                 <Check class="h-5 w-5 text-green-400 mr-2" />
@@ -228,7 +234,7 @@
               </li>
               <li class="flex items-center">
                 <Check class="h-5 w-5 text-green-400 mr-2" />
-                <span>{{ $t('30MinuteDelay') }}</span>
+                <span>{{ $t('XMinuteDelay', 30) }}</span>
               </li>
             </ul>
           </div>
@@ -244,12 +250,13 @@
               {{ $t('mostPopular') }}
             </div>
             <h3 class="text-xl font-bold mb-2">Collectors</h3>
-            <p class="text-3xl font-bold mb-6">$9.99<span class="text-sm font-normal text-slate-300">{{ $t('month')
-                }}</span></p>
+            <p class="text-3xl font-bold mb-6">$9.99
+              <span class="text-sm font-normal text-slate-300">{{ $t('month') }}</span>
+            </p>
             <ul class="mb-8 space-y-3">
               <li class="flex items-center">
                 <Check class="h-5 w-5 text-green-400 mr-2" />
-                <span>{{ $t('20ActiveFilters') }}</span>
+                <span>{{ $t('XActiveFilters', 20) }}</span>
               </li>
               <li class="flex items-center">
                 <Check class="h-5 w-5 text-green-400 mr-2" />
@@ -257,7 +264,7 @@
               </li>
               <li class="flex items-center">
                 <Check class="h-5 w-5 text-green-400 mr-2" />
-                <span> {{ $t('10MinuteDelay') }}</span>
+                <span> {{ $t('XMinuteDelay', 10) }}</span>
               </li>
             </ul>
           </div>
@@ -270,16 +277,17 @@
           class="bg-slate-900/50 p-6 rounded-lg border border-slate-800 hover:border-slate-600 transition flex flex-col justify-between">
           <div>
             <h3 class="text-xl font-bold mb-2">{{ $t('flippers') }}</h3>
-            <p class="text-3xl font-bold mb-6">$69.69<span class="text-sm font-normal text-slate-300">{{ $t('month')
-                }}</span></p>
+            <p class="text-3xl font-bold mb-6">$69.69
+              <span class="text-sm font-normal text-slate-300">{{ $t('month') }}</span>
+            </p>
             <ul class="mb-8 space-y-3">
               <li class="flex items-center">
                 <Check class="h-5 w-5 text-green-400 mr-2" />
-                <span>{{ $t('500activeFilters') }}</span>
+                <span>{{ $t('XactiveFilters', 500) }}</span>
               </li>
               <li class="flex items-center">
                 <Check class="h-5 w-5 text-green-400 mr-2" />
-                <span>{{ $t('2MinuteDelay') }}</span>
+                <span>{{ $t('XMinuteDelay', 2) }}</span>
               </li>
               <li class="flex items-center">
                 <Check class="h-5 w-5 text-green-400 mr-2" />
@@ -366,6 +374,7 @@
 
 <script setup>
 import { Bell, Filter, TrendingUp, Check, Star, User } from 'lucide-vue-next'
+const { t, n } = useI18n();
 
 definePageMeta({
   layout: 'landing'

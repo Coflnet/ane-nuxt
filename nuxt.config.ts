@@ -14,7 +14,6 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     'nuxt-vuefire',
     "@nuxt/icon",
-    "nuxt-translation-manager",
     '@nuxtjs/i18n',
     "@hey-api/nuxt",
     "notivue/nuxt",
@@ -48,12 +47,28 @@ export default defineNuxtConfig({
 
   i18n: ({
     locales: [
-      { code: 'en', name: 'English', file: 'en.json' },
-      { code: 'de', name: 'Deutsch', file: 'de.json' }
+      {
+        code: 'en',
+        name: 'English',
+        file: 'en.json'
+
+      },
+      {
+        code: 'de',
+        name: 'Deutsch',
+        file: 'de.json'
+      }
     ],
-    defaultLocale: 'en',
+    defaultLocale: 'de',
     langDir: "../locales/",
+    strategy: 'prefix_except_default',
     lazy: true,
+    detectBrowserLanguage: {
+      useCookie: true,
+      alwaysRedirect: true,
+      cookieKey: 'i18n_redirected',
+      redirectOn: 'root' // recommended
+    }
   }),
 
   vuefire: {
