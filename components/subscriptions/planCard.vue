@@ -11,7 +11,6 @@
           class="px-3 py-1 text-xs font-medium rounded-full bg-indigo-500 text-white">
           <div>
             {{ $t('currentPlan') }}
-
           </div>
         </span>
         <span v-else-if="plan.popular" class="px-3 py-1 text-xs font-medium rounded-full bg-indigo-500 text-white">
@@ -29,7 +28,7 @@
         <li v-for="(feature, index) in plan.features" :key="index" class="flex items-start">
           <Icon name="tabler:check" v-if="feature.included" class="h-5 w-5 text-indigo-500 mr-2 flex-shrink-0 mt-0.5" />
           <Icon v-else name="tabler:x" class="h-5 w-5 text-gray-500 mr-2 flex-shrink-0 mt-0.5" />
-          <span :class="feature.included ? 'text-gray-300' : 'text-gray-500'">{{ $t(feature.text) }}</span>
+          <span :class="feature.included ? 'text-gray-300' : 'text-gray-500'">{{ featureText(feature) }}</span>
         </li>
       </ul>
       <button @click="$emit('select-plan', plan.id)" :class="[
@@ -49,9 +48,14 @@
 </template>
 
 <script setup lang="ts">
-import { planPrices, type Plan, type PlanId } from '~/types/SubscriptionConstants';
+import { planPrices, type Feature, type Plan, type PlanId } from '~/types/SubscriptionConstants';
 const { t } = useI18n();
 
+const featureText = (feature: Feature) => {
+  if (feature.amount)
+    return t(feature.text, feature.amount);
+  return t(feature.text);
+}
 
 const props = defineProps<{
   plan: Plan;

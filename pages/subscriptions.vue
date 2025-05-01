@@ -2,10 +2,10 @@
   <div class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
     <div class="text-center mb-12">
       <h1 class="text-3xl font-extrabold text-white sm:text-4xl">
-        Choose Your Plan
+        {{ $t('chooseYourPlan') }}
       </h1>
       <p class="mt-4 text-xl text-gray-300">
-        Select the plan that best fits your needs
+        {{ $t('selectPlanDetail') }}
       </p>
     </div>
 

@@ -1,5 +1,6 @@
 export interface Feature {
   text: string;
+  amount?: number;
   included: boolean;
 }
 
@@ -29,9 +30,9 @@ export const plans: Plan[] = [
     description: 'greatTryingAne',
     popular: false,
     features: [
-      { text: '3activeFilters', included: true },
+      { text: 'XactiveFilters', amount: 3, included: true },
       { text: 'pushNotifications', included: true },
-      { text: '30MinuteDelay', included: true },
+      { text: 'XMinuteDelay', amount: 30, included: true },
       { text: 'priceCalculation', included: false },
     ],
   },
@@ -42,9 +43,9 @@ export const plans: Plan[] = [
     description: 'buyThingsCheaper',
     popular: true,
     features: [
-      { text: '20ActiveFilters', included: true },
+      { text: 'XActiveFilters', amount: 20, included: true },
       { text: 'pushNotifications', included: true },
-      { text: '10MinuteDelay', included: true },
+      { text: 'XMinuteDelay', amount: 10, included: true },
       { text: 'priceCalculation', included: false },
     ],
   },
@@ -56,9 +57,9 @@ export const plans: Plan[] = [
     popular: false,
     available: false,
     features: [
-      { text: '500activeFilters', included: true },
+      { text: 'XactiveFilters', amount: 500, included: true },
       { text: 'pushNotifications', included: true },
-      { text: '2MinuteDelay', included: true },
+      { text: 'XMinuteDelay', amount: 1, included: true },
       { text: 'priceCalculation', included: true },
     ],
 
