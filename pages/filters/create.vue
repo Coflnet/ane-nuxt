@@ -40,7 +40,7 @@
 
 <script setup lang="ts">
 
-import type { ListingListener } from '~/src/api-client';
+import type { FilterMatch, ListingListener } from '~/src/api-client';
 import { debounce } from 'lodash';
 import NotificationSettingsFilter from '~/components/filters/NotificationSettingsFilter.vue';
 import { getMessaging, getToken } from 'firebase/messaging'
@@ -61,7 +61,7 @@ const isNewFilter = computed(() => {
 })
 
 
-const matches = ref<Listing[]>([])
+const matches = ref<FilterMatch[]>([])
 
 const filter = ref<Filter>({
   name: '',
@@ -102,7 +102,12 @@ async function testFilter() {
     }
     const res = await filterStore.testFilter(f);
     if (res) {
-      matches.value = res;
+      // this is required because recnet match container is used for both this the test endpoint and overview table
+      // test endpoint return listing object which has no listener id (filter) and no match date
+      // while recent matches return FilterMatch object 
+      matches.value = res.map((i) => {
+        return { matchedAt: "", listenerId: 0, listingData: i };
+      });
     }
   } catch (e) {
     console.error(e);
@@ -267,7 +272,7 @@ async function handleFilters(): Promise<{ name: string; value: any }[]> {
   if (rawFilter.keywords.length != 0)
     filters.push({ name: "ContainsKeyWord", value: rawFilter.keywords.join(',') });
 
-  if (rawFilter.blacklist.length == 0)
+  if (rawFilter.blacklist.length != 0)
     filters.push({ name: "NotContainsKeyWord", value: rawFilter.blacklist.join(',') });
   return filters
 }

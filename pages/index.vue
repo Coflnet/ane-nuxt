@@ -4,15 +4,15 @@
     <nav class="container mx-auto px-6 py-4">
       <div class="flex justify-between items-center">
         <div class="flex items-center">
-          <span class="text-xl font-bold">NimDing</span>
+          <span class="text-xl font-bold">ANE</span>
         </div>
         <div class="hidden md:flex space-x-8">
           <a href="#features" class="hover:text-slate-300 transition">{{ $t('features') }}</a>
           <a href="#how-it-works" class="hover:text-slate-300 transition">{{ $t('howItWorks') }}</a>
           <a href="#pricing" class="hover:text-slate-300 transition">{{ $t('pricing') }}</a>
         </div>
-        <NuxtLink to="/register" class="bg-slate-600 hover:bg-slate-700 px-4 py-2 rounded-lg font-medium transition">
-          {{ $t('signUp') }}
+        <NuxtLink to="/overview" class="bg-slate-600 hover:bg-slate-700 px-4 py-2 rounded-lg font-medium transition">
+          {{ $t('getStarted') }}
         </NuxtLink>
 
       </div>
@@ -33,8 +33,9 @@
             {{ $t('createCustomAlerts') }}
           </p>
           <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-            <button class="bg-slate-600 hover:bg-slate-700 px-6 py-3 rounded-lg font-medium text-lg transition">
-              {{ $t('signUp') }}
+            <button @click="navigateTo('/overview')"
+              class="bg-slate-600 hover:bg-slate-700 px-6 py-3 rounded-lg font-medium text-lg transition">
+              {{ $t('getStarted') }}
             </button>
           </div>
         </div>
@@ -121,7 +122,7 @@
     <!-- How It Works -->
     <section id="how-it-works" class="container mx-auto px-6 py-16 md:py-24 bg-slate-950/50 rounded-xl">
       <h2 class="text-3xl md:text-4xl font-bold text-center mb-16">
-        {{ $t('how') }} <span class="text-slate-400">NimDing</span> {{ $t('works') }}
+        {{ $t('how') }} <span class="text-slate-400">ANE</span> {{ $t('works') }}
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div class="text-center">
@@ -310,9 +311,9 @@
         <p class="text-lg md:text-xl mb-8 max-w-2xl mx-auto">
           {{ $t('joinThousandsSmartShoppers') }}
         </p>
-        <NuxtLink to="/register"
+        <NuxtLink to="/overview"
           class="bg-white text-slate-800 hover:bg-slate-200 px-8 py-3 rounded-lg font-medium text-lg transition">
-          {{ $t('signUp') }}
+          {{ $t('getStarted') }}
         </NuxtLink>
         <p class="mt-4 text-slate-200">
           {{ $t('joinFreeToday') }}
@@ -326,7 +327,7 @@
         <div class="flex flex-col md:flex-row justify-between mb-8">
           <div class="mb-8 md:mb-0">
             <div class="flex items-center mb-4">
-              <span class="text-xl font-bold">NimDing</span>
+              <span class="text-xl font-bold">ANE</span>
             </div>
             <p class="text-slate-300 max-w-xs">
               {{ $t('smartWayToFindDeals') }}
