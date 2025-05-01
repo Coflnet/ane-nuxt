@@ -31,7 +31,7 @@
         <span class="ml-1 text-sm font-medium text-indigo-400">{{
           filterStore.getSimplifiedFilters[auction.listenerId ?? 0] }}</span>
       </div>
-      <UiLinkLabel :href="auction!.listingData.imageUrls![0] ?? ''">
+      <UiLinkLabel :href="auctionUrl" target="_blank">
         {{ $t('view') }}
         <Icon name="tabler:external-link" class="ml-1" />
       </UiLinkLabel>
@@ -46,7 +46,20 @@ import { Icon, UiHeaderLabel } from '#components';
 import type { FilterMatch } from '#hey-api';
 
 const filterStore = useFilterStore()
-defineProps<{ auction: FilterMatch }>()
+const listingStore = useListingStore()
+
+const props = defineProps<{
+  auction: FilterMatch
+}>()
+
+const auctionUrl = computed(() => {
+  if (!props.auction.listingData)
+    return ''
+  const url = listingStore.constructListingUrl(props.auction.listingData);
+  if (!url)
+    return ''
+  return url
+})
 
 onMounted(() => {
   console.log(filterStore.getSimplifiedFilters)
