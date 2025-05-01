@@ -14,16 +14,6 @@ export interface User {
   avatar?: string
 }
 
-export interface MatchItem {
-  title: string | null | undefined;
-  marketplace: Platform | undefined;
-  price: number | undefined;
-  matchedAt: string;
-  filter: number | undefined;
-  url: string | null | undefined;
-  image: string | null | undefined
-}
-
 export interface CachedAuctions {
   auctions: FilterMatch[];
   timeStamp: string;
