@@ -15,7 +15,9 @@
   <OverviewStats :filterCount="filterCount" :matchedAuctions="stats.matchedAuctions"
     :notificationperHour="stats.notificationperHour" />
 
-  <OverviewRecentMatchTable :matches="listingStore.recentMatches" :title="$t('dashboard')" :overview="true" />
+  <OverviewRecentMatchTable :matches="listingStore.recentMatches" :title="$t('dashboard')" :overview="true"
+    :loading="loading" />
+
   <UiGrid :grid-size="2">
     <OverviewTopFilters :top-filters="topFilters" />
     <OverviewNotificationChannels />
@@ -29,6 +31,8 @@ import type { FilterMatch } from '~/src/api-client';
 import type { TopFilter } from '~/types/FilterType';
 
 const localePath = useLocalePath();
+
+const loading = ref(true);
 
 const stats = ref({
   activeFilters: 0,
@@ -96,7 +100,6 @@ onMounted(async () => {
   await Promise.allSettled([filterStore.loadFilters(), listingStore.loadMatches()]);
   loadStats();
   filterStore.loadFilters()
-  console.log(useUserStore().isAnonymous)
-  console.log(useUserStore().isAuthenticated)
+  loading.value = false
 })
 </script>

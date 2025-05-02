@@ -15,13 +15,18 @@
   <UiDefaultContainer class="p-6">
     <UiHeaderLabel :label="$t('yourFilters')" />
 
-    <UiGrid :grid-size="3" class="mt-4" :grid-shink="true">
+    <UiGrid :grid-size="3" class="mt-4" :grid-shink="true" v-if="filters.length > 0">
       <div v-for="(filter, index) in filters" :key="index"
         class="border border-slate-700 rounded-lg overflow-hidden hover:shadow-md transition-shadow p-4">
         <FiltersFilterViewFilterItem :filter="filter" />
       </div>
     </UiGrid>
 
+    <div v-else class="py-12 text-center">
+      <Icon name="tabler:file-sad" class="size-11 text-white" />
+      <UiHeaderLabel :label="$t('noFilters')" />
+      <UiFooterLabel :label="$t('tryCreatingFilters')" />
+    </div>
   </UiDefaultContainer>
 
 </template>

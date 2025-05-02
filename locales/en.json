@@ -188,5 +188,7 @@
   "description": "Description",
   "navigation": "Navigation",
   "language": "Language",
-  "account": "Account"
+  "account": "Account",
+  "noFilters": "You dont have any filters",
+  "tryCreatingFilters": "Try creating a filter to get started"
 }
