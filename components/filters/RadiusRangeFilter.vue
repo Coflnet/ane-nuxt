@@ -1,8 +1,8 @@
 <template>
-  <!-- The grid component does not want to work this -->
+  <!-- The grid component does not want to work with this -->
   <div class="grid grid-cols-2 md:grid-cols-4 gap-x-8 ">
     <div>
-      <UiInput v-model="filter.searchRadius" :label="$t('searchRadius')" type="number" :placeholder="$t('radiusEq', 10)"
+      <UiInput v-model="filter.searchRadius" :label="$t('searchRadius')" type="number" :placeholder="$t('radiusEq', 80)"
         :footer="$t('searchRadiusAroundYou')" :error="radiusError" />
       <p v-if="radiusError" class="mt-1 text-xs text-rose-500">{{ radiusErrorMessage }} </p>
     </div>

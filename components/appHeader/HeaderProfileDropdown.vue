@@ -1,5 +1,5 @@
 <template>
-  <div class="relative" ref="profileMenuRef" v-if="loggedIn">
+  <div class="relative w-14" ref="profileMenuRef" v-if="loggedIn">
     <button @click="isProfileMenuOpen = !isProfileMenuOpen"
       class="flex items-center space-x-1 text-slate-300 hover:text-indigo-400 focus:outline-none">
       <img :src="userStore.user?.avatar ?? ''" alt="Profile" class="w-8 h-8 rounded-full" />
@@ -8,7 +8,7 @@
 
     <transition name="fade">
       <div v-show="isProfileMenuOpen"
-        class="absolute right-0 mt-2 w-60 bg-slate-800 rounded-md shadow-lg py-1 z-50 border border-slate-700">
+        class="absolute right-[-55px] md:right-0 mt-2 w-60 bg-slate-800 rounded-md shadow-lg py-1 border border-slate-700 z-50">
         <div class="px-4 py-2 border-b border-slate-700">
           <p class="text-sm font-medium text-white">{{ userStore.user?.name }}</p>
           <p class="text-xs text-slate-400">{{ userStore.user?.email }}</p>
