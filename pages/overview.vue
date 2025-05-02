@@ -94,5 +94,7 @@ onMounted(async () => {
   await Promise.allSettled([filterStore.loadFilters(), listingStore.loadMatches()]);
   loadStats();
   filterStore.loadFilters()
+  console.log(useUserStore().isAnonymous)
+  console.log(useUserStore().isAuthenticated)
 })
 </script>

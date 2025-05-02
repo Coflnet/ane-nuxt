@@ -87,13 +87,12 @@ export const useUserStore = defineStore("user", () => {
     isLoading.value = true
     error.value = null
 
-    console.log(isAnonymous)
     if (isAnonymous.value && !login) {
       const upgrade = await upgradeUserAccount(clientAuth, new GoogleAuthProvider())
       if (upgrade) {
+        isAnonymous.value = false
         return { success: true };
       }
-      isAnonymous.value = true
       return { success: false, error: useI18n().t("thatEmnailInUse") }
     }
 
@@ -174,6 +173,7 @@ export const useUserStore = defineStore("user", () => {
       if (isAnonymous && !isLogin) {
         const credential = EmailAuthProvider.credential(email, password);
         upgradeUserAccount(clientAuth, credential)
+        isAnonymous.value = false;
         return { success: true }
       }
       const result = isLogin ? await createUserWithEmailAndPassword(clientAuth, email, password) : await signInWithEmailAndPassword(clientAuth, email, password)
