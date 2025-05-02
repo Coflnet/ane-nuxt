@@ -5,7 +5,7 @@
       <OverviewTableHeader :headers="tableHeader" />
       <tbody>
         <tr v-for="(auction, index) in props.matches" :key="index"
-          class="border-b border-slate-700 hover:bg-slate-700/50">
+          class="border-b border-slate-700 hover:bg-slate-700/50 cursor-pointer" @click="tableClicked(auction)">
           <td class="px-4 py-3 text-sm text-white">
             <div class="flex items-center space-x-3">
               <img :src="auction.listingData?.imageUrls![0] ?? ''" alt="Auction thumbnail"
@@ -22,20 +22,11 @@
           <td class="px-4 py-3 text-sm font-medium text-white">
             {{ $t('dollarSign') }}{{ auction.listingData?.price }}
           </td>
-          <td class="px-4 py-3 text-sm font-medium text-white max-w-9 " v-if="!overview">
+          <td class="px-4 py-3 text-sm font-medium text-white hidden md:table-cell" v-if="!overview">
             <!-- the <p> is required because <td> handles line clamping weird -->
-            <p class="line-clamp-2 md:line-clamp-3">{{ auction.listingData?.descriptionShort }}</p>
+            <p class="line-clamp-3">{{ auction.listingData?.descriptionShort }}</p>
           </td>
           <td class="px-4 py-3 text-sm font-medium text-white hidden md:table-cell"> {{ timeAgo(auction) }}</td>
-          <td class="px-4 py-3 text-sm">
-            <div class="flex items-center space-x-2 ml-2.5">
-              <a :href="listingStore.constructListingUrl(auction.listingData) ?? ''" target="_blank"
-                class="p-1 rounded-md hover:bg-slate-700" title="View auction">
-                <Icon name="tabler:external-link" class="size-5 text-slate-400" />
-              </a>
-
-            </div>
-          </td>
         </tr>
       </tbody>
     </table>
@@ -61,12 +52,21 @@ const props = defineProps({
   },
 })
 
+async function tableClicked(auction: FilterMatch) {
+  navigateTo(listingStore.constructListingUrl(auction.listingData), {
+    external: true,
+    open: {
+      target: '_blank',
+    },
+  })
+}
+
 const tableHeader = computed(() => {
   if (props.overview)
     // change the header for mobile 768 is equivalent tailwinds md
-    return width.value > 768 ? ['auction', 'filter', 'price', 'matched', 'actions'] : ['auction', 'price', 'actions']
+    return width.value > 768 ? ['auction', 'filter', 'price', 'matched'] : ['auction', 'price']
 
-  return ['auction', 'price', 'description', 'actions']
+  return ['auction', 'price', 'description']
 });
 
 const filters = useFilterStore()
