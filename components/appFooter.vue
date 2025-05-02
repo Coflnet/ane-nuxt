@@ -1,7 +1,7 @@
 <template>
   <footer class="bg-slate-800 border-t border-slate-700 py-8">
     <div class="container mx-auto px-4">
-      <div class="flex flex-col md:flex-row justify-center items-center">
+      <div class="flex flex-col md:flex-row justify-center md:justify-between items-center">
         <div class="mb-4 md:mb-0">
           <div class="flex items-center space-x-2">
             <UiLogo />
