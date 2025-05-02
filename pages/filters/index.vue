@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-between items-start mb-8">
+  <div class="flex flex-col md:flex-row justify-between items-start mb-8">
     <div>
       <h1>
         <UiHeaderLabel :label="$t('filters')" :xl="true" />
@@ -15,7 +15,7 @@
   <UiDefaultContainer class="p-6">
     <UiHeaderLabel :label="$t('yourFilters')" />
 
-    <UiGrid :grid-size="3" class="mt-4">
+    <UiGrid :grid-size="3" class="mt-4" :grid-shink="true">
       <div v-for="(filter, index) in filters" :key="index"
         class="border border-slate-700 rounded-lg overflow-hidden hover:shadow-md transition-shadow p-4">
         <FiltersFilterViewFilterItem :filter="filter" />

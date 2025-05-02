@@ -1,5 +1,5 @@
 <template>
-  <DefaultInputBox class="flex items-center p-4" :accent="true">
+  <DefaultInputBox class="flex items-center p-4 flex-nowrap" :accent="true">
     <div class="flex items-center flex-col h-full justify-center">
       <input :id="config.notificationType" v-model="filter.notificationType" type="radio"
         :value="config.notificationType" @click="itemSelected()"

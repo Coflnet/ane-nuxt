@@ -62,11 +62,10 @@ async function tableClicked(auction: FilterMatch) {
 }
 
 const tableHeader = computed(() => {
-  if (props.overview)
-    // change the header for mobile 768 is equivalent tailwinds md
-    return width.value > 768 ? ['auction', 'filter', 'price', 'matched'] : ['auction', 'price']
+  if (width.value > 768)
+    return props.overview ? ['auction', 'filter', 'price', 'matched'] : ['auction', 'price', 'description']
 
-  return ['auction', 'price', 'description']
+  return ['auction', 'price']
 });
 
 const filters = useFilterStore()
