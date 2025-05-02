@@ -2,7 +2,7 @@
   <header class="bg-slate-900 border-b border-slate-800 relative z-30">
     <div class="container mx-auto px-4 py-4">
       <div class="flex items-center justify-between">
-        <div class="flex items-center w-full justify-between">
+        <div class="flex items-center w-full md:w-24 justify-between">
           <UiLogo location="/overview" />
           <button class="mr-3 text-white md:hidden focus:outline-none" @click="toggleMobileMenu"
             aria-label="Toggle navigation menu">
