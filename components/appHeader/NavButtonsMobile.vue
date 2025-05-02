@@ -11,7 +11,7 @@
 
         </div>
 
-        <div v-if="!userStore.isLoggedIn" class="flex flex-col space-y-3">
+        <div v-if="!userStore.isLoggedIn" class="space-y-3">
           <UiTextButton @on-click="navigateAndClose('/login')" class="justify-start">
             <Icon name="lucide:log-in" class="w-5 h-5 mr-2" />
             {{ $t('signIn') }}
