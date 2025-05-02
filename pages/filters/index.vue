@@ -6,7 +6,7 @@
       </h1>
       <UiFooterLabel :label="$t('manageFilters')"></UiFooterLabel>
     </div>
-    <UiButton @on-click="navigateTo('/filters/create')" :primary="true">
+    <UiButton @on-click="navigateTo(localePath('/filters/create'))" :primary="true">
       <Icon name="tabler:plus" class="size-5" />
       <span class="mr-1">{{ $t('createFilter') }}</span>
     </UiButton>
@@ -29,6 +29,7 @@
 <script setup lang="ts">
 import type { FilterFace } from '~/types/FilterType';
 
+const localePath = useLocalePath();
 
 const filterStore = useFilterStore();
 

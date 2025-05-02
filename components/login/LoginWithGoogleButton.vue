@@ -9,6 +9,7 @@
 <script setup lang="ts">
 const userStore = useUserStore()
 const auth = useFirebaseAuth()
+const localePath = useLocalePath();
 
 const props = defineProps({ login: Boolean });
 
@@ -18,7 +19,7 @@ async function loginWithGoogle() {
   }
   const googleSignInRequest = await userStore.loginWithGoogle(auth, props.login)
   if (googleSignInRequest.success) {
-    navigateTo("/overview");
+    navigateTo(localePath("/overview"));
     return;
   }
   push.error(googleSignInRequest.error ?? 'Something is very wrong')

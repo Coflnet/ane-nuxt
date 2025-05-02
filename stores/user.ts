@@ -83,6 +83,8 @@ export const useUserStore = defineStore("user", () => {
   const getNotificationSettings = computed(() => notificationSettings.value)
   const isUserAnonymous = computed(() => isAnonymous.value)
 
+  const localePath = useLocalePath();
+
   async function loginWithGoogle(clientAuth: Auth, login: Boolean): Promise<{ success: boolean; error?: string | null }> {
     isLoading.value = true
     error.value = null
@@ -225,7 +227,7 @@ export const useUserStore = defineStore("user", () => {
     isAuthenticated.value = false
     token.value = null
 
-    navigateTo("/login")
+    navigateTo(localePath("/login"))
   }
 
   async function checkAuth(clientAuth: Auth) {

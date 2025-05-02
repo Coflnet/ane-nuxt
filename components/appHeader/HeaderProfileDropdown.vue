@@ -18,7 +18,7 @@
           <Icon name="tabler:logout-2" class="w-4 h-4 mr-2" />
           {{ $t('signOut') }}
         </UiTextButton>
-        <UiTextButton @on-click="navigateTo('/subscriptions')" class="m-1 mt-2">
+        <UiTextButton @on-click="navigateTo(localePath('/subscriptions'))" class="m-1 mt-2">
           <Icon name="tabler:calendar-week" class="w-4 h-4 mr-2" />
           {{ $t('subscriptions') }}
         </UiTextButton>
@@ -34,13 +34,13 @@ const userStore = useUserStore()
 const isProfileMenuOpen = ref(false)
 const profileMenuRef = ref<HTMLElement | null>(null)
 const loggedIn = ref(false)
-
+const localePath = useLocalePath();
 
 async function logout() {
   await userStore.logout()
   isProfileMenuOpen.value = true
   localStorage.clear()
-  navigateTo("/register")
+  navigateTo(localePath("/register"))
 }
 
 onMounted(async () => {

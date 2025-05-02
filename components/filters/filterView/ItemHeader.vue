@@ -6,7 +6,7 @@
     </div>
     <div class="flex flex-row gap-x-1">
       <div class="flex items-center space-x-1">
-        <UiTextButton @on-click="navigateTo(`/filters/create?id=${filter.id}`)">
+        <UiTextButton @on-click="navigateTo(localePath(`/filters/create?id=${filter.id}`))">
           <UiIcon name="tabler:edit" />
         </UiTextButton>
       </div>
@@ -19,6 +19,7 @@
 
 <script setup lang="ts">
 import type { FilterFace } from '~/types/FilterType';
+const localePath = useLocalePath();
 
 defineProps<{ filter: FilterFace }>()
 

@@ -6,7 +6,7 @@
       </h1>
       <UiFooterLabel :label="$t('monitorAuctionAndFilters')" />
     </div>
-    <UiButton @on-click="navigateTo('/filters/create')" :primary="true">
+    <UiButton @on-click="navigateTo(localePath('/filters/create'))" :primary="true">
       <Icon name="tabler:plus" class="size-5" />
       <span class="mr-1">{{ $t('createFilter') }}</span>
     </UiButton>
@@ -27,6 +27,8 @@ import { ref } from 'vue'
 import type { FilterMatch } from '~/src/api-client';
 
 import type { TopFilter } from '~/types/FilterType';
+
+const localePath = useLocalePath();
 
 const stats = ref({
   activeFilters: 0,
