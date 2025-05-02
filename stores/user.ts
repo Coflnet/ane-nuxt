@@ -256,6 +256,7 @@ export const useUserStore = defineStore("user", () => {
     // State
     user,
     isAuthenticated,
+    isAnonymous,
     isLoading,
     error,
     token,

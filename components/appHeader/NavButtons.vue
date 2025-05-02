@@ -46,4 +46,5 @@ const availableLocales = computed(() => {
 })
 
 const userStore = useUserStore()
+
 </script>
