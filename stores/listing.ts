@@ -55,17 +55,17 @@ export const useListingStore = defineStore("listing", () => {
 
   }
 
-  function constructListingUrl(listing: Listing): string | null {
+  function constructListingUrl(listing: Listing, lang: string): string | null {
     if (!listing.platform)
       return null;
     if (!listing.id)
       return null;
-    return getUrl(listing.platform, listing.id);
+    return getUrl(listing.platform, listing.id, lang);
   }
 
-  function getUrl(listing: string, id: string) {
+  function getUrl(listing: string, id: string, lang: string) {
     if (listing === 'Ebay') {
-      if (navigator.language == "de") {
+      if (lang == "de") {
         return `https://www.ebay.de/itm/` + id;
       }
       return `https://www.ebay.com/itm/` + id;

@@ -39,6 +39,7 @@ import humanizeDuration from 'humanize-duration'
 import type { FilterMatch } from '~/src/api-client';
 
 const { width } = useWindowSize()
+const { locale } = useI18n()
 
 const props = defineProps({
   overview: { type: Boolean },
@@ -53,7 +54,7 @@ const props = defineProps({
 })
 
 async function tableClicked(auction: FilterMatch) {
-  navigateTo(listingStore.constructListingUrl(auction.listingData), {
+  navigateTo(listingStore.constructListingUrl(auction.listingData, locale.value), {
     external: true,
     open: {
       target: '_blank',
