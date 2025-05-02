@@ -52,7 +52,7 @@ export const useUserStore = defineStore("user", () => {
   const token = ref<string | null>(null)
   const cachedAuctions = ref<CachedAuctions | null>(null)
   const cachedFilters = ref<{ [id: number]: string }>()
-  const currentPlan = ref<ActiveSubscription>();
+  const currentPlan = ref<ActiveSubscription | null>();
 
 
   const notificationSettings = ref<NotificationSettings>({

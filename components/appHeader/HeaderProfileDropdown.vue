@@ -39,6 +39,7 @@ const loggedIn = ref(false)
 async function logout() {
   await userStore.logout()
   isProfileMenuOpen.value = true
+  localStorage.clear()
   navigateTo("/register")
 }
 

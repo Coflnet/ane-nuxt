@@ -99,6 +99,9 @@ function getButtonText(): string {
   if (!props.currentPlan)
     return t('selectPlan');
 
+  console.log(props.plan.id)
+  console.log(props.plan.name)
+
   if (planPrices[props.plan.id] ?? 0 > planPrices[props.currentPlan ?? '']! ?? 0)
     return t('upgrade');
   return t('downgrade');
