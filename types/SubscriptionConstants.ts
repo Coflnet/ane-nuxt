@@ -29,6 +29,7 @@ export const plans: Plan[] = [
     price: planPrices.basic ?? 0,
     description: 'greatTryingAne',
     popular: false,
+    available: true,
     features: [
       { text: 'XactiveFilters', amount: 3, included: true },
       { text: 'pushNotifications', included: true },
