@@ -1,7 +1,6 @@
 <template>
   <ClientOnly>
     <div class="flex items-center space-x-4">
-
       <UiTextButton data-testid="home-navigation-button" @on-click="navigateTo(localePath('/overview'))">
         {{ $t('appHeaderHome') }}
       </UiTextButton>

@@ -75,7 +75,7 @@ async function tableClicked(auction: FilterMatch) {
 
 const tableHeader = computed(() => {
   if (width.value > 768)
-    return props.overview ? ['auction', 'filter', 'price', 'matched'] : ['auction', 'price', 'description']
+    return props.overview ? ['auction', 'filter', 'price', 'matched'] : ['auction', 'price', 'description', "matched"]
 
   return ['auction', 'price']
 });
