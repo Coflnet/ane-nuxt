@@ -42,6 +42,7 @@ export const plans: Plan[] = [
     price: planPrices.collector ?? 0,
     description: 'buyThingsCheaper',
     popular: true,
+    available: true,
     features: [
       { text: 'XActiveFilters', amount: 20, included: true },
       { text: 'pushNotifications', included: true },

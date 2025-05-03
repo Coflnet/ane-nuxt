@@ -1,5 +1,6 @@
 <template>
-  <button :type="type ?? 'button'" @click="emit('onClick')" :class="buttonClasses" :disabled="!!proccessing"
+  <button :type="type ?? 'button'" @click="emit('onClick')" :class="buttonClasses"
+    :disabled="!!proccessing || !!disabled"
     class="mt-4 md:mt-0 px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 justify-center">
     <div class="relative flex justify-center items-center">
       <div class="flex space-x-2 items-center" :class="proccessing ? 'opacity-0 pointer-events-none' : 'opacity-100'">
@@ -15,7 +16,14 @@
 
 const emit = defineEmits(['onClick'])
 
-const props = defineProps<{ warning?: Boolean, primary?: Boolean, type?: 'button' | 'submit' | 'reset' | undefined, proccessing?: Boolean }>()
+const props = defineProps<{
+  warning?: Boolean,
+  primary?: Boolean,
+  disabled?: Boolean,
+  type?: 'button' | 'submit' | 'reset' | undefined,
+  proccessing?: Boolean,
+
+}>()
 
 const buttonClasses = computed(() => {
   if (props.warning)

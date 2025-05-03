@@ -29,6 +29,8 @@ const currentPlan = ref<PlanId>('basic');
 const selectedPlan = ref<PlanId | null>(null);
 const confirmCancelation = ref(false)
 const endDate = ref<Date | null>(null);
+// I am only caching 1 url right now since there is only one tier
+var subscribeUrl = "";
 
 const apiToken = `Bearer ${useUserStore().token}`;
 
