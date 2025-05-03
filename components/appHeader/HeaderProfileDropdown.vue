@@ -22,6 +22,12 @@
           <Icon name="tabler:calendar-week" class="w-4 h-4 mr-2" />
           {{ $t('subscriptions') }}
         </UiTextButton>
+
+        <UiTextButton v-for="locale in availableLocales" :key="locale.code" class="m-1 mt-2"
+          @on-click="navigateTo(switchLocalePath(locale.code))">
+          <Icon name="tabler:language" class="w-4 h-4 mr-2" />
+          {{ locale.name }}
+        </UiTextButton>
       </div>
     </transition>
   </div>
@@ -30,11 +36,20 @@
 
 
 <script setup lang="ts">
+const { locale, locales } = useI18n();
+const localePath = useLocalePath();
+const switchLocalePath = useSwitchLocalePath()
+
 const userStore = useUserStore()
 const isProfileMenuOpen = ref(false)
 const profileMenuRef = ref<HTMLElement | null>(null)
 const loggedIn = ref(false)
-const localePath = useLocalePath();
+
+
+const availableLocales = computed(() => {
+  return locales.value.filter(i => i.code !== locale.value)
+})
+
 
 async function logout() {
   await userStore.logout()
