@@ -10,6 +10,8 @@
 const userStore = useUserStore()
 const auth = useFirebaseAuth()
 const localePath = useLocalePath();
+const router = useRouter();
+const redirectTo = router.currentRoute.value.query.redirectTo as string | undefined;
 
 const props = defineProps({ login: Boolean });
 
@@ -19,7 +21,7 @@ async function loginWithGoogle() {
   }
   const googleSignInRequest = await userStore.loginWithGoogle(auth, props.login)
   if (googleSignInRequest.success) {
-    navigateTo(localePath("/overview"));
+    navigateTo(localePath(redirectTo ?? 'overview'));
     return;
   }
   push.error(googleSignInRequest.error ?? 'Something is very wrong')
