@@ -12,7 +12,7 @@
           <UiFooterLabel :label="footer" />
 
           <div class="flex justify-end space-x-3 mt-6">
-            <UiButton @on-click="$emit('update:modelValue', false)">{{ $t('cancel') }}
+            <UiButton @on-click="$emit('cancel')">{{ $t('cancel') }}
             </UiButton>
             <UiButton @on-click="$emit('confirm'); loading = true" :warning="true" :proccessing="loading">{{
               $t('delete') }}</UiButton>

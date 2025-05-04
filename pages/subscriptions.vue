@@ -15,7 +15,7 @@
     </div>
 
     <UiConformationPopup :footer="$t('confirmCancelSub')" :header="$t('confirmCancel')"
-      :model-value="confirmCancelation" @confirm="confirmCancelSubscription" />
+      :model-value="confirmCancelation" @confirm="confirmCancelSubscription" @cancel="confirmCancelation = false" />
 
   </div>
 </template>

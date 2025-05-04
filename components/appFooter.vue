@@ -1,7 +1,7 @@
 <template>
   <footer class="bg-slate-800 border-t border-slate-700 py-8">
     <div class="container mx-auto px-4">
-      <div class="flex flex-col md:flex-row justify-between items-center">
+      <div class="flex flex-col md:flex-row justify-center md:justify-between items-center">
         <div class="mb-4 md:mb-0">
           <div class="flex items-center space-x-2">
             <UiLogo />
@@ -9,8 +9,8 @@
           <UiFooterLabel :label="$t('advancedNotification')" :xs="true" />
         </div>
 
-        <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-12">
-          <div>
+        <div class="flex items-center space-x-12">
+          <div class="">
             <h3 class="font-medium text-white mb-2">{{ $t('resources') }}</h3>
             <ul class="space-y-2">
               <li>
@@ -29,7 +29,6 @@
           <div>
             <h3 class="font-medium text-white mb-2">{{ $t('company') }}</h3>
             <ul class="space-y-2">
-
               <li>
                 <UiTextButton @on-click="navigateTo('https://coflnet.com/privacy')" :gray="true" :sm="true">
                   {{ $t('privacy') }}

@@ -4,30 +4,9 @@
       <UiIcon name="tabler:trash" />
     </button>
 
-    <Teleport to="body">
-      <div v-if="isModalOpen" class="fixed inset-0 z-50 overflow-y-auto">
-        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" @click="isModalOpen = false"></div>
-
-        <div class="flex items-center justify-center min-h-screen p-4">
-          <UiDefaultContainer @click.stop class="max-w-md transform p-6">
-            <h3 class="text-lg font-medium text-gray-100 mb-2">
-              {{ $t('confirmDeletion') }}
-            </h3>
-
-            <UiFooterLabel :label="$t('areYouSureDeletion')" />
-
-            <div class="flex justify-end space-x-3 mt-6">
-              <UiButton @on-click="isModalOpen = false">{{ $t('cancel') }}</UiButton>
-              <UiButton @on-click="deleteFilterId" :warning="true" :proccessing="deleting">{{ $t('delete') }}</UiButton>
-            </div>
-          </UiDefaultContainer>
-
-        </div>
-      </div>
-    </Teleport>
-
     <UiConformationPopup :footer="$t('areYouSureDeletion')" :header="$t('confirmDeletion')" :model-value="isModalOpen"
-      @confirm="deleteFilterId" />
+      @confirm="deleteFilterId" @cancel="isModalOpen = false" />
+
   </div>
 </template>
 

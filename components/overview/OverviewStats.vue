@@ -1,5 +1,5 @@
 <template>
-  <UiGrid :grid-size="3" class="mb-6">
+  <UiGrid :grid-size="3" class="mb-6 hidden md:grid">
     <StatContainer :stat="String(filterCount)" iconColorCircle="bg-indigo-900" iconColor="text-indigo-400"
       icon="tabler:filter" :label="$t('activeFilters')" />
 
