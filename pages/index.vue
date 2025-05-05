@@ -9,13 +9,13 @@
         <div class="hidden md:flex space-x-8">
           <a href="#features" class="hover:text-slate-300 transition">{{
             $t("features")
-            }}</a>
+          }}</a>
           <a href="#how-it-works" class="hover:text-slate-300 transition">{{
             $t("howItWorks")
-            }}</a>
+          }}</a>
           <a href="#pricing" class="hover:text-slate-300 transition">{{
             $t("pricing")
-            }}</a>
+          }}</a>
         </div>
         <NuxtLink to="/overview" class="bg-slate-600 hover:bg-slate-700 px-4 py-2 rounded-lg font-medium transition">
           {{ $t("getStarted") }}
@@ -32,7 +32,7 @@
               <template v-slot:deal>
                 <span class="text-slate-400">{{
                   $t("marketingTextNeverMissADeal.deal")
-                  }}</span>
+                }}</span>
               </template>
             </i18n-t>
           </h1>
@@ -99,7 +99,7 @@
           <template v-slot:dealHunter>
             <span class="text-slate-400">{{
               $t("marketingTextPowerTools.dealHunter")
-              }}</span>
+            }}</span>
           </template>
         </i18n-t>
       </h2>
@@ -247,7 +247,7 @@
               $0
               <span class="text-sm font-normal text-slate-300">{{
                 $t("month")
-                }}</span>
+              }}</span>
             </p>
             <ul class="mb-8 space-y-3">
               <li class="flex items-center">
@@ -281,7 +281,7 @@
               $9.99
               <span class="text-sm font-normal text-slate-300">{{
                 $t("month")
-                }}</span>
+              }}</span>
             </p>
             <ul class="mb-8 space-y-3">
               <li class="flex items-center">
@@ -299,7 +299,7 @@
             </ul>
           </div>
 
-          <button @click="navigateTo(localePath('/register?redirectTo=/subscription'))"
+          <button @click="navigateTo(localePath('/register?redirectTo=/subscriptions'))"
             class="w-full bg-slate-500 hover:bg-slate-600 px-4 py-2 rounded-lg font-medium transition">
             {{ $t("getStarted") }}
           </button>
@@ -312,7 +312,7 @@
               $69.69
               <span class="text-sm font-normal text-slate-300">{{
                 $t("month")
-                }}</span>
+              }}</span>
             </p>
             <ul class="mb-8 space-y-3">
               <li class="flex items-center">
@@ -408,7 +408,7 @@
                 <li>
                   <a href="https://coflnet.com/privacy" class="text-slate-300 hover:text-white transition">{{
                     $t("privacy")
-                    }}</a>
+                  }}</a>
                 </li>
                 <li>
                   <a href="https://coflnet.com/terms-of-service" class="text-slate-300 hover:text-white transition">{{
