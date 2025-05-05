@@ -11,26 +11,26 @@
             href="#features"
             class="hover:text-slate-300 transition"
           >{{
-            $t("features")
+            $t('features')
           }}</a>
           <a
             href="#how-it-works"
             class="hover:text-slate-300 transition"
           >{{
-            $t("howItWorks")
+            $t('howItWorks')
           }}</a>
           <a
             href="#pricing"
             class="hover:text-slate-300 transition"
           >{{
-            $t("pricing")
+            $t('pricing')
           }}</a>
         </div>
         <NuxtLink
           to="/overview"
           class="bg-slate-600 hover:bg-slate-700 px-4 py-2 rounded-lg font-medium transition"
         >
-          {{ $t("getStarted") }}
+          {{ $t('getStarted') }}
         </NuxtLink>
       </div>
     </nav>
@@ -46,20 +46,20 @@
             >
               <template #deal>
                 <span class="text-slate-400">{{
-                  $t("marketingTextNeverMissADeal.deal")
+                  $t('marketingTextNeverMissADeal.deal')
                 }}</span>
               </template>
             </i18n-t>
           </h1>
           <p class="text-lg md:text-xl mb-8 text-slate-100">
-            {{ $t("createCustomAlerts") }}
+            {{ $t('createCustomAlerts') }}
           </p>
           <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
             <button
               class="bg-slate-600 hover:bg-slate-700 px-6 py-3 rounded-lg font-medium text-lg transition"
               @click="navigateTo(localePath('/overview'))"
             >
-              {{ $t("getStarted") }}
+              {{ $t('getStarted') }}
             </button>
           </div>
         </div>
@@ -70,17 +70,17 @@
               <div class="flex items-center mb-4">
                 <Bell class="h-5 w-5 mr-2 text-slate-400" />
                 <h3 class="font-medium">
-                  {{ $t("newAlert") }}
+                  {{ $t('newAlert') }}
                 </h3>
               </div>
               <div class="bg-slate-900 rounded-lg p-4 mb-4">
                 <div class="flex justify-between items-start">
                   <div>
                     <h4 class="font-medium">
-                      {{ $t("vintageCameraLens") }}
+                      {{ $t('vintageCameraLens') }}
                     </h4>
                     <p class="text-slate-300 text-sm">
-                      {{ $t("listedXMinutesAgo", 3) }}
+                      {{ $t('listedXMinutesAgo', 3) }}
                     </p>
                   </div>
                   <div class="text-right">
@@ -88,7 +88,7 @@
                       $85.00
                     </p>
                     <p class="text-slate-300 text-sm line-through">
-                      {{ $t("market150") }}
+                      {{ $t('market150') }}
                     </p>
                   </div>
                 </div>
@@ -97,10 +97,10 @@
                 <div class="flex justify-between items-start">
                   <div>
                     <h4 class="font-medium">
-                      {{ $t("mechanicalKeyboard") }}
+                      {{ $t('mechanicalKeyboard') }}
                     </h4>
                     <p class="text-slate-300 text-sm">
-                      {{ $t("listedXMinutesAgo", 17) }}
+                      {{ $t('listedXMinutesAgo', 17) }}
                     </p>
                   </div>
                   <div class="text-right">
@@ -108,7 +108,7 @@
                       $45.00
                     </p>
                     <p class="text-slate-300 text-sm line-through">
-                      {{ $t("market120") }}
+                      {{ $t('market120') }}
                     </p>
                   </div>
                 </div>
@@ -131,7 +131,7 @@
         >
           <template #dealHunter>
             <span class="text-slate-400">{{
-              $t("marketingTextPowerTools.dealHunter")
+              $t('marketingTextPowerTools.dealHunter')
             }}</span>
           </template>
         </i18n-t>
@@ -142,10 +142,10 @@
             <Bell class="h-6 w-6 text-slate-300" />
           </div>
           <h3 class="text-xl font-bold mb-3">
-            {{ $t("realTimeAlerts") }}
+            {{ $t('realTimeAlerts') }}
           </h3>
           <p class="text-slate-200">
-            {{ $t("instantNotifications") }}
+            {{ $t('instantNotifications') }}
           </p>
         </div>
         <div class="bg-slate-900/50 p-6 rounded-lg border border-slate-800 hover:border-slate-600 transition">
@@ -153,10 +153,10 @@
             <Filter class="h-6 w-6 text-slate-300" />
           </div>
           <h3 class="text-xl font-bold mb-3">
-            {{ $t("advanvedFilters") }}
+            {{ $t('advanvedFilters') }}
           </h3>
           <p class="text-slate-200">
-            {{ $t("complexFilters") }}
+            {{ $t('complexFilters') }}
           </p>
         </div>
         <div class="bg-slate-900/50 p-6 rounded-lg border border-slate-800 hover:border-slate-600 transition">
@@ -164,10 +164,10 @@
             <TrendingUp class="h-6 w-6 text-slate-300" />
           </div>
           <h3 class="text-xl font-bold mb-3">
-            {{ $t("marketAnalyist") }}
+            {{ $t('marketAnalyist') }}
           </h3>
           <p class="text-slate-200">
-            {{ $t("viewHistoricalData") }}
+            {{ $t('viewHistoricalData') }}
           </p>
         </div>
       </div>
@@ -179,8 +179,8 @@
       class="container mx-auto px-6 py-16 md:py-24 bg-slate-950/50 rounded-xl"
     >
       <h2 class="text-3xl md:text-4xl font-bold text-center mb-16">
-        {{ $t("how") }} <span class="text-slate-400">ANE</span>
-        {{ $t("works") }}
+        {{ $t('how') }} <span class="text-slate-400">ANE</span>
+        {{ $t('works') }}
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div class="text-center">
@@ -188,10 +188,10 @@
             <span class="text-2xl font-bold">1</span>
           </div>
           <h3 class="text-xl font-bold mb-3">
-            {{ $t("createFilter") }}
+            {{ $t('createFilter') }}
           </h3>
           <p class="text-slate-200">
-            {{ $t("customFilter") }}
+            {{ $t('customFilter') }}
           </p>
         </div>
         <div class="text-center">
@@ -199,10 +199,10 @@
             <span class="text-2xl font-bold">2</span>
           </div>
           <h3 class="text-xl font-bold mb-3">
-            {{ $t("getNotified") }}
+            {{ $t('getNotified') }}
           </h3>
           <p class="text-slate-200">
-            {{ $t("receiveInstantAlerts") }}
+            {{ $t('receiveInstantAlerts') }}
           </p>
         </div>
         <div class="text-center">
@@ -210,10 +210,10 @@
             <span class="text-2xl font-bold">3</span>
           </div>
           <h3 class="text-xl font-bold mb-3">
-            {{ $t("buyAndSave") }}
+            {{ $t('buyAndSave') }}
           </h3>
           <p class="text-slate-200">
-            {{ $t("beTheFirst") }}
+            {{ $t('beTheFirst') }}
           </p>
         </div>
       </div>
@@ -222,8 +222,8 @@
     <!-- Testimonials -->
     <section class="container mx-auto px-6 py-16 md:py-24">
       <h2 class="text-3xl md:text-4xl font-bold text-center mb-16">
-        {{ $t("whatOur") }}
-        <span class="text-slate-400">{{ $t("usersSay") }}</span>
+        {{ $t('whatOur') }}
+        <span class="text-slate-400">{{ $t('usersSay') }}</span>
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div class="bg-slate-900/50 p-6 rounded-lg border border-slate-800">
@@ -238,7 +238,7 @@
                 Sarah K.
               </h4>
               <p class="text-slate-300 text-sm">
-                {{ $t("vintageCollector") }}
+                {{ $t('vintageCollector') }}
               </p>
               <div class="flex text-yellow-400 mt-1">
                 <Star class="h-4 w-4" />
@@ -250,7 +250,7 @@
             </div>
           </div>
           <p class="text-slate-200">
-            {{ $t("vintageCollectorDecription") }}
+            {{ $t('vintageCollectorDecription') }}
           </p>
         </div>
         <div class="bg-slate-900/50 p-6 rounded-lg border border-slate-800">
@@ -265,7 +265,7 @@
                 Marcus T.
               </h4>
               <p class="text-slate-300 text-sm">
-                {{ $t("reseller") }}
+                {{ $t('reseller') }}
               </p>
               <div class="flex text-yellow-400 mt-1">
                 <Star class="h-4 w-4" />
@@ -278,8 +278,8 @@
           </div>
           <p class="text-slate-200">
             {{
-              $t("resellerDescription", {
-                amount: $n(3000, "currency"),
+              $t('resellerDescription', {
+                amount: $n(3000, 'currency'),
                 months: 3,
               })
             }}
@@ -294,8 +294,8 @@
       class="container mx-auto px-6 py-16 md:py-24"
     >
       <h2 class="text-3xl md:text-4xl font-bold text-center mb-16">
-        {{ $t("simpleTransparent") }}
-        <span class="text-slate-400"> {{ $t("pricing") }}</span>
+        {{ $t('simpleTransparent') }}
+        <span class="text-slate-400"> {{ $t('pricing') }}</span>
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div
@@ -303,26 +303,26 @@
         >
           <div>
             <h3 class="text-xl font-bold mb-2">
-              {{ $t("free") }}
+              {{ $t('free') }}
             </h3>
             <p class="text-3xl font-bold mb-6">
               $0
               <span class="text-sm font-normal text-slate-300">{{
-                $t("month")
+                $t('month')
               }}</span>
             </p>
             <ul class="mb-8 space-y-3">
               <li class="flex items-center">
                 <Check class="h-5 w-5 text-green-400 mr-2" />
-                <span> {{ $t("XactiveFilters", 30) }}</span>
+                <span> {{ $t('XactiveFilters', 30) }}</span>
               </li>
               <li class="flex items-center">
                 <Check class="h-5 w-5 text-green-400 mr-2" />
-                <span>{{ $t("pushNotifications") }}</span>
+                <span>{{ $t('pushNotifications') }}</span>
               </li>
               <li class="flex items-center">
                 <Check class="h-5 w-5 text-green-400 mr-2" />
-                <span>{{ $t("XMinuteDelay", 30) }}</span>
+                <span>{{ $t('XMinuteDelay', 30) }}</span>
               </li>
             </ul>
           </div>
@@ -330,7 +330,7 @@
             class="w-full bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg font-medium transition"
             @click="navigateTo(localePath('/overview'))"
           >
-            {{ $t("getStarted") }}
+            {{ $t('getStarted') }}
           </button>
         </div>
         <div
@@ -340,7 +340,7 @@
             <div
               class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-slate-500 px-4 py-1 rounded-full text-sm font-bold"
             >
-              {{ $t("mostPopular") }}
+              {{ $t('mostPopular') }}
             </div>
             <h3 class="text-xl font-bold mb-2">
               Collectors
@@ -348,21 +348,21 @@
             <p class="text-3xl font-bold mb-6">
               $9.99
               <span class="text-sm font-normal text-slate-300">{{
-                $t("month")
+                $t('month')
               }}</span>
             </p>
             <ul class="mb-8 space-y-3">
               <li class="flex items-center">
                 <Check class="h-5 w-5 text-green-400 mr-2" />
-                <span>{{ $t("XActiveFilters", 20) }}</span>
+                <span>{{ $t('XActiveFilters', 20) }}</span>
               </li>
               <li class="flex items-center">
                 <Check class="h-5 w-5 text-green-400 mr-2" />
-                <span>{{ $t("pushNotifications") }}</span>
+                <span>{{ $t('pushNotifications') }}</span>
               </li>
               <li class="flex items-center">
                 <Check class="h-5 w-5 text-green-400 mr-2" />
-                <span> {{ $t("XMinuteDelay", 10) }}</span>
+                <span> {{ $t('XMinuteDelay', 10) }}</span>
               </li>
             </ul>
           </div>
@@ -371,7 +371,7 @@
             class="w-full bg-slate-500 hover:bg-slate-600 px-4 py-2 rounded-lg font-medium transition"
             @click="navigateTo(localePath('/register?redirectTo=/subscriptions'))"
           >
-            {{ $t("getStarted") }}
+            {{ $t('getStarted') }}
           </button>
         </div>
         <div
@@ -379,31 +379,31 @@
         >
           <div>
             <h3 class="text-xl font-bold mb-2">
-              {{ $t("flippers") }}
+              {{ $t('flippers') }}
             </h3>
             <p class="text-3xl font-bold mb-6">
               $69.69
               <span class="text-sm font-normal text-slate-300">{{
-                $t("month")
+                $t('month')
               }}</span>
             </p>
             <ul class="mb-8 space-y-3">
               <li class="flex items-center">
                 <Check class="h-5 w-5 text-green-400 mr-2" />
-                <span>{{ $t("XactiveFilters", 500) }}</span>
+                <span>{{ $t('XactiveFilters', 500) }}</span>
               </li>
               <li class="flex items-center">
                 <Check class="h-5 w-5 text-green-400 mr-2" />
-                <span>{{ $t("XMinuteDelay", 2) }}</span>
+                <span>{{ $t('XMinuteDelay', 2) }}</span>
               </li>
               <li class="flex items-center">
                 <Check class="h-5 w-5 text-green-400 mr-2" />
-                <span> {{ $t("priceCalculation") }}</span>
+                <span> {{ $t('priceCalculation') }}</span>
               </li>
             </ul>
           </div>
           <button class="w-full bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg font-medium transition">
-            {{ $t("comingSoon") }}
+            {{ $t('comingSoon') }}
           </button>
         </div>
       </div>
@@ -413,19 +413,19 @@
     <section class="container mx-auto px-6 py-16 md:py-24">
       <div class="bg-gradient-to-r from-slate-800 to-slate-700 rounded-xl p-8 md:p-12 text-center">
         <h2 class="text-3xl md:text-4xl font-bold mb-6">
-          {{ $t("startFindingDeals") }}
+          {{ $t('startFindingDeals') }}
         </h2>
         <p class="text-lg md:text-xl mb-8 max-w-2xl mx-auto">
-          {{ $t("joinThousandsSmartShoppers") }}
+          {{ $t('joinThousandsSmartShoppers') }}
         </p>
         <NuxtLink
           to="/overview"
           class="bg-white text-slate-800 hover:bg-slate-200 px-8 py-3 rounded-lg font-medium text-lg transition"
         >
-          {{ $t("getStarted") }}
+          {{ $t('getStarted') }}
         </NuxtLink>
         <p class="mt-4 text-slate-200">
-          {{ $t("joinFreeToday") }}
+          {{ $t('joinFreeToday') }}
         </p>
       </div>
     </section>
@@ -439,7 +439,7 @@
               <span class="text-xl font-bold">ANE</span>
             </div>
             <p class="text-slate-300 max-w-xs">
-              {{ $t("smartWayToFindDeals") }}
+              {{ $t('smartWayToFindDeals') }}
             </p>
           </div>
           <div class="grid grid-cols-2 md:grid-cols-3 gap-8">
@@ -515,7 +515,7 @@
                     href="https://coflnet.com/privacy"
                     class="text-slate-300 hover:text-white transition"
                   >{{
-                    $t("privacy")
+                    $t('privacy')
                   }}</a>
                 </li>
                 <li>
@@ -523,14 +523,14 @@
                     href="https://coflnet.com/terms-of-service"
                     class="text-slate-300 hover:text-white transition"
                   >{{
-                    $t("terms") }}</a>
+                    $t('terms') }}</a>
                 </li>
               </ul>
             </div>
           </div>
         </div>
         <div class="border-t border-slate-800 pt-8 mt-8 text-center text-slate-400 text-sm">
-          <p>{{ $t("rights") }}</p>
+          <p>{{ $t('rights') }}</p>
         </div>
       </div>
     </footer>
