@@ -45,7 +45,4 @@ const closeMobileMenu = () => {
   isMobileMenuOpen.value = false
   document.body.style.overflow = ''
 }
-
-
-
 </script>
