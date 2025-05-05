@@ -29,6 +29,8 @@ const currentPlan = ref<PlanId>('basic');
 const selectedPlan = ref<PlanId | null>(null);
 const confirmCancelation = ref(false)
 const endDate = ref<Date | null>(null);
+// I am only caching 1 url right now since there is only one tier
+var subscribeUrl = "";
 
 const apiToken = `Bearer ${useUserStore().token}`;
 
@@ -67,9 +69,11 @@ async function getCurrentSubscription() {
   try {
     const result = await getSubscription({ composable: '$fetch', headers: { Authorization: apiToken } })
     console.log(result);
-    if (result.length == 0)
+    if (result.length == 0) {
+      if (currentPlan.value !== "basic")
+        resetSubscription();
       return;
-
+    }
     currentPlan.value = result[0]?.product as PlanId;
     userStore.currentPlan = result[0];
     if (result[0]?.endsAt !== "")
@@ -78,6 +82,12 @@ async function getCurrentSubscription() {
     push.error("error requesting your")
 
   }
+}
+
+async function resetSubscription() {
+  currentPlan.value = "basic";
+  userStore.currentPlan = null;
+  endDate.value = null;
 }
 
 onMounted(() => getCurrentSubscription())

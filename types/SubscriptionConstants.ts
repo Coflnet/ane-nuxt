@@ -18,7 +18,7 @@ export type PlanId = 'basic' | 'collector' | 'enterprise';
 
 export const planPrices: { [key: string]: number } = {
   basic: 0,
-  pro: 9.99,
+  collector: 9.99,
   enterprise: 69.69,
 };
 
@@ -29,6 +29,7 @@ export const plans: Plan[] = [
     price: planPrices.basic ?? 0,
     description: 'greatTryingAne',
     popular: false,
+    available: true,
     features: [
       { text: 'XactiveFilters', amount: 3, included: true },
       { text: 'pushNotifications', included: true },
@@ -39,9 +40,10 @@ export const plans: Plan[] = [
   {
     id: 'collector',
     name: 'collector',
-    price: planPrices.pro ?? 0,
+    price: planPrices.collector ?? 0,
     description: 'buyThingsCheaper',
     popular: true,
+    available: true,
     features: [
       { text: 'XActiveFilters', amount: 20, included: true },
       { text: 'pushNotifications', included: true },
