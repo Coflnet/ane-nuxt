@@ -1,8 +1,3 @@
-
-// https://nuxt.com/docs/api/configuration/nuxt-config
-
-import { messaging } from "firebase-admin";
-
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   future: {
@@ -17,6 +12,7 @@ export default defineNuxtConfig({
     '@nuxtjs/i18n',
     "@hey-api/nuxt",
     "notivue/nuxt",
+    '@nuxt/eslint'
   ],
 
   heyApi: {
@@ -86,5 +82,12 @@ export default defineNuxtConfig({
       enabled: true
     },
 
+  },
+
+  eslint: {
+    checker: true,
+    config: {
+      stylistic: true,
+    }
   }
 })
