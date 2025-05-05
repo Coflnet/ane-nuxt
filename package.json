@@ -36,13 +36,14 @@
     "nuxt-vuefire": "^1.0.5",
     "pinia": "^2.3.1",
     "pinia-plugin-persistedstate": "^4.2.0",
+    "vite-plugin-eslint2": "^5.0.3",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0",
     "vuefire": "^3.2.1"
   },
   "devDependencies": {
     "@types/lodash": "^4.17.16",
-    "eslint": "^9.23.0",
+    "eslint": "^9.26.0",
     "eslint-plugin-nuxt": "^4.0.0"
   }
 }
