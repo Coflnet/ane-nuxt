@@ -56,6 +56,7 @@ async function login() {
     return
   }
 
+  console.log('redirecting')
   navigateTo(localePath(redirectTo ?? '/overview'))
 }
 </script>
