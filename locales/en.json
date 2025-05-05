@@ -129,7 +129,7 @@
   "radiusEq": "e.g., {n}",
   "realTimeAlerts": "Real time alerts",
   "receiveInstantAlerts": "Receive instant alerts when matching items are listed. Choose from email, discord, or push notifications.",
-  "register": "Registrieren",
+  "register": "Register",
   "reseller": "Verkäufer",
   "resellerDesciption": "I saved {amount} in only {months} months. NimDing helped me find the best deals and maximize my profit margin.",
   "resources": "Resources",
@@ -188,5 +188,7 @@
   "description": "Description",
   "navigation": "Navigation",
   "language": "Language",
-  "account": "Account"
+  "account": "Account",
+  "noFilters": "You dont have any filters",
+  "tryCreatingFilters": "Try creating a filter to get started"
 }

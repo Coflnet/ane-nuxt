@@ -18,9 +18,15 @@
           <Icon name="tabler:logout-2" class="w-4 h-4 mr-2" />
           {{ $t('signOut') }}
         </UiTextButton>
-        <UiTextButton @on-click="navigateTo('/subscriptions')" class="m-1 mt-2">
+        <UiTextButton @on-click="navigateTo(localePath('/subscriptions'))" class="m-1 mt-2">
           <Icon name="tabler:calendar-week" class="w-4 h-4 mr-2" />
           {{ $t('subscriptions') }}
+        </UiTextButton>
+
+        <UiTextButton v-for="locale in availableLocales" :key="locale.code" class="m-1 mt-2"
+          @on-click="navigateTo(switchLocalePath(locale.code))">
+          <Icon name="tabler:language" class="w-4 h-4 mr-2" />
+          {{ locale.name }}
         </UiTextButton>
       </div>
     </transition>
@@ -30,16 +36,26 @@
 
 
 <script setup lang="ts">
+const { locale, locales } = useI18n();
+const localePath = useLocalePath();
+const switchLocalePath = useSwitchLocalePath()
+
 const userStore = useUserStore()
 const isProfileMenuOpen = ref(false)
 const profileMenuRef = ref<HTMLElement | null>(null)
 const loggedIn = ref(false)
 
 
+const availableLocales = computed(() => {
+  return locales.value.filter(i => i.code !== locale.value)
+})
+
+
 async function logout() {
   await userStore.logout()
   isProfileMenuOpen.value = true
-  navigateTo("/register")
+  localStorage.clear()
+  navigateTo(localePath("/register"))
 }
 
 onMounted(async () => {

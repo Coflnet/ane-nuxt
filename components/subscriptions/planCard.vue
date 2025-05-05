@@ -24,25 +24,17 @@
       <p class="mt-4 text-gray-400">{{ $t(plan.description) }}</p>
     </div>
     <div class="p-6 bg-gray-800 border-t border-gray-700">
-      <ul class="space-y-4 h-full">
+      <ul class="space-y-4 h-full mb-8">
         <li v-for="(feature, index) in plan.features" :key="index" class="flex items-start">
           <Icon name="tabler:check" v-if="feature.included" class="h-5 w-5 text-indigo-500 mr-2 flex-shrink-0 mt-0.5" />
           <Icon v-else name="tabler:x" class="h-5 w-5 text-gray-500 mr-2 flex-shrink-0 mt-0.5" />
           <span :class="feature.included ? 'text-gray-300' : 'text-gray-500'">{{ featureText(feature) }}</span>
         </li>
       </ul>
-      <button @click="$emit('select-plan', plan.id)" :class="[
-        'mt-8 w-full py-3 px-4 rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500',
-        currentPlan === plan.id
-          ? 'bg-gray-700 text-gray-300 cursor-default'
-          : selectedPlan === plan.id
-            ? 'bg-indigo-600 text-white hover:bg-indigo-700'
-            : plan.available == false
-              ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-              : 'bg-indigo-500 text-white hover:bg-indigo-600 disabled'
-      ]" :disabled="currentPlan === plan.id || plan.available == false">
+      <UiButton :proccessing="loadingUrlButtonState" :primary="currentPlan !== plan.id && plan.available == true"
+        :disabled="!plan.available || currentPlan === plan.id" class="w-full mt-8" @on-click="handleButtonClick">
         {{ getButtonText() }}
-      </button>
+      </UiButton>
     </div>
   </div>
 </template>
@@ -50,6 +42,7 @@
 <script setup lang="ts">
 import { planPrices, type Feature, type Plan, type PlanId } from '~/types/SubscriptionConstants';
 const { t } = useI18n();
+const loadingUrlButtonState = ref(false);
 
 const featureText = (feature: Feature) => {
   if (feature.amount)
@@ -64,15 +57,22 @@ const props = defineProps<{
   endDate: Date | null;
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'select-plan', planId: PlanId): void;
 }>();
 
+function handleButtonClick() {
+  if (getButtonText() == t('upgrade'))
+    loadingUrlButtonState.value = true;
+
+  emit('select-plan', props.plan.id);
+}
+
 const currentPlanText = computed(() => {
-  console.log(props.endDate)
   if (props.endDate === null) {
     return t('currentPlan');
   } else {
+    // Calculate the number of days left until the end date
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -88,6 +88,7 @@ const currentPlanText = computed(() => {
     return `${daysLeft} ${t('daysLeft')}`;
   }
 });
+
 
 function getButtonText(): string {
   if (props.currentPlan === props.plan.id)

@@ -1,7 +1,7 @@
 <template>
   <UiDefaultContainer class="mb-6 p-6">
     <UiHeaderLabel :label="props.title" class="mb-4" />
-    <table class="w-full">
+    <table class="w-full" v-if="matches.length > 0 || loading">
       <OverviewTableHeader :headers="tableHeader" />
       <tbody>
         <tr v-for="(auction, index) in props.matches" :key="index"
@@ -30,6 +30,12 @@
         </tr>
       </tbody>
     </table>
+
+    <div v-else class="py-12 text-center">
+      <Icon name="tabler:file-sad" class="size-11 text-white" />
+      <UiHeaderLabel :label="$t('noFilters')" />
+      <UiFooterLabel :label="$t('tryCreatingFilters')" />
+    </div>
   </UiDefaultContainer>
 </template>
 
@@ -39,6 +45,7 @@ import humanizeDuration from 'humanize-duration'
 import type { FilterMatch } from '~/src/api-client';
 
 const { width } = useWindowSize()
+const { locale } = useI18n()
 
 const props = defineProps({
   overview: { type: Boolean },
@@ -50,10 +57,15 @@ const props = defineProps({
     type: String,
     default: 'Recent Matches'
   },
+  loading: {
+    type: Boolean,
+    required: false,
+    default: false
+  }
 })
 
 async function tableClicked(auction: FilterMatch) {
-  navigateTo(listingStore.constructListingUrl(auction.listingData), {
+  navigateTo(listingStore.constructListingUrl(auction.listingData, locale.value), {
     external: true,
     open: {
       target: '_blank',
@@ -63,7 +75,7 @@ async function tableClicked(auction: FilterMatch) {
 
 const tableHeader = computed(() => {
   if (width.value > 768)
-    return props.overview ? ['auction', 'filter', 'price', 'matched'] : ['auction', 'price', 'description']
+    return props.overview ? ['auction', 'filter', 'price', 'matched'] : ['auction', 'price', 'description', "matched"]
 
   return ['auction', 'price']
 });

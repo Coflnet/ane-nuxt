@@ -44,6 +44,7 @@
 <script setup lang="ts">
 import { Icon, UiHeaderLabel } from '#components';
 import type { FilterMatch } from '#hey-api';
+const { locale } = useI18n()
 
 const filterStore = useFilterStore()
 const listingStore = useListingStore()
@@ -55,7 +56,7 @@ const props = defineProps<{
 const auctionUrl = computed(() => {
   if (!props.auction.listingData)
     return ''
-  const url = listingStore.constructListingUrl(props.auction.listingData);
+  const url = listingStore.constructListingUrl(props.auction.listingData, locale.value);
   if (!url)
     return ''
   return url

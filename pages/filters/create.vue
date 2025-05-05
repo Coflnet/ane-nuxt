@@ -53,6 +53,8 @@ const userStore = useUserStore();
 const firebaseApp = useFirebaseApp()
 const savingFilter = ref(false)
 
+const localePath = useLocalePath();
+
 const route = useRoute()
 
 
@@ -199,7 +201,7 @@ async function saveFilter() {
       return
     await filterStore.saveFilter(f)
     push.success("Filter successfully saved");
-    navigateTo("/overview")
+    navigateTo(localePath("/overview"));
   } catch (e) {
     savingFilter.value = false
     push.error(`We ran into issue`)

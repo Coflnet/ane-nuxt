@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
 import { sendPasswordResetEmail } from 'firebase/auth';
-
+const localePath = useLocalePath();
 
 definePageMeta({
   layout: 'landing'
@@ -35,7 +35,7 @@ async function resetPassword() {
   sendPasswordResetEmail(auth!, email.value)
     .then(() => {
       push.success("Password reset email sent");
-      navigateTo("/login");
+      navigateTo(localePath("/login"));
       return true;
     })
     .catch((error) => {

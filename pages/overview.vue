@@ -6,7 +6,7 @@
       </h1>
       <UiFooterLabel :label="$t('monitorAuctionAndFilters')" />
     </div>
-    <UiButton @on-click="navigateTo('/filters/create')" :primary="true">
+    <UiButton @on-click="navigateTo(localePath('/filters/create'))" :primary="true">
       <Icon name="tabler:plus" class="size-5" />
       <span class="mr-1">{{ $t('createFilter') }}</span>
     </UiButton>
@@ -15,7 +15,9 @@
   <OverviewStats :filterCount="filterCount" :matchedAuctions="stats.matchedAuctions"
     :notificationperHour="stats.notificationperHour" />
 
-  <OverviewRecentMatchTable :matches="listingStore.recentMatches" :title="$t('dashboard')" :overview="true" />
+  <OverviewRecentMatchTable :matches="listingStore.recentMatches" :title="$t('dashboard')" :overview="true"
+    :loading="loading" />
+
   <UiGrid :grid-size="2">
     <OverviewTopFilters :top-filters="topFilters" />
     <OverviewNotificationChannels />
@@ -27,6 +29,10 @@ import { ref } from 'vue'
 import type { FilterMatch } from '~/src/api-client';
 
 import type { TopFilter } from '~/types/FilterType';
+
+const localePath = useLocalePath();
+
+const loading = ref(true);
 
 const stats = ref({
   activeFilters: 0,
@@ -94,5 +100,6 @@ onMounted(async () => {
   await Promise.allSettled([filterStore.loadFilters(), listingStore.loadMatches()]);
   loadStats();
   filterStore.loadFilters()
+  loading.value = false
 })
 </script>

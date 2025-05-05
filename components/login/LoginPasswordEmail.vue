@@ -34,9 +34,11 @@ const password = ref('')
 const props = defineProps({ isLogin: Boolean })
 
 const auth = useFirebaseAuth()
+
 const userStore = useUserStore()
 
 const emailPassError = ref(false)
+const localePath = useLocalePath();
 
 async function login() {
   if (!email.value || !password.value) {
@@ -51,6 +53,7 @@ async function login() {
     push.error(`There was an error creating your account \n If you have not made a account yet try making one`)
     return
   }
-  navigateTo('/overview')
+
+  navigateTo(localePath('/overview'));
 }
 </script>

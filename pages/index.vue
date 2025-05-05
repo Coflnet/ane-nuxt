@@ -33,7 +33,7 @@
             {{ $t('createCustomAlerts') }}
           </p>
           <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-            <button @click="navigateTo('/overview')"
+            <button @click="navigateTo(localePath('/overview'))"
               class="bg-slate-600 hover:bg-slate-700 px-6 py-3 rounded-lg font-medium text-lg transition">
               {{ $t('getStarted') }}
             </button>
@@ -374,7 +374,7 @@
 
 <script setup>
 import { Bell, Filter, TrendingUp, Check, Star, User } from 'lucide-vue-next'
-const { t, n } = useI18n();
+const localePath = useLocalePath();
 
 definePageMeta({
   layout: 'landing'

@@ -52,7 +52,7 @@ export const useUserStore = defineStore("user", () => {
   const token = ref<string | null>(null)
   const cachedAuctions = ref<CachedAuctions | null>(null)
   const cachedFilters = ref<{ [id: number]: string }>()
-  const currentPlan = ref<ActiveSubscription>();
+  const currentPlan = ref<ActiveSubscription | null>();
 
 
   const notificationSettings = ref<NotificationSettings>({
@@ -83,17 +83,18 @@ export const useUserStore = defineStore("user", () => {
   const getNotificationSettings = computed(() => notificationSettings.value)
   const isUserAnonymous = computed(() => isAnonymous.value)
 
+  const localePath = useLocalePath();
+
   async function loginWithGoogle(clientAuth: Auth, login: Boolean): Promise<{ success: boolean; error?: string | null }> {
     isLoading.value = true
     error.value = null
 
-    console.log(isAnonymous)
     if (isAnonymous.value && !login) {
       const upgrade = await upgradeUserAccount(clientAuth, new GoogleAuthProvider())
       if (upgrade) {
+        isAnonymous.value = false
         return { success: true };
       }
-      isAnonymous.value = true
       return { success: false, error: useI18n().t("thatEmnailInUse") }
     }
 
@@ -174,6 +175,7 @@ export const useUserStore = defineStore("user", () => {
       if (isAnonymous && !isLogin) {
         const credential = EmailAuthProvider.credential(email, password);
         upgradeUserAccount(clientAuth, credential)
+        isAnonymous.value = false;
         return { success: true }
       }
       const result = isLogin ? await createUserWithEmailAndPassword(clientAuth, email, password) : await signInWithEmailAndPassword(clientAuth, email, password)
@@ -225,7 +227,7 @@ export const useUserStore = defineStore("user", () => {
     isAuthenticated.value = false
     token.value = null
 
-    navigateTo("/login")
+    navigateTo(localePath("/login"))
   }
 
   async function checkAuth(clientAuth: Auth) {
@@ -256,6 +258,7 @@ export const useUserStore = defineStore("user", () => {
     // State
     user,
     isAuthenticated,
+    isAnonymous,
     isLoading,
     error,
     token,
