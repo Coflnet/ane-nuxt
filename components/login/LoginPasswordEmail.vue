@@ -19,9 +19,9 @@ const props = defineProps({ isLogin: Boolean })
 const auth = useFirebaseAuth()
 const userStore = useUserStore();
 const emailPassError = ref(false)
-const localePath = useLocalePath();
-const router = useRouter();
-const redirectTo = router.currentRoute.value.query.redirectTo as string | undefined;
+const localePath = useLocalePath()
+const router = useRouter()
+const redirectTo = router.currentRoute.value.query.redirectTo as string | undefined
 
 async function login() {
   if (!email.value || !password.value) {
@@ -37,7 +37,7 @@ async function login() {
     return;
   }
 
-  navigateTo(localePath(redirectTo ?? '/overview'));
+  navigateTo(localePath(redirectTo ?? '/overview'))
 }
 
 </script>
