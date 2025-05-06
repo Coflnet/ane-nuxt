@@ -214,10 +214,11 @@ async function loadEditParam() {
         case 'SearchTerm':
           filter.value.searchValue = item.value ?? ''
           break
-        case 'TotalCost':
+        case 'TotalCost': {
           const [min, _max] = item.value!.split('-')
           filter.value.totalCost = Number(min)
           break
+        }
       }
     })
   }
