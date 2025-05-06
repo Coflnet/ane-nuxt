@@ -110,7 +110,6 @@ export const useUserStore = defineStore('user', () => {
         isAnonymous.value = false
         return { success: true }
       }
-      console.log('hihih')
       return { success: false, error: 'thatEmailInUse' }
     }
 
