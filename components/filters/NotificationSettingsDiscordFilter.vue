@@ -44,7 +44,6 @@ const validateWebhook = () => {
     // eslint-disable-next-line vue/no-mutating-props
     props.filter.notificationTarget = webhookUrl.value
     // store the webhook url for predefined values
-    console.log('hihihi')
     userStore.notificationSettings.discord.webhookUrl = webhookUrl.value
   }
 }
