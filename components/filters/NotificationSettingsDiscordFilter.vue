@@ -55,9 +55,6 @@ watch(webhookUrl, (newValue) => {
   }
   else {
     isValidWebhook.value = true
-    // yes this isn't best practive
-
-    console.log('hihihi')
     props.filter.notificationTarget = ''
   }
 })
