@@ -1,23 +1,48 @@
 <template>
-  <DefaultInputBox class="flex items-center p-4 flex-nowrap" :accent="true">
+  <DefaultInputBox
+    class="flex items-center p-4 flex-nowrap"
+    :accent="true"
+  >
     <div class="flex items-center flex-col h-full justify-center">
-      <input :id="config.notificationType" v-model="filter.notificationType" type="radio"
-        :value="config.notificationType" @click="itemSelected()"
-        class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300" />
+      <input
+        :id="config.notificationType"
+        v-model="filter.notificationType"
+        type="radio"
+        :value="config.notificationType"
+        class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300"
+        @click="itemSelected()"
+      >
     </div>
-    <label :for="config.notificationType" class="ml-3 flex">
+    <label
+      :for="config.notificationType"
+      class="ml-3 flex"
+    >
       <div class="flex items-center">
         <div class="w-8 h-8 rounded-md bg-indigo-900 flex items-center justify-center mr-3">
-          <Icon :name="config.icon" class="size-6 text-indigo-400" />
+          <Icon
+            :name="config.icon"
+            class="size-6 text-indigo-400"
+          />
         </div>
         <div>
           <p class="font-medium text-white">{{ config.name }}</p>
           <p class="text-xs text-slate-400">{{ messages.footer }}</p>
         </div>
       </div>
-      <div v-if="filter.notificationType === config.notificationType && config.textInput" class="ml-11 mt-2">
-        <UiInput type="string" :placeholder="config.placeholder" v-model="model" :error="validation!.error" />
-        <p v-if="validation!.error" class="mt-1 text-sm text-red-500">
+      <div
+        v-if="filter.notificationType === config.notificationType && config.textInput"
+        class="ml-11 mt-2"
+      >
+        <UiInput
+          v-model="model"
+          type="string"
+          :placeholder="config.placeholder"
+          :error="validation!.error"
+        />
+        <p
+          v-if="validation!.error"
+          class="mt-1 text-sm text-red-500"
+        >
           {{ messages.error }}
         </p>
       </div>
@@ -25,40 +50,38 @@
   </DefaultInputBox>
 </template>
 
-
-
 <script setup lang="ts">
-import type { Filter } from '~/types/FilterType';
-import DefaultInputBox from '../ui/DefaultInputBox.vue';
+import DefaultInputBox from '../ui/DefaultInputBox.vue'
+import type { Filter } from '~/types/FilterType'
+
 const emit = defineEmits(['itemSelected'])
-const model = defineModel();
+const model = defineModel<string>()
 
 const props = defineProps<{
-  filter: Filter,
+  filter: Filter
   config: {
-    predefinedValue: string,
-    notificationType: string,
-    name: string,
-    placeholder?: string,
-    icon: string,
-    // setting default is annoying
+    predefinedValue: string
+    notificationType: string
+    name: string
+    placeholder?: string
+    icon: string
     textInput?: boolean
-  },
+  }
   messages: {
-    footer: string,
+    footer: string
     error?: string
-  },
+  }
   validation?: {
     error: boolean
   }
-}>();
+}>()
 
 function itemSelected() {
   if (props.config.textInput) {
+    console.log(props.config.predefinedValue)
     props.filter.notificationTarget = props.config.predefinedValue
     return
   }
-  emit('itemSelected');
+  emit('itemSelected')
 }
-
 </script>
