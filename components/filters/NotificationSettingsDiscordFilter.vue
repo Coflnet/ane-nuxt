@@ -56,7 +56,8 @@ watch(webhookUrl, (newValue) => {
   else {
     isValidWebhook.value = true
     // yes this isn't best practive
-    // eslint-disable-next-line vue/no-mutating-props
+
+    console.log('hihihi')
     props.filter.notificationTarget = ''
   }
 })

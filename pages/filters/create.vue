@@ -127,6 +127,8 @@ const debouncedTestFilter = debounce(async () => {
 }, 500)
 
 async function testFilter() {
+  if (filter.value.searchValue == '')
+    return
   try {
     const f = await filterToCreate()
     if (!f) {

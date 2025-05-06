@@ -78,8 +78,7 @@ const props = defineProps<{
 
 function itemSelected() {
   if (props.config.textInput) {
-    console.log(props.config.predefinedValue)
-    props.filter.notificationTarget = props.config.predefinedValue
+    model.value = props.config.predefinedValue
     return
   }
   emit('itemSelected')
