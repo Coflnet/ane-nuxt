@@ -190,5 +190,6 @@
   "language": "Language",
   "account": "Account",
   "noFilters": "You dont have any filters",
-  "tryCreatingFilters": "Try creating a filter to get started"
+  "tryCreatingFilters": "Try creating a filter to get started",
+  "fillOutAllFields": "Please fill out all fields"
 }

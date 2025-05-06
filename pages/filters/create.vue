@@ -132,7 +132,7 @@ async function testFilter() {
   try {
     const f = await filterToCreate()
     if (!f) {
-      push.error('Please fill out all required fields')
+      push.error(t('fillOutAllFields'))
       return
     }
     const res = await filterStore.testFilter(f)
@@ -224,7 +224,7 @@ async function loadEditParam() {
   }
   catch (e) {
     console.error(e)
-    push.error(`We ran into issue\n ${e}`)
+    push.error(`${t('weRanIssue')}\n ${e}`)
   }
 }
 
@@ -241,7 +241,7 @@ async function saveFilter() {
   catch (e) {
     savingFilter.value = false
     console.error(e)
-    push.error(`We ran into issue`)
+    push.error(t('weRanIssue'))
   }
 }
 
@@ -330,7 +330,7 @@ async function handleSearchRadius(): Promise<[string, string]> {
   catch (error) {
     console.error('Error fetching country:', error)
     savingFilter.value = false
-    push.error(`We ran into issue\n ${error}`)
+    push.error(`${t('weRanIssue')}\n ${error}`)
   }
   return ['', '']
 }
