@@ -61,7 +61,7 @@ onMounted(async () => {
   useInfiniteScroll(window, loadMore, {
     distance: 300, canLoadMore(_el) {
       // vueUse doesnt have a way to kill infinite scroll so I just used this work around for now
-      // this will get continuesly called untill the page is refreshed tho
+      // this will get continuously called until the page is refreshed though
       if (useRequestURL().pathname === localePath('/auctions'))
         return true
       return false
