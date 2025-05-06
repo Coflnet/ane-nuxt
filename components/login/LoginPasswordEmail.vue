@@ -1,11 +1,28 @@
 <template>
-  <UiInput v-model="email" type="email" :placeholder="$t('email')" :radius-error="emailPassError" />
-  <UiInput v-model="password" type="password" :placeholder="$t('password')" class="mt-3"
-    :radius-error="emailPassError" />
+  <UiInput
+    v-model="email"
+    type="email"
+    :placeholder="$t('email')"
+    :radius-error="emailPassError"
+  />
+  <UiInput
+    v-model="password"
+    type="password"
+    :placeholder="$t('password')"
+    class="mt-3"
+    :radius-error="emailPassError"
+  />
   <div class="flex justify-end mt-1.5 mb-3">
-    <a href="/forgot-password" class="text-blue-600 text-sm">{{ $t('forgotPassword') }}</a>
+    <a
+      href="/forgot-password"
+      class="text-blue-600 text-sm"
+    >{{ $t('forgotPassword') }}</a>
   </div>
-  <UiButton class="w-full text-center" :primary="true" @click="login">
+  <UiButton
+    class="w-full text-center"
+    :primary="true"
+    @click="login"
+  >
     {{ isLogin ? $t("signIn") : $t('register') }}
   </UiButton>
 </template>
