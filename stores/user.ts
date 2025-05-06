@@ -105,8 +105,6 @@ export const useUserStore = defineStore('user', () => {
 
     if (isAnonymous.value && !login) {
       const upgrade = await upgradeUserAccount(clientAuth, new GoogleAuthProvider())
-
-      console.log(upgrade)
       if (upgrade) {
         isAuthenticated.value = true
         isAnonymous.value = false
