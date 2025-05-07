@@ -278,7 +278,7 @@
           </div>
           <p class="text-slate-200">
             {{
-              $t('resellerDescription', {
+              $t('resellerDesciption', {
                 amount: $n(3000, 'currency'),
                 months: 3,
               })
