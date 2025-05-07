@@ -306,7 +306,7 @@
               {{ $t('free') }}
             </h3>
             <p class="text-3xl font-bold mb-6">
-              $0
+              $0/
               <span class="text-sm font-normal text-slate-300">{{
                 $t('month')
               }}</span>
