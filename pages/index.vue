@@ -4,7 +4,7 @@
     <nav class="container mx-auto px-6 py-4">
       <div class="flex justify-between items-center">
         <div class="flex items-center">
-          <span class="text-xl font-bold">ANE</span>
+          <UiLogo />
         </div>
         <div class="hidden md:flex space-x-8">
           <a
@@ -314,7 +314,7 @@
             <ul class="mb-8 space-y-3">
               <li class="flex items-center">
                 <Check class="h-5 w-5 text-green-400 mr-2" />
-                <span> {{ $t('XactiveFilters', 30) }}</span>
+                <span> {{ $t('XactiveFilters', 3) }}</span>
               </li>
               <li class="flex items-center">
                 <Check class="h-5 w-5 text-green-400 mr-2" />
