@@ -19,7 +19,6 @@
             :label="$t('marketplaces')"
           />
         </UiGrid>
-        <Button label="Verify" />
         <UiInput
           v-model="filter.searchValue"
           :name="$t('searchValue')"
@@ -80,7 +79,7 @@ const filterStore = useFilterStore()
 const userStore = useUserStore()
 const firebaseApp = useFirebaseApp()
 const savingFilter = ref(false)
-const selectedMarketplaces = ref<string[]>([])
+const selectedMarketplaces = ref<{ value: string, label: string }[]>([])
 
 const localePath = useLocalePath()
 
@@ -223,6 +222,8 @@ async function saveFilter() {
   try {
     savingFilter.value = true
     const f = await filterToCreate()
+    console.log(f)
+    return
     if (!f)
       return
     await filterStore.saveFilter(f)
@@ -273,17 +274,11 @@ async function handleFilters(): Promise<{ name: string, value: any }[]> {
   if (rawFilter.minPrice != 0 || rawFilter.maxPrice || rawFilter.maxPrice == 0) {
     filters.push({ name: 'PriceRange', value: `${Number(rawFilter.minPrice)}-${Number(rawFilter.maxPrice)}` })
   }
-  console.log(rawFilter.marketplace)
-  if (rawFilter.marketplace != 'all') {
+  console.log(selectedMarketplaces.value)
+  if (!selectedMarketplaces.value.map(item => item.value).includes('all')) {
     filters.push({
       name: 'IncludePlatforms',
-      value: rawFilter.marketplace,
-    })
-  }
-  else {
-    filters.push({
-      name: 'IncludePlatforms',
-      value: 'Ebay,Kleinanzeigen',
+      value: selectedMarketplaces.value.map(i => i.value).join(','),
     })
   }
   if (rawFilter.commercialSeller) {
@@ -333,7 +328,7 @@ async function connectPushNotifications(): Promise<string> {
 }
 
 onMounted(async () => {
-  await Promise.allSettled([filterStore.loadFilterOptions(), filterStore.loadFilters()])
+  await Promise.allSettled([filterStore.loadFilters()])
   loadEditParam()
 })
 </script>
