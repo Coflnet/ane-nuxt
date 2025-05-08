@@ -1,67 +1,94 @@
 <template>
-  <FiltersCreateHeader :is-new-filter="isNewFilter" />
-  <UiDefaultContainer class="mb-6 p-6">
-    <form @submit.prevent="saveFilter" class="space-y-6">
-      <UiGrid :grid-size="2">
-        <UiInput :name="$t('filterName')" :placeholder="$t('nameEg')" :label="$t('filterName')" v-model="filter.name" />
-        <UiDropdown id="marketplace" v-model="filter.marketplace" :options="[
-          { value: 'all', label: $t('allMarket') },
-          { value: 'Ebay', label: 'Ebay' },
-          { value: 'Kleinanzeigen', label: 'Kleinanzeigen' },
-        ]" :label="$t('marketplace')" />
-      </UiGrid>
+  <div>
+    <FiltersCreateHeader :is-new-filter="isNewFilter" />
+    <UiDefaultContainer class="mb-6 p-6">
+      <form
+        class="space-y-6"
+        @submit.prevent="saveFilter"
+      >
+        <UiGrid :grid-size="2">
+          <UiInput
+            v-model="filter.name"
+            :name="$t('filterName')"
+            :placeholder="$t('nameEg')"
+            :label="$t('filterName')"
+          />
+          <UiMultiSelect
+            v-model="selectedMarketplaces"
+            :options="marketplaces"
+            :label="$t('marketplaces')"
+          />
+        </UiGrid>
+        <Button label="Verify" />
+        <UiInput
+          v-model="filter.searchValue"
+          :name="$t('searchValue')"
+          :placeholder="$t('cameraEg')"
+          :label="$t('searchValue')"
+        />
 
+        <FiltersKeywordFilter
+          :model-value="filter.keywords"
+          :label="$t('searchKeywords')"
+          :footer="$t('addKeyDescription')"
+          :place-holder="$t('addKeywordPressEnter')"
+        />
+        <FiltersKeywordFilter
+          :model-value="filter.blacklist"
+          :label="$t('blackKeywords')"
+          :footer="$t('addblacklistKeywords')"
+          :place-holder="$t('addBlackListPressEnter')"
+        />
 
-      <UiInput :name="$t('searchValue')" :placeholder="$t('cameraEg')" :label="$t('searchValue')"
-        v-model="filter.searchValue" />
+        <!-- Dont worry about this, this whole system needs to get reworked by akwav -->
+        <div v-for="(option, _index) in filterStore.getFilterOptions">
+          <FiltersKleinanzeigenCategoryFilter
+            v-if="option.name === 'KleinanzeigenKategorie' && filter.marketplace == 'kleinanzeigen'"
+            :filter="filter"
+            :options="option.value.options"
+          />
+        </div>
 
-      <FiltersKeywordFilter :model-value="filter.keywords" :label="$t('searchKeywords')"
-        :footer="$t('addKeyDescription')" :place-holder="$t('addKeywordPressEnter')" />
-      <FiltersKeywordFilter :model-value="filter.blacklist" :label="$t('blackKeywords')"
-        :footer="$t('addblacklistKeywords')" :place-holder="$t('addBlackListPressEnter')" />
+        <FiltersRadiusRangeFilter :filter="filter" />
+        <NotificationSettingsFilter :filter="filter" />
 
+        <FiltersCreateConfirmCreation
+          :is-new-filter="isNewFilter"
+          :saving="savingFilter"
+        />
+      </form>
+    </UiDefaultContainer>
 
-      <!-- Dont worry about this, this whole system needs to get reworked by akwav -->
-      <div v-for="(option, _index) in filterStore.getFilterOptions">
-        <FiltersKleinanzeigenCategoryFilter :filter="filter"
-          v-if="option.name === 'KleinanzeigenKategorie' && filter.marketplace == 'kleinanzeigen'"
-          :options="option.value.options" />
-      </div>
-
-      <FiltersRadiusRangeFilter :filter="filter" />
-      <NotificationSettingsFilter :filter="filter"></NotificationSettingsFilter>
-
-      <FiltersCreateConfirmCreation :is-new-filter="isNewFilter" :saving="savingFilter" />
-    </form>
-  </UiDefaultContainer>
-
-  <OverviewRecentMatchTable :matches :title="$t('auctionMatchedToFilters')" v-if="matches.length > 0" />
+    <OverviewRecentMatchTable
+      v-if="matches.length > 0"
+      :matches
+      :title="$t('auctionMatchedToFilters')"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
-
-import type { FilterMatch, ListingListener } from '~/src/api-client';
-import { debounce } from 'lodash';
-import NotificationSettingsFilter from '~/components/filters/NotificationSettingsFilter.vue';
+import { debounce } from 'lodash'
 import { getMessaging, getToken } from 'firebase/messaging'
 import { useFirebaseApp } from 'vuefire'
-import type { Filter } from '~/types/FilterType';
+import NotificationSettingsFilter from '~/components/filters/NotificationSettingsFilter.vue'
+import type { FilterMatch, ListingListener } from '~/src/api-client'
+import type { Filter } from '~/types/FilterType'
+import { marketplaces } from '~/constants/Marketplaces'
 
-
-const filterStore = useFilterStore();
-const userStore = useUserStore();
+const filterStore = useFilterStore()
+const userStore = useUserStore()
 const firebaseApp = useFirebaseApp()
 const savingFilter = ref(false)
+const selectedMarketplaces = ref<string[]>([])
 
-const localePath = useLocalePath();
+const localePath = useLocalePath()
 
 const route = useRoute()
 
-
 const isNewFilter = computed(() => {
-  return route.query.id == "" || route.query.id == undefined
+  return route.query.id == '' || route.query.id == undefined
 })
-
 
 const matches = ref<FilterMatch[]>([])
 
@@ -82,7 +109,7 @@ const filter = ref<Filter>({
   location: '',
   id: 0,
   notificationType: 'Unknown',
-  notificationTarget: ""
+  notificationTarget: '',
 })
 
 watch(filter, (_) => {
@@ -94,69 +121,67 @@ const debouncedTestFilter = debounce(async () => {
 }, 500)
 
 async function testFilter() {
-
   try {
-
     const f = await filterToCreate()
     if (!f) {
-      push.error("Please fill out all required fields")
+      push.error('Please fill out all required fields')
       return
     }
-    const res = await filterStore.testFilter(f);
+    const res = await filterStore.testFilter(f)
     if (res) {
       // this is required because recnet match container is used for both this the test endpoint and overview table
       // test endpoint return listing object which has no listener id (filter) and no match date
-      // while recent matches return FilterMatch object 
+      // while recent matches return FilterMatch object
       matches.value = res.map((i) => {
-        return { matchedAt: i.foundAt, listenerId: 0, listingData: i };
-      });
+        return { matchedAt: i.foundAt, listenerId: 0, listingData: i }
+      })
     }
-  } catch (e) {
-    console.error(e);
-    matches.value = [];
+  }
+  catch (e) {
+    console.error(e)
+    matches.value = []
   }
 }
 
 const radiusError = ref(false)
 
-
 async function loadEditParam() {
   if (isNewFilter.value) {
-    return;
+    return
   }
 
   try {
-    const cachedFilters = filterStore.getUserFilters;
-    const currentId = Number(route.query.id ?? 0);
+    const cachedFilters = filterStore.getUserFilters
+    const currentId = Number(route.query.id ?? 0)
 
-    let activeFilter = cachedFilters.find(i => Number(i.id ?? 0) === currentId)
-      ?? filterStore.getUserFilterById(currentId);
+    const activeFilter = cachedFilters.find(i => Number(i.id ?? 0) === currentId)
+      ?? filterStore.getUserFilterById(currentId)
 
     if (!activeFilter?.filters) {
-      console.error("Filter not found");
-      return;
+      console.error('Filter not found')
+      return
     }
 
-    filter.value.name = activeFilter.name ?? ""
+    filter.value.name = activeFilter.name ?? ''
     filter.value.id = activeFilter.id ?? 0
-    filter.value.notificationType = activeFilter.targetType ?? "Unknown"
+    filter.value.notificationType = activeFilter.targetType ?? 'Unknown'
 
-    activeFilter.filters.forEach(item => {
+    activeFilter.filters.forEach((item) => {
       switch (item.name) {
         case 'Radius': {
-          const [_lat, _lon, radius, zipcode] = item.value?.split?.(';') ?? ""
+          const [_lat, _lon, radius, zipcode] = item.value?.split?.(';') ?? ''
           filter.value.searchRadius = Number(radius ?? 0)
-          filter.value.zipcode = zipcode ?? ""
+          filter.value.zipcode = zipcode ?? ''
           break
         }
         case 'ContainsKeyWord':
-          if (item.value == "") break;
+          if (item.value == '') break
           item?.value?.split(',').forEach((keyword: string) => {
             filter.value.keywords.push(keyword)
           })
           break
         case 'NotContainsKeyWord':
-          if (item.value == "") break;
+          if (item.value == '') break
           item?.value?.split(',').forEach((keyword: string) => {
             filter.value.blacklist.push(keyword)
           })
@@ -169,17 +194,17 @@ async function loadEditParam() {
         }
         case 'IncludePlatforms':
           console.log(item.value)
-          if (["Ebay", "Kleinanzeigen"].includes(item.value!)) {
+          if (['Ebay', 'Kleinanzeigen'].includes(item.value!)) {
             filter.value.marketplace = item.value!
-            break;
+            break
           }
-          filter.value.marketplace = "all"
+          filter.value.marketplace = 'all'
           break
         case 'CommercialSeller':
           filter.value.commercialSeller = Boolean(item.value)
           break
         case 'SearchTerm':
-          filter.value.searchValue = item.value ?? ""
+          filter.value.searchValue = item.value ?? ''
           break
         case 'TotalCost':
           const [min, _max] = item.value!.split('-')
@@ -187,7 +212,8 @@ async function loadEditParam() {
           break
       }
     })
-  } catch (e) {
+  }
+  catch (e) {
     console.error(e)
     push.error(`We ran into issue\n ${e}`)
   }
@@ -200,9 +226,10 @@ async function saveFilter() {
     if (!f)
       return
     await filterStore.saveFilter(f)
-    push.success("Filter successfully saved");
-    navigateTo(localePath("/overview"));
-  } catch (e) {
+    push.success('Filter successfully saved')
+    navigateTo(localePath('/overview'))
+  }
+  catch (e) {
     savingFilter.value = false
     push.error(`We ran into issue`)
   }
@@ -210,10 +237,10 @@ async function saveFilter() {
 
 async function filterToCreate(): Promise<ListingListener | null> {
   if (radiusError.value) {
-    return null;
+    return null
   }
 
-  var rawFilter = toRaw(filter.value);
+  const rawFilter = toRaw(filter.value)
 
   if (rawFilter.notificationType == 'FireBase') {
     rawFilter.notificationTarget = await connectPushNotifications()
@@ -228,38 +255,39 @@ async function filterToCreate(): Promise<ListingListener | null> {
   }
 
   const filterToCreate = {
-    name: rawFilter.name == "" ? rawFilter.searchValue : rawFilter.name,
+    name: rawFilter.name == '' ? rawFilter.searchValue : rawFilter.name,
     userId: '',
     id: filter.value.id,
     target: rawFilter.notificationTarget,
     targetType: rawFilter.notificationType as TargetType,
-    filters: await handleFilters()
+    filters: await handleFilters(),
   }
 
-  return filterToCreate;
+  return filterToCreate
 }
 
-async function handleFilters(): Promise<{ name: string; value: any }[]> {
-  var rawFilter = toRaw(filter.value);
-  var filters: { name: string; value: any }[] = []
+async function handleFilters(): Promise<{ name: string, value: any }[]> {
+  const rawFilter = toRaw(filter.value)
+  const filters: { name: string, value: any }[] = []
 
   if (rawFilter.minPrice != 0 || rawFilter.maxPrice || rawFilter.maxPrice == 0) {
-    filters.push({ name: "PriceRange", value: `${Number(rawFilter.minPrice)}-${Number(rawFilter.maxPrice)}` })
+    filters.push({ name: 'PriceRange', value: `${Number(rawFilter.minPrice)}-${Number(rawFilter.maxPrice)}` })
   }
   console.log(rawFilter.marketplace)
-  if (rawFilter.marketplace != "all") {
+  if (rawFilter.marketplace != 'all') {
     filters.push({
-      name: "IncludePlatforms",
-      value: rawFilter.marketplace
+      name: 'IncludePlatforms',
+      value: rawFilter.marketplace,
     })
-  } else {
+  }
+  else {
     filters.push({
-      name: "IncludePlatforms",
-      value: "Ebay,Kleinanzeigen"
+      name: 'IncludePlatforms',
+      value: 'Ebay,Kleinanzeigen',
     })
   }
   if (rawFilter.commercialSeller) {
-    filters.push({ name: "CommercialSeller", value: true })
+    filters.push({ name: 'CommercialSeller', value: true })
   }
   if (rawFilter.zipcode != '' && rawFilter.marketplace != 'ebay') {
     const location = await handleSearchRadius()
@@ -272,24 +300,25 @@ async function handleFilters(): Promise<{ name: string; value: any }[]> {
   }
 
   if (rawFilter.keywords.length != 0)
-    filters.push({ name: "ContainsKeyWord", value: rawFilter.keywords.join(',') });
+    filters.push({ name: 'ContainsKeyWord', value: rawFilter.keywords.join(',') })
 
   if (rawFilter.blacklist.length != 0)
-    filters.push({ name: "NotContainsKeyWord", value: rawFilter.blacklist.join(',') });
+    filters.push({ name: 'NotContainsKeyWord', value: rawFilter.blacklist.join(',') })
   return filters
 }
 
 async function handleSearchRadius(): Promise<[string, string]> {
-  // If you are looking at this... I am sorry 
+  // If you are looking at this... I am sorry
   try {
-    const response = await fetch('https://ipapi.co/json/');
-    const data = await response.json();
-    const url = `https://nominatim.openstreetmap.org/search?postalcode=${filter.value.zipcode}&country=${data.country_name}&format=json`;
-    const response2 = await fetch(url);
-    const data2 = await response2.json();
+    const response = await fetch('https://ipapi.co/json/')
+    const data = await response.json()
+    const url = `https://nominatim.openstreetmap.org/search?postalcode=${filter.value.zipcode}&country=${data.country_name}&format=json`
+    const response2 = await fetch(url)
+    const data2 = await response2.json()
     return [data2[0].lat, data2[0].lon]
-  } catch (error) {
-    console.error('Error fetching country:', error);
+  }
+  catch (error) {
+    console.error('Error fetching country:', error)
     savingFilter.value = false
     push.error(`We ran into issue\n ${error}`)
   }
@@ -297,7 +326,7 @@ async function handleSearchRadius(): Promise<[string, string]> {
 }
 
 async function connectPushNotifications(): Promise<string> {
-  const messaging = getMessaging(firebaseApp);
+  const messaging = getMessaging(firebaseApp)
   // vapid key is meant to be public
   const token = await getToken(messaging, { vapidKey: 'BC2o4A75_oGlbklpFN4iVXjdZE3lg6Qci7EZg0NrsRAKyKmySam77NrlUAodBAzKhTECJGj-rgfdbQ0qzWUh9nU' })
   return token
@@ -305,7 +334,6 @@ async function connectPushNotifications(): Promise<string> {
 
 onMounted(async () => {
   await Promise.allSettled([filterStore.loadFilterOptions(), filterStore.loadFilters()])
-  loadEditParam();
+  loadEditParam()
 })
-
 </script>

@@ -10,39 +10,49 @@
     </div>
 
     <div class="grid gap-8 lg:grid-cols-3 sm:grid-cols-2 sm:gap-6">
-      <SubscriptionsPlanCard v-for="plan in plans" :key="plan.id" :plan="plan" :current-plan="currentPlan"
-        :end-date="endDate" :selected-plan="selectedPlan" @select-plan="changePlan" />
+      <SubscriptionsPlanCard
+        v-for="plan in plans"
+        :key="plan.id"
+        :plan="plan"
+        :current-plan="currentPlan"
+        :end-date="endDate"
+        :selected-plan="selectedPlan"
+        @select-plan="changePlan"
+      />
     </div>
 
-    <UiConformationPopup :footer="$t('confirmCancelSub')" :header="$t('confirmCancel')"
-      :model-value="confirmCancelation" @confirm="confirmCancelSubscription" @cancel="confirmCancelation = false" />
-
+    <UiConformationPopup
+      :footer="$t('confirmCancelSub')"
+      :header="$t('confirmCancel')"
+      :model-value="confirmCancelation"
+      @confirm="confirmCancelSubscription"
+      @cancel="confirmCancelation = false"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { plans, type PlanId } from '~/types/SubscriptionConstants';
-const { t } = useI18n();
-const userStore = useUserStore();
+import { plans, type PlanId } from '~/constants/SubscriptionConstants'
 
-const currentPlan = ref<PlanId>('basic');
-const selectedPlan = ref<PlanId | null>(null);
+const { t } = useI18n()
+const userStore = useUserStore()
+
+const currentPlan = ref<PlanId>('basic')
+const selectedPlan = ref<PlanId | null>(null)
 const confirmCancelation = ref(false)
-const endDate = ref<Date | null>(null);
-// I am only caching 1 url right now since there is only one tier
-var subscribeUrl = "";
+const endDate = ref<Date | null>(null)
 
-const apiToken = `Bearer ${useUserStore().token}`;
+const apiToken = `Bearer ${useUserStore().token}`
 
-async function changePlan(plan: String) {
-  if (plan === currentPlan.value || plan == "basic") {
-    confirmCancelation.value = true;
-    return;
+async function changePlan(plan: string) {
+  if (plan === currentPlan.value || plan == 'basic') {
+    confirmCancelation.value = true
+    return
   };
 
   const url = await subscribe({
     composable: '$fetch',
-    body: { planSlug: "collector", redirectSuccess: "https://ane.deals/overview", redirectCancel: "https://ane.deals/overview", },
+    body: { planSlug: 'collector', redirectSuccess: 'https://ane.deals/overview', redirectCancel: 'https://ane.deals/overview' },
     headers: { Authorization: apiToken },
   })
 
@@ -50,46 +60,44 @@ async function changePlan(plan: String) {
 }
 
 async function confirmCancelSubscription() {
-
   const result = await getSubscription({ composable: '$fetch', headers: { Authorization: apiToken } })
   await cancelSubscription({
     composable: '$fetch',
-    path: { id: result[0]?.id ?? "" },
+    path: { id: result[0]?.id ?? '' },
     headers: { Authorization: apiToken },
   })
 
-  push.success(t('cancelSubscriptionSuc'));
+  push.success(t('cancelSubscriptionSuc'))
 }
 
 async function getCurrentSubscription() {
   // accessing the product from the same type that is returned from the api
-  currentPlan.value = userStore.currentPlan?.product as PlanId ?? "basic";
-  endDate.value = userStore.currentPlan?.endsAt ? new Date(userStore.currentPlan?.endsAt) : null;
+  currentPlan.value = userStore.currentPlan?.product as PlanId ?? 'basic'
+  endDate.value = userStore.currentPlan?.endsAt ? new Date(userStore.currentPlan?.endsAt) : null
 
   try {
     const result = await getSubscription({ composable: '$fetch', headers: { Authorization: apiToken } })
-    console.log(result);
     if (result.length == 0) {
-      if (currentPlan.value !== "basic")
-        resetSubscription();
-      return;
+      if (currentPlan.value !== 'basic')
+        resetSubscription()
+      return
     }
-    currentPlan.value = result[0]?.product as PlanId;
-    userStore.currentPlan = result[0];
-    if (result[0]?.endsAt !== "")
-      endDate.value = new Date(result[0]?.endsAt ?? "");
-  } catch (error) {
-    push.error("error requesting your")
-
+    currentPlan.value = result[0]?.product as PlanId
+    userStore.currentPlan = result[0]
+    if (result[0]?.endsAt !== '')
+      endDate.value = new Date(result[0]?.endsAt ?? '')
+  }
+  catch (error) {
+    push.error(t('errorRequesting'))
+    console.error(error)
   }
 }
 
 async function resetSubscription() {
-  currentPlan.value = "basic";
-  userStore.currentPlan = null;
-  endDate.value = null;
+  currentPlan.value = 'basic'
+  userStore.currentPlan = null
+  endDate.value = null
 }
 
 onMounted(() => getCurrentSubscription())
-
 </script>
