@@ -222,8 +222,6 @@ async function saveFilter() {
   try {
     savingFilter.value = true
     const f = await filterToCreate()
-    console.log(f)
-    return
     if (!f)
       return
     await filterStore.saveFilter(f)
@@ -281,6 +279,7 @@ async function handleFilters(): Promise<{ name: string, value: any }[]> {
       value: selectedMarketplaces.value.map(i => i.value).join(','),
     })
   }
+
   if (rawFilter.commercialSeller) {
     filters.push({ name: 'CommercialSeller', value: true })
   }
