@@ -11,13 +11,11 @@ Make sure to install dependencies:
 npm install
 ```
 
-Add a [firebase service account]('https://firebase.google.com/docs/admin/setup#initialize_the_sdk_in_non-google_environments')
+Add a [firebase service account](https://firebase.google.com/docs/admin/setup#initialize_the_sdk_in_non-google_environments)
 
 Create a ``.env`` file with this content
 ```json
 GOOGLE_APPLICATION_CREDENTIALS=YOUR-SERVICE-ACCOUNT
-```
-```
 ```
 
 ## Development Server
