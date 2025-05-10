@@ -131,7 +131,7 @@
   "receiveInstantAlerts": "Receive instant alerts when matching items are listed. Choose from email, discord, or push notifications.",
   "register": "Register",
   "reseller": "Verkäufer",
-  "resellerDesciption": "I saved {amount} in only {months} months. ANE helped me find the best deals and maximize my profit margin.",
+  "resellerDescription": "I saved {amount} in only {months} months. ANE helped me find the best deals and maximize my profit margin.",
   "resources": "Resources",
   "yearRights": "{n} Coflnet GmbH. All rights reserved.",
   "rights": "© 2025 Coflnet GmbH. All rights reserved.",
