@@ -1,93 +1,94 @@
 export default defineNuxtConfig({
-  compatibilityDate: '2024-11-01',
-  future: {
-    compatibilityVersion: 4,
-  },
-  devtools: { enabled: true },
   modules: [
     '@nuxtjs/tailwindcss',
     '@pinia/nuxt',
     'nuxt-vuefire',
-    "@nuxt/icon",
+    '@nuxt/icon',
     '@nuxtjs/i18n',
-    "@hey-api/nuxt",
-    "notivue/nuxt",
-    '@nuxt/eslint'
+    '@hey-api/nuxt',
+    'notivue/nuxt',
+    '@nuxt/eslint',
   ],
 
-  heyApi: {
-    config: {
-      input: "https://ane.coflnet.com/api/openapi/v1/openapi.json"
-    }
-
-  },
-
   ssr: true,
-  tailwindcss: { exposeConfig: true },
+  devtools: { enabled: true },
 
   css: [
     'notivue/notification.css',
-    'notivue/animations.css'
+    'notivue/animations.css',
   ],
+  future: {
+    compatibilityVersion: 4,
+  },
+  compatibilityDate: '2024-11-01',
 
-  notivue: {
-    position: "top-right",
+  eslint: {
+    checker: true,
+    config: {
+      stylistic: true,
+    },
   },
 
-  icon: {
-    serverBundle: {
-      remote: 'jsdelivr',
-    }
-  },
+  heyApi: {
+    config: {
+      input: 'https://ane.coflnet.com/api/openapi/v1/openapi.json',
+    },
 
+  },
 
   i18n: ({
     locales: [
       {
         code: 'en',
         name: 'English',
-        file: 'en.json'
+        file: 'en.json',
       },
       {
         code: 'de',
         name: 'Deutsch',
-        file: 'de.json'
-      }
+        file: 'de.json',
+      },
     ],
     defaultLocale: 'en',
-    langDir: "../locales/",
+    langDir: '../locales/',
     strategy: 'prefix_except_default',
     lazy: true,
     detectBrowserLanguage: {
       useCookie: true,
       alwaysRedirect: true,
       cookieKey: 'i18n_redirected',
-      redirectOn: 'root' // recommended
-    }
+      redirectOn: 'root', // recommended
+    },
   }),
+
+  icon: {
+    serverBundle: {
+      remote: 'jsdelivr',
+    },
+  },
+
+  notivue: {
+    position: 'top-right',
+  },
+
+  tailwindcss: { exposeConfig: true },
 
   vuefire: {
     config: {
-      apiKey: "AIzaSyB8B7BaoOT_PhPJaa2peh2a_Q8VKDOb0yU",
-      authDomain: "anenotifier.firebaseapp.com",
-      projectId: "anenotifier",
-      storageBucket: "anenotifier.firebasestorage.app",
-      messagingSenderId: "625983368920",
-      appId: "1:625983368920:web:04af5415ef9a54d14331ad"
+      apiKey: 'AIzaSyB8B7BaoOT_PhPJaa2peh2a_Q8VKDOb0yU',
+      authDomain: 'anenotifier.firebaseapp.com',
+      projectId: 'anenotifier',
+      storageBucket: 'anenotifier.firebasestorage.app',
+      messagingSenderId: '625983368920',
+      appId: '1:625983368920:web:04af5415ef9a54d14331ad',
     },
     messaging: {
       enabled: true,
     },
     auth: {
-      enabled: true
+      enabled: true,
     },
 
   },
-
-  eslint: {
-    checker: true,
-    config: {
-      stylistic: true,
-    }
-  }
 })
+

@@ -1,4 +1,4 @@
-import { getMatches, type FilterMatch } from "~/src/api-client";
+import { getMatches, type FilterMatch, type Platform } from "~/src/api-client";
 
 export const useListingStore = defineStore("listing", () => {
   const userStore = useUserStore();
@@ -63,7 +63,7 @@ export const useListingStore = defineStore("listing", () => {
     return getUrl(listing.platform, listing.id, lang);
   }
 
-  function getUrl(listing: string, id: string, lang: string) {
+  function getUrl(listing: Platform, id: string, lang: string) {
     if (listing === 'Ebay') {
       if (lang == "de") {
         return `https://www.ebay.de/itm/` + id;
@@ -73,6 +73,8 @@ export const useListingStore = defineStore("listing", () => {
     if (listing === 'Kleinanzeigen') {
       return `https://www.kleinanzeigen.de/s-anzeige/copy/${id}-1-1`;
     }
+    if (listing === 'AutoScout24')
+      return `https://www.autoscout24.de/angebote/${id}`;
     return "";
   }
 

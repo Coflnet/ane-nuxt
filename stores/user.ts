@@ -90,6 +90,7 @@ export const useUserStore = defineStore('user', () => {
     if (isAnonymous.value && !login) {
       const upgrade = await upgradeUserAccount(clientAuth, new GoogleAuthProvider())
       if (upgrade) {
+        isAuthenticated.value = true
         isAnonymous.value = false
         return { success: true }
       }
@@ -126,6 +127,7 @@ export const useUserStore = defineStore('user', () => {
       return { success: true }
     }
     catch (err) {
+      console.error('Error during Google login:', err)
       return { success: false, error: 'Failed to login. Please try again.' }
     }
   }
@@ -216,9 +218,6 @@ export const useUserStore = defineStore('user', () => {
   }
 
   async function logout() {
-    // In a real implementation, this would call the API
-    // await useFetch('/api/auth/logout', { method: 'POST' })
-
     user.value = null
     isAuthenticated.value = false
     token.value = null
@@ -250,7 +249,6 @@ export const useUserStore = defineStore('user', () => {
 
   // Return all state, getters, and actions
   return {
-    // State
     user,
     isAuthenticated,
     isAnonymous,

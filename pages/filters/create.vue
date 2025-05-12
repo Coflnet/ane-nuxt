@@ -13,6 +13,7 @@
             :placeholder="$t('nameEg')"
             :label="$t('filterName')"
           />
+<<<<<<< HEAD
           <UiDropdown
             id="marketplace"
             v-model="filter.marketplace"
@@ -67,6 +68,53 @@
       </form>
     </UiDefaultContainer>
 
+=======
+          <UiMultiSelect
+            v-model="selectedMarketplaces"
+            :options="marketplaces"
+            :label="$t('marketplaces')"
+          />
+        </UiGrid>
+        <UiInput
+          v-model="filter.searchValue"
+          :name="$t('searchValue')"
+          :placeholder="$t('cameraEg')"
+          :label="$t('searchValue')"
+        />
+
+        <FiltersKeywordFilter
+          :model-value="filter.keywords"
+          :label="$t('searchKeywords')"
+          :footer="$t('addKeyDescription')"
+          :place-holder="$t('addKeywordPressEnter')"
+        />
+        <FiltersKeywordFilter
+          :model-value="filter.blacklist"
+          :label="$t('blackKeywords')"
+          :footer="$t('addblacklistKeywords')"
+          :place-holder="$t('addBlackListPressEnter')"
+        />
+
+        <!-- Dont worry about this, this whole system needs to get reworked by akwav -->
+        <div v-for="(option, _index) in filterStore.getFilterOptions">
+          <FiltersKleinanzeigenCategoryFilter
+            v-if="option.name === 'KleinanzeigenKategorie' && filter.marketplace == 'kleinanzeigen'"
+            :filter="filter"
+            :options="option.value.options"
+          />
+        </div>
+
+        <FiltersRadiusRangeFilter :filter="filter" />
+        <NotificationSettingsFilter :filter="filter" />
+
+        <FiltersCreateConfirmCreation
+          :is-new-filter="isNewFilter"
+          :saving="savingFilter"
+        />
+      </form>
+    </UiDefaultContainer>
+
+>>>>>>> main
     <OverviewRecentMatchTable
       v-if="matches.length > 0"
       :matches
@@ -82,11 +130,16 @@ import { useFirebaseApp } from 'vuefire'
 import NotificationSettingsFilter from '~/components/filters/NotificationSettingsFilter.vue'
 import type { FilterMatch, ListingListener } from '~/src/api-client'
 import type { Filter } from '~/types/FilterType'
+<<<<<<< HEAD
+=======
+import { marketplaces } from '~/constants/Marketplaces'
+>>>>>>> main
 
 const filterStore = useFilterStore()
 const userStore = useUserStore()
 const firebaseApp = useFirebaseApp()
 const savingFilter = ref(false)
+const selectedMarketplaces = ref<{ value: string, label: string }[]>([])
 
 const localePath = useLocalePath()
 
@@ -127,12 +180,20 @@ const debouncedTestFilter = debounce(async () => {
 }, 500)
 
 async function testFilter() {
+<<<<<<< HEAD
   if (filter.value.searchValue == '')
     return
+=======
+>>>>>>> main
   try {
     const f = await filterToCreate()
+
     if (!f) {
+<<<<<<< HEAD
       push.error(t('fillOutAllFields'))
+=======
+      push.error('Please fill out all required fields')
+>>>>>>> main
       return
     }
     const res = await filterStore.testFilter(f)
@@ -232,6 +293,7 @@ async function saveFilter() {
   try {
     savingFilter.value = true
     const f = await filterToCreate()
+
     if (!f)
       return
     await filterStore.saveFilter(f)
@@ -276,13 +338,20 @@ async function filterToCreate(): Promise<ListingListener | null> {
   return filterToCreate
 }
 
+<<<<<<< HEAD
 async function handleFilters(): Promise<{ name: string, value: [] }[]> {
   const rawFilter = toRaw(filter.value)
   const filters: { name: string, value: [] }[] = []
+=======
+async function handleFilters(): Promise<{ name: string, value: any }[]> {
+  const rawFilter = toRaw(filter.value)
+  const filters: { name: string, value: any }[] = []
+>>>>>>> main
 
   if (rawFilter.minPrice != 0 || rawFilter.maxPrice || rawFilter.maxPrice == 0) {
     filters.push({ name: 'PriceRange', value: `${Number(rawFilter.minPrice)}-${Number(rawFilter.maxPrice)}` })
   }
+<<<<<<< HEAD
 
   if (rawFilter.marketplace != 'all') {
     filters.push({
@@ -294,8 +363,15 @@ async function handleFilters(): Promise<{ name: string, value: [] }[]> {
     filters.push({
       name: 'IncludePlatforms',
       value: 'Ebay,Kleinanzeigen',
+=======
+  if (!selectedMarketplaces.value.map(item => item.value).includes('all')) {
+    filters.push({
+      name: 'IncludePlatforms',
+      value: selectedMarketplaces.value.map(i => i.value).join(','),
+>>>>>>> main
     })
   }
+
   if (rawFilter.commercialSeller) {
     filters.push({ name: 'CommercialSeller', value: true })
   }
@@ -343,7 +419,11 @@ async function connectPushNotifications(): Promise<string> {
 }
 
 onMounted(async () => {
+<<<<<<< HEAD
   await Promise.allSettled([filterStore.loadFilterOptions(), filterStore.loadFilters()])
+=======
+  await Promise.allSettled([filterStore.loadFilters()])
+>>>>>>> main
   loadEditParam()
 })
 </script>

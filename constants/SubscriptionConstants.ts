@@ -1,26 +1,26 @@
 export interface Feature {
-  text: string;
-  amount?: number;
-  included: boolean;
+  text: string
+  amount?: number
+  included: boolean
 }
 
 export interface Plan {
-  id: PlanId;
-  name: string;
-  price: number;
-  description: string;
-  popular: boolean;
-  available?: boolean;
-  features: Feature[];
+  id: PlanId
+  name: string
+  price: number
+  description: string
+  popular: boolean
+  available?: boolean
+  features: Feature[]
 }
 
-export type PlanId = 'basic' | 'collector' | 'enterprise';
+export type PlanId = 'basic' | 'collector' | 'enterprise'
 
 export const planPrices: { [key: string]: number } = {
   basic: 0,
   collector: 9.99,
   enterprise: 69.69,
-};
+}
 
 export const plans: Plan[] = [
   {
@@ -66,5 +66,4 @@ export const plans: Plan[] = [
     ],
 
   },
-];
-
+]
