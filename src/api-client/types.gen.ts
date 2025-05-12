@@ -13,9 +13,9 @@ export type FilterInfo = {
 };
 
 export type FilterMatch = {
-  listenerId?: number;
-  listingData: Listing;
-  matchedAt?: string;
+  listenerId?: number | null;
+  listingData?: Listing;
+  matchedAt?: string | null;
 };
 
 export type FilterOptions = {
@@ -23,7 +23,7 @@ export type FilterOptions = {
   options?: Array<StringStringKeyValuePair> | null;
 };
 
-export type FilterType = 'Options' | 'NumberRange' | 'Text' | 'DATE' | 'Radius' | 'Bool' | 'MultiSelect';
+export type FilterType = 'Options' | 'NumberRange' | 'Text' | 'Date' | 'Radius' | 'Bool' | 'MultiSelect';
 
 export type Listing = {
   priceKind?: PriceKind;
@@ -38,18 +38,18 @@ export type Listing = {
   region?: string | null;
   country?: string | null;
   imageUrls?: Array<string> | null;
-  price?: number;
+  price?: number | null;
   currency?: string | null;
   contact?: string | null;
   userId?: string | null;
-  latitude?: number;
-  longitude?: number;
+  latitude?: number | null;
+  longitude?: number | null;
   shipping?: string | null;
   returnPolicy?: string | null;
   attributes?: {
     [key: string]: string;
   } | null;
-  foundAt?: string;
+  foundAt?: string | null;
   createdAt?: string | null;
   soldBefore?: string | null;
   commercial?: boolean | null;
@@ -57,17 +57,27 @@ export type Listing = {
 
 export type ListingListener = {
   targetType?: TargetType;
+  state?: SearchState;
   userId?: string | null;
-  id?: number;
+  id?: number | null;
   filters?: Array<FilterInfo> | null;
   target?: string | null;
   name?: string | null;
-  matchCount?: number;
+  matchCount?: number | null;
 };
 
-export type Platform = 'Unknown' | 'Ebay' | 'Kleinanzeigen' | 'Marktplaats' | 'Willhaben' | 'Shpock' | 'MarktDe';
+export type Platform = 'Unknown' | 'Ebay' | 'Kleinanzeigen' | 'Marktplaats' | 'Willhaben' | 'Shpock' | 'MarktDe' | 'Vinted' | 'Facebook' | 'Poshmark' | 'Mercari' | 'Depop' | 'Mobile' | 'AutoScout24' | 'WirKaufenDeinAuto' | 'AutoDe' | 'Gebrauchtwagen12';
 
 export type PriceKind = 'Unknown' | 'BuyItemNow' | 'Auction' | 'Negotiatable' | 'IncludesTax';
+
+export type ProblemDetails = {
+  type?: string | null;
+  title?: string | null;
+  status?: number | null;
+  detail?: string | null;
+  instance?: string | null;
+  [key: string]: unknown | (string | null) | (string | null) | (number | null) | (string | null) | (string | null) | undefined;
+};
 
 export type SearchState = 'None' | 'Disabled';
 
@@ -518,6 +528,7 @@ export type GetMatchesData = {
   query?: {
     before?: string;
     limit?: number;
+    after?: string;
   };
   url: '/api/matches';
 };
@@ -875,6 +886,61 @@ export type GetMeResponses = {
 };
 
 export type GetMeResponse = GetMeResponses[keyof GetMeResponses];
+
+export type UpdateMeData = {
+  body?: User;
+  path?: never;
+  query?: never;
+  url: '/api/user/me';
+};
+
+export type UpdateMeErrors = {
+  /**
+   * Bad Request
+   */
+  400: {
+    /**
+     * Human readable id for this kind of error
+     */
+    slug?: string;
+    /**
+     * More info about the error, may sometimes be sufficient to display to user
+     */
+    message?: string;
+  };
+  /**
+   * Not Found
+   */
+  404: ProblemDetails;
+  /**
+   * Internal Server Error
+   */
+  500: {
+    /**
+     * Human readable id for this kind of error
+     */
+    slug?: string;
+    /**
+     * Unknown error occured
+     */
+    message?: string;
+    /**
+     * Id for the error report with this id
+     */
+    trace?: string;
+  };
+};
+
+export type UpdateMeError = UpdateMeErrors[keyof UpdateMeErrors];
+
+export type UpdateMeResponses = {
+  /**
+   * OK
+   */
+  200: User;
+};
+
+export type UpdateMeResponse = UpdateMeResponses[keyof UpdateMeResponses];
 
 export type ClientOptions = {
   baseURL: 'https://ane.coflnet.com' | (string & {});

@@ -1,38 +1,75 @@
 <template>
   <UiDefaultContainer class="mb-6 p-6">
-    <UiHeaderLabel :label="props.title" class="mb-4" />
-    <table class="w-full" v-if="matches.length > 0 || loading">
+    <UiHeaderLabel
+      :label="props.title"
+      class="mb-4"
+    />
+    <table
+      v-if="matches.length > 0 || loading"
+      class="w-full"
+    >
       <OverviewTableHeader :headers="tableHeader" />
       <tbody>
-        <tr v-for="(auction, index) in props.matches" :key="index"
-          class="border-b border-slate-700 hover:bg-slate-700/50 cursor-pointer" @click="tableClicked(auction)">
+        <tr
+          v-for="(auction, index) in props.matches"
+          :key="index"
+          class="border-b border-slate-700 hover:bg-slate-700/50 cursor-pointer"
+          @click="tableClicked(auction)"
+        >
           <td class="px-4 py-3 text-sm text-white">
             <div class="flex items-center space-x-3">
-              <img :src="auction.listingData?.imageUrls![0] ?? ''" alt="Auction thumbnail"
-                class="w-10 h-10 rounded-md object-cover" />
+              <img
+                :src="auction.listingData?.imageUrls![0] ?? ''"
+                loading="lazy"
+                alt="Auction thumbnail"
+                class="w-10 h-10 rounded-md object-cover"
+              >
               <div>
-                <p class="font-medium line-clamp-2">{{ auction.listingData?.title }}</p>
-                <UiFooterLabel v-if="'marketplace' in auction" :label="auction.listingData?.platform" :xs="true" />
+                <p class="font-medium line-clamp-2">
+                  {{ auction.listingData?.title }}
+                </p>
+                <UiFooterLabel
+                  v-if="'marketplace' in auction"
+                  :label="auction.listingData?.platform"
+                  :xs="true"
+                />
               </div>
             </div>
           </td>
-          <td class="px-4 py-3 text-sm font-medium text-white hidden md:table-cell" v-if="overview">{{
-            filters.getSimplifiedFilters[auction.listenerId ?? 0] }}
+          <td
+            v-if="overview"
+            class="px-4 py-3 text-sm font-medium text-white hidden md:table-cell"
+          >
+            {{
+              filters.getSimplifiedFilters[auction.listenerId ?? 0] }}
           </td>
           <td class="px-4 py-3 text-sm font-medium text-white">
             {{ $t('dollarSign') }}{{ auction.listingData?.price }}
           </td>
-          <td class="px-4 py-3 text-sm font-medium text-white hidden md:table-cell" v-if="!overview">
+          <td
+            v-if="!overview"
+            class="px-4 py-3 text-sm font-medium text-white hidden md:table-cell"
+          >
             <!-- the <p> is required because <td> handles line clamping weird -->
-            <p class="line-clamp-3">{{ auction.listingData?.descriptionShort }}</p>
+            <p class="line-clamp-3">
+              {{ auction.listingData?.descriptionShort }}
+            </p>
           </td>
-          <td class="px-4 py-3 text-sm font-medium text-white hidden md:table-cell"> {{ timeAgo(auction) }}</td>
+          <td class="px-4 py-3 text-sm font-medium text-white hidden md:table-cell">
+            {{ timeAgo(auction) }}
+          </td>
         </tr>
       </tbody>
     </table>
 
-    <div v-else class="py-12 text-center">
-      <Icon name="tabler:file-sad" class="size-11 text-white" />
+    <div
+      v-else
+      class="py-12 text-center"
+    >
+      <Icon
+        name="tabler:file-sad"
+        class="size-11 text-white"
+      />
       <UiHeaderLabel :label="$t('noFilters')" />
       <UiFooterLabel :label="$t('tryCreatingFilters')" />
     </div>
@@ -40,9 +77,9 @@
 </template>
 
 <script setup lang="ts">
-import { useWindowSize } from '@vueuse/core';
+import { useWindowSize } from '@vueuse/core'
 import humanizeDuration from 'humanize-duration'
-import type { FilterMatch } from '~/src/api-client';
+import type { FilterMatch } from '~/src/api-client'
 
 const { width } = useWindowSize()
 const { locale } = useI18n()
@@ -51,17 +88,17 @@ const props = defineProps({
   overview: { type: Boolean },
   matches: {
     type: Array<FilterMatch>,
-    required: true
+    required: true,
   },
   title: {
     type: String,
-    default: 'Recent Matches'
+    default: 'Recent Matches',
   },
   loading: {
     type: Boolean,
     required: false,
-    default: false
-  }
+    default: false,
+  },
 })
 
 async function tableClicked(auction: FilterMatch) {
@@ -75,27 +112,25 @@ async function tableClicked(auction: FilterMatch) {
 
 const tableHeader = computed(() => {
   if (width.value > 768)
-    return props.overview ? ['auction', 'filter', 'price', 'matched'] : ['auction', 'price', 'description', "matched"]
+    return props.overview ? ['auction', 'filter', 'price', 'matched'] : ['auction', 'price', 'description', 'matched']
 
   return ['auction', 'price']
-});
+})
 
 const filters = useFilterStore()
 const listingStore = useListingStore()
 
-
 function timeAgo(auction: FilterMatch): string {
-  const past = new Date(auction.matchedAt ?? '');
+  const past = new Date(auction.matchedAt ?? '')
   const t = Math.round(new Date().getTime() - past.getTime())
 
   const str = humanizeDuration(t, {
-    units: ["d", "h", "m"],
+    units: ['d', 'h', 'm'],
     largest: 1,
     round: true,
     language: navigator.language?.startsWith('de') ? 'de' : 'en',
-    fallbacks: ['en', 'de']
+    fallbacks: ['en', 'de'],
   })
   return str
 }
-
 </script>

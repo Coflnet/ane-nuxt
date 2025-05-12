@@ -193,5 +193,6 @@
   "tryCreatingFilters": "Try creating a filter to get started",
   "errorRequesting": "There was an error creating your subscription",
   "autoScout": "AutoScout24",
-  "selectMarket": "Select Marketplace"
+  "selectMarket": "Select Marketplace",
+  "thatEmailInUse": "This email is already in use try signin or using a different email"
 }

@@ -122,6 +122,7 @@ const debouncedTestFilter = debounce(async () => {
 async function testFilter() {
   try {
     const f = await filterToCreate()
+
     if (!f) {
       push.error('Please fill out all required fields')
       return
@@ -222,6 +223,7 @@ async function saveFilter() {
   try {
     savingFilter.value = true
     const f = await filterToCreate()
+
     if (!f)
       return
     await filterStore.saveFilter(f)
@@ -272,7 +274,6 @@ async function handleFilters(): Promise<{ name: string, value: any }[]> {
   if (rawFilter.minPrice != 0 || rawFilter.maxPrice || rawFilter.maxPrice == 0) {
     filters.push({ name: 'PriceRange', value: `${Number(rawFilter.minPrice)}-${Number(rawFilter.maxPrice)}` })
   }
-  console.log(selectedMarketplaces.value)
   if (!selectedMarketplaces.value.map(item => item.value).includes('all')) {
     filters.push({
       name: 'IncludePlatforms',
