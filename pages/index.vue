@@ -1,118 +1,204 @@
 <template>
-  <div class="bg-gradient-to-b from-slate-950 to-slate-900 min-h-screen text-white">
+  <div class="min-h-screen bg-gray-950">
     <!-- Navigation -->
-    <nav class="container mx-auto px-6 py-4">
-      <div class="flex justify-between items-center">
+    <nav class="container mx-auto px-6 py-4 sticky top-0 z-50 bg-gray-900/80 backdrop-blur-md border-b border-gray-800">
+      <div class="flex items-center justify-between">
         <div class="flex items-center">
-          <span class="text-xl font-bold">ANE</span>
+          <UiLogo />
         </div>
-        <div class="hidden md:flex space-x-8">
-          <a
-            href="#features"
-            class="hover:text-slate-300 transition"
-          >{{
-            $t('features')
-          }}</a>
-          <a
-            href="#how-it-works"
-            class="hover:text-slate-300 transition"
-          >{{
-            $t('howItWorks')
-          }}</a>
-          <a
-            href="#pricing"
-            class="hover:text-slate-300 transition"
-          >{{
-            $t('pricing')
-          }}</a>
+        <div class="hidden md:block">
+          <div class="flex items-center space-x-8">
+            <a
+              href="#features"
+              class="text-gray-300 hover:text-indigo-400 transition-colors"
+            >{{ $t('features')
+            }}</a>
+            <a
+              href="#how-it-works"
+              class="text-gray-300 hover:text-indigo-400 transition-colors"
+            >{{
+              $t('howItWorks') }}</a>
+            <a
+              href="#pricing"
+              class="text-gray-300 hover:text-indigo-400 transition-colors"
+            >{{ $t('pricing')
+            }}</a>
+            <a
+              href="#faq"
+              class="text-gray-300 hover:text-indigo-400 transition-colors"
+            >{{ $t('faq') }}</a>
+            <a
+              href="#"
+              class="px-4 py-2 rounded-full bg-gray-700 text-white hover:bg-gray-600 transition-all"
+            >{{
+              $t('signIn') }}</a>
+            <a
+              href="#"
+              class="px-4 py-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-900/20"
+            >{{
+              $t('getStarted') }}</a>
+          </div>
         </div>
-        <NuxtLink
-          to="/overview"
-          class="bg-slate-600 hover:bg-slate-700 px-4 py-2 rounded-lg font-medium transition"
-        >
-          {{ $t('getStarted') }}
-        </NuxtLink>
+        <div class="md:hidden">
+          <button
+            class="text-gray-300"
+            @click="mobileMenuOpen = !mobileMenuOpen"
+          >
+            <Icon
+              v-if="!mobileMenuOpen"
+              name="menu"
+              class="w-6 h-6"
+            />
+            <Icon
+              v-else
+              name="x"
+              class="w-6 h-6"
+            />
+          </button>
+        </div>
+      </div>
+      <!-- Mobile menu -->
+      <div
+        v-if="mobileMenuOpen"
+        class="md:hidden mt-4 space-y-4"
+      >
+        <a
+          href="#features"
+          class="block text-gray-300 hover:text-indigo-400 py-2"
+        >{{ $t('nav.features') }}</a>
+        <a
+          href="#how-it-works"
+          class="block text-gray-300 hover:text-indigo-400 py-2"
+        >{{ $t('nav.howItWorks') }}</a>
+        <a
+          href="#pricing"
+          class="block text-gray-300 hover:text-indigo-400 py-2"
+        >{{ $t('nav.pricing') }}</a>
+        <a
+          href="#faq"
+          class="block text-gray-300 hover:text-indigo-400 py-2"
+        >{{ $t('nav.faq') }}</a>
+        <a
+          href="#"
+          class="block px-4 py-2 rounded-full bg-gray-700 text-white hover:bg-gray-600 transition-all text-center my-2"
+        >{{
+          $t('nav.signIn') }}</a>
+        <a
+          href="#"
+          class="block px-4 py-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition-all text-center shadow-lg shadow-indigo-900/20"
+        >{{
+          $t('nav.getStarted') }}</a>
       </div>
     </nav>
 
     <!-- Hero Section -->
-    <section class="container mx-auto px-6 py-16 md:py-24">
-      <div class="flex flex-col md:flex-row items-center">
-        <div class="md:w-1/2 mb-10 md:mb-0 mr-8">
-          <h1 class="text-4xl md:text-5xl font-bold leading-tight mb-6">
-            <i18n-t
-              keypath="marketingTextNeverMissADeal.text"
-              tag="span"
-            >
-              <template #deal>
-                <span class="text-slate-400">{{
-                  $t('marketingTextNeverMissADeal.deal')
-                }}</span>
-              </template>
-            </i18n-t>
-          </h1>
-          <p class="text-lg md:text-xl mb-8 text-slate-100">
-            {{ $t('createCustomAlerts') }}
-          </p>
-          <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-            <button
-              class="bg-slate-600 hover:bg-slate-700 px-6 py-3 rounded-lg font-medium text-lg transition"
-              @click="navigateTo(localePath('/overview'))"
-            >
-              {{ $t('getStarted') }}
-            </button>
+    <section class="relative overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-br from-gray-900 to-gray-950 -z-10" />
+      <div
+        class="absolute -top-24 -right-24 w-96 h-96 bg-indigo-900 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"
+      />
+      <div
+        class="absolute -bottom-24 -left-24 w-96 h-96 bg-purple-900 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"
+      />
+
+      <div class="container mx-auto px-6 py-20 md:py-32">
+        <div class="flex flex-col md:flex-row items-center">
+          <div
+            v-intersect="fadeInLeft"
+            class="md:w-1/2 mb-12 md:mb-0"
+          >
+            <div class="inline-block px-3 py-1 rounded-full bg-indigo-900 text-indigo-400 font-medium text-sm mb-6">
+              {{ $t('hero.badge') }}
+            </div>
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
+              {{ $t('hero.titleStart') }} <span class="text-indigo-400">{{ $t('hero.titleHighlight') }}</span> {{
+                $t('hero.titleEnd') }}
+            </h1>
+            <p class="text-lg text-gray-300 mb-8 max-w-lg">
+              {{ $t('hero.description') }}
+            </p>
+            <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+              <a
+                href="#"
+                class="px-8 py-4 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition-all text-center shadow-lg shadow-indigo-900/20 font-medium"
+              >
+                {{ $t('hero.startFree') }}
+              </a>
+            </div>
+          </div>
+          <div
+            v-intersect="fadeInRight"
+            class="md:w-1/2"
+          >
+            <div class="relative">
+              <div
+                class="absolute -inset-0.5 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl blur opacity-30 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse"
+              />
+              <img
+                alt="Dashboard Preview"
+                class="relative rounded-2xl shadow-2xl border border-gray-800"
+              >
+              <div
+                class="absolute -right-6 -bottom-6 bg-gray-800 rounded-2xl shadow-xl p-4 flex items-center space-x-2"
+              >
+                <div class="w-10 h-10 bg-indigo-900 rounded-full flex items-center justify-center">
+                  <Icon
+                    name="bell"
+                    class="w-5 h-5 text-indigo-400"
+                  />
+                </div>
+                <div>
+                  <div class="text-sm font-semibold text-white">
+                    {{ $t('hero.notification.title') }}
+                  </div>
+                  <div class="text-xs text-gray-400">
+                    {{ $t('hero.notification.content') }}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="md:w-1/2">
-          <div class="relative">
-            <div class="absolute -top-4 -left-4 w-full h-full bg-slate-400 rounded-lg" />
-            <div class="relative bg-slate-800 p-6 rounded-lg border border-slate-700 shadow-xl">
-              <div class="flex items-center mb-4">
-                <Bell class="h-5 w-5 mr-2 text-slate-400" />
-                <h3 class="font-medium">
-                  {{ $t('newAlert') }}
-                </h3>
-              </div>
-              <div class="bg-slate-900 rounded-lg p-4 mb-4">
-                <div class="flex justify-between items-start">
-                  <div>
-                    <h4 class="font-medium">
-                      {{ $t('vintageCameraLens') }}
-                    </h4>
-                    <p class="text-slate-300 text-sm">
-                      {{ $t('listedXMinutesAgo', 3) }}
-                    </p>
-                  </div>
-                  <div class="text-right">
-                    <p class="text-green-400 font-bold">
-                      $85.00
-                    </p>
-                    <p class="text-slate-300 text-sm line-through">
-                      {{ $t('market150') }}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="bg-slate-900 rounded-lg p-4">
-                <div class="flex justify-between items-start">
-                  <div>
-                    <h4 class="font-medium">
-                      {{ $t('mechanicalKeyboard') }}
-                    </h4>
-                    <p class="text-slate-300 text-sm">
-                      {{ $t('listedXMinutesAgo', 17) }}
-                    </p>
-                  </div>
-                  <div class="text-right">
-                    <p class="text-green-400 font-bold">
-                      $45.00
-                    </p>
-                    <p class="text-slate-300 text-sm line-through">
-                      {{ $t('market120') }}
-                    </p>
-                  </div>
-                </div>
-              </div>
+      </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section
+      v-intersect="fadeIn"
+      class="py-12 bg-gray-900 border-y border-gray-800"
+    >
+      <div class="container mx-auto px-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div class="text-center">
+            <div class="text-4xl font-bold text-indigo-400 mb-2">
+              {{ $t('stats.itemsTracked.number') }}
+            </div>
+            <div class="text-gray-300">
+              {{ $t('stats.itemsTracked.label') }}
+            </div>
+          </div>
+          <div class="text-center">
+            <div class="text-4xl font-bold text-indigo-400 mb-2">
+              {{ $t('stats.marketplaces.number') }}
+            </div>
+            <div class="text-gray-300">
+              {{ $t('stats.marketplaces.label') }}
+            </div>
+          </div>
+          <div class="text-center">
+            <div class="text-4xl font-bold text-indigo-400 mb-2">
+              {{ $t('stats.uptime.number') }}
+            </div>
+            <div class="text-gray-300">
+              {{ $t('stats.uptime.label') }}
+            </div>
+          </div>
+          <div class="text-center">
+            <div class="text-4xl font-bold text-indigo-400 mb-2">
+              {{ $t('stats.monitoring.number') }}
+            </div>
+            <div class="text-gray-300">
+              {{ $t('stats.monitoring.label') }}
             </div>
           </div>
         </div>
@@ -122,398 +208,1206 @@
     <!-- Features Section -->
     <section
       id="features"
-      class="container mx-auto px-6 py-16 md:py-24"
+      class="py-20 md:py-32 bg-gray-950"
     >
-      <h2 class="text-3xl md:text-4xl font-bold text-center mb-16">
-        <i18n-t
-          keypath="marketingTextPowerTools.text"
-          tag="span"
+      <div class="container mx-auto px-6">
+        <div
+          v-intersect="fadeIn"
+          class="text-center mb-20"
         >
-          <template #dealHunter>
-            <span class="text-slate-400">{{
-              $t('marketingTextPowerTools.dealHunter')
-            }}</span>
-          </template>
-        </i18n-t>
-      </h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="bg-slate-900/50 p-6 rounded-lg border border-slate-800 hover:border-slate-600 transition">
-          <div class="bg-slate-800 rounded-full w-12 h-12 flex items-center justify-center mb-4">
-            <Bell class="h-6 w-6 text-slate-300" />
+          <div class="inline-block px-3 py-1 rounded-full bg-indigo-900 text-indigo-400 font-medium text-sm mb-6">
+            {{ $t('features.badge') }}
           </div>
-          <h3 class="text-xl font-bold mb-3">
-            {{ $t('realTimeAlerts') }}
-          </h3>
-          <p class="text-slate-200">
-            {{ $t('instantNotifications') }}
+          <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">
+            {{ $t('features.title') }}
+          </h2>
+          <p class="text-lg text-gray-300 max-w-2xl mx-auto">
+            {{ $t('features.description') }}
           </p>
         </div>
-        <div class="bg-slate-900/50 p-6 rounded-lg border border-slate-800 hover:border-slate-600 transition">
-          <div class="bg-slate-800 rounded-full w-12 h-12 flex items-center justify-center mb-4">
-            <Filter class="h-6 w-6 text-slate-300" />
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <!-- Feature 1 -->
+          <div
+            v-intersect="fadeInUp"
+            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800 transition-all hover:shadow-2xl hover:-translate-y-1"
+          >
+            <div
+              class="w-14 h-14 bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-indigo-900/20"
+            >
+              <Icon
+                name="bell"
+                class="w-7 h-7 text-white"
+              />
+            </div>
+            <h3 class="text-xl font-semibold text-white mb-3">
+              {{ $t('features.notifiers.title') }}
+            </h3>
+            <p class="text-gray-300 mb-4">
+              {{ $t('features.notifiers.description') }}
+            </p>
+            <ul class="space-y-2 mb-6">
+              <li class="flex items-start">
+                <Icon
+                  name="check-circle"
+                  class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                />
+                <span class="text-gray-300">{{ $t('features.notifiers.benefits.first') }}</span>
+              </li>
+              <li class="flex items-start">
+                <Icon
+                  name="check-circle"
+                  class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                />
+                <span class="text-gray-300">{{ $t('features.notifiers.benefits.second') }}</span>
+              </li>
+              <li class="flex items-start">
+                <Icon
+                  name="check-circle"
+                  class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                />
+                <span class="text-gray-300">{{ $t('features.notifiers.benefits.third') }}</span>
+              </li>
+            </ul>
           </div>
-          <h3 class="text-xl font-bold mb-3">
-            {{ $t('advanvedFilters') }}
-          </h3>
-          <p class="text-slate-200">
-            {{ $t('complexFilters') }}
-          </p>
+
+          <!-- Feature 2 -->
+          <div
+            v-intersect="fadeInUp"
+            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800 transition-all hover:shadow-2xl hover:-translate-y-1"
+          >
+            <div
+              class="w-14 h-14 bg-gradient-to-br from-purple-600 to-purple-800 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-purple-900/20"
+            >
+              <Icon
+                name="filter"
+                class="w-7 h-7 text-white"
+              />
+            </div>
+            <h3 class="text-xl font-semibold text-white mb-3">
+              {{ $t('features.filters.title') }}
+            </h3>
+            <p class="text-gray-300 mb-4">
+              {{ $t('features.filters.description') }}
+            </p>
+            <ul class="space-y-2 mb-6">
+              <li class="flex items-start">
+                <Icon
+                  name="check-circle"
+                  class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                />
+                <span class="text-gray-300">{{ $t('features.filters.benefits.first') }}</span>
+              </li>
+              <li class="flex items-start">
+                <Icon
+                  name="check-circle"
+                  class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                />
+                <span class="text-gray-300">{{ $t('features.filters.benefits.second') }}</span>
+              </li>
+              <li class="flex items-start">
+                <Icon
+                  name="check-circle"
+                  class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                />
+                <span class="text-gray-300">{{ $t('features.filters.benefits.third') }}</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Feature 3 -->
+          <div
+            v-intersect="fadeInUp"
+            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800 transition-all hover:shadow-2xl hover:-translate-y-1"
+          >
+            <div
+              class="w-14 h-14 bg-gradient-to-br from-indigo-600 to-purple-800 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-indigo-900/20"
+            >
+              <Icon
+                name="zap"
+                class="w-7 h-7 text-white"
+              />
+            </div>
+            <h3 class="text-xl font-semibold text-white mb-3">
+              {{ $t('features.alerts.title') }}
+            </h3>
+            <p class="text-gray-300 mb-4">
+              {{ $t('features.alerts.description') }}
+            </p>
+            <ul class="space-y-2 mb-6">
+              <li class="flex items-start">
+                <Icon
+                  name="check-circle"
+                  class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                />
+                <span class="text-gray-300">{{ $t('features.alerts.benefits.first') }}</span>
+              </li>
+              <li class="flex items-start">
+                <Icon
+                  name="check-circle"
+                  class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                />
+                <span class="text-gray-300">{{ $t('features.alerts.benefits.second') }}</span>
+              </li>
+              <li class="flex items-start">
+                <Icon
+                  name="check-circle"
+                  class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                />
+                <span class="text-gray-300">{{ $t('features.alerts.benefits.third') }}</span>
+              </li>
+            </ul>
+          </div>
         </div>
-        <div class="bg-slate-900/50 p-6 rounded-lg border border-slate-800 hover:border-slate-600 transition">
-          <div class="bg-slate-800 rounded-full w-12 h-12 flex items-center justify-center mb-4">
-            <TrendingUp class="h-6 w-6 text-slate-300" />
+
+        <!-- Additional Features -->
+        <div class="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div
+            v-intersect="fadeInLeft"
+            class="bg-gray-900 p-8 rounded-2xl border border-gray-800"
+          >
+            <div class="flex items-start">
+              <div class="w-12 h-12 bg-indigo-900 rounded-xl flex items-center justify-center mr-4">
+                <Icon
+                  name="bar-chart"
+                  class="w-6 h-6 text-indigo-400"
+                />
+              </div>
+              <div>
+                <h3 class="text-xl font-semibold text-white mb-2">
+                  {{ $t('features.additional.analytics.title') }}
+                </h3>
+                <p class="text-gray-300">
+                  {{ $t('features.additional.analytics.description') }}
+                </p>
+              </div>
+            </div>
           </div>
-          <h3 class="text-xl font-bold mb-3">
-            {{ $t('marketAnalyist') }}
-          </h3>
-          <p class="text-slate-200">
-            {{ $t('viewHistoricalData') }}
-          </p>
+
+          <div
+            v-intersect="fadeInRight"
+            class="bg-gray-900 p-8 rounded-2xl border border-gray-800"
+          >
+            <div class="flex items-start">
+              <div class="w-12 h-12 bg-indigo-900 rounded-xl flex items-center justify-center mr-4">
+                <Icon
+                  name="settings"
+                  class="w-6 h-6 text-indigo-400"
+                />
+              </div>
+              <div>
+                <h3 class="text-xl font-semibold text-white mb-2">
+                  {{ $t('features.additional.dashboard.title') }}
+                </h3>
+                <p class="text-gray-300">
+                  {{ $t('features.additional.dashboard.description') }}
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- How It Works -->
+    <!-- How It Works Section -->
     <section
       id="how-it-works"
-      class="container mx-auto px-6 py-16 md:py-24 bg-slate-950/50 rounded-xl"
+      class="py-20 md:py-32 bg-gray-900"
     >
-      <h2 class="text-3xl md:text-4xl font-bold text-center mb-16">
-        {{ $t('how') }} <span class="text-slate-400">ANE</span>
-        {{ $t('works') }}
-      </h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="text-center">
-          <div class="bg-slate-800 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
-            <span class="text-2xl font-bold">1</span>
+      <div class="container mx-auto px-6">
+        <div
+          v-intersect="fadeIn"
+          class="text-center mb-20"
+        >
+          <div class="inline-block px-3 py-1 rounded-full bg-indigo-900 text-indigo-400 font-medium text-sm mb-6">
+            {{ $t('howItWorks.badge') }}
           </div>
-          <h3 class="text-xl font-bold mb-3">
-            {{ $t('createFilter') }}
-          </h3>
-          <p class="text-slate-200">
-            {{ $t('customFilter') }}
+          <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">
+            {{ $t('howItWorks.title') }}
+          </h2>
+          <p class="text-lg text-gray-300 max-w-2xl mx-auto">
+            {{ $t('howItWorks.description') }}
           </p>
         </div>
-        <div class="text-center">
-          <div class="bg-slate-800 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
-            <span class="text-2xl font-bold">2</span>
+
+        <div class="relative">
+          <!-- Connection Line -->
+          <div class="absolute top-1/2 left-0 right-0 h-1 bg-indigo-800 -translate-y-1/2 hidden md:block" />
+
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
+            <!-- Step 1 -->
+            <div
+              v-intersect="fadeInUp"
+              class="relative"
+            >
+              <div
+                class="w-16 h-16 bg-gray-900 rounded-full border-4 border-indigo-500 flex items-center justify-center text-2xl font-bold text-indigo-400 mx-auto mb-6 relative z-10"
+              >
+                1
+              </div>
+              <div class="bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-700 text-center">
+                <h3 class="text-xl font-semibold text-white mb-3">
+                  {{ $t('howItWorks.steps.first.title') }}
+                </h3>
+                <p class="text-gray-300">
+                  {{ $t('howItWorks.steps.first.description') }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div
+              v-intersect="fadeInUp"
+              class="relative"
+            >
+              <div
+                class="w-16 h-16 bg-gray-900 rounded-full border-4 border-indigo-500 flex items-center justify-center text-2xl font-bold text-indigo-400 mx-auto mb-6 relative z-10"
+              >
+                2
+              </div>
+              <div class="bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-700 text-center">
+                <h3 class="text-xl font-semibold text-white mb-3">
+                  {{ $t('howItWorks.steps.second.title') }}
+                </h3>
+                <p class="text-gray-300">
+                  {{ $t('howItWorks.steps.second.description') }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div
+              v-intersect="fadeInUp"
+              class="relative"
+            >
+              <div
+                class="w-16 h-16 bg-gray-900 rounded-full border-4 border-indigo-500 flex items-center justify-center text-2xl font-bold text-indigo-400 mx-auto mb-6 relative z-10"
+              >
+                3
+              </div>
+              <div class="bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-700 text-center">
+                <h3 class="text-xl font-semibold text-white mb-3">
+                  {{ $t('howItWorks.steps.third.title') }}
+                </h3>
+                <p class="text-gray-300">
+                  {{ $t('howItWorks.steps.third.description') }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div
+              v-intersect="fadeInUp"
+              class="relative"
+            >
+              <div
+                class="w-16 h-16 bg-gray-900 rounded-full border-4 border-indigo-500 flex items-center justify-center text-2xl font-bold text-indigo-400 mx-auto mb-6 relative z-10"
+              >
+                4
+              </div>
+              <div class="bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-700 text-center">
+                <h3 class="text-xl font-semibold text-white mb-3">
+                  {{ $t('howItWorks.steps.fourth.title') }}
+                </h3>
+                <p class="text-gray-300">
+                  {{ $t('howItWorks.steps.fourth.description') }}
+                </p>
+              </div>
+            </div>
           </div>
-          <h3 class="text-xl font-bold mb-3">
-            {{ $t('getNotified') }}
-          </h3>
-          <p class="text-slate-200">
-            {{ $t('receiveInstantAlerts') }}
-          </p>
         </div>
-        <div class="text-center">
-          <div class="bg-slate-800 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
-            <span class="text-2xl font-bold">3</span>
-          </div>
-          <h3 class="text-xl font-bold mb-3">
-            {{ $t('buyAndSave') }}
-          </h3>
-          <p class="text-slate-200">
-            {{ $t('beTheFirst') }}
-          </p>
+
+        <div
+          v-intersect="fadeIn"
+          class="mt-16 text-center"
+        >
+          <a
+            href="#"
+            class="px-8 py-4 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition-all inline-block shadow-lg shadow-indigo-900/20 font-medium"
+          >
+            {{ $t('howItWorks.cta') }}
+          </a>
         </div>
       </div>
     </section>
 
-    <!-- Testimonials -->
-    <section class="container mx-auto px-6 py-16 md:py-24">
-      <h2 class="text-3xl md:text-4xl font-bold text-center mb-16">
-        {{ $t('whatOur') }}
-        <span class="text-slate-400">{{ $t('usersSay') }}</span>
-      </h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div class="bg-slate-900/50 p-6 rounded-lg border border-slate-800">
-          <div class="flex items-start mb-4">
-            <div class="mr-4">
-              <div class="bg-slate-700 w-12 h-12 rounded-full flex items-center justify-center">
-                <User class="h-6 w-6" />
-              </div>
-            </div>
-            <div>
-              <h4 class="font-bold">
-                Sarah K.
-              </h4>
-              <p class="text-slate-300 text-sm">
-                {{ $t('vintageCollector') }}
-              </p>
-              <div class="flex text-yellow-400 mt-1">
-                <Star class="h-4 w-4" />
-                <Star class="h-4 w-4" />
-                <Star class="h-4 w-4" />
-                <Star class="h-4 w-4" />
-                <Star class="h-4 w-4" />
-              </div>
-            </div>
+    <!-- Use Cases Section -->
+    <section class="py-20 md:py-32 bg-gray-950">
+      <div class="container mx-auto px-6">
+        <div
+          v-intersect="fadeIn"
+          class="text-center mb-20"
+        >
+          <div class="inline-block px-3 py-1 rounded-full bg-indigo-900 text-indigo-400 font-medium text-sm mb-6">
+            {{ $t('useCases.badge') }}
           </div>
-          <p class="text-slate-200">
-            {{ $t('vintageCollectorDecription') }}
+          <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">
+            {{ $t('useCases.title') }}
+          </h2>
+          <p class="text-lg text-gray-300 max-w-2xl mx-auto">
+            {{ $t('useCases.description') }}
           </p>
         </div>
-        <div class="bg-slate-900/50 p-6 rounded-lg border border-slate-800">
-          <div class="flex items-start mb-4">
-            <div class="mr-4">
-              <div class="bg-slate-700 w-12 h-12 rounded-full flex items-center justify-center">
-                <User class="h-6 w-6" />
-              </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <!-- Use Case 1 -->
+          <div
+            v-intersect="fadeInUp"
+            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800"
+          >
+            <div
+              class="w-14 h-14 bg-gradient-to-br from-purple-600 to-purple-800 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-purple-900/20"
+            >
+              <Icon
+                name="shopping-bag"
+                class="w-7 h-7 text-white"
+              />
             </div>
-            <div>
-              <h4 class="font-bold">
-                Marcus T.
-              </h4>
-              <p class="text-slate-300 text-sm">
-                {{ $t('reseller') }}
-              </p>
-              <div class="flex text-yellow-400 mt-1">
-                <Star class="h-4 w-4" />
-                <Star class="h-4 w-4" />
-                <Star class="h-4 w-4" />
-                <Star class="h-4 w-4" />
-                <Star class="h-4 w-4" />
-              </div>
-            </div>
+            <h3 class="text-xl font-semibold text-white mb-3">
+              {{ $t('useCases.collectors.title') }}
+            </h3>
+            <p class="text-gray-300 mb-4">
+              {{ $t('useCases.collectors.description') }}
+            </p>
+            <ul class="space-y-2 mb-6">
+              <li class="flex items-start">
+                <Icon
+                  name="check-circle"
+                  class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                />
+                <span class="text-gray-300">{{ $t('useCases.collectors.benefits.first') }}</span>
+              </li>
+              <li class="flex items-start">
+                <Icon
+                  name="check-circle"
+                  class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                />
+                <span class="text-gray-300">{{ $t('useCases.collectors.benefits.second') }}</span>
+              </li>
+              <li class="flex items-start">
+                <Icon
+                  name="check-circle"
+                  class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                />
+                <span class="text-gray-300">{{ $t('useCases.collectors.benefits.third') }}</span>
+              </li>
+            </ul>
           </div>
-          <p class="text-slate-200">
-            {{
-              $t('resellerDescription', {
-                amount: $n(3000, 'currency'),
-                months: 3,
-              })
-            }}
-          </p>
+
+          <!-- Use Case 2 -->
+          <div
+            v-intersect="fadeInUp"
+            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800"
+          >
+            <div
+              class="w-14 h-14 bg-gradient-to-br from-violet-600 to-violet-800 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-violet-900/20"
+            >
+              <Icon
+                name="trending-up"
+                class="w-7 h-7 text-white"
+              />
+            </div>
+            <h3 class="text-xl font-semibold text-white mb-3">
+              {{ $t('useCases.resellers.title') }}
+            </h3>
+            <p class="text-gray-300 mb-4">
+              {{ $t('useCases.resellers.description') }}
+            </p>
+            <ul class="space-y-2 mb-6">
+              <li class="flex items-start">
+                <Icon
+                  name="check-circle"
+                  class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                />
+                <span class="text-gray-300">{{ $t('useCases.resellers.benefits.first') }}</span>
+              </li>
+              <li class="flex items-start">
+                <Icon
+                  name="check-circle"
+                  class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                />
+                <span class="text-gray-300">{{ $t('useCases.resellers.benefits.second') }}</span>
+              </li>
+              <li class="flex items-start">
+                <Icon
+                  name="check-circle"
+                  class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                />
+                <span class="text-gray-300">{{ $t('useCases.resellers.benefits.third') }}</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Use Case 3 -->
+          <div
+            v-intersect="fadeInUp"
+            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800"
+          >
+            <div
+              class="w-14 h-14 bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-indigo-900/20"
+            >
+              <Icon
+                name="users"
+                class="w-7 h-7 text-white"
+              />
+            </div>
+            <h3 class="text-xl font-semibold text-white mb-3">
+              {{ $t('useCases.bargainHunters.title') }}
+            </h3>
+            <p class="text-gray-300 mb-4">
+              {{ $t('useCases.bargainHunters.description') }}
+            </p>
+            <ul class="space-y-2 mb-6">
+              <li class="flex items-start">
+                <Icon
+                  name="check-circle"
+                  class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                />
+                <span class="text-gray-300">{{ $t('useCases.bargainHunters.benefits.first') }}</span>
+              </li>
+              <li class="flex items-start">
+                <Icon
+                  name="check-circle"
+                  class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                />
+                <span class="text-gray-300">{{ $t('useCases.bargainHunters.benefits.second') }}</span>
+              </li>
+              <li class="flex items-start">
+                <Icon
+                  name="check-circle"
+                  class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                />
+                <span class="text-gray-300">{{ $t('useCases.bargainHunters.benefits.third') }}</span>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Pricing -->
+    <!-- Marketplace Support Section -->
+    <section class="py-20 md:py-32 bg-gray-900">
+      <div class="container mx-auto px-6">
+        <div
+          v-intersect="fadeIn"
+          class="text-center mb-16"
+        >
+          <div class="inline-block px-3 py-1 rounded-full bg-indigo-900 text-indigo-400 font-medium text-sm mb-6">
+            {{ $t('marketplaces.badge') }}
+          </div>
+          <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">
+            {{ $t('marketplaces.title') }}
+          </h2>
+          <p class="text-lg text-gray-300 max-w-2xl mx-auto">
+            {{ $t('marketplaces.description') }}
+          </p>
+        </div>
+
+        <div
+          v-intersect="fadeIn"
+          class="grid grid-cols-2 md:grid-cols-3 gap-8"
+        >
+          <div
+            class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"
+          >
+            <div class="text-xl font-semibold text-gray-200">
+              {{ $t('marketplaces.platforms.ebay') }}
+            </div>
+          </div>
+          <div
+            class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"
+          >
+            <div class="text-xl font-semibold text-gray-200">
+              {{ $t('marketplaces.platforms.facebook') }}
+            </div>
+          </div>
+          <div
+            class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"
+          >
+            <div class="text-xl font-semibold text-gray-200">
+              {{ $t('marketplaces.platforms.craigslist') }}
+            </div>
+          </div>
+          <div
+            class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"
+          >
+            <div class="text-xl font-semibold text-gray-200">
+              {{ $t('marketplaces.platforms.kleinanzeigen') }}
+            </div>
+          </div>
+          <div
+            class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"
+          >
+            <div class="text-xl font-semibold text-gray-200">
+              {{ $t('marketplaces.platforms.autoscout22') }}
+            </div>
+          </div>
+          <div
+            class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"
+          >
+            <div class="text-xl font-semibold text-gray-200">
+              {{ $t('marketplaces.platforms.more') }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-20 md:py-32 bg-gray-950">
+      <div class="container mx-auto px-6">
+        <div
+          v-intersect="fadeIn"
+          class="text-center mb-16"
+        >
+          <div class="inline-block px-3 py-1 rounded-full bg-indigo-900 text-indigo-400 font-medium text-sm mb-6">
+            {{ $t('testimonials.badge') }}
+          </div>
+          <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">
+            {{ $t('testimonials.title') }}
+          </h2>
+          <p class="text-lg text-gray-300 max-w-2xl mx-auto">
+            {{ $t('testimonials.description') }}
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <!-- Testimonial 1 -->
+          <div
+            v-intersect="fadeInUp"
+            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800"
+          >
+            <p class="text-gray-300 mb-6 italic">
+              {{ $t('testimonials.items.first.quote') }}
+            </p>
+            <div class="flex items-center">
+              <div class="bg-slate-700 w-12 h-12 rounded-full flex items-center justify-center mr-3">
+                <User class="h-6 w-6" />
+              </div>
+              <div>
+                <div class="font-semibold text-white">
+                  {{ $t('testimonials.items.first.name') }}
+                </div>
+                <div class="text-sm text-gray-400">
+                  {{ $t('testimonials.items.first.role') }}
+                </div>
+                <div class="text-indigo-400 flex">
+                  <Star class="h-4 w-4" />
+                  <Star class="h-4 w-4" />
+                  <Star class="h-4 w-4" />
+                  <Star class="h-4 w-4" />
+                  <Star class="h-4 w-4" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Testimonial 2 -->
+          <div
+            v-intersect="fadeInUp"
+            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800"
+          >
+            <p class="text-gray-300 mb-6 italic">
+              {{ $t('testimonials.items.second.quote') }}
+            </p>
+            <div class="flex items-center">
+              <div class="bg-slate-700 w-12 h-12 rounded-full flex items-center justify-center mr-3">
+                <User class="h-6 w-6" />
+              </div>
+              <div>
+                <div class="font-semibold text-white">
+                  {{ $t('testimonials.items.second.name') }}
+                </div>
+                <div class="text-sm text-gray-400">
+                  {{ $t('testimonials.items.second.role') }}
+                </div>
+                <div class="text-indigo-400 flex">
+                  <Star class="h-4 w-4" />
+                  <Star class="h-4 w-4" />
+                  <Star class="h-4 w-4" />
+                  <Star class="h-4 w-4" />
+                  <Star class="h-4 w-4" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Testimonial 3 -->
+          <div
+            v-intersect="fadeInUp"
+            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800"
+          >
+            <p class="text-gray-300 mb-6 italic">
+              {{ $t('testimonials.items.third.quote') }}
+            </p>
+            <div class="flex items-center">
+              <div class="bg-slate-700 w-12 h-12 rounded-full flex items-center justify-center mr-3">
+                <User class="h-6 w-6" />
+              </div>
+              <div>
+                <div class="font-semibold text-white">
+                  {{ $t('testimonials.items.third.name') }}
+                </div>
+                <div class="text-sm text-gray-400">
+                  {{ $t('testimonials.items.third.role') }}
+                </div>
+                <div class="text-indigo-400 flex">
+                  <Star class="h-4 w-4" />
+                  <Star class="h-4 w-4" />
+                  <Star class="h-4 w-4" />
+                  <Star class="h-4 w-4" />
+                  <Star class="h-4 w-4" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing Section -->
     <section
       id="pricing"
-      class="container mx-auto px-6 py-16 md:py-24"
+      class="py-20 md:py-32 bg-gray-900"
     >
-      <h2 class="text-3xl md:text-4xl font-bold text-center mb-16">
-        {{ $t('simpleTransparent') }}
-        <span class="text-slate-400"> {{ $t('pricing') }}</span>
-      </h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="container mx-auto px-6">
         <div
-          class="bg-slate-900/50 p-6 rounded-lg border border-slate-800 hover:border-slate-600 transition flex flex-col justify-between"
+          v-intersect="fadeIn"
+          class="text-center mb-16"
         >
-          <div>
-            <h3 class="text-xl font-bold mb-2">
-              {{ $t('free') }}
-            </h3>
-            <p class="text-3xl font-bold mb-6">
-              $0
-              <span class="text-sm font-normal text-slate-300">{{
-                $t('month')
-              }}</span>
-            </p>
-            <ul class="mb-8 space-y-3">
-              <li class="flex items-center">
-                <Check class="h-5 w-5 text-green-400 mr-2" />
-                <span> {{ $t('XactiveFilters', 30) }}</span>
-              </li>
-              <li class="flex items-center">
-                <Check class="h-5 w-5 text-green-400 mr-2" />
-                <span>{{ $t('pushNotifications') }}</span>
-              </li>
-              <li class="flex items-center">
-                <Check class="h-5 w-5 text-green-400 mr-2" />
-                <span>{{ $t('XMinuteDelay', 30) }}</span>
-              </li>
-            </ul>
+          <div class="inline-block px-3 py-1 rounded-full bg-indigo-900 text-indigo-400 font-medium text-sm mb-6">
+            {{ $t('pricing.badge') }}
           </div>
-          <button
-            class="w-full bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg font-medium transition"
-            @click="navigateTo(localePath('/overview'))"
-          >
-            {{ $t('getStarted') }}
-          </button>
+          <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">
+            {{ $t('pricing.title') }}
+          </h2>
+          <p class="text-lg text-gray-300 max-w-2xl mx-auto">
+            {{ $t('pricing.description') }}
+          </p>
         </div>
-        <div
-          class="bg-slate-800 p-6 rounded-lg border-2 border-slate-500 transform md:-translate-y-4 relative flex flex-col justify-between"
-        >
-          <div>
-            <div
-              class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-slate-500 px-4 py-1 rounded-full text-sm font-bold"
-            >
-              {{ $t('mostPopular') }}
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <!-- Free Plan -->
+          <div
+            v-intersect="fadeInUp"
+            class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700 transition-all hover:shadow-2xl hover:-translate-y-1"
+          >
+            <div class="text-center mb-6">
+              <h3 class="text-2xl font-bold text-white mb-2">
+                {{ $t('pricing.plans.free.name') }}
+              </h3>
+              <p class="text-gray-300 mb-4">
+                {{ $t('pricing.plans.free.subtitle') }}
+              </p>
+              <div class="text-4xl font-bold text-white mb-1">
+                {{ $t('pricing.plans.free.price') }}
+              </div>
+              <p class="text-gray-300">
+                {{ $t('pricing.plans.free.billing') }}
+              </p>
             </div>
-            <h3 class="text-xl font-bold mb-2">
-              Collectors
-            </h3>
-            <p class="text-3xl font-bold mb-6">
-              $9.99
-              <span class="text-sm font-normal text-slate-300">{{
-                $t('month')
-              }}</span>
-            </p>
-            <ul class="mb-8 space-y-3">
-              <li class="flex items-center">
-                <Check class="h-5 w-5 text-green-400 mr-2" />
-                <span>{{ $t('XActiveFilters', 20) }}</span>
-              </li>
-              <li class="flex items-center">
-                <Check class="h-5 w-5 text-green-400 mr-2" />
-                <span>{{ $t('pushNotifications') }}</span>
-              </li>
-              <li class="flex items-center">
-                <Check class="h-5 w-5 text-green-400 mr-2" />
-                <span> {{ $t('XMinuteDelay', 10) }}</span>
-              </li>
-            </ul>
+            <div class="border-t border-gray-700 pt-6 mb-6">
+              <ul class="space-y-4">
+                <li class="flex items-start">
+                  <Icon
+                    name="check-circle"
+                    class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                  />
+                  <span class="text-gray-300">{{ $t('pricing.plans.free.features.notifiers') }}</span>
+                </li>
+                <li class="flex items-start">
+                  <Icon
+                    name="check-circle"
+                    class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                  />
+                  <span class="text-gray-300">{{ $t('pricing.plans.free.features.filters') }}</span>
+                </li>
+                <li class="flex items-start">
+                  <Icon
+                    name="check-circle"
+                    class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                  />
+                  <span class="text-gray-300">{{ $t('pricing.plans.free.features.email') }}</span>
+                </li>
+                <li class="flex items-start">
+                  <Icon
+                    name="check-circle"
+                    class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                  />
+                  <span class="text-gray-300">{{ $t('pricing.plans.free.features.updates') }}</span>
+                </li>
+                <li class="flex items-start">
+                  <Icon
+                    name="x"
+                    class="w-5 h-5 text-gray-600 mr-2 mt-0.5"
+                  />
+                  <span class="text-gray-500">{{ $t('pricing.plans.free.features.crossMarketplace') }}</span>
+                </li>
+                <li class="flex items-start">
+                  <Icon
+                    name="x"
+                    class="w-5 h-5 text-gray-600 mr-2 mt-0.5"
+                  />
+                  <span class="text-gray-500">{{ $t('pricing.plans.free.features.realtime') }}</span>
+                </li>
+                <li class="flex items-start">
+                  <Icon
+                    name="x"
+                    class="w-5 h-5 text-gray-600 mr-2 mt-0.5"
+                  />
+                  <span class="text-gray-500">{{ $t('pricing.plans.free.features.analytics') }}</span>
+                </li>
+              </ul>
+            </div>
+            <a
+              href="#"
+              class="block w-full px-4 py-3 rounded-full border border-gray-600 text-gray-300 hover:bg-gray-700 transition-all text-center font-medium"
+            >
+              {{ $t('pricing.plans.free.cta') }}
+            </a>
           </div>
 
-          <button
-            class="w-full bg-slate-500 hover:bg-slate-600 px-4 py-2 rounded-lg font-medium transition"
-            @click="navigateTo(localePath('/register?redirectTo=/subscriptions'))"
+          <!-- Collector Plan -->
+          <div
+            v-intersect="fadeInUp"
+            class="bg-gray-800 p-8 rounded-2xl shadow-2xl border border-indigo-800 transform scale-105 relative z-10"
           >
-            {{ $t('getStarted') }}
-          </button>
-        </div>
-        <div
-          class="bg-slate-900/50 p-6 rounded-lg border border-slate-800 hover:border-slate-600 transition flex flex-col justify-between"
-        >
-          <div>
-            <h3 class="text-xl font-bold mb-2">
-              {{ $t('flippers') }}
-            </h3>
-            <p class="text-3xl font-bold mb-6">
-              $69.69
-              <span class="text-sm font-normal text-slate-300">{{
-                $t('month')
-              }}</span>
-            </p>
-            <ul class="mb-8 space-y-3">
-              <li class="flex items-center">
-                <Check class="h-5 w-5 text-green-400 mr-2" />
-                <span>{{ $t('XactiveFilters', 500) }}</span>
-              </li>
-              <li class="flex items-center">
-                <Check class="h-5 w-5 text-green-400 mr-2" />
-                <span>{{ $t('XMinuteDelay', 2) }}</span>
-              </li>
-              <li class="flex items-center">
-                <Check class="h-5 w-5 text-green-400 mr-2" />
-                <span> {{ $t('priceCalculation') }}</span>
-              </li>
-            </ul>
+            <div
+              class="absolute top-0 right-0 bg-indigo-600 text-white px-4 py-1 rounded-bl-lg rounded-tr-lg text-sm font-medium"
+            >
+              {{ $t('pricing.popular') }}
+            </div>
+            <div class="text-center mb-6">
+              <h3 class="text-2xl font-bold text-white mb-2">
+                {{ $t('pricing.plans.collector.name') }}
+              </h3>
+              <p class="text-gray-300 mb-4">
+                {{ $t('pricing.plans.collector.subtitle') }}
+              </p>
+              <div class="text-4xl font-bold text-white mb-1">
+                {{ $t('pricing.plans.collector.price') }}
+              </div>
+              <p class="text-gray-300">
+                {{ $t('pricing.plans.collector.billing') }}
+              </p>
+            </div>
+            <div class="border-t border-gray-700 pt-6 mb-6">
+              <ul class="space-y-4">
+                <li class="flex items-start">
+                  <Icon
+                    name="check-circle"
+                    class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                  />
+                  <span class="text-gray-300">{{ $t('pricing.plans.collector.features.notifiers') }}</span>
+                </li>
+                <li class="flex items-start">
+                  <Icon
+                    name="check-circle"
+                    class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                  />
+                  <span class="text-gray-300">{{ $t('pricing.plans.collector.features.filters') }}</span>
+                </li>
+                <li class="flex items-start">
+                  <Icon
+                    name="check-circle"
+                    class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                  />
+                  <span class="text-gray-300">{{ $t('pricing.plans.collector.features.notifications') }}</span>
+                </li>
+                <li class="flex items-start">
+                  <Icon
+                    name="check-circle"
+                    class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                  />
+                  <span class="text-gray-300">{{ $t('pricing.plans.collector.features.updates') }}</span>
+                </li>
+                <li class="flex items-start">
+                  <Icon
+                    name="check-circle"
+                    class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                  />
+                  <span class="text-gray-300">{{ $t('pricing.plans.collector.features.crossMarketplace') }}</span>
+                </li>
+                <li class="flex items-start">
+                  <Icon
+                    name="check-circle"
+                    class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                  />
+                  <span class="text-gray-300">{{ $t('pricing.plans.collector.features.analytics') }}</span>
+                </li>
+                <li class="flex items-start">
+                  <Icon
+                    name="x"
+                    class="w-5 h-5 text-gray-600 mr-2 mt-0.5"
+                  />
+                  <span class="text-gray-500">{{ $t('pricing.plans.collector.features.history') }}</span>
+                </li>
+              </ul>
+            </div>
+            <a
+              href="#"
+              class="block w-full px-4 py-3 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition-all text-center font-medium shadow-lg shadow-indigo-900/20"
+            >
+              {{ $t('pricing.plans.collector.cta') }}
+            </a>
           </div>
-          <button class="w-full bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg font-medium transition">
-            {{ $t('comingSoon') }}
-          </button>
+
+          <!-- Flipper Plan -->
+          <div
+            v-intersect="fadeInUp"
+            class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700 relative transition-all hover:shadow-2xl hover:-translate-y-1"
+          >
+            <div
+              class="absolute top-0 right-0 bg-gray-600 text-white px-4 py-1 rounded-bl-lg rounded-tr-lg text-sm font-medium"
+            >
+              {{ $t('pricing.comingSoon') }}
+            </div>
+            <div class="text-center mb-6">
+              <h3 class="text-2xl font-bold text-white mb-2">
+                {{ $t('pricing.plans.flipper.name') }}
+              </h3>
+              <p class="text-gray-300 mb-4">
+                {{ $t('pricing.plans.flipper.subtitle') }}
+              </p>
+              <div class="text-4xl font-bold text-white mb-1">
+                {{ $t('pricing.plans.flipper.price') }}
+              </div>
+              <p class="text-gray-300">
+                {{ $t('pricing.plans.flipper.billing') }}
+              </p>
+            </div>
+            <div class="border-t border-gray-700 pt-6 mb-6">
+              <ul class="space-y-4">
+                <li class="flex items-start">
+                  <Icon
+                    name="check-circle"
+                    class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                  />
+                  <span class="text-gray-300">{{ $t('pricing.plans.flipper.features.notifiers') }}</span>
+                </li>
+                <li class="flex items-start">
+                  <Icon
+                    name="check-circle"
+                    class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                  />
+                  <span class="text-gray-300">{{ $t('pricing.plans.flipper.features.filters') }}</span>
+                </li>
+                <li class="flex items-start">
+                  <Icon
+                    name="check-circle"
+                    class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                  />
+                  <span class="text-gray-300">{{ $t('pricing.plans.flipper.features.notifications') }}</span>
+                </li>
+                <li class="flex items-start">
+                  <Icon
+                    name="check-circle"
+                    class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                  />
+                  <span class="text-gray-300">{{ $t('pricing.plans.flipper.features.updates') }}</span>
+                </li>
+                <li class="flex items-start">
+                  <Icon
+                    name="check-circle"
+                    class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                  />
+                  <span class="text-gray-300">{{ $t('pricing.plans.flipper.features.analytics') }}</span>
+                </li>
+                <li class="flex items-start">
+                  <Icon
+                    name="check-circle"
+                    class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                  />
+                  <span class="text-gray-300">{{ $t('pricing.plans.flipper.features.bulk') }}</span>
+                </li>
+                <li class="flex items-start">
+                  <Icon
+                    name="check-circle"
+                    class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
+                  />
+                  <span class="text-gray-300">{{ $t('pricing.plans.flipper.features.api') }}</span>
+                </li>
+              </ul>
+            </div>
+            <button
+              disabled
+              class="block w-full px-4 py-3 rounded-full bg-gray-700 text-gray-500 cursor-not-allowed text-center font-medium"
+            >
+              {{ $t('pricing.plans.flipper.cta') }}
+            </button>
+          </div>
+        </div>
+
+        <div
+          v-intersect="fadeIn"
+          class="mt-16 bg-gray-800 p-8 rounded-2xl shadow-lg border border-gray-700"
+        >
+          <h3 class="text-xl font-semibold text-white mb-4 text-center">
+            {{ $t('pricing.allPlansInclude.title') }}
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 ">
+            <div class="flex items-center">
+              <Icon
+                name="shield"
+                class="w-5 h-5 text-indigo-400 mr-2"
+              />
+              <span class="text-gray-300">{{ $t('pricing.allPlansInclude.security') }}</span>
+            </div>
+            <div class="flex items-center">
+              <Icon
+                name="headphones"
+                class="w-5 h-5 text-indigo-400 mr-2"
+              />
+              <span class="text-gray-300">{{ $t('pricing.allPlansInclude.support') }}</span>
+            </div>
+            <div class="flex items-center">
+              <Icon
+                name="refresh-cw"
+                class="w-5 h-5 text-indigo-400 mr-2"
+              />
+              <span class="text-gray-300">{{ $t('pricing.allPlansInclude.updates') }}</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- CTA -->
-    <section class="container mx-auto px-6 py-16 md:py-24">
-      <div class="bg-gradient-to-r from-slate-800 to-slate-700 rounded-xl p-8 md:p-12 text-center">
-        <h2 class="text-3xl md:text-4xl font-bold mb-6">
-          {{ $t('startFindingDeals') }}
-        </h2>
-        <p class="text-lg md:text-xl mb-8 max-w-2xl mx-auto">
-          {{ $t('joinThousandsSmartShoppers') }}
-        </p>
-        <NuxtLink
-          to="/overview"
-          class="bg-white text-slate-800 hover:bg-slate-200 px-8 py-3 rounded-lg font-medium text-lg transition"
+    <!-- FAQ Section -->
+    <section
+      id="faq"
+      class="py-20 md:py-32 bg-gray-950"
+    >
+      <div class="container mx-auto px-6">
+        <div
+          v-intersect="fadeIn"
+          class="text-center mb-16"
         >
-          {{ $t('getStarted') }}
-        </NuxtLink>
-        <p class="mt-4 text-slate-200">
-          {{ $t('joinFreeToday') }}
-        </p>
+          <div class="inline-block px-3 py-1 rounded-full bg-indigo-900 text-indigo-400 font-medium text-sm mb-6">
+            {{ $t('faq.badge') }}
+          </div>
+          <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">
+            {{ $t('faq.title') }}
+          </h2>
+          <p class="text-lg text-gray-300 max-w-2xl mx-auto">
+            {{ $t('faq.description') }}
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <!-- FAQ Item 1 -->
+          <div
+            v-intersect="fadeIn"
+            class="bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-800"
+          >
+            <h3 class="text-xl font-semibold text-white mb-3">
+              {{ $t('faq.items.first.question') }}
+            </h3>
+            <p class="text-gray-300">
+              {{ $t('faq.items.first.answer') }}
+            </p>
+          </div>
+
+          <!-- FAQ Item 3 -->
+          <div
+            v-intersect="fadeIn"
+            class="bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-800"
+          >
+            <h3 class="text-xl font-semibold text-white mb-3">
+              {{ $t('faq.items.third.question') }}
+            </h3>
+            <p class="text-gray-300">
+              {{ $t('faq.items.third.answer') }}
+            </p>
+          </div>
+
+          <!-- FAQ Item 5 -->
+          <div
+            v-intersect="fadeIn"
+            class="bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-800"
+          >
+            <h3 class="text-xl font-semibold text-white mb-3">
+              {{ $t('faq.items.fifth.question') }}
+            </h3>
+            <p class="text-gray-300">
+              {{ $t('faq.items.fifth.answer') }}
+            </p>
+          </div>
+
+          <!-- FAQ Item 6 -->
+          <div
+            v-intersect="fadeIn"
+            class="bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-800"
+          >
+            <h3 class="text-xl font-semibold text-white mb-3">
+              {{ $t('faq.items.sixth.question') }}
+            </h3>
+            <p class="text-gray-300">
+              {{ $t('faq.items.sixth.answer') }}
+            </p>
+          </div>
+        </div>
+
+        <div
+          v-intersect="fadeIn"
+          class="mt-12 text-center"
+        >
+          <p class="text-gray-300 mb-4">
+            {{ $t('faq.moreQuestions') }}
+          </p>
+          <a
+            href="#"
+            class="px-6 py-3 rounded-full bg-gray-700 text-white hover:bg-gray-600 transition-all inline-block"
+          >
+            {{ $t('faq.contactSupport') }}
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 md:py-32 bg-gray-950">
+      <div class="container mx-auto px-6">
+        <div
+          v-intersect="fadeIn"
+          class="bg-gradient-to-r from-indigo-800 to-purple-800 rounded-3xl p-12 text-center text-white relative overflow-hidden"
+        >
+          <div
+            class="absolute -top-24 -right-24 w-96 h-96 bg-white rounded-full mix-blend-overlay filter blur-3xl opacity-10 animate-blob"
+          />
+          <div
+            class="absolute -bottom-24 -left-24 w-96 h-96 bg-white rounded-full mix-blend-overlay filter blur-3xl opacity-10 animate-blob animation-delay-2000"
+          />
+
+          <div class="relative z-10">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6">
+              {{ $t('cta.title') }}
+            </h2>
+            <p class="text-lg mb-8 max-w-2xl mx-auto">
+              {{ $t('cta.description') }}
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+              <a
+                href="#"
+                class="px-8 py-4 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition-all font-medium shadow-lg"
+              >
+                {{ $t('cta.primaryButton') }}
+              </a>
+              <a
+                href="#"
+                class="px-8 py-4 rounded-full border border-white text-white hover:bg-white/10 transition-all font-medium"
+              >
+                {{ $t('cta.secondaryButton') }}
+              </a>
+            </div>
+
+            <div
+              class="mt-12 pt-8 border-t border-white/20 flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-8"
+            >
+              <div class="flex items-center">
+                <Icon
+                  name="shield-check"
+                  class="w-6 h-6 mr-2"
+                />
+                <span>{{ $t('cta.benefits.noCreditCard') }}</span>
+              </div>
+
+              <div class="flex items-center">
+                <Icon
+                  name="x-circle"
+                  class="w-6 h-6 mr-2"
+                />
+                <span>{{ $t('cta.benefits.cancelAnytime') }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
     <!-- Footer -->
-    <footer class="bg-slate-950 py-12">
+    <footer class="bg-gray-950 py-12 border-t border-gray-800">
       <div class="container mx-auto px-6">
         <div class="flex flex-col md:flex-row justify-between mb-8">
           <div class="mb-8 md:mb-0">
             <div class="flex items-center mb-4">
-              <span class="text-xl font-bold">ANE</span>
+              <span class="text-xl font-bold text-white">ANE</span>
             </div>
-            <p class="text-slate-300 max-w-xs">
+            <p class="text-gray-400 max-w-xs">
               {{ $t('smartWayToFindDeals') }}
             </p>
           </div>
           <div class="grid grid-cols-2 md:grid-cols-3 gap-8">
             <div class="hidden">
-              <h4 class="hidden font-bold mb-4">
+              <h4 class="hidden font-bold mb-4 text-white">
                 Product
               </h4>
               <ul class="space-y-2">
                 <li>
                   <a
                     href="#"
-                    class="text-slate-300 hover:text-white transition"
+                    class="text-gray-400 hover:text-white transition"
                   >Features</a>
                 </li>
                 <li>
                   <a
                     href="#"
-                    class="text-slate-300 hover:text-white transition"
+                    class="text-gray-400 hover:text-white transition"
                   >Pricing</a>
                 </li>
                 <li>
                   <a
                     href="#"
-                    class="text-slate-300 hover:text-white transition"
+                    class="text-gray-400 hover:text-white transition"
                   >Testimonials</a>
                 </li>
                 <li>
                   <a
                     href="#"
-                    class="text-slate-300 hover:text-white transition"
+                    class="text-gray-400 hover:text-white transition"
                   >FAQ</a>
                 </li>
               </ul>
             </div>
             <div class="hidden">
-              <h4 class="font-bold mb-4">
+              <h4 class="font-bold mb-4 text-white">
                 Company
               </h4>
               <ul class="space-y-2">
                 <li>
                   <a
                     href="#"
-                    class="text-slate-300 hover:text-white transition"
+                    class="text-gray-400 hover:text-white transition"
                   >About</a>
                 </li>
                 <li>
                   <a
                     href="#"
-                    class="text-slate-300 hover:text-white transition"
+                    class="text-gray-400 hover:text-white transition"
                   >Blog</a>
                 </li>
                 <li>
                   <a
                     href="#"
-                    class="text-slate-300 hover:text-white transition"
+                    class="text-gray-400 hover:text-white transition"
                   >Careers</a>
                 </li>
                 <li>
                   <a
                     href="#"
-                    class="text-slate-300 hover:text-white transition"
+                    class="text-gray-400 hover:text-white transition"
                   >Contact</a>
                 </li>
               </ul>
             </div>
             <div>
-              <h4 class="font-bold mb-4">
+              <h4 class="font-bold mb-4 text-white">
                 Legal
               </h4>
               <ul class="space-y-2">
                 <li>
                   <a
                     href="https://coflnet.com/privacy"
-                    class="text-slate-300 hover:text-white transition"
+                    class="text-gray-400 hover:text-white transition"
                   >{{
                     $t('privacy')
                   }}</a>
@@ -521,7 +1415,7 @@
                 <li>
                   <a
                     href="https://coflnet.com/terms-of-service"
-                    class="text-slate-300 hover:text-white transition"
+                    class="text-gray-400 hover:text-white transition"
                   >{{
                     $t('terms') }}</a>
                 </li>
@@ -529,7 +1423,7 @@
             </div>
           </div>
         </div>
-        <div class="border-t border-slate-800 pt-8 mt-8 text-center text-slate-400 text-sm">
+        <div class="border-t border-gray-800 pt-8 mt-8 text-center text-gray-500 text-sm">
           <p>{{ $t('rights') }}</p>
         </div>
       </div>
@@ -537,12 +1431,100 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { Bell, Filter, TrendingUp, Check, Star, User } from 'lucide-vue-next'
+import { ref, onMounted } from 'vue'
+import { useIntersectionObserver } from '@vueuse/core'
+import { definePageMeta } from '#imports'
 
-const localePath = useLocalePath()
+const mobileMenuOpen = ref(false)
+
+// Animation functions
+const fadeIn = (el: Element) => {
+  el.classList.add('transition-opacity', 'duration-1000')
+  el.classList.remove('opacity-0')
+  el.classList.add('opacity-100')
+}
+
+const fadeInUp = (el: Element) => {
+  el.classList.add('transition-all', 'duration-1000')
+  el.classList.remove('opacity-0', 'translate-y-10')
+  el.classList.add('opacity-100', 'translate-y-0')
+}
+
+const fadeInLeft = (el: Element) => {
+  el.classList.add('transition-all', 'duration-1000')
+  el.classList.remove('opacity-0', 'translate-x-10')
+  el.classList.add('opacity-100', 'translate-x-0')
+}
+
+const fadeInRight = (el: Element) => {
+  el.classList.add('transition-all', 'duration-1000')
+  el.classList.remove('opacity-0', '-translate-x-10')
+  el.classList.add('opacity-100', 'translate-x-0')
+}
+
+// Custom directive for intersection observer
+const vIntersect = {
+  mounted: (el: Element, binding: any) => {
+    const callback = binding.value
+
+    // Set initial state
+    el.classList.add('opacity-0')
+
+    // Use VueUse's intersection observer
+    const { stop } = useIntersectionObserver(
+      el,
+      ([{ isIntersecting }]) => {
+        if (isIntersecting) {
+          callback(el)
+          stop() // Stop observing once animation is triggered
+        }
+      },
+      { threshold: 0.1 },
+    )
+  },
+}
 
 definePageMeta({
   layout: 'landing',
 })
 </script>
+
+<style>
+/* Animation classes */
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+</style>
