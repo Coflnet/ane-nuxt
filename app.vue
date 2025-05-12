@@ -18,9 +18,12 @@ useHead({
   title: 'ANE - Advanced Notification Engine',
   meta: [
     { name: 'description', content: 'Track auctions across marketplaces with custom filters and notifications' },
+<<<<<<< HEAD
+=======
   ],
   link: [
     { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+>>>>>>> main
   ],
 })
 
@@ -29,7 +32,11 @@ onMounted(async () => {
   if (import.meta.server) return
 
   if ('serviceWorker' in navigator) {
+<<<<<<< HEAD
+    navigator.serviceWorker.register('firebase-messaging-sw.js', { scope: '/' })
+=======
     navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' })
+>>>>>>> main
       .then((reg) => {
         console.log(`Service Worker Registration (Scope: ${reg.scope})`)
       })

@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang='ts'>
-import type { Filter } from '~/types/FilterType';
+import type { Filter } from '~/types/FilterType'
 
 const props = defineProps<{ filter: Filter }>()
 </script>

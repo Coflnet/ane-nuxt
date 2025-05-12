@@ -191,6 +191,7 @@
   "account": "Account",
   "noFilters": "You dont have any filters",
   "tryCreatingFilters": "Try creating a filter to get started",
+  "fillOutAllFields": "Please fill out all fields",
   "errorRequesting": "There was an error creating your subscription",
   "autoScout": "AutoScout24",
   "selectMarket": "Select Marketplace",

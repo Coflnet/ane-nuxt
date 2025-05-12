@@ -1,24 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import {
-  createUserWithEmailAndPassword,
-  EmailAuthProvider,
-  GoogleAuthProvider,
-  linkWithCredential,
-  linkWithPopup,
-  signInAnonymously,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  updateProfile,
-} from 'firebase/auth'
-
-import type {
-  EmailAuthCredential,
-  Auth,
-  UserCredential,
-} from 'firebase/auth'
+import { createUserWithEmailAndPassword, type EmailAuthCredential, EmailAuthProvider, GoogleAuthProvider, linkWithCredential, linkWithPopup, signInAnonymously, signInWithEmailAndPassword, signInWithPopup, type Auth, updateProfile, type UserCredential } from 'firebase/auth'
 import { navigateTo } from '#app'
-import { loginFirebase, type Platform, type TokenContainer } from '~/src/api-client'
+import { loginFirebase } from '~/src/api-client'
 import type { ActiveSubscription } from '#hey-api'
 
 // Types
@@ -110,7 +94,7 @@ export const useUserStore = defineStore('user', () => {
         isAnonymous.value = false
         return { success: true }
       }
-      return { success: false, error: 'thatEmailInUse' }
+      return { success: false, error: useI18n().t('thatEmnailInUse') }
     }
 
     try {
@@ -263,6 +247,7 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  // Return all state, getters, and actions
   return {
     user,
     isAuthenticated,
