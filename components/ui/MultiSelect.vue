@@ -84,7 +84,7 @@ const emit = defineEmits<{
 }>()
 
 const isOpen = ref(false)
-const selectedItems = ref<{ value: string, label: string }[]>(model.value ?? [])
+const selectedItems = ref<{ value: string, label: string }[]>([])
 
 const selectedLabels = computed(() => {
   if (selectedItems.value.length === 0) return ''
@@ -148,6 +148,7 @@ const handleClickOutside = (event: MouseEvent) => {
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
+  toggleSelection(props.options![0]!)
 })
 
 onBeforeUnmount(() => {

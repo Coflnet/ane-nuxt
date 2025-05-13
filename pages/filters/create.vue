@@ -8,10 +8,10 @@
       >
         <UiGrid :grid-size="2">
           <UiInput
-            v-model="filter.name"
-            :name="$t('filterName')"
-            :placeholder="$t('nameEg')"
-            :label="$t('filterName')"
+            v-model="filter.searchValue"
+            :name="$t('searchValue')"
+            :placeholder="$t('cameraEg')"
+            :label="$t('searchValue')"
           />
           <UiMultiSelect
             v-model="selectedMarketplaces"
@@ -19,12 +19,6 @@
             :label="$t('marketplaces')"
           />
         </UiGrid>
-        <UiInput
-          v-model="filter.searchValue"
-          :name="$t('searchValue')"
-          :placeholder="$t('cameraEg')"
-          :label="$t('searchValue')"
-        />
 
         <FiltersKeywordFilter
           :model-value="filter.keywords"
@@ -83,7 +77,7 @@ const filterStore = useFilterStore()
 const userStore = useUserStore()
 const firebaseApp = useFirebaseApp()
 const savingFilter = ref(false)
-const selectedMarketplaces = ref<{ value: string, label: string }[]>([])
+const selectedMarketplaces = ref<{ value: string, label: string }[]>([{ value: 'all', label: 'allMarket' }])
 
 const localePath = useLocalePath()
 
@@ -274,7 +268,6 @@ async function filterToCreate(): Promise<ListingListener | null> {
 
   return filterToCreate
 }
-
 
 async function handleFilters(): Promise<{ name: string, value: any }[]> {
   const rawFilter = toRaw(filter.value)
