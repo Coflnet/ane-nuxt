@@ -1,126 +1,73 @@
 <template>
-  <div>
-    <FiltersCreateHeader :is-new-filter="isNewFilter" />
-    <UiDefaultContainer class="mb-6 p-6">
-      <form
-        class="space-y-6"
-        @submit.prevent="saveFilter"
-      >
-        <UiGrid :grid-size="2">
-          <UiInput
-            v-model="filter.name"
-            :name="$t('filterName')"
-            :placeholder="$t('nameEg')"
-            :label="$t('filterName')"
-          />
-<<<<<<< HEAD
-          <UiDropdown
-            id="marketplace"
-            v-model="filter.marketplace"
-            :options="[
-              { value: 'all', label: $t('allMarket') },
-              { value: 'Ebay', label: 'Ebay' },
-              { value: 'Kleinanzeigen', label: 'Kleinanzeigen' },
-            ]"
-            :label="$t('marketplace')"
-          />
-        </UiGrid>
-
+  <FiltersCreateHeader :is-new-filter="isNewFilter" />
+  <UiDefaultContainer class="mb-6 p-6">
+    <form
+      class="space-y-6"
+      @submit.prevent="saveFilter"
+    >
+      <UiGrid :grid-size="2">
         <UiInput
-          v-model="filter.searchValue"
-          :name="$t('searchValue')"
-          :placeholder="$t('cameraEg')"
-          :label="$t('searchValue')"
+          v-model="filter.name"
+          :name="$t('filterName')"
+          :placeholder="$t('nameEg')"
+          :label="$t('filterName')"
         />
-
-        <FiltersKeywordFilter
-          :model-value="filter.keywords"
-          :label="$t('searchKeywords')"
-          :footer="$t('addKeyDescription')"
-          :place-holder="$t('addKeywordPressEnter')"
+        <UiDropdown
+          id="marketplace"
+          v-model="filter.marketplace"
+          :options="[
+            { value: 'all', label: $t('allMarket') },
+            { value: 'Ebay', label: 'Ebay' },
+            { value: 'Kleinanzeigen', label: 'Kleinanzeigen' },
+          ]"
+          :label="$t('marketplace')"
         />
-        <FiltersKeywordFilter
-          :model-value="filter.blacklist"
-          :label="$t('blackKeywords')"
-          :footer="$t('addblacklistKeywords')"
-          :place-holder="$t('addBlackListPressEnter')"
+      </UiGrid>
+
+      <UiInput
+        v-model="filter.searchValue"
+        :name="$t('searchValue')"
+        :placeholder="$t('cameraEg')"
+        :label="$t('searchValue')"
+      />
+
+      <FiltersKeywordFilter
+        :model-value="filter.keywords"
+        :label="$t('searchKeywords')"
+        :footer="$t('addKeyDescription')"
+        :place-holder="$t('addKeywordPressEnter')"
+      />
+      <FiltersKeywordFilter
+        :model-value="filter.blacklist"
+        :label="$t('blackKeywords')"
+        :footer="$t('addblacklistKeywords')"
+        :place-holder="$t('addBlackListPressEnter')"
+      />
+
+      <!-- Dont worry about this, this whole system needs to get reworked by akwav -->
+      <div v-for="(option, _index) in filterStore.getFilterOptions">
+        <FiltersKleinanzeigenCategoryFilter
+          v-if="option.name === 'KleinanzeigenKategorie' && filter.marketplace == 'kleinanzeigen'"
+          :filter="filter"
+          :options="option.value.options"
         />
+      </div>
 
-        <!-- Dont worry about this, this whole system needs to get reworked by akwav -->
-        <div
-          v-for="(option, index) in filterStore.getFilterOptions"
-          :key="index"
-        >
-          <FiltersKleinanzeigenCategoryFilter
-            v-if="option.name === 'KleinanzeigenKategorie' && filter.marketplace == 'kleinanzeigen'"
-            :filter="filter"
-            :options="option.value.options"
-          />
-        </div>
+      <FiltersRadiusRangeFilter :filter="filter" />
+      <NotificationSettingsFilter :filter="filter" />
 
-        <FiltersRadiusRangeFilter :filter="filter" />
-        <NotificationSettingsFilter :filter="filter" />
+      <FiltersCreateConfirmCreation
+        :is-new-filter="isNewFilter"
+        :saving="savingFilter"
+      />
+    </form>
+  </UiDefaultContainer>
 
-        <FiltersCreateConfirmCreation
-          :is-new-filter="isNewFilter"
-          :saving="savingFilter"
-        />
-      </form>
-    </UiDefaultContainer>
-
-=======
-          <UiMultiSelect
-            v-model="selectedMarketplaces"
-            :options="marketplaces"
-            :label="$t('marketplaces')"
-          />
-        </UiGrid>
-        <UiInput
-          v-model="filter.searchValue"
-          :name="$t('searchValue')"
-          :placeholder="$t('cameraEg')"
-          :label="$t('searchValue')"
-        />
-
-        <FiltersKeywordFilter
-          :model-value="filter.keywords"
-          :label="$t('searchKeywords')"
-          :footer="$t('addKeyDescription')"
-          :place-holder="$t('addKeywordPressEnter')"
-        />
-        <FiltersKeywordFilter
-          :model-value="filter.blacklist"
-          :label="$t('blackKeywords')"
-          :footer="$t('addblacklistKeywords')"
-          :place-holder="$t('addBlackListPressEnter')"
-        />
-
-        <!-- Dont worry about this, this whole system needs to get reworked by akwav -->
-        <div v-for="(option, _index) in filterStore.getFilterOptions">
-          <FiltersKleinanzeigenCategoryFilter
-            v-if="option.name === 'KleinanzeigenKategorie' && filter.marketplace == 'kleinanzeigen'"
-            :filter="filter"
-            :options="option.value.options"
-          />
-        </div>
-
-        <FiltersRadiusRangeFilter :filter="filter" />
-        <NotificationSettingsFilter :filter="filter" />
-
-        <FiltersCreateConfirmCreation
-          :is-new-filter="isNewFilter"
-          :saving="savingFilter"
-        />
-      </form>
-    </UiDefaultContainer>
-
->>>>>>> main
-    <OverviewRecentMatchTable
-      v-if="matches.length > 0"
-      :matches
-      :title="$t('auctionMatchedToFilters')"
-    />
-  </div>
+  <OverviewRecentMatchTable
+    v-if="matches.length > 0"
+    :matches
+    :title="$t('auctionMatchedToFilters')"
+  />
 </template>
 
 <script setup lang="ts">
@@ -130,16 +77,11 @@ import { useFirebaseApp } from 'vuefire'
 import NotificationSettingsFilter from '~/components/filters/NotificationSettingsFilter.vue'
 import type { FilterMatch, ListingListener } from '~/src/api-client'
 import type { Filter } from '~/types/FilterType'
-<<<<<<< HEAD
-=======
-import { marketplaces } from '~/constants/Marketplaces'
->>>>>>> main
 
 const filterStore = useFilterStore()
 const userStore = useUserStore()
 const firebaseApp = useFirebaseApp()
 const savingFilter = ref(false)
-const selectedMarketplaces = ref<{ value: string, label: string }[]>([])
 
 const localePath = useLocalePath()
 
@@ -180,20 +122,11 @@ const debouncedTestFilter = debounce(async () => {
 }, 500)
 
 async function testFilter() {
-<<<<<<< HEAD
-  if (filter.value.searchValue == '')
-    return
-=======
->>>>>>> main
   try {
     const f = await filterToCreate()
 
     if (!f) {
-<<<<<<< HEAD
-      push.error(t('fillOutAllFields'))
-=======
       push.error('Please fill out all required fields')
->>>>>>> main
       return
     }
     const res = await filterStore.testFilter(f)
@@ -275,17 +208,16 @@ async function loadEditParam() {
         case 'SearchTerm':
           filter.value.searchValue = item.value ?? ''
           break
-        case 'TotalCost': {
+        case 'TotalCost':
           const [min, _max] = item.value!.split('-')
           filter.value.totalCost = Number(min)
           break
-        }
       }
     })
   }
   catch (e) {
     console.error(e)
-    push.error(`${t('weRanIssue')}\n ${e}`)
+    push.error(`We ran into issue\n ${e}`)
   }
 }
 
@@ -302,8 +234,7 @@ async function saveFilter() {
   }
   catch (e) {
     savingFilter.value = false
-    console.error(e)
-    push.error(t('weRanIssue'))
+    push.error(`We ran into issue`)
   }
 }
 
@@ -338,37 +269,17 @@ async function filterToCreate(): Promise<ListingListener | null> {
   return filterToCreate
 }
 
-<<<<<<< HEAD
-async function handleFilters(): Promise<{ name: string, value: [] }[]> {
-  const rawFilter = toRaw(filter.value)
-  const filters: { name: string, value: [] }[] = []
-=======
 async function handleFilters(): Promise<{ name: string, value: any }[]> {
   const rawFilter = toRaw(filter.value)
   const filters: { name: string, value: any }[] = []
->>>>>>> main
 
   if (rawFilter.minPrice != 0 || rawFilter.maxPrice || rawFilter.maxPrice == 0) {
     filters.push({ name: 'PriceRange', value: `${Number(rawFilter.minPrice)}-${Number(rawFilter.maxPrice)}` })
   }
-<<<<<<< HEAD
-
   if (rawFilter.marketplace != 'all') {
     filters.push({
       name: 'IncludePlatforms',
       value: rawFilter.marketplace,
-    })
-  }
-  else {
-    filters.push({
-      name: 'IncludePlatforms',
-      value: 'Ebay,Kleinanzeigen',
-=======
-  if (!selectedMarketplaces.value.map(item => item.value).includes('all')) {
-    filters.push({
-      name: 'IncludePlatforms',
-      value: selectedMarketplaces.value.map(i => i.value).join(','),
->>>>>>> main
     })
   }
 
@@ -406,7 +317,7 @@ async function handleSearchRadius(): Promise<[string, string]> {
   catch (error) {
     console.error('Error fetching country:', error)
     savingFilter.value = false
-    push.error(`${t('weRanIssue')}\n ${error}`)
+    push.error(`We ran into issue\n ${error}`)
   }
   return ['', '']
 }
@@ -419,11 +330,7 @@ async function connectPushNotifications(): Promise<string> {
 }
 
 onMounted(async () => {
-<<<<<<< HEAD
   await Promise.allSettled([filterStore.loadFilterOptions(), filterStore.loadFilters()])
-=======
-  await Promise.allSettled([filterStore.loadFilters()])
->>>>>>> main
   loadEditParam()
 })
 </script>
