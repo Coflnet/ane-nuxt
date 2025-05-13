@@ -67,13 +67,15 @@
 </template>
 
 <script setup lang="ts">
-import { debounce } from 'lodash'
+import lodash from 'lodash'
 import { getMessaging, getToken } from 'firebase/messaging'
 import { useFirebaseApp } from 'vuefire'
 import NotificationSettingsFilter from '~/components/filters/NotificationSettingsFilter.vue'
 import type { FilterMatch, ListingListener } from '~/src/api-client'
 import type { Filter } from '~/types/FilterType'
 import { marketplaces } from '~/constants/Marketplaces'
+
+const { debounce } = lodash
 
 const { t } = useI18n()
 
@@ -113,7 +115,7 @@ const filter = ref<Filter>({
   notificationTarget: '',
 })
 
-watch(filter, (_) => {
+watch([filter, selectedMarketplaces], (_) => {
   debouncedTestFilter()
 }, { deep: true })
 
