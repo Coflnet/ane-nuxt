@@ -285,7 +285,7 @@
     "platforms": {
       "ebay": "eBay",
       "kleinanzeigen": "Kleinanzeigen",
-      "autoscout22": "Autoscout24",
+      "autoscout24": "Autoscout24",
       "facebook": "Facebook",
       "craigslist": "Craigslist",
       "more": "+ Many More"
@@ -326,10 +326,10 @@
         "price": "$0",
         "billing": "Forever free",
         "features": {
-          "notifiers": "Up to 3 active notifiers",
+          "notifiers": "Up to 3 search notifiers",
           "filters": "Access to multiple marketplaces",
           "email": "All notifications channels",
-          "updates": "Notifications within 30 minutes",
+          "updates": "Notifications within 1 hour",
           "analytics": "Advanced analytics"
         },
         "cta": "Get Started"
@@ -340,7 +340,7 @@
         "price": "$9.99",
         "billing": "per month",
         "features": {
-          "notifiers": "Up to 20 active notifiers",
+          "notifiers": "Up to 20 search notifiers",
           "filters": "Access to all marketplaces",
           "notifications": "All notifications channels",
           "updates": "Notifications within 10 minutes",
@@ -351,10 +351,10 @@
       "flipper": {
         "name": "Flipper",
         "subtitle": "For professional resellers",
-        "price": "$24.99",
+        "price": "??,99€",
         "billing": "per month",
         "features": {
-          "notifiers": "Unlimited active notifiers",
+          "notifiers": "High amount search notifiers",
           "filters": "Access to marketplaces",
           "notifications": "All notification channels",
           "updates": "Notifications within the minute",
@@ -393,7 +393,7 @@
       },
       "fifth": {
         "question": "How many marketplaces can I monitor at once?",
-        "answer": "Notification speed depends on your chosen tier. Free tier users receive notifications within 30 minutes. Collector tier within 10 minutes. Our upcoming Flipper tier will offer near real-time notifications"
+        "answer": "Notification speed depends on your chosen tier. Free tier users receive notifications within 1 hour. Collector tier within 10 minutes. Our upcoming Flipper tier will offer near real-time notifications"
       },
       "sixth": {
         "question": "When will the Flipper plan be available?",
