@@ -1,20 +1,20 @@
-type TargetType = 'Unknown' | 'FireBase' | 'DiscordWebhook' | 'Email' | 'WhatsApp';
+type TargetType = 'Unknown' | 'FireBase' | 'DiscordWebhook' | 'Email' | 'WhatsApp'
 
 export interface TopFilter {
-  name: string;
-  matches: number;
-  keywords: string[];
+  name: string
+  matches: number
+  keywords: string[]
 }
 
 export interface FilterFace {
-  id: number;
-  name: string;
-  marketplace: string;
-  keywords: string[];
-  priceRange: string;
-  location: string;
-  active: boolean;
-  matchCount: number;
+  id: number
+  name: string
+  marketplace: string
+  keywords: string[]
+  priceRange: string
+  location: string
+  active: boolean
+  matchCount: number
 }
 
 export interface Filter {
@@ -35,4 +35,5 @@ export interface Filter {
   id: number
   notificationType: TargetType
   notificationTarget: string
+  country: string
 }

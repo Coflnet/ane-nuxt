@@ -33,6 +33,8 @@
           :place-holder="$t('addBlackListPressEnter')"
         />
 
+        <FiltersCreateCountrySection :model-value="filter" />
+
         <!-- Dont worry about this, this whole system needs to get reworked by akwav -->
         <div v-for="(option, _index) in filterStore.getFilterOptions">
           <FiltersKleinanzeigenCategoryFilter
