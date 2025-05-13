@@ -28,7 +28,7 @@
               class="text-gray-300 hover:text-indigo-400 transition-colors"
             >{{ $t('faqHeader') }}</a>
             <a
-              href="/signin"
+              href="/login"
               class="px-4 py-2 rounded-full bg-gray-700 text-white hover:bg-gray-600 transition-all"
             >{{
               $t('signIn') }}</a>
