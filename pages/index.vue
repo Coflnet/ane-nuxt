@@ -1,8 +1,8 @@
 <template>
   <div class="min-h-screen bg-gray-950">
     <!-- Navigation -->
-    <nav class="container mx-auto px-6 py-4 sticky top-0 z-50 bg-gray-900/80 backdrop-blur-md border-b border-gray-800">
-      <div class="flex items-center justify-between">
+    <nav class=" py-4 sticky top-0 z-50 bg-gray-900/80 backdrop-blur-md border-b border-gray-800">
+      <div class="flex items-center justify-between container mx-auto">
         <div class="flex items-center">
           <UiLogo />
         </div>
@@ -11,29 +11,29 @@
             <a
               href="#features"
               class="text-gray-300 hover:text-indigo-400 transition-colors"
-            >{{ $t('features')
+            >{{ $t('featuresHeader')
             }}</a>
             <a
               href="#how-it-works"
               class="text-gray-300 hover:text-indigo-400 transition-colors"
             >{{
-              $t('howItWorks') }}</a>
+              $t('howItWorksHeader') }}</a>
             <a
               href="#pricing"
               class="text-gray-300 hover:text-indigo-400 transition-colors"
-            >{{ $t('pricing')
+            >{{ $t('pricingHeader')
             }}</a>
             <a
               href="#faq"
               class="text-gray-300 hover:text-indigo-400 transition-colors"
-            >{{ $t('faq') }}</a>
+            >{{ $t('faqHeader') }}</a>
             <a
-              href="#"
+              href="/signin"
               class="px-4 py-2 rounded-full bg-gray-700 text-white hover:bg-gray-600 transition-all"
             >{{
               $t('signIn') }}</a>
             <a
-              href="#"
+              href="/overview"
               class="px-4 py-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-900/20"
             >{{
               $t('getStarted') }}</a>
@@ -84,7 +84,7 @@
         >{{
           $t('nav.signIn') }}</a>
         <a
-          href="#"
+          href="/overview"
           class="block px-4 py-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition-all text-center shadow-lg shadow-indigo-900/20"
         >{{
           $t('nav.getStarted') }}</a>
@@ -110,16 +110,25 @@
             <div class="inline-block px-3 py-1 rounded-full bg-indigo-900 text-indigo-400 font-medium text-sm mb-6">
               {{ $t('hero.badge') }}
             </div>
-            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
-              {{ $t('hero.titleStart') }} <span class="text-indigo-400">{{ $t('hero.titleHighlight') }}</span> {{
-                $t('hero.titleEnd') }}
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6 text-white">
+              <i18n-t
+                keypath="hero.marketingTextNeverMissADeal.text"
+                tag="span"
+              >
+                <template #deal>
+                  <span class="text-indigo-400">{{
+                    $t('hero.marketingTextNeverMissADeal.deal')
+                  }}</span>
+                </template>
+              </i18n-t>
             </h1>
+
             <p class="text-lg text-gray-300 mb-8 max-w-lg">
               {{ $t('hero.description') }}
             </p>
             <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
               <a
-                href="#"
+                href="/overview"
                 class="px-8 py-4 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition-all text-center shadow-lg shadow-indigo-900/20 font-medium"
               >
                 {{ $t('hero.startFree') }}
@@ -135,6 +144,7 @@
                 class="absolute -inset-0.5 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl blur opacity-30 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse"
               />
               <img
+                src="../public/DashboardPreview.png"
                 alt="Dashboard Preview"
                 class="relative rounded-2xl shadow-2xl border border-gray-800"
               >
@@ -143,7 +153,7 @@
               >
                 <div class="w-10 h-10 bg-indigo-900 rounded-full flex items-center justify-center">
                   <Icon
-                    name="bell"
+                    name="tabler:bell"
                     class="w-5 h-5 text-indigo-400"
                   />
                 </div>
@@ -236,7 +246,7 @@
               class="w-14 h-14 bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-indigo-900/20"
             >
               <Icon
-                name="bell"
+                name="tabler:bell"
                 class="w-7 h-7 text-white"
               />
             </div>
@@ -249,21 +259,21 @@
             <ul class="space-y-2 mb-6">
               <li class="flex items-start">
                 <Icon
-                  name="check-circle"
+                  name="tabler:circle-dashed-check"
                   class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                 />
                 <span class="text-gray-300">{{ $t('features.notifiers.benefits.first') }}</span>
               </li>
               <li class="flex items-start">
                 <Icon
-                  name="check-circle"
+                  name="tabler:circle-dashed-check"
                   class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                 />
                 <span class="text-gray-300">{{ $t('features.notifiers.benefits.second') }}</span>
               </li>
               <li class="flex items-start">
                 <Icon
-                  name="check-circle"
+                  name="tabler:circle-dashed-check"
                   class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                 />
                 <span class="text-gray-300">{{ $t('features.notifiers.benefits.third') }}</span>
@@ -280,7 +290,7 @@
               class="w-14 h-14 bg-gradient-to-br from-purple-600 to-purple-800 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-purple-900/20"
             >
               <Icon
-                name="filter"
+                name="tabler:filter"
                 class="w-7 h-7 text-white"
               />
             </div>
@@ -293,21 +303,21 @@
             <ul class="space-y-2 mb-6">
               <li class="flex items-start">
                 <Icon
-                  name="check-circle"
+                  name="tabler:circle-dashed-check"
                   class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                 />
                 <span class="text-gray-300">{{ $t('features.filters.benefits.first') }}</span>
               </li>
               <li class="flex items-start">
                 <Icon
-                  name="check-circle"
+                  name="tabler:circle-dashed-check"
                   class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                 />
                 <span class="text-gray-300">{{ $t('features.filters.benefits.second') }}</span>
               </li>
               <li class="flex items-start">
                 <Icon
-                  name="check-circle"
+                  name="tabler:circle-dashed-check"
                   class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                 />
                 <span class="text-gray-300">{{ $t('features.filters.benefits.third') }}</span>
@@ -324,7 +334,7 @@
               class="w-14 h-14 bg-gradient-to-br from-indigo-600 to-purple-800 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-indigo-900/20"
             >
               <Icon
-                name="zap"
+                name="tabler:brand-speedtest"
                 class="w-7 h-7 text-white"
               />
             </div>
@@ -337,73 +347,26 @@
             <ul class="space-y-2 mb-6">
               <li class="flex items-start">
                 <Icon
-                  name="check-circle"
+                  name="tabler:circle-dashed-check"
                   class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                 />
                 <span class="text-gray-300">{{ $t('features.alerts.benefits.first') }}</span>
               </li>
               <li class="flex items-start">
                 <Icon
-                  name="check-circle"
+                  name="tabler:circle-dashed-check"
                   class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                 />
                 <span class="text-gray-300">{{ $t('features.alerts.benefits.second') }}</span>
               </li>
               <li class="flex items-start">
                 <Icon
-                  name="check-circle"
+                  name="tabler:circle-dashed-check"
                   class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                 />
                 <span class="text-gray-300">{{ $t('features.alerts.benefits.third') }}</span>
               </li>
             </ul>
-          </div>
-        </div>
-
-        <!-- Additional Features -->
-        <div class="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div
-            v-intersect="fadeInLeft"
-            class="bg-gray-900 p-8 rounded-2xl border border-gray-800"
-          >
-            <div class="flex items-start">
-              <div class="w-12 h-12 bg-indigo-900 rounded-xl flex items-center justify-center mr-4">
-                <Icon
-                  name="bar-chart"
-                  class="w-6 h-6 text-indigo-400"
-                />
-              </div>
-              <div>
-                <h3 class="text-xl font-semibold text-white mb-2">
-                  {{ $t('features.additional.analytics.title') }}
-                </h3>
-                <p class="text-gray-300">
-                  {{ $t('features.additional.analytics.description') }}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div
-            v-intersect="fadeInRight"
-            class="bg-gray-900 p-8 rounded-2xl border border-gray-800"
-          >
-            <div class="flex items-start">
-              <div class="w-12 h-12 bg-indigo-900 rounded-xl flex items-center justify-center mr-4">
-                <Icon
-                  name="settings"
-                  class="w-6 h-6 text-indigo-400"
-                />
-              </div>
-              <div>
-                <h3 class="text-xl font-semibold text-white mb-2">
-                  {{ $t('features.additional.dashboard.title') }}
-                </h3>
-                <p class="text-gray-300">
-                  {{ $t('features.additional.dashboard.description') }}
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -522,7 +485,7 @@
           class="mt-16 text-center"
         >
           <a
-            href="#"
+            href="/overview"
             class="px-8 py-4 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition-all inline-block shadow-lg shadow-indigo-900/20 font-medium"
           >
             {{ $t('howItWorks.cta') }}
@@ -559,7 +522,7 @@
               class="w-14 h-14 bg-gradient-to-br from-purple-600 to-purple-800 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-purple-900/20"
             >
               <Icon
-                name="shopping-bag"
+                name="tabler:shopping-bag"
                 class="w-7 h-7 text-white"
               />
             </div>
@@ -572,21 +535,21 @@
             <ul class="space-y-2 mb-6">
               <li class="flex items-start">
                 <Icon
-                  name="check-circle"
+                  name="tabler:circle-dashed-check"
                   class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                 />
                 <span class="text-gray-300">{{ $t('useCases.collectors.benefits.first') }}</span>
               </li>
               <li class="flex items-start">
                 <Icon
-                  name="check-circle"
+                  name="tabler:circle-dashed-check"
                   class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                 />
                 <span class="text-gray-300">{{ $t('useCases.collectors.benefits.second') }}</span>
               </li>
               <li class="flex items-start">
                 <Icon
-                  name="check-circle"
+                  name="tabler:circle-dashed-check"
                   class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                 />
                 <span class="text-gray-300">{{ $t('useCases.collectors.benefits.third') }}</span>
@@ -603,7 +566,7 @@
               class="w-14 h-14 bg-gradient-to-br from-violet-600 to-violet-800 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-violet-900/20"
             >
               <Icon
-                name="trending-up"
+                name="tabler:trending-up"
                 class="w-7 h-7 text-white"
               />
             </div>
@@ -616,21 +579,21 @@
             <ul class="space-y-2 mb-6">
               <li class="flex items-start">
                 <Icon
-                  name="check-circle"
+                  name="tabler:circle-dashed-check"
                   class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                 />
                 <span class="text-gray-300">{{ $t('useCases.resellers.benefits.first') }}</span>
               </li>
               <li class="flex items-start">
                 <Icon
-                  name="check-circle"
+                  name="tabler:circle-dashed-check"
                   class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                 />
                 <span class="text-gray-300">{{ $t('useCases.resellers.benefits.second') }}</span>
               </li>
               <li class="flex items-start">
                 <Icon
-                  name="check-circle"
+                  name="tabler:circle-dashed-check"
                   class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                 />
                 <span class="text-gray-300">{{ $t('useCases.resellers.benefits.third') }}</span>
@@ -647,7 +610,7 @@
               class="w-14 h-14 bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-indigo-900/20"
             >
               <Icon
-                name="users"
+                name="tabler:users"
                 class="w-7 h-7 text-white"
               />
             </div>
@@ -660,21 +623,21 @@
             <ul class="space-y-2 mb-6">
               <li class="flex items-start">
                 <Icon
-                  name="check-circle"
+                  name="tabler:circle-dashed-check"
                   class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                 />
                 <span class="text-gray-300">{{ $t('useCases.bargainHunters.benefits.first') }}</span>
               </li>
               <li class="flex items-start">
                 <Icon
-                  name="check-circle"
+                  name="tabler:circle-dashed-check"
                   class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                 />
                 <span class="text-gray-300">{{ $t('useCases.bargainHunters.benefits.second') }}</span>
               </li>
               <li class="flex items-start">
                 <Icon
-                  name="check-circle"
+                  name="tabler:circle-dashed-check"
                   class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                 />
                 <span class="text-gray-300">{{ $t('useCases.bargainHunters.benefits.third') }}</span>
@@ -792,11 +755,26 @@
                   {{ $t('testimonials.items.first.role') }}
                 </div>
                 <div class="text-indigo-400 flex">
-                  <Star class="h-4 w-4" />
-                  <Star class="h-4 w-4" />
-                  <Star class="h-4 w-4" />
-                  <Star class="h-4 w-4" />
-                  <Star class="h-4 w-4" />
+                  <Icon
+                    name="tabler:star-filled"
+                    class="h- w-4"
+                  />
+                  <Icon
+                    name="tabler:star-filled"
+                    class="h- w-4"
+                  />
+                  <Icon
+                    name="tabler:star-filled"
+                    class="h- w-4"
+                  />
+                  <Icon
+                    name="tabler:star-filled"
+                    class="h- w-4"
+                  />
+                  <Icon
+                    name="tabler:star-filled"
+                    class="h- w-4"
+                  />
                 </div>
               </div>
             </div>
@@ -822,11 +800,26 @@
                   {{ $t('testimonials.items.second.role') }}
                 </div>
                 <div class="text-indigo-400 flex">
-                  <Star class="h-4 w-4" />
-                  <Star class="h-4 w-4" />
-                  <Star class="h-4 w-4" />
-                  <Star class="h-4 w-4" />
-                  <Star class="h-4 w-4" />
+                  <Icon
+                    name="tabler:star-filled"
+                    class="h- w-4"
+                  />
+                  <Icon
+                    name="tabler:star-filled"
+                    class="h- w-4"
+                  />
+                  <Icon
+                    name="tabler:star-filled"
+                    class="h- w-4"
+                  />
+                  <Icon
+                    name="tabler:star-filled"
+                    class="h- w-4"
+                  />
+                  <Icon
+                    name="tabler:star-filled"
+                    class="h- w-4"
+                  />
                 </div>
               </div>
             </div>
@@ -852,11 +845,26 @@
                   {{ $t('testimonials.items.third.role') }}
                 </div>
                 <div class="text-indigo-400 flex">
-                  <Star class="h-4 w-4" />
-                  <Star class="h-4 w-4" />
-                  <Star class="h-4 w-4" />
-                  <Star class="h-4 w-4" />
-                  <Star class="h-4 w-4" />
+                  <Icon
+                    name="tabler:star-filled"
+                    class="h- w-4"
+                  />
+                  <Icon
+                    name="tabler:star-filled"
+                    class="h- w-4"
+                  />
+                  <Icon
+                    name="tabler:star-filled"
+                    class="h- w-4"
+                  />
+                  <Icon
+                    name="tabler:star-filled"
+                    class="h- w-4"
+                  />
+                  <Icon
+                    name="tabler:star-filled"
+                    class="h- w-4"
+                  />
                 </div>
               </div>
             </div>
@@ -910,49 +918,36 @@
               <ul class="space-y-4">
                 <li class="flex items-start">
                   <Icon
-                    name="check-circle"
+                    name="tabler:circle-dashed-check"
                     class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                   />
                   <span class="text-gray-300">{{ $t('pricing.plans.free.features.notifiers') }}</span>
                 </li>
                 <li class="flex items-start">
                   <Icon
-                    name="check-circle"
+                    name="tabler:circle-dashed-check"
                     class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                   />
                   <span class="text-gray-300">{{ $t('pricing.plans.free.features.filters') }}</span>
                 </li>
                 <li class="flex items-start">
                   <Icon
-                    name="check-circle"
+                    name="tabler:circle-dashed-check"
                     class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                   />
                   <span class="text-gray-300">{{ $t('pricing.plans.free.features.email') }}</span>
                 </li>
                 <li class="flex items-start">
                   <Icon
-                    name="check-circle"
+                    name="tabler:circle-dashed-check"
                     class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                   />
                   <span class="text-gray-300">{{ $t('pricing.plans.free.features.updates') }}</span>
                 </li>
+
                 <li class="flex items-start">
                   <Icon
-                    name="x"
-                    class="w-5 h-5 text-gray-600 mr-2 mt-0.5"
-                  />
-                  <span class="text-gray-500">{{ $t('pricing.plans.free.features.crossMarketplace') }}</span>
-                </li>
-                <li class="flex items-start">
-                  <Icon
-                    name="x"
-                    class="w-5 h-5 text-gray-600 mr-2 mt-0.5"
-                  />
-                  <span class="text-gray-500">{{ $t('pricing.plans.free.features.realtime') }}</span>
-                </li>
-                <li class="flex items-start">
-                  <Icon
-                    name="x"
+                    name="tabler:circle-dashed-x"
                     class="w-5 h-5 text-gray-600 mr-2 mt-0.5"
                   />
                   <span class="text-gray-500">{{ $t('pricing.plans.free.features.analytics') }}</span>
@@ -960,7 +955,7 @@
               </ul>
             </div>
             <a
-              href="#"
+              href="/overview"
               class="block w-full px-4 py-3 rounded-full border border-gray-600 text-gray-300 hover:bg-gray-700 transition-all text-center font-medium"
             >
               {{ $t('pricing.plans.free.cta') }}
@@ -995,57 +990,43 @@
               <ul class="space-y-4">
                 <li class="flex items-start">
                   <Icon
-                    name="check-circle"
+                    name="tabler:circle-dashed-check"
                     class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                   />
                   <span class="text-gray-300">{{ $t('pricing.plans.collector.features.notifiers') }}</span>
                 </li>
                 <li class="flex items-start">
                   <Icon
-                    name="check-circle"
+                    name="tabler:circle-dashed-check"
                     class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                   />
                   <span class="text-gray-300">{{ $t('pricing.plans.collector.features.filters') }}</span>
                 </li>
                 <li class="flex items-start">
                   <Icon
-                    name="check-circle"
+                    name="tabler:circle-dashed-check"
                     class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                   />
                   <span class="text-gray-300">{{ $t('pricing.plans.collector.features.notifications') }}</span>
                 </li>
                 <li class="flex items-start">
                   <Icon
-                    name="check-circle"
+                    name="tabler:circle-dashed-check"
                     class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                   />
                   <span class="text-gray-300">{{ $t('pricing.plans.collector.features.updates') }}</span>
                 </li>
                 <li class="flex items-start">
                   <Icon
-                    name="check-circle"
-                    class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
-                  />
-                  <span class="text-gray-300">{{ $t('pricing.plans.collector.features.crossMarketplace') }}</span>
-                </li>
-                <li class="flex items-start">
-                  <Icon
-                    name="check-circle"
-                    class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
-                  />
-                  <span class="text-gray-300">{{ $t('pricing.plans.collector.features.analytics') }}</span>
-                </li>
-                <li class="flex items-start">
-                  <Icon
-                    name="x"
+                    name="tabler:circle-dashed-x"
                     class="w-5 h-5 text-gray-600 mr-2 mt-0.5"
                   />
-                  <span class="text-gray-500">{{ $t('pricing.plans.collector.features.history') }}</span>
+                  <span class="text-gray-500">{{ $t('pricing.plans.collector.features.priceCalculation') }}</span>
                 </li>
               </ul>
             </div>
             <a
-              href="#"
+              href="/register?redirectTo=/subscriptions'"
               class="block w-full px-4 py-3 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition-all text-center font-medium shadow-lg shadow-indigo-900/20"
             >
               {{ $t('pricing.plans.collector.cta') }}
@@ -1080,52 +1061,38 @@
               <ul class="space-y-4">
                 <li class="flex items-start">
                   <Icon
-                    name="check-circle"
+                    name="tabler:circle-dashed-check"
                     class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                   />
                   <span class="text-gray-300">{{ $t('pricing.plans.flipper.features.notifiers') }}</span>
                 </li>
                 <li class="flex items-start">
                   <Icon
-                    name="check-circle"
+                    name="tabler:circle-dashed-check"
                     class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                   />
                   <span class="text-gray-300">{{ $t('pricing.plans.flipper.features.filters') }}</span>
                 </li>
                 <li class="flex items-start">
                   <Icon
-                    name="check-circle"
+                    name="tabler:circle-dashed-check"
                     class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                   />
                   <span class="text-gray-300">{{ $t('pricing.plans.flipper.features.notifications') }}</span>
                 </li>
                 <li class="flex items-start">
                   <Icon
-                    name="check-circle"
+                    name="tabler:circle-dashed-check"
                     class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                   />
                   <span class="text-gray-300">{{ $t('pricing.plans.flipper.features.updates') }}</span>
                 </li>
                 <li class="flex items-start">
                   <Icon
-                    name="check-circle"
+                    name="tabler:circle-dashed-check"
                     class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                   />
                   <span class="text-gray-300">{{ $t('pricing.plans.flipper.features.analytics') }}</span>
-                </li>
-                <li class="flex items-start">
-                  <Icon
-                    name="check-circle"
-                    class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
-                  />
-                  <span class="text-gray-300">{{ $t('pricing.plans.flipper.features.bulk') }}</span>
-                </li>
-                <li class="flex items-start">
-                  <Icon
-                    name="check-circle"
-                    class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
-                  />
-                  <span class="text-gray-300">{{ $t('pricing.plans.flipper.features.api') }}</span>
                 </li>
               </ul>
             </div>
@@ -1148,21 +1115,21 @@
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6 ">
             <div class="flex items-center">
               <Icon
-                name="shield"
+                name="tabler:shield"
                 class="w-5 h-5 text-indigo-400 mr-2"
               />
               <span class="text-gray-300">{{ $t('pricing.allPlansInclude.security') }}</span>
             </div>
             <div class="flex items-center">
               <Icon
-                name="headphones"
+                name="tabler:headphones"
                 class="w-5 h-5 text-indigo-400 mr-2"
               />
               <span class="text-gray-300">{{ $t('pricing.allPlansInclude.support') }}</span>
             </div>
             <div class="flex items-center">
               <Icon
-                name="refresh-cw"
+                name="tabler:refresh"
                 class="w-5 h-5 text-indigo-400 mr-2"
               />
               <span class="text-gray-300">{{ $t('pricing.allPlansInclude.updates') }}</span>
@@ -1206,6 +1173,17 @@
               {{ $t('faq.items.first.answer') }}
             </p>
           </div>
+          <div
+            v-intersect="fadeIn"
+            class="bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-800"
+          >
+            <h3 class="text-xl font-semibold text-white mb-3">
+              {{ $t('faq.items.second.question') }}
+            </h3>
+            <p class="text-gray-300">
+              {{ $t('faq.items.second.answer') }}
+            </p>
+          </div>
 
           <!-- FAQ Item 3 -->
           <div
@@ -1219,7 +1197,17 @@
               {{ $t('faq.items.third.answer') }}
             </p>
           </div>
-
+          <div
+            v-intersect="fadeIn"
+            class="bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-800"
+          >
+            <h3 class="text-xl font-semibold text-white mb-3">
+              {{ $t('faq.items.fourth.question') }}
+            </h3>
+            <p class="text-gray-300">
+              {{ $t('faq.items.fourth.answer') }}
+            </p>
+          </div>
           <!-- FAQ Item 5 -->
           <div
             v-intersect="fadeIn"
@@ -1255,7 +1243,7 @@
             {{ $t('faq.moreQuestions') }}
           </p>
           <a
-            href="#"
+            href="https://discord.gg/vdjgMWDDzW"
             class="px-6 py-3 rounded-full bg-gray-700 text-white hover:bg-gray-600 transition-all inline-block"
           >
             {{ $t('faq.contactSupport') }}
@@ -1287,16 +1275,10 @@
             </p>
             <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
               <a
-                href="#"
+                href="/overview"
                 class="px-8 py-4 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition-all font-medium shadow-lg"
               >
                 {{ $t('cta.primaryButton') }}
-              </a>
-              <a
-                href="#"
-                class="px-8 py-4 rounded-full border border-white text-white hover:bg-white/10 transition-all font-medium"
-              >
-                {{ $t('cta.secondaryButton') }}
               </a>
             </div>
 
@@ -1305,7 +1287,7 @@
             >
               <div class="flex items-center">
                 <Icon
-                  name="shield-check"
+                  name="tabler:shield-check"
                   class="w-6 h-6 mr-2"
                 />
                 <span>{{ $t('cta.benefits.noCreditCard') }}</span>
@@ -1313,10 +1295,10 @@
 
               <div class="flex items-center">
                 <Icon
-                  name="x-circle"
+                  name="tabler:mail-x"
                   class="w-6 h-6 mr-2"
                 />
-                <span>{{ $t('cta.benefits.cancelAnytime') }}</span>
+                <span>{{ $t('cta.benefits.noEmailRequired') }}</span>
               </div>
             </div>
           </div>

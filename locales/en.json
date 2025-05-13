@@ -61,7 +61,7 @@
   "email": "Email",
   "endsToday": "Ends today",
   "enterEmailAddress": "Enter your email address",
-  "features": "Features",
+  "featuresHeader": "Features",
   "filter": "Filter",
   "filterName": "Filter Name",
   "filters": "Filters",
@@ -96,7 +96,7 @@
   "price": "Price",
   "priceCalculation": "Price calculation",
   "priceRange": "Price Range",
-  "pricing": "Pricing",
+  "pricingHeader": "Pricing",
   "privacy": "Privacy",
   "privacyPolicy": "Privacy Policy",
   "pushNotifications": "Email, Discord & push notifications",
@@ -118,7 +118,7 @@
   "setup": "Setup Required",
   "setUpNewAuctionFilter": "Set up a new auction search filter",
   "signIn": "Sign in",
-  "howItWorks": "How It Works",
+  "howItWorksHeader": "How It Works",
   "signInAgreeMessage": {
     "text": "With signing in you agree to our {tos} and {privacy}",
     "tos": "terms of service",
@@ -156,12 +156,14 @@
   "noFilters": "You dont have any filters",
   "tryCreatingFilters": "Try creating a filter to get started",
   "thatEmailInUse": "This email is already in use try signin or using a different email",
-  "faq": "FAQ", 
+  "faqHeader": "FAQ", 
+  "smartWayToFindDeals": "The smart way to find deals and make profits on online marketplaces.",
   "hero": {
     "badge": "#1 Marketplace Monitoring Tool",
-    "titleStart": "Never Miss a",
-    "titleHighlight": "Marketplace Deal",
-    "titleEnd": "Again",
+    "marketingTextNeverMissADeal": {
+    "text": "Never miss a {deal} again",
+    "deal": "Deal"
+    },
     "description": "Create custom notifiers across multiple marketplaces and get instant alerts when items matching your criteria appear. Stay ahead of the competition with real-time updates.",
     "startFree": "Start for Free",
     "usersJoined": "users already joined",
@@ -176,7 +178,7 @@
       "label": "Items Tracked"
     },
     "marketplaces": {
-      "number": "50+",
+      "number": "10+",
       "label": "Marketplaces"
     },
     "uptime": {
@@ -215,28 +217,10 @@
       "description": "Receive notifications in real-time via email, SMS, or push notifications as soon as matching items are listed. Never miss a deal again.",
       "benefits": {
         "first": "Email notifications",
-        "second": "SMS alerts",
-        "third": "Mobile push notifications"
+        "second": "Push notifications",
+        "third": "Discord webhook"
       }
-    },
-    "additional": {
-      "analytics": {
-        "title": "Advanced Analytics",
-        "description": "Track price history, monitor trends, and gain insights into market dynamics to make informed buying and selling decisions."
-      },
-      "dashboard": {
-        "title": "Customizable Dashboard",
-        "description": "Personalize your monitoring experience with a fully customizable dashboard that shows you exactly what you need at a glance."
-      },
-      "mobile": {
-        "title": "Mobile App",
-        "description": "Stay connected on the go with our mobile app, available for iOS and Android. Receive notifications and manage your alerts from anywhere."
-      },
-      "security": {
-        "title": "Secure & Private",
-        "description": "Your data is encrypted and secure. We never share your information with third parties or use it for anything other than providing our service."
-      }
-    }
+    }, 
   },
   "howItWorks": {
     "badge": "Simple Process",
@@ -245,7 +229,7 @@
     "steps": {
       "first": {
         "title": "Create an Account",
-        "description": "Sign up for a free account to get started with MarketAlert. No credit card required."
+        "description": "Get started with ANE no login or credit card required."
       },
       "second": {
         "title": "Set Up Notifiers",
@@ -257,7 +241,7 @@
       },
       "fourth": {
         "title": "Receive Alerts",
-        "description": "Get instant notifications when items matching your criteria are listed."
+        "description": "Receive notifications when items matching your criteria are listed."
       }
     },
     "cta": "Get Started in Minutes"
@@ -280,8 +264,8 @@
       "description": "Find underpriced items to flip for profit. Get notified of deals before competitors and maximize your margins.",
       "benefits": {
         "first": "Identify underpriced items",
-        "second": "Track price history",
-        "third": "Analyze market trends"
+        "second": "Set filters for underpriced items",
+        "third": "Sync across multiple websites"
       }
     },
     "bargainHunters": {
@@ -297,14 +281,14 @@
   "marketplaces": {
     "badge": "Wide Coverage",
     "title": "Supported Marketplaces",
-    "description": "Our platform integrates with all major online marketplaces to give you comprehensive coverage and ensure you never miss a deal.",
+    "description": "Our platform integrates with many major online and local marketplaces to give you comprehensive coverage and ensure you never miss a deal.",
     "platforms": {
       "ebay": "eBay",
       "kleinanzeigen": "Kleinanzeigen",
-      "autoscout22": "Autoscout22",
+      "autoscout22": "Autoscout24",
       "facebook": "Facebook",
       "craigslist": "Craigslist",
-      "more": "+ More"
+      "more": "+ Many More"
     },
   },
   "testimonials": {
@@ -343,11 +327,9 @@
         "billing": "Forever free",
         "features": {
           "notifiers": "Up to 3 active notifiers",
-          "filters": "Basic filters",
-          "email": "Email notifications",
-          "updates": "Daily updates",
-          "crossMarketplace": "Cross-marketplace search",
-          "realtime": "Real-time alerts",
+          "filters": "Access to multiple marketplaces",
+          "email": "All notifications channels",
+          "updates": "Notifications within 30 minutes",
           "analytics": "Advanced analytics"
         },
         "cta": "Get Started"
@@ -359,12 +341,10 @@
         "billing": "per month",
         "features": {
           "notifiers": "Up to 20 active notifiers",
-          "filters": "Advanced filters",
-          "notifications": "Email & SMS notifications",
-          "updates": "Real-time updates",
-          "crossMarketplace": "Cross-marketplace search",
-          "analytics": "Basic analytics",
-          "history": "Price history & trends"
+          "filters": "Access to all marketplaces",
+          "notifications": "All notifications channels",
+          "updates": "Notifications within 10 minutes",
+          "priceCalculation": "Price Calculation"
         },
         "cta": "Subscribe Now"
       },
@@ -375,12 +355,10 @@
         "billing": "per month",
         "features": {
           "notifiers": "Unlimited active notifiers",
-          "filters": "Premium filters",
+          "filters": "Access to marketplaces",
           "notifications": "All notification channels",
-          "updates": "Instant notifications",
-          "analytics": "Price history & analytics",
-          "bulk": "Bulk import/export",
-          "api": "API access"
+          "updates": "Notifications within the minute",
+          "analytics": "Price calculation",
         },
         "cta": "Coming Soon"
       }
@@ -398,16 +376,24 @@
     "description": "Find answers to common questions about ANE and how it can help you stay ahead of the competition.",
     "items": {
       "first": {
-        "question": "How quickly will I receive notifications?",
-        "answer": "Free users receive daily digest notifications. Collector plan subscribers receive notifications within minutes, and Flipper plan subscribers (coming soon) will receive instant notifications as soon as matching items are listed."
+        "question": "What platforms are supported?",
+        "answer": "Our service supports a wide range of popular online marketplaces, including Facebook Marketplace, Autoscout24, Kleineanzeigen, and eBay, among others. We are continuously expanding our platform integrations to provide more options."
       },
-            "third": {
+      "second": {
+        "question": "Is there a free trial?",
+        "answer": "We offer a completely free trial that doesn't require any login or credit card information. Experience the power of our platform risk-free and see how we can help you find what you're looking for before committing to a paid plan."
+      },
+      "third": {
         "question": "How many marketplaces can I monitor at once?",
         "answer": "All plans allow you to monitor all supported marketplaces simultaneously. The difference between plans is the number of active notifiers you can have and the frequency of notifications."
       }, 
+      "fourth":{
+        "question": "Can I customize the types of notifications I receive?",
+        "answer": "Included in all tiers you can customize many things like adding blacklisted and whitelisted keywords, price range, search radius and more"
+      },
       "fifth": {
-        "question": "What happens if I reach my notifier limit?",
-        "answer": "If you reach your plan's limit for active notifiers, you'll need to deactivate some existing notifiers before creating new ones, or upgrade to a higher plan to increase your limit."
+        "question": "How many marketplaces can I monitor at once?",
+        "answer": "Notification speed depends on your chosen tier. Free tier users receive notifications within 30 minutes. Collector tier within 10 minutes. Our upcoming Flipper tier will offer near real-time notifications"
       },
       "sixth": {
         "question": "When will the Flipper plan be available?",
@@ -420,11 +406,10 @@
   "cta": {
     "title": "Ready to Never Miss a Deal Again?",
     "description": "Join thousands of collectors and resellers who use our platform to stay ahead of the competition. Start for free today!",
-    "primaryButton": "Start Your Free Trial",
-    "secondaryButton": "Schedule a Demo",
+    "primaryButton": "Get Started Now",
     "benefits": {
       "noCreditCard": "No credit card required",
-      "cancelAnytime": "Cancel anytime"
+      "noEmailRequired": "No Email Required"
     }
   },
   "common": {
