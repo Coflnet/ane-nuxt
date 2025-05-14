@@ -8,7 +8,7 @@
             {{ $t('features') }}
           </UiTextButton>
           <UiTextButton @on-click="navigateTo(localePath('/#features'))">
-            {{ $t('pricingHedaer') }}
+            {{ $t('pricingHeader') }}
           </UiTextButton>
           <UiTextButton @on-click="navigateTo(localePath('/#features'))">
             {{ $t('support') }}
