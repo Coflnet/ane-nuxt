@@ -1,7 +1,9 @@
 <template>
-  <div class="relative w-full ">
+  <div
+    ref="dropdownContainer"
+    class="relative w-full "
+  >
     <!-- Dropdown toggle button -->
-
     <UiHeaderLabel
       :label="label"
       :sm="true"
@@ -41,27 +43,25 @@
       role="listbox"
       aria-multiselectable="true"
     >
-      <div class="py-1">
-        <div
-          v-for="option in options"
-          :key="option.value"
-          class="flex items-center px-4 py-2 cursor-pointer hover:bg-slate-700 focus:bg-slate-700 focus:outline-none"
-          :class="{ 'bg-slate-700': isSelected(option) }"
-          role="option"
-          :aria-selected="isSelected(option)"
-          tabindex="0"
-          @click="toggleSelection(option)"
-          @keydown.enter="toggleSelection(option)"
-          @keydown.space.prevent="toggleSelection(option)"
-        >
-          <div class="flex items-center justify-center w-5 h-5 mr-3 rounded-full border border-slate-400 bg-slate-900">
-            <div
-              v-if="isSelected(option)"
-              class="w-3 h-3 rounded-full bg-indigo-500"
-            />
-          </div>
-          <span class="text-white">{{ $t(option.label) }}</span>
+      <div
+        v-for="option in options"
+        :key="option.value"
+        class="flex items-center px-4 py-2 cursor-pointer hover:bg-slate-700 focus:bg-slate-700 focus:outline-none"
+        :class="{ 'bg-slate-700': isSelected(option) }"
+        role="option"
+        :aria-selected="isSelected(option)"
+        tabindex="0"
+        @click="toggleSelection(option)"
+        @keydown.enter="toggleSelection(option)"
+        @keydown.space.prevent="toggleSelection(option)"
+      >
+        <div class="flex items-center justify-center w-5 h-5 mr-3 rounded-full border border-slate-400 bg-slate-900">
+          <div
+            v-if="isSelected(option)"
+            class="w-3 h-3 rounded-full bg-indigo-500"
+          />
         </div>
+        <span class="text-white">{{ $t(option.label) }}</span>
       </div>
     </div>
   </div>
@@ -71,11 +71,12 @@
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { UiHeaderLabel } from '#components'
 
+const dropdownContainer = ref<HTMLElement | null>(null) // Ref for the container
 const { t } = useI18n()
 const model = defineModel<{ value: string, label: string }[]>()
 const props = defineProps<{
   options: { value: string, label: string }[]
-  id?: string
+  overrideValue?: string
   label?: string
 }>()
 
@@ -86,12 +87,16 @@ const emit = defineEmits<{
 const isOpen = ref(false)
 const selectedItems = ref<{ value: string, label: string }[]>([])
 
+// create the string that is displayed on the button eq. Ebay, AutoScout24
 const selectedLabels = computed(() => {
+  console.log(selectedItems.value)
   if (selectedItems.value.length === 0) return ''
-
+  console.log('selected labe')
   const selected = props.options
     .filter(option => selectedItems.value.includes(option))
     .map(option => t(option.label))
+
+  console.log(selected, ' gello')
 
   if (selected.length <= 3) {
     return selected.join(', ')
@@ -102,6 +107,14 @@ const selectedLabels = computed(() => {
 
 const toggleDropdown = () => {
   isOpen.value = !isOpen.value
+
+  // this is required so you can multiple multi select objects at once
+  if (isOpen.value && dropdownContainer.value) {
+    window.addEventListener('click', handleGlobalClick)
+  }
+  else {
+    window.removeEventListener('click', handleGlobalClick)
+  }
 }
 
 const isSelected = (value: { value: string, label: string }): boolean => {
@@ -111,47 +124,43 @@ const isSelected = (value: { value: string, label: string }): boolean => {
 // Toggle selection of an item
 const toggleSelection = (value: { value: string, label: string }) => {
   const index = selectedItems.value.indexOf(value)
+  console.log('selecting', value.value)
+  console.log(index)
   if (index === -1) {
-    // deselect all other options when all is selected
-    if (value.value === 'all') {
+    // deselect all other options when the overrideValue is selected
+    if (value.value === props.overrideValue) {
       selectedItems.value = [value]
       emit('update:modelValue', [...selectedItems.value])
       return
     }
 
     // fuck .include and fuck .filter
-    if (selectedItems.value.map(item => item.value).includes('all')) {
+    if (selectedItems.value.map(item => item.value).includes(props.overrideValue ?? ''))
       selectedItems.value = []
-    }
 
     selectedItems.value.push(value)
   }
-  else {
+  else
     selectedItems.value.splice(index, 1)
-  }
 
+  console.log(selectedItems, ' hi')
   emit('update:modelValue', [...selectedItems.value])
 }
 
-// Close dropdown when clicking outside
-const handleClickOutside = (event: MouseEvent) => {
+const handleGlobalClick = (event: MouseEvent) => {
   const target = event.target as HTMLElement
-  const dropdown = document.querySelector('[role="listbox"]')
-  const button = document.querySelector('[aria-haspopup="listbox"]')
-
-  if (isOpen.value && dropdown && button
-    && !dropdown.contains(target)
-    && !button.contains(target)) {
+  if (isOpen.value && dropdownContainer.value && !dropdownContainer.value.contains(target)) {
     isOpen.value = false
   }
 }
 
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
+  console.log(props.options)
   toggleSelection(props.options![0]!)
 })
 
 onBeforeUnmount(() => {
-  document.removeEventListener('click', handleClickOutside)
+  // Ensure the global listener is removed if the component is unmounted while open
+  window.removeEventListener('click', handleGlobalClick)
 })
 </script>

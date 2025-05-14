@@ -17,6 +17,7 @@
             v-model="selectedMarketplaces"
             :options="marketplaces"
             :label="$t('marketplaces')"
+            override-value="all"
           />
         </UiGrid>
 
@@ -45,7 +46,7 @@
           />
         </div>
 
-        <FiltersRadiusRangeFilter :filter="filter" />
+        <FiltersPriceConditionFilter v-model="filter" />
         <NotificationSettingsFilter :filter="filter" />
 
         <FiltersCreateConfirmCreation
@@ -111,7 +112,7 @@ const filter = ref<Filter>({
   notificationType: 'Unknown',
   notificationTarget: '',
   country: t('selectedCountry'),
-  internationalShipping: false,
+  condition: '',
 })
 
 watch([filter, selectedMarketplaces], (_) => {
@@ -283,9 +284,6 @@ async function handleFilters(): Promise<{ name: string, value: any }[]> {
 
   if (rawFilter.minPrice != 0 || rawFilter.maxPrice || rawFilter.maxPrice == 0)
     filters.push({ name: 'PriceRange', value: `${Number(rawFilter.minPrice)}-${Number(rawFilter.maxPrice)}` })
-
-  if (rawFilter.internationalShipping)
-    filters.push({ name: 'CrossBorder', value: 'true' })
 
   if (rawFilter.country != t('selectedCountry'))
     filters.push({ name: 'Country', value: rawFilter.country })

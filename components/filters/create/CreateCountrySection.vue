@@ -28,11 +28,6 @@
         :error="radiusError"
       />
     </UiGrid>
-    <UiCheckbox
-      v-model="model!.internationalShipping"
-      class="mt-2"
-      :label="$t('internationalShipping')"
-    />
   </div>
 </template>
 

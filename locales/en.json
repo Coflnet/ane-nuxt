@@ -199,5 +199,10 @@
   "country": "Country",
   "internationalShipping": "International Shipping",
   "selectedCountry": "Select Country",
-  "yourCountry": "Select your country"
+  "yourCountry": "Select your country",
+  "allCondition": "All Conditions",
+  "newCondition": "New Condition",
+  "usedCondition": "Used Condition",
+  "forPartsCondition": "For Parts",
+  "condition": "Condition"
 }
