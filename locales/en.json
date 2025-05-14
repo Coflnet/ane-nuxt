@@ -25,7 +25,6 @@
   "auctionMatchedToFilters": "Auctions that mached your filters",
   "auctionsPerHour": "Auctions per hour",
   "backToFilters": "Back to filters",
-  "beTheFirst": "Be the first to purchase underpriced items and save money on things you want",
   "blackKeywords": "Blacklist Keywords",
   "browserNotifications": "Browser notifications push notifications",
   "buyAndSave": "Buy & Save",
@@ -37,7 +36,6 @@
   "chooseYourPlan": "Choose Your Plan",
   "collector": "Collector",
   "comingSoon": "Coming soon",
-  "complexFilters": "Create complex filters with multiple conditions. Filter by price, condition, seller rating, and more.",
   "confirm": "Confirm",
   "confirmCancel": "Confirm Cancel",
   "confirmCancelSub": "Are you sure you want to cancel your subscription?",
@@ -45,12 +43,10 @@
   "connectedToXChannels": "Connected to {n} channels",
   "continueWithGoogle": "Continue with Google",
   "createAccount": "Create your account",
-  "createCustomAlerts": "Create custom alerts and filters for eBay and other marketplaces. Buy items below market value",
   "createFilter": "Create Filter",
   "createYourFilter": "Create Your Filters",
   "current": "Current",
   "currentPlan": "Current Plan",
-  "customFilter": "Set up custom filters for the items you're looking for. Specify price ranges, keywords, and conditions.",
   "dashboard": "Dashboard",
   "daysLeft": "Days left",
   "deal": "Deal",
@@ -65,7 +61,7 @@
   "email": "Email",
   "endsToday": "Ends today",
   "enterEmailAddress": "Enter your email address",
-  "features": "Features",
+  "featuresHeader": "Features",
   "filter": "Filter",
   "filterName": "Filter Name",
   "filters": "Filters",
@@ -77,30 +73,10 @@
   "getStarted": "Get Started",
   "greatTryingAne": "Great for trying out ANE",
   "how": "How",
-  "howItWorks": "How it works",
-  "instantNotifications": "Get instant notifications when items matching your criteria are listed. Be the first to snag that deal.",
-  "invalidDiscordWebhook": "Please enter a valid Discord webhook URL",
-  "invalidEmail": "Please enter a valid email address",
-  "joinFreeToday": "No credit card required. Start with our free plan today.",
-  "joinThousandsSmartShoppers": "Join thousands of smart shoppers and resellers who are saving money and making profits with ANE.",
-  "justNow": "Just now",
-  "keywords": "KeyWords",
   "listedXMinutesAgo": "Listed {n} minutes ago",
   "loadMoreAuctions": "Loading more auctions",
   "login": "Login",
   "manageFilters": "Manage your auction search filters",
-  "market120": "Market 120+",
-  "market150": "Market 150+",
-  "marketAnalyist": "Market Analysis",
-  "marketplace": "Marketplace",
-  "marketingTextNeverMissADeal": {
-    "text": "Never miss a {deal} again",
-    "deal": "Deal"
-  },
-  "marketingTextPowerTools": {
-    "text": "Powerful Tools for {dealHunter}",
-    "dealHunter": "Deal Hunters"
-  },
   "matched": "Matched",
   "matchedAuctions": "Matched Auctions",
   "matches": "Matches",
@@ -111,7 +87,6 @@
   "mostPopular": "Most Popular",
   "nameEg": "e.g., Photography Equipment",
   "neverMissADealAgain": "Never Miss a Deal Again",
-  "newAlert": "New Alert Match!",
   "noAuctions": "No Auctions found",
   "noImageForAuction": "This Auction has no image",
   "none": "None",
@@ -122,13 +97,11 @@
   "price": "Price",
   "priceCalculation": "Price calculation",
   "priceRange": "Price Range",
-  "pricing": "Pricing",
+  "pricingHeader": "Pricing",
   "privacy": "Privacy",
   "privacyPolicy": "Privacy Policy",
   "pushNotifications": "Email, Discord & push notifications",
   "radiusEq": "e.g., {n}",
-  "realTimeAlerts": "Real time alerts",
-  "receiveInstantAlerts": "Receive instant alerts when matching items are listed. Choose from email, discord, or push notifications.",
   "register": "Register",
   "reseller": "Verkäufer",
   "resellerDescription": "I saved {amount} in only {months} months. ANE helped me find the best deals and maximize my profit margin.",
@@ -148,6 +121,7 @@
   "setup": "Setup Required",
   "setUpNewAuctionFilter": "Set up a new auction search filter",
   "signIn": "Sign in",
+  "howItWorksHeader": "How It Works",
   "signInAgreeMessage": {
     "text": "With signing in you agree to our {tos} and {privacy}",
     "tos": "terms of service",
@@ -156,9 +130,6 @@
   "signintoAccount": "Sign in to your account",
   "signOut": "Sign out",
   "signUp": "Sign up",
-  "simpleTransparent": "Simple, Transparent,",
-  "smartWayToFindDeals": "The smart way to find deals and make profits on online marketplaces.",
-  "startFindingDeals": "Ready to Start Finding Deals?",
   "subscriptions": "Subscriptions",
   "support": "Support",
   "terms": "Terms",
@@ -176,21 +147,267 @@
   "viewHistoricalData": "See historical price data and trends to identify the best buying and selling opportunities.",
   "vintageCameraLens": "Vintage Camera Lens",
   "vintageCollector": "Vintage Collector",
-  "vintageCollectorDecription": "ANE has completely changed how I source vintage items. I've found rare pieces at 60% below market value because I was notified the moment they were listed.",
-  "webPush": "Web Push",
-  "whatOur": "What Our",
-  "works": "Works",
-  "yourFilters": "Your Filters",
-  "yourZip": "Your Zip Code",
-  "zipCode": "Zip-code",
-  "zipCodeEq": "e.g., xxxxx",
-  "zipCodePlease": "Please enter a zip code when using search radius",
-  "description": "Description",
-  "navigation": "Navigation",
-  "language": "Language",
-  "account": "Account",
-  "noFilters": "You dont have any filters",
-  "tryCreatingFilters": "Try creating a filter to get started",
+  "vintageCollectorDecription": "ANE has completely changed how I source vintage items. I've found rare pieces at 60% below market value because I was notified the moment they were listed.", 
+  "thatEmailInUse": "This email is already in use try signin or using a different email",
+  "faqHeader": "FAQ", 
+  "smartWayToFindDeals": "The smart way to find deals and make profits on online marketplaces.",
+  "hero": {
+    "badge": "#1 Marketplace Monitoring Tool",
+    "marketingTextNeverMissADeal": {
+    "text": "Never miss a {deal} again",
+    "deal": "Deal"
+    },
+    "description": "Create custom notifiers across multiple marketplaces and get instant alerts when items matching your criteria appear. Stay ahead of the competition with real-time updates.",
+    "startFree": "Start for Free",
+    "usersJoined": "users already joined",
+    "notification": {
+      "title": "New Match Found!",
+      "content": "PlayStation 5 - $399"
+    }
+  },
+  "stats": {
+    "itemsTracked": {
+      "number": "10M+",
+      "label": "Items Tracked"
+    },
+    "marketplaces": {
+      "number": "10+",
+      "label": "Marketplaces"
+    },
+    "uptime": {
+      "number": "99.9%",
+      "label": "Uptime"
+    },
+    "monitoring": {
+      "number": "24/7",
+      "label": "Monitoring"
+    }
+  },
+  "features": {
+    "badge": "Powerful Features",
+    "title": "Everything You Need for Marketplace Monitoring",
+    "description": "Our platform helps you stay ahead of the competition with real-time notifications across multiple marketplaces, powerful filtering, and advanced analytics.",
+    "notifiers": {
+      "title": "Custom Notifiers",
+      "description": "Create personalized alerts for specific items, price ranges, or sellers across any supported marketplace. Get notified exactly when and how you want.",
+      "benefits": {
+        "first": "Keyword-based alerts",
+        "second": "Price range filters",
+        "third": "Seller reputation filtering"
+      }
+    },
+    "filters": {
+      "title": "Cross-Marketplace Filters",
+      "description": "Set up sophisticated filters that work across multiple platforms simultaneously to find exactly what you're looking for, no matter where it's listed.",
+      "benefits": {
+        "first": "Unified search across platforms",
+        "second": "Advanced boolean logic",
+        "third": "Exclusion filters"
+      }
+    },
+    "alerts": {
+      "title": "Instant Alerts",
+      "description": "Receive notifications in real-time via email, SMS, or push notifications as soon as matching items are listed. Never miss a deal again.",
+      "benefits": {
+        "first": "Email notifications",
+        "second": "Push notifications",
+        "third": "Discord webhook"
+      }
+    }, 
+  },
+  "howItWorks": {
+    "badge": "Simple Process",
+    "title": "How ANE Works",
+    "description": "Our platform makes it easy to set up and manage marketplace alerts in just a few simple steps.",
+    "steps": {
+      "first": {
+        "title": "Create an Account",
+        "description": "Get started with ANE no login or credit card required."
+      },
+      "second": {
+        "title": "Set Up Notifiers",
+        "description": "Create custom notifiers with your specific search criteria and preferences."
+      },
+      "third": {
+        "title": "Choose Notification Methods",
+        "description": "Select how you want to be notified when matching items are found."
+      },
+      "fourth": {
+        "title": "Receive Alerts",
+        "description": "Receive notifications when items matching your criteria are listed."
+      }
+    },
+    "cta": "Get Started in Minutes"
+  },
+  "useCases": {
+    "badge": "Perfect For",
+    "title": "Who Uses ANE?",
+    "description": "Our platform is designed for a variety of users who need to stay on top of marketplace listings.",
+    "collectors": {
+      "title": "Collectors",
+      "description": "Find rare collectibles, limited editions, and hard-to-find items across multiple marketplaces before anyone else.",
+      "benefits": {
+        "first": "Track rare collectibles",
+        "second": "Set price thresholds",
+        "third": "Monitor multiple marketplaces"
+      }
+    },
+    "resellers": {
+      "title": "Resellers",
+      "description": "Find underpriced items to flip for profit. Get notified of deals before competitors and maximize your margins.",
+      "benefits": {
+        "first": "Identify underpriced items",
+        "second": "Set filters for underpriced items",
+        "third": "Sync across multiple websites"
+      }
+    },
+    "bargainHunters": {
+      "title": "Bargain Hunters",
+      "description": "Never miss a deal on products you want. Set up alerts for specific items and get notified when prices drop.",
+      "benefits": {
+        "first": "Track price drops",
+        "second": "Find limited-time offers",
+        "third": "Compare prices across platforms"
+      }
+    }
+  },
+  "marketplaces": {
+    "badge": "Wide Coverage",
+    "title": "Supported Marketplaces",
+    "description": "Our platform integrates with many major online and local marketplaces to give you comprehensive coverage and ensure you never miss a deal.",
+    "platforms": {
+      "ebay": "eBay",
+      "kleinanzeigen": "Kleinanzeigen",
+      "autoscout24": "Autoscout24",
+      "facebook": "Facebook",
+      "craigslist": "Craigslist",
+      "more": "+ Many More"
+    },
+  },
+  "testimonials": {
+    "badge": "Customer Stories",
+    "title": "What Our Users Say",
+    "description": "Don't just take our word for it. Here's what our customers have to say about ANE.",
+    "items": {
+      "first": {
+        "quote": "ANE has completely changed how I collect vintage video games. I was able to find a rare sealed copy of Chrono Trigger that I'd been hunting for years!",
+        "name": "Michael Thompson",
+        "role": "Game Collector"
+      },
+      "second": {
+        "quote": "As a reseller, timing is everything. ANE has helped me increase my profits by 40% by alerting me to deals before my competition even knows they exist.",
+        "name": "Sarah Johnson",
+        "role": "eCommerce Entrepreneur"
+      },
+      "third": {
+        "quote": "I was able to furnish my entire apartment with amazing deals thanks to ANE. The cross-marketplace filters are a game-changer for finding exactly what you want.",
+        "name": "David Rodriguez",
+        "role": "Bargain Hunter"
+      }
+    }
+  },
+  "pricing": {
+    "badge": "Pricing Plans",
+    "title": "Simple, Transparent Pricing",
+    "description": "Choose the plan that fits your needs. No hidden fees or long-term commitments. All plans include our core features.",
+    "popular": "Popular",
+    "comingSoon": "Coming Soon",
+    "plans": {
+      "free": {
+        "name": "Free",
+        "subtitle": "Perfect for casual browsing",
+        "price": "$0",
+        "billing": "Forever free",
+        "features": {
+          "notifiers": "Up to 3 search notifiers",
+          "filters": "Access to multiple marketplaces",
+          "email": "All notifications channels",
+          "updates": "Notifications within 1 hour",
+          "analytics": "Advanced analytics"
+        },
+        "cta": "Get Started"
+      },
+      "collector": {
+        "name": "Collector",
+        "subtitle": "For serious collectors",
+        "price": "$9.99",
+        "billing": "per month",
+        "features": {
+          "notifiers": "Up to 20 search notifiers",
+          "filters": "Access to all marketplaces",
+          "notifications": "All notifications channels",
+          "updates": "Notifications within 10 minutes",
+          "priceCalculation": "Price Calculation"
+        },
+        "cta": "Subscribe Now"
+      },
+      "flipper": {
+        "name": "Flipper",
+        "subtitle": "For professional resellers",
+        "price": "??,99€",
+        "billing": "per month",
+        "features": {
+          "notifiers": "High amount search notifiers",
+          "filters": "Access to marketplaces",
+          "notifications": "All notification channels",
+          "updates": "Notifications within the minute",
+          "analytics": "Price calculation",
+        },
+        "cta": "Coming Soon"
+      }
+    },
+    "allPlansInclude": {
+      "title": "All Plans Include",
+      "security": "Secure data encryption",
+      "support": "Email support",
+      "updates": "Regular updates",
+    }
+  },
+  "faq": {
+    "badge": "Questions & Answers",
+    "title": "Frequently Asked Questions",
+    "description": "Find answers to common questions about ANE and how it can help you stay ahead of the competition.",
+    "items": {
+      "first": {
+        "question": "What platforms are supported?",
+        "answer": "Our service supports a wide range of popular online marketplaces, including Facebook Marketplace, Autoscout24, Kleineanzeigen, and eBay, among others. We are continuously expanding our platform integrations to provide more options."
+      },
+      "second": {
+        "question": "Is there a free trial?",
+        "answer": "We offer a completely free trial that doesn't require any login or credit card information. Experience the power of our platform risk-free and see how we can help you find what you're looking for before committing to a paid plan."
+      },
+      "third": {
+        "question": "How many marketplaces can I monitor at once?",
+        "answer": "All plans allow you to monitor all supported marketplaces simultaneously. The difference between plans is the number of active notifiers you can have and the frequency of notifications."
+      }, 
+      "fourth":{
+        "question": "Can I customize the types of notifications I receive?",
+        "answer": "Included in all tiers you can customize many things like adding blacklisted and whitelisted keywords, price range, search radius and more"
+      },
+      "fifth": {
+        "question": "How many marketplaces can I monitor at once?",
+        "answer": "Notification speed depends on your chosen tier. Free tier users receive notifications within 1 hour. Collector tier within 10 minutes. Our upcoming Flipper tier will offer near real-time notifications"
+      },
+      "sixth": {
+        "question": "When will the Flipper plan be available?",
+        "answer": "The Flipper plan is currently in development and will be available soon. You can join our waitlist to be notified when it launches and get early access."
+      }
+    },
+    "moreQuestions": "Still have questions?",
+    "contactSupport": "Contact Support"
+  }, 
+  "cta": {
+    "title": "Ready to Never Miss a Deal Again?",
+    "description": "Join thousands of collectors and resellers who use our platform to stay ahead of the competition. Start for free today!",
+    "primaryButton": "Get Started Now",
+    "benefits": {
+      "noCreditCard": "No credit card required",
+      "noEmailRequired": "No Email Required"
+    }
+  },
+  "common": {
+    "learnMore": "Learn more"
+  },
   "fillOutAllFields": "Please fill out all fields",
   "errorRequesting": "There was an error creating your subscription",
   "autoScout": "AutoScout24",
