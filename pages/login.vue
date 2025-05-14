@@ -8,7 +8,7 @@
             {{ $t('features') }}
           </UiTextButton>
           <UiTextButton @on-click="navigateTo(localePath('/#features'))">
-            {{ $t('pricing') }}
+            {{ $t('pricingHeader') }}
           </UiTextButton>
           <UiTextButton @on-click="navigateTo(localePath('/#features'))">
             {{ $t('support') }}
@@ -16,10 +16,7 @@
         </nav>
 
         <div class="flex items-center space-x-4">
-          <UiButton
-            :primary="true"
-            @on-click="navigateTo(localePath('/register'))"
-          >
+          <UiButton :primary="true" @on-click="navigateTo(localePath('/register'))">
             {{ $t('signUp') }}
           </UiButton>
         </div>
