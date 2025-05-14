@@ -9,10 +9,20 @@
       @click="isProfileMenuOpen = !isProfileMenuOpen"
     >
       <img
+        v-if="userStore.user?.avatar != ''"
         :src="userStore.user?.avatar ?? ''"
         alt="Profile"
         class="w-8 h-8 rounded-full"
       >
+      <div
+        v-else
+        class="bg-slate-700 w-10 h-10 rounded-full flex items-center justify-center"
+      >
+        <Icon
+          name="tabler:user"
+          class="size-6"
+        />
+      </div>
       <Icon :name="isProfileMenuOpen ? 'tabler:chevron-up' : 'tabler:chevron-down'" />
     </button>
 

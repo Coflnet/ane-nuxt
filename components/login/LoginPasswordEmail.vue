@@ -55,7 +55,8 @@ async function login() {
     push.error(`There was an error creating your account \n If you have not made a account yet try making one`)
     return
   }
-
+  userStore.isAuthenticated = true
+  userStore.isAnonymous = false
   navigateTo(localePath(redirectTo ?? '/overview'))
 }
 </script>

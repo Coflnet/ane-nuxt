@@ -173,14 +173,17 @@ export const useUserStore = defineStore('user', () => {
 
     try {
       if (isAnonymous && !isLogin) {
+        console.log('anoynmous')
         const credential = EmailAuthProvider.credential(email, password)
         upgradeUserAccount(clientAuth, credential)
         isAnonymous.value = false
         return { success: true }
       }
-      const result = isLogin ? await createUserWithEmailAndPassword(clientAuth, email, password) : await signInWithEmailAndPassword(clientAuth, email, password)
+      console.log('logging in')
+      const result = isLogin ? await signInWithEmailAndPassword(clientAuth, email, password) : await createUserWithEmailAndPassword(clientAuth, email, password)
       const loggedInUser = result.user
 
+      console.log(loggedInUser)
       if (loggedInUser) {
         user.value = {
           id: loggedInUser.uid,
