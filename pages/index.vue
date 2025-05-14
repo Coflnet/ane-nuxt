@@ -28,12 +28,12 @@
               class="text-gray-300 hover:text-indigo-400 transition-colors"
             >{{ $t('faqHeader') }}</a>
             <a
-              href="/login"
+              :href="localePath('/login')"
               class="px-4 py-2 rounded-full bg-gray-700 text-white hover:bg-gray-600 transition-all"
             >{{
               $t('signIn') }}</a>
             <a
-              href="/overview"
+              :href="localePath('/overview')"
               class="px-4 py-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-900/20"
             >{{
               $t('getStarted') }}</a>
@@ -84,7 +84,7 @@
         >{{
           $t('nav.signIn') }}</a>
         <a
-          href="/overview"
+          :href="localePath('/overview')"
           class="block px-4 py-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition-all text-center shadow-lg shadow-indigo-900/20"
         >{{
           $t('nav.getStarted') }}</a>
@@ -128,7 +128,7 @@
             </p>
             <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
               <a
-                href="/overview"
+                :href="localePath('/overview')"
                 class="px-8 py-4 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition-all text-center shadow-lg shadow-indigo-900/20 font-medium"
               >
                 {{ $t('hero.startFree') }}
@@ -485,7 +485,7 @@
           class="mt-16 text-center"
         >
           <a
-            href="/overview"
+            :href="localePath('/overview')"
             class="px-8 py-4 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition-all inline-block shadow-lg shadow-indigo-900/20 font-medium"
           >
             {{ $t('howItWorks.cta') }}
@@ -955,7 +955,7 @@
               </ul>
             </div>
             <a
-              href="/overview"
+              :href="localePath('/overview')"
               class="block w-full px-4 py-3 rounded-full border border-gray-600 text-gray-300 hover:bg-gray-700 transition-all text-center font-medium"
             >
               {{ $t('pricing.plans.free.cta') }}
@@ -1026,7 +1026,7 @@
               </ul>
             </div>
             <a
-              href="/register?redirectTo=/subscriptions'"
+              :href="localePath('/register?redirectTo=/subscriptions')"
               class="block w-full px-4 py-3 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition-all text-center font-medium shadow-lg shadow-indigo-900/20"
             >
               {{ $t('pricing.plans.collector.cta') }}
@@ -1275,7 +1275,7 @@
             </p>
             <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
               <a
-                href="/overview"
+                :href="localePath('/overview')"
                 class="px-8 py-4 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition-all font-medium shadow-lg"
               >
                 {{ $t('cta.primaryButton') }}
@@ -1419,6 +1419,7 @@ import { ref, onMounted } from 'vue'
 import { useIntersectionObserver } from '@vueuse/core'
 import { definePageMeta } from '#imports'
 
+const localePath = useLocalePath()
 const mobileMenuOpen = ref(false)
 
 // Animation functions
