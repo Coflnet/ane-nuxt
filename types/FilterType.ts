@@ -36,4 +36,5 @@ export interface Filter {
   notificationType: TargetType
   notificationTarget: string
   country: string
+  internationalShipping: boolean
 }

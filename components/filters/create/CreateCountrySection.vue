@@ -1,37 +1,43 @@
 <template>
-  <UiGrid :grid-size="3">
-    <CountryDropDown :model-value="model" />
-    <div>
+  <div>
+    <UiGrid :grid-size="3">
+      <UiCountryDropDown :model-value="model" />
+      <div>
+        <UiInput
+          v-model="model!.searchRadius"
+          :label="$t('searchRadius')"
+          type="number"
+          :placeholder="$t('radiusEq', 80)"
+          :footer="$t('searchRadiusAroundYou')"
+          :error="radiusError"
+        />
+        <p
+          v-if="radiusError"
+          class="mt-1 text-xs text-rose-500"
+        >
+          {{ radiusErrorMessage }}
+        </p>
+      </div>
+
       <UiInput
-        v-model="model!.searchRadius"
-        :label="$t('searchRadius')"
+        v-model="model!.zipcode"
+        :label="$t('zipCode')"
         type="number"
-        :placeholder="$t('radiusEq', 80)"
-        :footer="$t('searchRadiusAroundYou')"
+        :placeholder="$t('zipCodeEq')"
+        :footer="$t('yourZip')"
         :error="radiusError"
       />
-      <p
-        v-if="radiusError"
-        class="mt-1 text-xs text-rose-500"
-      >
-        {{ radiusErrorMessage }}
-      </p>
-    </div>
-
-    <UiInput
-      v-model="model!.zipcode"
-      :label="$t('zipCode')"
-      type="number"
-      :placeholder="$t('zipCodeEq')"
-      :footer="$t('yourZip')"
-      :error="radiusError"
+    </UiGrid>
+    <UiCheckbox
+      v-model="model!.internationalShipping"
+      class="mt-2"
+      :label="$t('internationalShipping')"
     />
-  </UiGrid>
+  </div>
 </template>
 
 <script setup lang="ts">
 import type { Filter } from '~/types/FilterType'
-import CountryDropDown from '~/components/ui/CountryDropDown.vue'
 
 const { t } = useI18n()
 const radiusError = ref(false)

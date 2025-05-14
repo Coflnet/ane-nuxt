@@ -196,5 +196,8 @@
   "autoScout": "AutoScout24",
   "selectMarket": "Select Marketplace",
   "thatEmailInUse": "This email is already in use try signin or using a different email",
-  "country": "Country"
+  "country": "Country",
+  "internationalShipping": "International Shipping",
+  "selectedCountry": "Select Country",
+  "yourCountry": "Select your country"
 }

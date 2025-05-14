@@ -26,6 +26,7 @@
           :footer="$t('addKeyDescription')"
           :place-holder="$t('addKeywordPressEnter')"
         />
+
         <FiltersKeywordFilter
           :model-value="filter.blacklist"
           :label="$t('blackKeywords')"
@@ -109,6 +110,8 @@ const filter = ref<Filter>({
   id: 0,
   notificationType: 'Unknown',
   notificationTarget: '',
+  country: t('selectedCountry'),
+  internationalShipping: false,
 })
 
 watch([filter, selectedMarketplaces], (_) => {
@@ -227,6 +230,7 @@ async function saveFilter() {
     savingFilter.value = true
     const f = await filterToCreate()
 
+    return
     if (!f)
       return
     await filterStore.saveFilter(f)
@@ -246,6 +250,8 @@ async function filterToCreate(): Promise<ListingListener | null> {
   }
 
   const rawFilter = toRaw(filter.value)
+
+  console.log(rawFilter)
 
   if (rawFilter.notificationType == 'FireBase') {
     rawFilter.notificationTarget = await connectPushNotifications()
@@ -275,9 +281,15 @@ async function handleFilters(): Promise<{ name: string, value: any }[]> {
   const rawFilter = toRaw(filter.value)
   const filters: { name: string, value: any }[] = []
 
-  if (rawFilter.minPrice != 0 || rawFilter.maxPrice || rawFilter.maxPrice == 0) {
+  if (rawFilter.minPrice != 0 || rawFilter.maxPrice || rawFilter.maxPrice == 0)
     filters.push({ name: 'PriceRange', value: `${Number(rawFilter.minPrice)}-${Number(rawFilter.maxPrice)}` })
-  }
+
+  if (rawFilter.internationalShipping)
+    filters.push({ name: 'CrossBorder', value: 'true' })
+
+  if (rawFilter.country != t('selectedCountry'))
+    filters.push({ name: 'Country', value: rawFilter.country })
+
   if (!selectedMarketplaces.value.map(item => item.value).includes('all')) {
     filters.push({
       name: 'IncludePlatforms',
@@ -285,18 +297,17 @@ async function handleFilters(): Promise<{ name: string, value: any }[]> {
     })
   }
 
-  if (rawFilter.commercialSeller) {
+  if (rawFilter.commercialSeller)
     filters.push({ name: 'CommercialSeller', value: true })
-  }
+
   if (rawFilter.zipcode != '' && rawFilter.marketplace != 'ebay') {
     const location = await handleSearchRadius()
     filters.push({ name: 'Radius', value: `${location[0]};${location[1]};${rawFilter.searchRadius};${rawFilter.zipcode}` })
   }
 
   filters.push({ name: 'SearchTerm', value: rawFilter.searchValue })
-  if (rawFilter.totalCost != 0) {
+  if (rawFilter.totalCost != 0)
     filters.push({ name: 'TotalCost', value: `${rawFilter.totalCost}-${rawFilter.totalCost}` })
-  }
 
   if (rawFilter.keywords.length != 0)
     filters.push({ name: 'ContainsKeyWord', value: rawFilter.keywords.join(',') })

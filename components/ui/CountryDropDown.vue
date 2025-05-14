@@ -13,7 +13,7 @@
       name="country"
     >
       <option disabled>
-        select country
+        {{ $t('selectedCountry') }}
       </option>
       <option value="AF">
         Afghanistan
@@ -772,6 +772,11 @@
         Zimbabwe
       </option>
     </select>
+
+    <UiFooterLabel
+      :label="$t('yourCountry')"
+      :xs="true"
+    />
   </div>
 </template>
 
