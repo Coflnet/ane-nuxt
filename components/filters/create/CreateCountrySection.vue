@@ -28,7 +28,6 @@
 <script setup lang="ts">
 import type { Filter } from '~/types/FilterType'
 
-const { t } = useI18n()
 const radiusError = ref(false)
 const model = defineModel<Filter>()
 

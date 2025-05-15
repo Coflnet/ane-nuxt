@@ -3,7 +3,7 @@
     class="flex items-center p-4 flex-nowrap"
     :accent="true"
   >
-    <div class="flex items-center flex-col h-full justify-center">
+    <div class="flex items-center flex-col  h-full justify-center">
       <input
         :id="config.notificationType"
         v-model="filter.notificationType"
@@ -15,7 +15,7 @@
     </div>
     <label
       :for="config.notificationType"
-      class="ml-3 flex"
+      class="ml-3 flex flex-col md:flex-row"
     >
       <div class="flex items-center">
         <div class="w-8 h-8 rounded-md bg-indigo-900 flex items-center justify-center mr-3">
@@ -31,7 +31,7 @@
       </div>
       <div
         v-if="filter.notificationType === config.notificationType && config.textInput"
-        class="ml-11 mt-2"
+        class="md:ml-11 mt-2"
       >
         <UiInput
           v-model="model"
