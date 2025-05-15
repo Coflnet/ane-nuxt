@@ -1,16 +1,30 @@
 <template>
   <div class="w-full">
-    <UiHeaderLabel :label="label ?? ''" :sm="true" :accent="true" />
-    <input :id="name" :type="type" :placeholder="props.placeholder ?? ''" v-model="model" :class="[
-      'w-full px-4 py-2 rounded-lg border bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-400',
-      error ? 'border-rose-500' : 'border-slate-600'
-    ]" />
-    <FooterLabel v-if="!error" :label="footer" :xs="true" />
+    <UiHeaderLabel
+      :label="label ?? ''"
+      :sm="true"
+      :accent="true"
+    />
+    <input
+      :id="name"
+      v-model="model"
+      :type="type"
+      :placeholder="props.placeholder ?? ''"
+      :class="[
+        'w-full px-4 py-2 rounded-lg border bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-400',
+        error ? 'border-rose-500' : 'border-slate-600',
+      ]"
+    >
+    <FooterLabel
+      v-if="!error"
+      :label="footer"
+      :xs="true"
+    />
   </div>
 </template>
 
 <script setup lang='ts'>
-import FooterLabel from './FooterLabel.vue';
+import FooterLabel from './FooterLabel.vue'
 
 const props = defineProps({
   name: String,

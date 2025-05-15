@@ -196,13 +196,14 @@
   "autoScout": "AutoScout24",
   "selectMarket": "Select Marketplace",
   "thatEmailInUse": "This email is already in use try signin or using a different email",
-  "country": "Country",
+  "location": "Location",
   "internationalShipping": "International Shipping",
-  "selectedCountry": "Select Country",
+  "selectedCountry": "Select Location",
   "yourCountry": "Select your country",
   "allCondition": "All Conditions",
   "newCondition": "New Condition",
   "usedCondition": "Used Condition",
   "forPartsCondition": "For Parts",
-  "condition": "Condition"
+  "condition": "Condition",
+  "countryShipping": "Select your location or country to restrict shipping to that area"
 }

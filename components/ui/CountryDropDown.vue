@@ -1,10 +1,20 @@
 <template>
   <div>
-    <UiHeaderLabel
-      :label="$t('country')"
-      :accent="true"
-      :sm="true"
-    />
+    <div class="flex">
+      <UiHeaderLabel
+        :label="$t('location')"
+        :accent="true"
+        :sm="true"
+      />
+      <UiTooltipHover :text="$t('countryShipping')">
+        <div
+          class="border bg-slate-700 text-white border-slate-800 text-sm rounded-full size-6 text-center ml-2 -translate-y-0.5"
+        >
+          ?
+        </div>
+      </UiTooltipHover>
+    </div>
+
     <select
       id="country"
       v-model="model!.country"
@@ -14,6 +24,9 @@
     >
       <option disabled>
         {{ $t('selectedCountry') }}
+      </option>
+      <option value="EU">
+        Europe
       </option>
       <option value="AF">
         Afghanistan
