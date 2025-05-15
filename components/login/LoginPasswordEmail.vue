@@ -57,6 +57,6 @@ async function login() {
   }
   userStore.isAuthenticated = true
   userStore.isAnonymous = false
-  navigateTo(localePath(redirectTo ?? '/overview'))
+  navigateTo(localePath(redirectTo ?? props.isLogin ? '/overview' : '/filters/create'))
 }
 </script>

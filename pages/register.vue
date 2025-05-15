@@ -16,7 +16,10 @@
         </nav>
 
         <div class="flex items-center space-x-4">
-          <UiButton :primary="true" @on-click="navigateTo(localePath('/login'))">
+          <UiButton
+            :primary="true"
+            @on-click="navigateTo(localePath('/login'))"
+          >
             {{ $t('signIn') }}
           </UiButton>
         </div>
