@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { createUserWithEmailAndPassword, type EmailAuthCredential, EmailAuthProvider, GoogleAuthProvider, linkWithCredential, linkWithPopup, signInAnonymously, signInWithEmailAndPassword, signInWithPopup, type Auth, updateProfile, type UserCredential } from 'firebase/auth'
+import { createUserWithEmailAndPassword, type EmailAuthCredential, EmailAuthProvider, GoogleAuthProvider, linkWithCredential, linkWithPopup, signInAnonymously, signInWithEmailAndPassword, signInWithPopup, type Auth, updateProfile, type UserCredential, getAdditionalUserInfo } from 'firebase/auth'
 import { navigateTo } from '#app'
 import { loginFirebase } from '~/src/api-client'
 import type { ActiveSubscription } from '#hey-api'
@@ -83,7 +83,7 @@ export const useUserStore = defineStore('user', () => {
 
   const localePath = useLocalePath()
 
-  async function loginWithGoogle(clientAuth: Auth, login: boolean): Promise<{ success: boolean, error?: string | null }> {
+  async function loginWithGoogle(clientAuth: Auth, login: boolean): Promise<{ success: boolean, error?: string | null, newUser?: boolean }> {
     isLoading.value = true
     error.value = null
 
@@ -124,7 +124,7 @@ export const useUserStore = defineStore('user', () => {
 
       isAuthenticated.value = true
 
-      return { success: true }
+      return { success: true, newUser: getAdditionalUserInfo(result)?.isNewUser }
     }
     catch (err) {
       console.error('Error during Google login:', err)
