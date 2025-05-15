@@ -2,23 +2,6 @@
   <div>
     <UiGrid :grid-size="3">
       <UiCountryDropDown :model-value="model" />
-      <div>
-        <UiInput
-          v-model="model!.searchRadius"
-          :label="$t('searchRadius')"
-          type="number"
-          :placeholder="$t('radiusEq', 80)"
-          :footer="$t('searchRadiusAroundYou')"
-          :error="radiusError"
-        />
-        <p
-          v-if="radiusError"
-          class="mt-1 text-xs text-rose-500"
-        >
-          {{ radiusErrorMessage }}
-        </p>
-      </div>
-
       <UiInput
         v-model="model!.zipcode"
         :label="$t('zipCode')"
@@ -27,6 +10,17 @@
         :footer="$t('yourZip')"
         :error="radiusError"
       />
+
+      <div>
+        <UiInput
+          v-model="model!.searchRadius"
+          :disabled="model?.zipcode == ''"
+          :label="$t('searchRadius')"
+          type="number"
+          :placeholder="$t('radiusEq', 80)"
+          :footer="$t('searchRadiusAroundYou')"
+        />
+      </div>
     </UiGrid>
   </div>
 </template>
@@ -37,13 +31,6 @@ import type { Filter } from '~/types/FilterType'
 const { t } = useI18n()
 const radiusError = ref(false)
 const model = defineModel<Filter>()
-
-const radiusErrorMessage = computed(() => {
-  if (!radiusError.value) return ''
-  return model.value!.marketplace === 'ebay'
-    ? t('searchRadiusRequiresEbay')
-    : t('zipCodePlease')
-})
 
 watch([() => model.value!.searchRadius, () => model.value!.zipcode], ([newRadius, newZipcode]) => {
   validateRadiusAndZipcode(newRadius, newZipcode)
