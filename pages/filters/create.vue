@@ -281,14 +281,18 @@ async function handleFilters(): Promise<{ name: string, value: any }[]> {
   const rawFilter = toRaw(filter.value)
   const filters: { name: string, value: any }[] = []
 
-  if (rawFilter.country != '')
+  console.log(rawFilter.country)
+
+  // t('selectedCountry') is the default value
+  if (rawFilter.country != t('selectedCountry'))
     filters.push({ name: 'Country', value: rawFilter.country })
 
   if (rawFilter.minPrice != 0 || rawFilter.maxPrice || rawFilter.maxPrice == 0)
     filters.push({ name: 'PriceRange', value: `${Number(rawFilter.minPrice)}-${Number(rawFilter.maxPrice)}` })
 
-  if (rawFilter.country != t('selectedCountry'))
-    filters.push({ name: 'Country', value: rawFilter.country })
+  if (rawFilter.condition != '') {
+    filters.push({ name: 'Condition', value: rawFilter.condition })
+  }
 
   if (!selectedMarketplaces.value.map(item => item.value).includes('all')) {
     filters.push({

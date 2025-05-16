@@ -5,18 +5,26 @@
       :sm="true"
       :accent="true"
     />
-    <input
-      :id="name"
-      v-model="model"
-      :disabled="disabled"
-      :type="type"
-      :placeholder="props.placeholder ?? ''"
-      :class="[
-        'w-full px-4 py-2 rounded-lg border bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-400',
-        error ? 'border-rose-500' : 'border-slate-600',
-        disabled ? 'cursor-not-allowed' : '',
-      ]"
-    >
+    <div class="relative">
+      <input
+        :id="name"
+        v-model="model"
+        :disabled="disabled"
+        :type="type"
+        :placeholder="props.placeholder ?? ''"
+        :class="[
+          'w-full px-4 py-2 rounded-lg border bg-slate-700  focus:outline-none focus:ring-2 focus:ring-indigo-400 appearance-none',
+          error ? 'border-rose-500' : 'border-slate-600',
+          disabled ? 'cursor-not-allowed text-gray-500' : 'text-white',
+        ]"
+      >
+      <div
+        v-if="type == 'numeric'"
+        class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-gray-400"
+      >
+        km
+      </div>
+    </div>
     <FooterLabel
       v-if="!error"
       :label="footer"

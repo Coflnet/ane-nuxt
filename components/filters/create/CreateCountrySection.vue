@@ -14,7 +14,7 @@
         v-model="model!.searchRadius"
         :disabled="model?.zipcode == ''"
         :label="$t('searchRadius')"
-        type="number"
+        type="numeric"
         :placeholder="$t('radiusEq', 80)"
         :footer="$t('searchRadiusAroundYou')"
       />
