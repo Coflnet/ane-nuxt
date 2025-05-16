@@ -30,10 +30,12 @@
 import type { Filter } from '~/types/FilterType'
 
 const condiditonSelected = ref<{ value: string, label: string }[]>([])
-const condidtion = [{ value: 'all', label: 'allMarket' },
+const condidtion = [
+  { value: 'all', label: 'allCondition' },
   { value: 'new', label: 'newCondition' },
   { value: 'used', label: 'usedCondition' },
-  { value: 'forParts', label: 'forPartsCondition' }]
+  { value: 'refurbished', label: 'refurbishedCondition' },
+  { value: 'broken', label: 'forPartsCondition' }]
 
 // constuct the string send to backend here instead of in handleFilters()
 watch(condiditonSelected, () => {

@@ -99,7 +99,7 @@ const filter = ref<Filter>({
   searchValue: '',
   totalCost: 0,
   zipcode: '',
-  searchRadius: null as number | null,
+  searchRadius: 100,
   commercialSeller: false,
   seller: '',
   keywords: [] as string[],
@@ -231,6 +231,7 @@ async function saveFilter() {
     savingFilter.value = true
     const f = await filterToCreate()
 
+    console.log(f)
     return
     if (!f)
       return
@@ -251,8 +252,6 @@ async function filterToCreate(): Promise<ListingListener | null> {
   }
 
   const rawFilter = toRaw(filter.value)
-
-  console.log(rawFilter)
 
   if (rawFilter.notificationType == 'FireBase') {
     rawFilter.notificationTarget = await connectPushNotifications()
@@ -281,6 +280,9 @@ async function filterToCreate(): Promise<ListingListener | null> {
 async function handleFilters(): Promise<{ name: string, value: any }[]> {
   const rawFilter = toRaw(filter.value)
   const filters: { name: string, value: any }[] = []
+
+  if (rawFilter.country != '')
+    filters.push({ name: 'Country', value: rawFilter.country })
 
   if (rawFilter.minPrice != 0 || rawFilter.maxPrice || rawFilter.maxPrice == 0)
     filters.push({ name: 'PriceRange', value: `${Number(rawFilter.minPrice)}-${Number(rawFilter.maxPrice)}` })
@@ -323,6 +325,11 @@ async function handleSearchRadius(): Promise<[string, string]> {
     const url = `https://nominatim.openstreetmap.org/search?postalcode=${filter.value.zipcode}&country=${data.country_name}&format=json`
     const response2 = await fetch(url)
     const data2 = await response2.json()
+    if (data2.length == 0) {
+      push.error(t('enteringZipCodeError'))
+      savingFilter.value = false
+      return ['', '']
+    }
     return [data2[0].lat, data2[0].lon]
   }
   catch (error) {
