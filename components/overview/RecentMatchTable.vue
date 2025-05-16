@@ -70,8 +70,8 @@
         name="tabler:file-sad"
         class="size-11 text-white"
       />
-      <UiHeaderLabel :label="$t('noFilters')" />
-      <UiFooterLabel :label="$t('tryCreatingFilters')" />
+      <UiHeaderLabel :label="$t('noAuctions')" />
+      <UiFooterLabel :label="$t('createOrAdjustFilters')" />
     </div>
   </UiDefaultContainer>
 </template>

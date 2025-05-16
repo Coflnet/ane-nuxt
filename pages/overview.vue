@@ -1,43 +1,45 @@
 <template>
-  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-    <div>
-      <h1>
-        <UiHeaderLabel
-          :label="$t('dashboard')"
-          :xl="true"
+  <div>
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+      <div>
+        <h1>
+          <UiHeaderLabel
+            :label="$t('dashboard')"
+            :xl="true"
+          />
+        </h1>
+        <UiFooterLabel :label="$t('monitorAuctionAndFilters')" />
+      </div>
+      <UiButton
+        :primary="true"
+        @on-click="navigateTo(localePath('/filters/create'))"
+      >
+        <Icon
+          name="tabler:plus"
+          class="size-5"
         />
-      </h1>
-      <UiFooterLabel :label="$t('monitorAuctionAndFilters')" />
+        <span class="mr-1">{{ $t('createFilter') }}</span>
+      </UiButton>
     </div>
-    <UiButton
-      :primary="true"
-      @on-click="navigateTo(localePath('/filters/create'))"
-    >
-      <Icon
-        name="tabler:plus"
-        class="size-5"
-      />
-      <span class="mr-1">{{ $t('createFilter') }}</span>
-    </UiButton>
+
+    <OverviewStats
+      :filter-count="filterCount"
+      :matched-auctions="stats.matchedAuctions"
+      :notificationper-hour="stats.notificationperHour"
+    />
+
+    <OverviewRecentMatchTable
+      :matches="listingStore.recentMatches"
+      :title="$t('recentMatches')"
+      :overview="true"
+      :loading="loading"
+    />
+
+    <UiGrid :grid-size="2">
+      <OverviewTopFilters :top-filters="topFilters" />
+      <OverviewNotificationChannels />
+    </UiGrid>
   </div>
-
-  <OverviewStats
-    :filter-count="filterCount"
-    :matched-auctions="stats.matchedAuctions"
-    :notificationper-hour="stats.notificationperHour"
-  />
-
-  <OverviewRecentMatchTable
-    :matches="listingStore.recentMatches"
-    :title="$t('dashboard')"
-    :overview="true"
-    :loading="loading"
-  />
-
-  <UiGrid :grid-size="2">
-    <OverviewTopFilters :top-filters="topFilters" />
-    <OverviewNotificationChannels />
-  </UiGrid>
 </template>
 
 <script setup lang="ts">

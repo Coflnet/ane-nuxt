@@ -96,7 +96,6 @@
   "matches": "Treffer",
   "matchFilter": "Gefundener Filter:",
   "mechanicalKeyboard": "",
-  "monitorAuctionAndFilters": "",
   "month": "Monat",
   "mostPopular": "Am beliebtesten",
   "nameEg": "z.B. Fotografie-Zubehör",
@@ -422,5 +421,7 @@
   "common": {
     "learnMore": "Mehr erfahren"
   },
-  "monitorAuctionAndFilters": "Überwachen Sie Ihre Auktionsfilter und Benachrichtigungen"
+  "monitorAuctionAndFilters": "Überwachen Sie Ihre Auktionsfilter und Benachrichtigungen",
+  "recentMatches": "Kürzlich gefunden",
+  "createOrAdjustFilters": "Bearbeite deine Filter oder füge neue hinzu"
 }
