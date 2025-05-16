@@ -275,7 +275,6 @@ async function filterToCreate(): Promise<ListingListener | null> {
   return filterToCreate
 }
 
-
 async function handleFilters(): Promise<{ name: string, value: any }[]> {
   const rawFilter = toRaw(filter.value)
   const filters: { name: string, value: any }[] = []
@@ -337,6 +336,7 @@ async function connectPushNotifications(): Promise<string> {
 }
 
 onMounted(async () => {
+  await useUserStore().checkAuth(useFirebaseAuth()!)
   await Promise.allSettled([filterStore.loadFilters()])
   loadEditParam()
 })
