@@ -47,7 +47,7 @@
         </div>
 
         <FiltersPriceConditionFilter v-model="filter" />
-        <NotificationSettingsFilter :filter="filter" />
+        <NotificationSettingsFilter v-model="filter" />
 
         <FiltersCreateConfirmCreation
           :is-new-filter="isNewFilter"
@@ -110,7 +110,7 @@ const filter = ref<Filter>({
   location: '',
   id: 0,
   notificationType: 'Unknown',
-  notificationTarget: '',
+  notificationTarget: 'helloworld',
   country: t('selectedCountry'),
   condition: '',
 })
@@ -168,6 +168,7 @@ async function loadEditParam() {
       return
     }
 
+    filter.value.notificationTarget = activeFilter.target ?? ''
     filter.value.name = activeFilter.name ?? ''
     filter.value.id = activeFilter.id ?? 0
     filter.value.notificationType = activeFilter.targetType ?? 'Unknown'
@@ -200,7 +201,6 @@ async function loadEditParam() {
         }
         case 'IncludePlatforms':
           parseIncludedPlatforms(item.value ?? '')
-          console.log(selectedMarketplaces)
           break
         case 'CommercialSeller':
           filter.value.commercialSeller = Boolean(item.value)
@@ -231,9 +231,7 @@ async function loadEditParam() {
 async function parseIncludedPlatforms(marketplaceString: string) {
   selectedMarketplaces.value = []
   marketplaceString.split(',').map((marketplaceName) => {
-    console.log(marketplaceName)
     const marketplaceItem = marketplaces.find(m => m.value == marketplaceName)
-    console.log(marketplaceItem)
     if (marketplaceItem)
       selectedMarketplaces.value.push(marketplaceItem)
   })
@@ -291,8 +289,6 @@ async function filterToCreate(): Promise<ListingListener | null> {
 async function handleFilters(): Promise<{ name: string, value: any }[]> {
   const rawFilter = toRaw(filter.value)
   const filters: { name: string, value: any }[] = []
-
-  console.log(rawFilter.country)
 
   // t('selectedCountry') is the default value
   if (rawFilter.country != t('selectedCountry'))
@@ -364,6 +360,6 @@ async function connectPushNotifications(): Promise<string> {
 
 onMounted(async () => {
   await Promise.allSettled([filterStore.loadFilters()])
-  loadEditParam()
+  await loadEditParam()
 })
 </script>

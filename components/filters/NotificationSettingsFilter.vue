@@ -2,10 +2,10 @@
   <div>
     <UiHeaderLabel :label="$t('notificationsChannels')" />
     <div class="space-y-4 mt-4">
-      <FiltersNotificationSettingsDiscordFilter :filter="props.filter" />
-      <FiltersNotificationSettingsMailFilter :filter="props.filter" />
-      <FiltersNotificationSettingsWebPushFilter :filter="props.filter" />
-      <FiltersNotificationSettingsNoneFilter :filter="props.filter" />
+      <FiltersNotificationSettingsDiscordFilter v-model="model" />
+      <FiltersNotificationSettingsMailFilter v-model="model" />
+      <FiltersNotificationSettingsWebPushFilter v-model="model" />
+      <FiltersNotificationSettingsNoneFilter v-model="model" />
     </div>
   </div>
 </template>
@@ -13,5 +13,5 @@
 <script setup lang='ts'>
 import type { Filter } from '~/types/FilterType'
 
-const props = defineProps<{ filter: Filter }>()
+const model = defineModel<Filter>()
 </script>

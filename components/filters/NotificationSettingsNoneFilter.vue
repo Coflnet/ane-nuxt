@@ -3,7 +3,7 @@
     <div class="flex items-center h-5">
       <input
         id="none-notification"
-        v-model="filter.notificationType"
+        v-model="model!.notificationType"
         type="radio"
         value="Unknown"
         class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300"
@@ -25,5 +25,5 @@
 <script setup lang='ts'>
 import type { Filter } from '~/types/FilterType'
 
-defineProps<{ filter: Filter }>()
+const model = defineModel<Filter>()
 </script>

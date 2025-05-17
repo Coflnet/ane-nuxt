@@ -85,12 +85,7 @@ const emit = defineEmits<{
 }>()
 
 watch(model, () => {
-  console.log('this updated')
-
-  console.log(model.value, ' model')
-  console.log(selectedItems.value, ' selected')
   selectedItems.value = toRaw(model.value!)
-  console.log(selectedItems.value, ' selected2')
 })
 
 const isOpen = ref(false)
@@ -160,7 +155,6 @@ const handleGlobalClick = (event: MouseEvent) => {
 }
 
 onMounted(() => {
-  console.log(props.options[0])
   toggleSelection(props.options![0]!)
 })
 

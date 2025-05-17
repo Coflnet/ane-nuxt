@@ -1,42 +1,44 @@
 <template>
-  <FiltersNotificationSettingItem @item-selected="checkPushNotificationPermissions" :filter="filter" :config="{
-    notificationType: 'FireBase',
-    predefinedValue: '',
-    name: $t('webPush'),
-    icon: 'tabler:mail',
-    textInput: false
-  }" :messages="{
-    footer: $t('browserNotifications'),
-  }" />
+  <FiltersNotificationSettingItem
+    :filter="model!"
+    :config="{
+      notificationType: 'FireBase',
+      predefinedValue: '',
+      name: $t('webPush'),
+      icon: 'tabler:mail',
+      textInput: false,
+    }"
+    :messages="{
+      footer: $t('browserNotifications'),
+    }"
+    @item-selected="checkPushNotificationPermissions"
+  />
 </template>
 
 <script setup lang='ts'>
-import type { Filter } from '~/types/FilterType';
+import type { Filter } from '~/types/FilterType'
 
-const props = defineProps<{ filter: Filter }>()
-
+const model = defineModel<Filter>()
 
 if (import.meta.client) {
-  watch(() => props.filter.notificationType, async (newValue) => {
+  watch(() => model.value!.notificationType, async (newValue) => {
     if (newValue === 'FireBase') {
       // akwav request in his frontend had a - in it
-      props.filter.notificationTarget = '-'
+      model.value!.notificationTarget = '-'
     }
-  }, { immediate: true });
+  }, { immediate: true })
 }
 
 function checkPushNotificationPermissions() {
   if (import.meta.server)
-    return false;
+    return false
 
-  console.log('Requesting persmissions')
   Notification.requestPermission().then((permission) => {
     if (permission === 'granted') {
       console.log('Notification permission granted')
-      return;
+      return
     }
-    push.error("Getting persmissions for push notification failed please try again\nIf this continues please contact support")
+    push.error('Getting persmissions for push notification failed please try again\nIf this continues please contact support')
   })
 }
-
 </script>
