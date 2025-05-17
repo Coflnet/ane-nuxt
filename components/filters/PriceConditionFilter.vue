@@ -2,12 +2,27 @@
   <!-- The grid component does not want to work with this -->
   <div class="grid grid-cols-2 md:grid-cols-4 gap-x-8 ">
     <div class="flex items-center mb-4 space-x-2 col-span-2">
-      <UiInput v-model="model!.minPrice" :label="$t('priceRange')" type="number" placeholder="" />
+      <UiInput
+        v-model="model!.minPrice"
+        :label="$t('priceRange')"
+        type="number"
+        placeholder=""
+      />
       <span class="text-slate-400 mt-3.5">-</span>
-      <UiInput v-model="model!.maxPrice" class="mt-5" type="number" placeholder="0" />
+      <UiInput
+        v-model="model!.maxPrice"
+        class="mt-5"
+        type="number"
+        placeholder="0"
+      />
     </div>
-    <UiMultiSelect v-model="condiditonSelected" class="col-span-2" :label="$t('condition')" :options="condidtion"
-      override-value="all" />
+    <UiMultiSelect
+      v-model="condiditonSelected"
+      class="col-span-2"
+      :label="$t('condition')"
+      :options="condidtion"
+      override-value="all"
+    />
   </div>
 </template>
 
@@ -22,6 +37,18 @@ const condidtion = [
   { value: 'refurbished', label: 'refurbishedCondition' },
   { value: 'broken', label: 'forPartsCondition' }]
 
+const model = defineModel<Filter>()
+
+// reconstuct the selected conditions from a string updated when editing a filter
+watch(() => model.value!.condition, () => {
+  condiditonSelected.value = []
+  model.value?.condition.split(',').map((condidtionName) => {
+    const marketplaceItem = condidtion.find(m => m.value == condidtionName)
+    if (marketplaceItem)
+      condiditonSelected.value.push(marketplaceItem)
+  })
+})
+
 // constuct the string send to backend here instead of in handleFilters()
 watch(condiditonSelected, () => {
   if (condiditonSelected.value.map(item => item.value).includes('all')) {
@@ -30,5 +57,4 @@ watch(condiditonSelected, () => {
   }
   model.value!.condition = condiditonSelected.value.map(i => i.value).join(',')
 })
-const model = defineModel<Filter>()
 </script>

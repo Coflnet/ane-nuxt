@@ -84,19 +84,27 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: { value: string, label: string }[]): void
 }>()
 
+watch(model, () => {
+  console.log('this updated')
+
+  console.log(model.value, ' model')
+  console.log(selectedItems.value, ' selected')
+  selectedItems.value = toRaw(model.value!)
+  console.log(selectedItems.value, ' selected2')
+})
+
 const isOpen = ref(false)
 const selectedItems = ref<{ value: string, label: string }[]>([])
 
 // create the string that is displayed on the button eq. Ebay, AutoScout24
 const selectedLabels = computed(() => {
-  console.log(selectedItems.value)
   if (selectedItems.value.length === 0) return ''
-  console.log('selected labe')
+  const rawSelectedItems = selectedItems.value.map(item => toRaw(item)) // Convert Proxies to raw objects
   const selected = props.options
-    .filter(option => selectedItems.value.includes(option))
+    .filter(option => rawSelectedItems.some(selectedItem =>
+      selectedItem.value === option.value && selectedItem.label === option.label, // Compare all relevant properties
+    ))
     .map(option => t(option.label))
-
-  console.log(selected, ' gello')
 
   if (selected.length <= 3) {
     return selected.join(', ')
@@ -124,8 +132,6 @@ const isSelected = (value: { value: string, label: string }): boolean => {
 // Toggle selection of an item
 const toggleSelection = (value: { value: string, label: string }) => {
   const index = selectedItems.value.indexOf(value)
-  console.log('selecting', value.value)
-  console.log(index)
   if (index === -1) {
     // deselect all other options when the overrideValue is selected
     if (value.value === props.overrideValue) {
@@ -143,7 +149,6 @@ const toggleSelection = (value: { value: string, label: string }) => {
   else
     selectedItems.value.splice(index, 1)
 
-  console.log(selectedItems, ' hi')
   emit('update:modelValue', [...selectedItems.value])
 }
 
@@ -155,7 +160,7 @@ const handleGlobalClick = (event: MouseEvent) => {
 }
 
 onMounted(() => {
-  console.log(props.options)
+  console.log(props.options[0])
   toggleSelection(props.options![0]!)
 })
 

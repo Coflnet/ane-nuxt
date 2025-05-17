@@ -199,12 +199,8 @@ async function loadEditParam() {
           break
         }
         case 'IncludePlatforms':
-          console.log(item.value)
-          if (['Ebay', 'Kleinanzeigen'].includes(item.value!)) {
-            filter.value.marketplace = item.value!
-            break
-          }
-          filter.value.marketplace = 'all'
+          parseIncludedPlatforms(item.value ?? '')
+          console.log(selectedMarketplaces)
           break
         case 'CommercialSeller':
           filter.value.commercialSeller = Boolean(item.value)
@@ -212,10 +208,16 @@ async function loadEditParam() {
         case 'SearchTerm':
           filter.value.searchValue = item.value ?? ''
           break
+        case 'Condition':
+          filter.value.condition = item.value ?? ''
+          break
         case 'TotalCost': {
           const [min, _max] = item.value!.split('-')
           filter.value.totalCost = Number(min)
           break
+        }
+        case 'Country': {
+          filter.value.country = item.value ?? ''
         }
       }
     })
@@ -226,13 +228,22 @@ async function loadEditParam() {
   }
 }
 
+async function parseIncludedPlatforms(marketplaceString: string) {
+  selectedMarketplaces.value = []
+  marketplaceString.split(',').map((marketplaceName) => {
+    console.log(marketplaceName)
+    const marketplaceItem = marketplaces.find(m => m.value == marketplaceName)
+    console.log(marketplaceItem)
+    if (marketplaceItem)
+      selectedMarketplaces.value.push(marketplaceItem)
+  })
+}
+
 async function saveFilter() {
   try {
     savingFilter.value = true
     const f = await filterToCreate()
 
-    console.log(f)
-    return
     if (!f)
       return
     await filterStore.saveFilter(f)
