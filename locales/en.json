@@ -207,7 +207,7 @@
   "forPartsCondition": "For Parts",
   "condition": "Condition",
   "countryShipping": "Select your location or country to restrict shipping to that area",
-  "enteringZipCodeError": "While proccessing your zip code there was a error, try re-entering your zip-code or refreshing the page ",
+  "enteringZipCodeError": "While proccessing your zip code there was a error, try re-entering your zip-code",
   "unitedStates": "United States",
   "canada": "Canada",
   "unitedKingdom": "United Kingdom",
