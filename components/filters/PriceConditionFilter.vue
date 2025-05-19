@@ -1,6 +1,14 @@
 <template>
   <!-- The grid component does not want to work with this -->
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-x-8 ">
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-x-8 pt-2 mt-4">
+    <UiMultiSelect
+      v-model="condiditonSelected"
+      class="col-span-2"
+      :label="$t('condition')"
+      :options="condidtion"
+      override-value="all"
+    />
+
     <div class="flex items-center mb-4 space-x-2 col-span-2">
       <UiInput
         v-model="model!.minPrice"
@@ -16,13 +24,6 @@
         placeholder="0"
       />
     </div>
-    <UiMultiSelect
-      v-model="condiditonSelected"
-      class="col-span-2"
-      :label="$t('condition')"
-      :options="condidtion"
-      override-value="all"
-    />
   </div>
 </template>
 

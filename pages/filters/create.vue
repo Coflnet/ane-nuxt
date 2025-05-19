@@ -2,10 +2,7 @@
   <div>
     <FiltersCreateHeader :is-new-filter="isNewFilter" />
     <UiDefaultContainer class="mb-6 p-6">
-      <form
-        class="space-y-6"
-        @submit.prevent="saveFilter"
-      >
+      <form @submit.prevent="saveFilter">
         <UiGrid :grid-size="2">
           <UiInput
             v-model="filter.searchValue"
@@ -21,20 +18,7 @@
           />
         </UiGrid>
 
-        <FiltersKeywordFilter
-          :model-value="filter.keywords"
-          :label="$t('searchKeywords')"
-          :footer="$t('addKeyDescription')"
-          :place-holder="$t('addKeywordPressEnter')"
-        />
-
-        <FiltersKeywordFilter
-          :model-value="filter.blacklist"
-          :label="$t('blackKeywords')"
-          :footer="$t('addblacklistKeywords')"
-          :place-holder="$t('addBlackListPressEnter')"
-        />
-
+        <FiltersPriceConditionFilter v-model="filter" />
         <FiltersCreateCountrySection :model-value="filter" />
 
         <!-- Dont worry about this, this whole system needs to get reworked by akwav -->
@@ -45,8 +29,22 @@
             :options="option.value.options"
           />
         </div>
+        <UiExpandOption class="mt-1">
+          <FiltersKeywordFilter
+            :model-value="filter.keywords"
+            :label="$t('searchKeywords')"
+            :footer="$t('addKeyDescription')"
+            :place-holder="$t('addKeywordPressEnter')"
+          />
 
-        <FiltersPriceConditionFilter v-model="filter" />
+          <FiltersKeywordFilter
+            class="my-6"
+            :model-value="filter.blacklist"
+            :label="$t('blackKeywords')"
+            :footer="$t('addblacklistKeywords')"
+            :place-holder="$t('addBlackListPressEnter')"
+          />
+        </UiExpandOption>
         <NotificationSettingsFilter v-model="filter" />
 
         <FiltersCreateConfirmCreation

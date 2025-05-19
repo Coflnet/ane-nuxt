@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="mt-4">
     <UiHeaderLabel :label="$t('notificationsChannels')" />
     <div class="space-y-4 mt-4">
       <FiltersNotificationSettingsDiscordFilter v-model="model" />
