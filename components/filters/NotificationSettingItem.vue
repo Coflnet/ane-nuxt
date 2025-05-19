@@ -3,7 +3,7 @@
     class="flex items-center p-4 flex-nowrap"
     :accent="true"
   >
-    <div class="flex items-center flex-col  h-full justify-center">
+    <div class="flex items-center flex-col h-full justify-center">
       <input
         :id="config.notificationType"
         v-model="filter.notificationType"
