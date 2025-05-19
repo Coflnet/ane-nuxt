@@ -203,9 +203,19 @@
   "allCondition": "All Conditions",
   "newCondition": "New Condition",
   "usedCondition": "Used Condition",
-  "refurbishedCondition" : "Refurbished",
+  "refurbishedCondition": "Refurbished",
   "forPartsCondition": "For Parts",
   "condition": "Condition",
   "countryShipping": "Select your location or country to restrict shipping to that area",
-  "enteringZipCodeError": "While proccessing your zip code there was a error, try re-entering your zip-code or refreshing the page "
+  "enteringZipCodeError": "While proccessing your zip code there was a error, try re-entering your zip-code or refreshing the page ",
+  "unitedStates": "United States",
+  "canada": "Canada",
+  "unitedKingdom": "United Kingdom",
+  "germany": "Germany",
+  "france": "France",
+  "italy": "Italy",
+  "japan": "Japan",
+  "netherlands": "Netherlands",
+  "australia": "Australia",
+  "europe": "Europe"
 }

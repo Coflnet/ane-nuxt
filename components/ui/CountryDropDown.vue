@@ -26,7 +26,7 @@
         {{ $t('selectedCountry') }}
       </option>
       <option value="EU">
-        Europe
+        {{ $t('Europe') }}
       </option>
       <option value="US">
         {{ $t('unitedStates') }}
@@ -43,8 +43,17 @@
       <option value="FR">
         {{ $t('france') }}
       </option>
-      <option value="FR<C-D-S>">
-        {{ $t('france') }}
+      <option value="IT">
+        {{ $t('italy') }}
+      </option>
+      <option value="JP">
+        {{ $t('japan') }}
+      </option>
+      <option value="NL">
+        {{ $t('netherlands') }}
+      </option>
+      <option value="AU">
+        {{ $t('australia') }}
       </option>
     </select>
 
