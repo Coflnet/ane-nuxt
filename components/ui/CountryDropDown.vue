@@ -22,8 +22,8 @@
       autocomplete="country"
       name="country"
     >
-      <option disabled>
-        {{ $t('selectedCountry') }}
+      <option value="EU,US,GB">
+        {{ $t('anyCountry') }}
       </option>
       <option value="EU">
         {{ $t('Europe') }}
@@ -58,7 +58,7 @@
     </select>
 
     <UiFooterLabel
-      :label="$t('yourCountry')"
+      :label="$t('sendingCountry')"
       :xs="true"
     />
   </div>
