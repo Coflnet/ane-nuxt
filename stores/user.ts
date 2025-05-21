@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { createUserWithEmailAndPassword, type EmailAuthCredential, EmailAuthProvider, GoogleAuthProvider, linkWithCredential, linkWithPopup, signInAnonymously, signInWithEmailAndPassword, signInWithPopup, type Auth, updateProfile, type UserCredential } from 'firebase/auth'
+import { createUserWithEmailAndPassword, type EmailAuthCredential, EmailAuthProvider, GoogleAuthProvider, linkWithCredential, linkWithPopup, signInAnonymously, signInWithEmailAndPassword, signInWithPopup, type Auth, updateProfile, type UserCredential, getAdditionalUserInfo } from 'firebase/auth'
 import { navigateTo } from '#app'
 import { loginFirebase } from '~/src/api-client'
 import type { ActiveSubscription } from '#hey-api'
@@ -83,7 +83,7 @@ export const useUserStore = defineStore('user', () => {
 
   const localePath = useLocalePath()
 
-  async function loginWithGoogle(clientAuth: Auth, login: boolean): Promise<{ success: boolean, error?: string | null }> {
+  async function loginWithGoogle(clientAuth: Auth, login: boolean): Promise<{ success: boolean, error?: string | null, newUser?: boolean }> {
     isLoading.value = true
     error.value = null
 
@@ -124,7 +124,7 @@ export const useUserStore = defineStore('user', () => {
 
       isAuthenticated.value = true
 
-      return { success: true }
+      return { success: true, newUser: getAdditionalUserInfo(result)?.isNewUser }
     }
     catch (err) {
       console.error('Error during Google login:', err)
@@ -174,11 +174,16 @@ export const useUserStore = defineStore('user', () => {
     try {
       if (isAnonymous && !isLogin) {
         const credential = EmailAuthProvider.credential(email, password)
-        upgradeUserAccount(clientAuth, credential)
+        const upgradeResult = await upgradeUserAccount(clientAuth, credential)
+
+        if (upgradeResult == false) {
+          return { success: false }
+        }
+
         isAnonymous.value = false
         return { success: true }
       }
-      const result = isLogin ? await createUserWithEmailAndPassword(clientAuth, email, password) : await signInWithEmailAndPassword(clientAuth, email, password)
+      const result = isLogin ? await signInWithEmailAndPassword(clientAuth, email, password) : await createUserWithEmailAndPassword(clientAuth, email, password)
       const loggedInUser = result.user
 
       if (loggedInUser) {

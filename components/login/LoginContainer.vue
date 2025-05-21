@@ -10,7 +10,10 @@
 
     <UiFooterLabel class="mt-4 flex">
       {{ isLogin ? $t('dontHaveAccount') : $t('alreadyHaveAccount') }}
-      <UiLinkLabel :href="isLogin ? '/register' : '/login'" class="ml-1">
+      <UiLinkLabel
+        :href="isLogin ? '/register' : '/login'"
+        class="ml-1"
+      >
         {{ isLogin ? $t('signUp') : $t('signIn') }}
       </UiLinkLabel>
     </UiFooterLabel>
@@ -18,8 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { UiDefaultContainer } from '#components';
+import { UiDefaultContainer } from '#components'
 
 defineProps({ isLogin: Boolean })
-
 </script>

@@ -59,7 +59,6 @@
   "editFilter": "Filter bearbeiten",
   "email": "E-Mail",
   "enterEmailAddress": "Gib deine E-Mail-Adresse ein",
-  "features": "Funktionen",
   "filter": "Filter",
   "filterName": "Filter Name",
   "filters": "Filter",
@@ -71,7 +70,6 @@
   "getStarted": "Schnell loslegen",
   "greatTryingAne": "Gratis Version zum Testen",
   "how": "Verwendung von",
-  "howItWorks": "",
   "instantNotifications": "Erhalte sofortige Benachrichtigungen",
   "invalidDiscordWebhook": "Bitte gib eine gültige Discord Webhook-URL ein",
   "invalidEmail": "Bitte gib eine gültige E-Mail-Adresse ein",
@@ -98,7 +96,6 @@
   "matches": "Treffer",
   "matchFilter": "Gefundener Filter:",
   "mechanicalKeyboard": "",
-  "monitorAuctionAndFilters": "",
   "month": "Monat",
   "mostPopular": "Am beliebtesten",
   "nameEg": "z.B. Fotografie-Zubehör",
@@ -111,7 +108,6 @@
   "price": "Preis",
   "priceCalculation": "Preisberechnung",
   "priceRange": "Preisbereich",
-  "pricing": "Preis",
   "privacy": "Datenschutz",
   "privacyPolicy": "Datenrichterklärung",
   "pushNotifications": "E-Mail, Discord & Push-Benachrichtigungen",
@@ -143,7 +139,6 @@
   "signintoAccount": "Melde dich mit deinem Konto an",
   "signOut": "Abmelden",
   "signUp": "Registrieren",
-  "simpleTransparent": "Einfach und transparent",
   "smartWayToFindDeals": "Der intelligente Weg, um Schnäppchen zu finden",
   "startFindingDeals": "Starte die Suche nach Schnäppchen",
   "subscriptions": "Abos",
@@ -159,10 +154,6 @@
   "updateFilter": "Filter aktualisieren",
   "usersSay": "Nutzer sagen",
   "view": "Anzeigen",
-  "viewHistoricalData": "Zeige dir historische Daten an, um ein besseres Verständnis für den Markt zu bekommen.",
-  "vintageCameraLens": "Vintage Kameraobjektiv",
-  "vintageCollector": "Vintage Sammler",
-  "vintageCollectorDecription": "NimDing hat mir geholfen, die besten Vintage-Artikel zu finden. Ich habe in den letzten 3 Wochen 5 Aritkel gefunden, die ich für meine Sammlung kaufen konnte.",
   "webPush": "Web Push-Benachrichtigung",
   "whatOur": "Was unsere",
   "works": "",
@@ -210,5 +201,265 @@
   "pickupDelivery": "Abholung",
   "allDelivery": "Alle Versandarten",
   "deliveryMethod": "Versandart",
-  "marketplaces": "Marktplätze"
+  "faqHeader": "FAQ", 
+  "hero": {
+    "badge": "#1 Marktplatz-Überwachungstool",
+    "marketingTextNeverMissADeal": {
+    "text": "Verpasse nie wieder ein {deal}",
+    "deal": "Schnäppchen"
+    },
+    "description": "Erstelle benutzerdefinierte Benachrichtigungen für mehrere Marktplätze und erhalte sofortige Warnungen, wenn Artikel erscheinen, die deinen Kriterien entsprechen. Bleibe der Konkurrenz mit Echtzeit-Updates einen Schritt voraus.",
+    "startFree": "Kostenlos starten",
+    "usersJoined": "Benutzer sind bereits beigetreten",
+    "notification": {
+      "title": "Neuer Treffer gefunden!",
+      "content": "PlayStation 5 - $399"
+    }
+  },
+  "stats": {
+    "itemsTracked": {
+      "number": "10M+",
+      "label": "Verarbeitete Artikel"
+    },
+    "marketplaces": {
+      "number": "10+",
+      "label": "Marktplätze"
+    },
+    "uptime": {
+      "number": "99.9%",
+      "label": "Verfügbarkeit"
+    },
+    "monitoring": {
+      "number": "24/7",
+      "label": "Aktualisierung"
+    }
+  },
+  "features": {
+    "badge": "Mächtige Funktionen",
+    "title": "Alles, was Sie für die Marktplatzüberwachung benötigen",
+    "description": "Unsere Plattform hilft Ihnen, der Konkurrenz einen Schritt voraus zu sein, mit Echtzeit-Benachrichtigungen über mehrere Marktplätze, leistungsstarken Filtern und erweiterten Analysen.",
+    "notifiers": {
+      "title": "Benutzerdefinierte Benachrichtigungen",
+      "description": "Erstellen Sie personalisierte Benachrichtigungen für bestimmte Artikel, Preisspannen oder Verkäufer auf jedem unterstützten Marktplatz. Werden Sie genau dann und so benachrichtigt, wie Sie es möchten.",
+      "benefits": {
+        "first": "Keyword-basierte Benachrichtigungen",
+        "second": "Preisspannenfilter",
+        "third": "Filterung nach Verkäuferreputation"
+      }
+    },
+    "filters": {
+      "title": "Marktplatzübergreifende Filter",
+      "description": "Richten Sie komplexe Filter ein, die gleichzeitig auf mehreren Plattformen funktionieren, um genau das zu finden, wonach Sie suchen, egal wo es gelistet ist.",
+      "benefits": {
+        "first": "Einheitliche Suche über Plattformen hinweg",
+        "second": "Erweiterte boolesche Logik",
+        "third": "Ausschlussfilter"
+      }
+    },
+    "alerts": {
+      "title": "Sofortige Benachrichtigungen",
+      "description": "Erhalten Sie Benachrichtigungen in Echtzeit per E-Mail, Push-Benachrichtigungen und Discord, sobald passende Artikel gelistet werden. Verpassen Sie nie wieder ein Angebot.",
+      "benefits": {
+        "first": "E-Mail-Benachrichtigungen",
+        "second": "Push-Benachrichtigungen",
+        "third": "Discord-Webhook"
+      }
+    }
+  },
+  "howItWorks": {
+    "badge": "Einfacher Ablauf",
+    "title": "Wie ANE funktioniert",
+    "description": "Unsere Plattform macht es einfach, Marktplatz-Benachrichtigungen in nur wenigen einfachen Schritten einzurichten und zu verwalten.",
+    "steps": {
+      "first": {
+        "title": "Konto erstellen oder auch nicht",
+        "description": "Starte mit ANE, keine Anmeldung oder Kreditkarte erforderlich. Testen Sie einen Großteil der Funktionen ohne Verpflichtung."
+      },
+      "second": {
+        "title": "Benachrichtigungen einrichten",
+        "description": "Erstelle benutzerdefinierte Benachrichtigungen mit deinen spezifischen Suchkriterien und Präferenzen."
+      },
+      "third": {
+        "title": "Benachrichtigungsmethoden wählen",
+        "description": "Wähle aus, wie du benachrichtigt werden möchtest, wenn passende Artikel gefunden werden."
+      },
+      "fourth": {
+        "title": "Benachrichtigungen erhalten",
+        "description": "Erhalte Benachrichtigungen, wenn Artikel, die deinen Kriterien entsprechen, gelistet werden."
+      }
+    },
+    "cta": "In wenigen Minuten loslegen"
+  },
+  "useCases": {
+    "badge": "Perfekt für",
+    "title": "Wer nutzt ANE?",
+    "description": "Unsere Plattform ist für eine Vielzahl von Nutzern konzipiert, die den Überblick über Marktplatzangebote behalten müssen.",
+    "collectors": {
+      "title": "Sammler",
+      "description": "Finde seltene Sammlerstücke, limitierte Auflagen und schwer zu findende Artikel auf mehreren Marktplätzen vor allen anderen.",
+      "benefits": {
+        "first": "Seltene Sammlerstücke verfolgen",
+        "second": "Preisschwellen festlegen",
+        "third": "Mehrere Marktplätze überwachen"
+      }
+    },
+    "resellers": {
+      "title": "Flipper/Händler",
+      "description": "Finde unterbewertete Artikel, um sie gewinnbringend weiterzuverkaufen. Erhalte Benachrichtigungen über Angebote vor der Konkurrenz und maximiere deine Margen.",
+      "benefits": {
+        "first": "Unterbewertete Artikel identifizieren",
+        "second": "Filter für unterbewertete Artikel einstellen",
+        "third": "Synchronisierung über mehrere Websites hinweg"
+      }
+    },
+    "bargainHunters": {
+      "title": "Schnäppchenjäger",
+      "description": "Verpasse nie wieder ein Angebot für Produkte, die du möchtest. Richte Benachrichtigungen für bestimmte Artikel ein und werde benachrichtigt, wenn die Preise fallen.",
+      "benefits": {
+        "first": "Preisverfälle verfolgen",
+        "second": "Zeitlich begrenzte Angebote finden",
+        "third": "Preise plattformübergreifend vergleichen"
+      }
+    }
+  },
+  "marketplaces": {
+    "badge": "Wide Coverage",
+    "title": "Supported Marketplaces",
+    "description": "Our platform integrates with many major online and local marketplaces to give you comprehensive coverage and ensure you never miss a deal.",
+    "platforms": {
+      "ebay": "eBay",
+      "kleinanzeigen": "Kleinanzeigen",
+      "autoscout24": "Autoscout24",
+      "facebook": "Facebook",
+      "craigslist": "Craigslist",
+      "more": "+ Viele mehr"
+        }
+      },
+      "testimonials": {
+        "badge": "Kundenstimmen",
+        "title": "Das sagen unsere Nutzer",
+        "description": "Verlassen Sie sich nicht nur auf unser Wort. Das sagen unsere Kunden über ANE.",
+        "items": {
+      "first": {
+        "quote": "ANE has completely changed how I collect vintage video games. I was able to find a rare sealed copy of Chrono Trigger that I'd been hunting for years!",
+        "name": "Michael Thompson",
+        "role": "Game Collector"
+      },
+      "second": {
+        "quote": "As a reseller, timing is everything. ANE has helped me increase my profits by 40% by alerting me to deals before my competition even knows they exist.",
+        "name": "Sarah Johnson",
+        "role": "eCommerce Entrepreneur"
+      },
+      "third": {
+        "quote": "I was able to furnish my entire apartment with amazing deals thanks to ANE. The cross-marketplace filters are a game-changer for finding exactly what you want.",
+        "name": "David Rodriguez",
+        "role": "Bargain Hunter"
+      }
+    }
+  },
+  "pricing": {
+    "badge": "Preispläne",
+    "title": "Einfache, transparente Preise",
+    "description": "Wähle den Plan, der zu deinen Bedürfnissen passt. Keine versteckten Gebühren oder langfristigen Verpflichtungen. Alle Pläne beinhalten unsere Kernfunktionen.",
+    "popular": "Beliebt",
+    "comingSoon": "Bald verfügbar",
+    "plans": {
+      "free": {
+        "name": "Kostenlos",
+        "subtitle": "Perfekt für gelegentliches Stöbern",
+        "price": "0€",
+        "billing": "Für immer kostenlos",
+        "features": {
+          "notifiers": "Bis zu 3 Filter",
+          "filters": "Zugang zu mehreren Marktplätzen",
+          "email": "Alle Benachrichtigungskanäle",
+          "updates": "Benachrichtigungen innerhalb von einer Stunde",
+          "analytics": "Erweiterte Analysen"
+        },
+        "cta": "Loslegen"
+      },
+      "collector": {
+        "name": "Sammler",
+        "subtitle": "Für leidenschaftliche Sammler",
+        "price": "9,99€",
+        "billing": "pro Monat",
+        "features": {
+          "notifiers": "Bis zu 20 Filter",
+          "filters": "Zugang zu allen Marktplätzen",
+          "notifications": "Alle Benachrichtigungskanäle",
+          "updates": "Benachrichtigungen innerhalb von 10 Minuten",
+          "priceCalculation": "Preisberechnung"
+        },
+        "cta": "Jetzt abonnieren"
+      },
+      "flipper": {
+        "name": "Flipper",
+        "subtitle": "Für professionelle Wiederverkäufer",
+        "price": "??,99€",
+        "billing": "pro Monat",
+        "features": {
+          "notifiers": "Unbegrenzte aktive Benachrichtigungen",
+          "filters": "Zugang zu Marktplätzen",
+          "notifications": "Alle Benachrichtigungskanäle",
+          "updates": "Benachrichtigungen innerhalb einer Minute",
+          "analytics": "Preisberechnung"
+        },
+        "cta": "Demnächst verfügbar"
+      }
+    },
+    "allPlansInclude": {
+      "title": "Alle Pläne beinhalten",
+      "security": "Datenschutz auf höchstem Niveau",
+      "support": "Support",
+      "updates": "Regelmäßige Updates"
+    }
+  },
+  "faq": {
+    "badge": "Fragen & Antworten",
+    "title": "Häufig gestellte Fragen",
+    "description": "Finden Sie Antworten auf häufig gestellte Fragen zu ANE und wie es Ihnen helfen kann, der Konkurrenz einen Schritt voraus zu sein.",
+    "items": {
+      "first": {
+        "question": "Welche Plattformen werden unterstützt?",
+        "answer": "Unser Service unterstützt eine breite Palette beliebter Online-Marktplätze, darunter Autoscout24, Kleinanzeigen und eBay. Wir erweitern kontinuierlich unsere Plattformintegrationen, um mehr Optionen anzubieten. Schreibe uns, wenn du eine bestimmte Plattform im Sinn hast!"
+      },
+      "second": {
+        "question": "Gibt es eine kostenlose Testversion?",
+        "answer": "Wir bieten eine völlig kostenlose Testversion an, für die keine Anmelde- oder Kreditkarteninformationen erforderlich sind. Erleben Sie die Leistungsfähigkeit unserer Plattform risikofrei und sehen Sie, wie wir Ihnen helfen können, das zu finden, wonach Sie suchen, bevor Sie sich für einen kostenpflichtigen Plan entscheiden."
+      },
+      "third": {
+        "question": "Wie viele Marktplätze kann ich gleichzeitig überwachen?",
+        "answer": "Alle Pläne ermöglichen es Ihnen, alle unterstützten Marktplätze gleichzeitig zu überwachen. Der Unterschied zwischen den Plänen besteht in der Anzahl der aktiven Suchen, die Sie haben können, und der Häufigkeit der Benachrichtigungen."
+      },
+      "fourth":{
+        "question": "Kann ich die Arten der Benachrichtigungen anpassen, die ich erhalte?",
+        "answer": "In allen Stufen können Sie viele Dinge anpassen, z. B. das Hinzufügen von Blacklist- und Whitelist-Schlüsselwörtern, Preisspannen, Suchradius und mehr."
+      },
+      "fifth": {
+        "question": "Wie schnell erhalte ich Benachrichtigungen?",
+        "answer": "Die Benachrichtigungsgeschwindigkeit hängt von Ihrer gewählten Stufe ab. Benutzer der kostenlosen Stufe erhalten Benachrichtigungen innerhalb von einer Stunde. Sammlerstufe innerhalb von 10 Minuten. Unsere kommende Flipper-Stufe bietet Benachrichtigungen nahezu in Echtzeit."
+      },
+      "sixth": {
+        "question": "Wann wird der Flipper-Plan verfügbar sein?",
+        "answer": "Der Flipper-Plan befindet sich derzeit in der Entwicklung und wird in Kürze verfügbar sein."
+      }
+    },
+    "moreQuestions": "Haben Sie noch Fragen?",
+    "contactSupport": "Support kontaktieren"
+  },
+  "cta": {
+    "title": "Bereit, nie wieder ein Angebot zu verpassen?",
+    "description": "Schließe dich Tausenden von Sammlern und Wiederverkäufern an, die unsere Plattform nutzen, um der Konkurrenz einen Schritt voraus zu sein. Starte noch heute kostenlos!",
+    "primaryButton": "Jetzt loslegen",
+    "benefits": {
+      "noCreditCard": "Keine Kreditkarte erforderlich",
+      "noEmailRequired": "Keine E-Mail erforderlich"
+    }
+  },
+  "common": {
+    "learnMore": "Mehr erfahren"
+  },
+  "monitorAuctionAndFilters": "Überwachen Sie Ihre Auktionsfilter und Benachrichtigungen",
+  "recentMatches": "Kürzlich gefunden",
+  "createOrAdjustFilters": "Bearbeite deine Filter oder füge neue hinzu"
 }

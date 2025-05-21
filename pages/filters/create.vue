@@ -369,6 +369,7 @@ async function connectPushNotifications(): Promise<string> {
 }
 
 onMounted(async () => {
+  await useUserStore().checkAuth(useFirebaseAuth()!)
   await Promise.allSettled([filterStore.loadFilters()])
   await loadEditParam()
 })
