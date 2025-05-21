@@ -111,6 +111,7 @@ const filter = ref<Filter>({
   notificationTarget: 'helloworld',
   country: t('selectedCountry'),
   condition: '',
+  deliveryMethod: '',
 })
 
 watch([filter, selectedMarketplaces], (_) => {
@@ -166,6 +167,8 @@ async function loadEditParam() {
       return
     }
 
+    console.log(activeFilter)
+
     filter.value.notificationTarget = activeFilter.target ?? ''
     filter.value.name = activeFilter.name ?? ''
     filter.value.id = activeFilter.id ?? 0
@@ -209,6 +212,9 @@ async function loadEditParam() {
         case 'Condition':
           filter.value.condition = item.value ?? ''
           break
+        case 'DeliveryMethod':
+          filter.value.deliveryMethod = item.value ?? ''
+          break
         case 'TotalCost': {
           const [min, _max] = item.value!.split('-')
           filter.value.totalCost = Number(min)
@@ -240,6 +246,8 @@ async function saveFilter() {
     savingFilter.value = true
     const f = await filterToCreate()
 
+    console.log(f)
+    return
     if (!f)
       return
     await filterStore.saveFilter(f)
@@ -287,6 +295,7 @@ async function filterToCreate(): Promise<ListingListener | null> {
 async function handleFilters(): Promise<{ name: string, value: any }[]> {
   const rawFilter = toRaw(filter.value)
   const filters: { name: string, value: any }[] = []
+  console.log(rawFilter)
 
   // t('selectedCountry') is the default value
   if (rawFilter.country != t('selectedCountry'))
@@ -298,6 +307,9 @@ async function handleFilters(): Promise<{ name: string, value: any }[]> {
   if (rawFilter.condition != '') {
     filters.push({ name: 'Condition', value: rawFilter.condition })
   }
+
+  if (rawFilter.deliveryMethod != '')
+    filters.push({ name: 'DeliveryMethod', value: rawFilter.deliveryMethod })
 
   if (!selectedMarketplaces.value.map(item => item.value).includes('all')) {
     filters.push({
