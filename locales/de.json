@@ -205,5 +205,10 @@
   "netherlands": "Niederlande",
   "australia": "Australien",
   "europe": "Europa",
-  "advancedOptions": "Erweiterte Optionen"
+  "advancedOptions": "Erweiterte Optionen",
+  "shippingDelivery": "Versand",
+  "pickupDelivery": "Abholung",
+  "allDelivery": "Alle Versandarten",
+  "deliveryMethod": "Versandart",
+  "marketplaces": "Marktplätze"
 }
