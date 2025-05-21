@@ -213,7 +213,7 @@
         "second": "Push notifications",
         "third": "Discord webhook"
       }
-    }, 
+    }
   },
   "howItWorks": {
     "badge": "Simple Process",
@@ -282,7 +282,7 @@
       "facebook": "Facebook",
       "craigslist": "Craigslist",
       "more": "+ Many More"
-    },
+    }
   },
   "testimonials": {
     "badge": "Customer Stories",
@@ -412,7 +412,6 @@
   "errorRequesting": "There was an error creating your subscription",
   "autoScout": "AutoScout24",
   "selectMarket": "Select Marketplace",
-  "thatEmailInUse": "This email is already in use try signin or using a different email",
   "account": "Account",
   "noFilters": "You dont have any filters",
   "tryCreatingFilters": "Try creating a filter to get started",
@@ -427,6 +426,34 @@
   "description": "Description",
   "navigation": "Navigation",
   "language": "Language",
+  "location": "Location",
+  "internationalShipping": "International Shipping",
+  "selectedCountry": "Select Country",
+  "anyCountry": "Any Country",
+  "sendingCountry": "Country item is shipping from",
+  "allCondition": "All Conditions",
+  "newCondition": "New Condition",
+  "usedCondition": "Used Condition",
+  "refurbishedCondition": "Refurbished",
+  "forPartsCondition": "For Parts",
+  "condition": "Condition",
+  "countryShipping": "Select the countries you want to receive items from. Select none if it doesn't matter.",
+  "enteringZipCodeError": "While proccessing your zip code there was a error, try re-entering your zip-code",
+  "unitedStates": "United States",
+  "canada": "Canada",
+  "unitedKingdom": "United Kingdom",
+  "germany": "Germany",
+  "france": "France",
+  "italy": "Italy",
+  "japan": "Japan",
+  "netherlands": "Netherlands",
+  "australia": "Australia",
+  "europe": "Europe",
+  "advancedOptions": "Advanced Options",
+  "shippingDelivery": "Shipping",
+  "pickupDelivery": "Pickup",
+  "allDelivery": "All Delivery Methods",
+  "deliveryMethod": "Delivery Method",
   "recentMatches": "Recent Matches",
   "createOrAdjustFilters": "Try adjusting your filters or creating a new one"
 }

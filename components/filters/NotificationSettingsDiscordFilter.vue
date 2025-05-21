@@ -1,7 +1,7 @@
 <template>
   <FiltersNotificationSettingItem
     v-model="webhookUrl"
-    :filter="filter"
+    :filter="model!"
     :config="{
       notificationType: 'DiscordWebhook',
       predefinedValue: userStore.notificationSettings.discord.webhookUrl,
@@ -26,10 +26,13 @@ import type { Filter } from '~/types/FilterType'
 
 const userStore = useUserStore()
 
-const props = defineProps<{ filter: Filter }>()
+const model = defineModel<Filter>()
 
-const webhookUrl = ref(props.filter.notificationTarget || '')
+const webhookUrl = ref(model.value!.notificationTarget || '')
 const isValidWebhook = ref(true)
+
+watch(() => model.value!.notificationTarget,
+  () => { webhookUrl.value = model.value?.notificationTarget ?? '' })
 
 const validateWebhook = () => {
   if (!webhookUrl.value) {
@@ -41,8 +44,7 @@ const validateWebhook = () => {
   isValidWebhook.value = discordWebhookPattern.test(webhookUrl.value)
 
   if (isValidWebhook.value) {
-    // eslint-disable-next-line vue/no-mutating-props
-    props.filter.notificationTarget = webhookUrl.value
+    model.value!.notificationTarget = webhookUrl.value
     // store the webhook url for predefined values
     userStore.notificationSettings.discord.webhookUrl = webhookUrl.value
   }
@@ -54,7 +56,7 @@ watch(webhookUrl, (newValue) => {
   }
   else {
     isValidWebhook.value = true
-    props.filter.notificationTarget = ''
+    model.value!.notificationTarget = ''
   }
 })
 </script>

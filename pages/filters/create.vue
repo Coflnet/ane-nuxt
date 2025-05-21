@@ -2,42 +2,24 @@
   <div>
     <FiltersCreateHeader :is-new-filter="isNewFilter" />
     <UiDefaultContainer class="mb-6 p-6">
-      <form
-        class="space-y-6"
-        @submit.prevent="saveFilter"
-      >
+      <form @submit.prevent="saveFilter">
         <UiGrid :grid-size="2">
           <UiInput
-            v-model="filter.name"
-            :name="$t('filterName')"
-            :placeholder="$t('nameEg')"
-            :label="$t('filterName')"
+            v-model="filter.searchValue"
+            :name="$t('searchValue')"
+            :placeholder="$t('cameraEg')"
+            :label="$t('searchValue')"
           />
           <UiMultiSelect
             v-model="selectedMarketplaces"
             :options="marketplaces"
             :label="$t('marketplaces')"
+            override-value="all"
           />
         </UiGrid>
-        <UiInput
-          v-model="filter.searchValue"
-          :name="$t('searchValue')"
-          :placeholder="$t('cameraEg')"
-          :label="$t('searchValue')"
-        />
 
-        <FiltersKeywordFilter
-          :model-value="filter.keywords"
-          :label="$t('searchKeywords')"
-          :footer="$t('addKeyDescription')"
-          :place-holder="$t('addKeywordPressEnter')"
-        />
-        <FiltersKeywordFilter
-          :model-value="filter.blacklist"
-          :label="$t('blackKeywords')"
-          :footer="$t('addblacklistKeywords')"
-          :place-holder="$t('addBlackListPressEnter')"
-        />
+        <FiltersPriceConditionFilter v-model="filter" />
+        <FiltersCreateCountrySection :model-value="filter" />
 
         <!-- Dont worry about this, this whole system needs to get reworked by akwav -->
         <div v-for="(option, _index) in filterStore.getFilterOptions">
@@ -47,9 +29,23 @@
             :options="option.value.options"
           />
         </div>
+        <UiExpandOption class="mt-1">
+          <FiltersKeywordFilter
+            :model-value="filter.keywords"
+            :label="$t('searchKeywords')"
+            :footer="$t('addKeyDescription')"
+            :place-holder="$t('addKeywordPressEnter')"
+          />
 
-        <FiltersRadiusRangeFilter :filter="filter" />
-        <NotificationSettingsFilter :filter="filter" />
+          <FiltersKeywordFilter
+            class="my-6"
+            :model-value="filter.blacklist"
+            :label="$t('blackKeywords')"
+            :footer="$t('addblacklistKeywords')"
+            :place-holder="$t('addBlackListPressEnter')"
+          />
+        </UiExpandOption>
+        <NotificationSettingsFilter v-model="filter" />
 
         <FiltersCreateConfirmCreation
           :is-new-filter="isNewFilter"
@@ -83,7 +79,7 @@ const filterStore = useFilterStore()
 const userStore = useUserStore()
 const firebaseApp = useFirebaseApp()
 const savingFilter = ref(false)
-const selectedMarketplaces = ref<{ value: string, label: string }[]>([])
+const selectedMarketplaces = ref<{ value: string, label: string }[]>([{ value: 'all', label: 'allMarket' }])
 
 const localePath = useLocalePath()
 
@@ -101,7 +97,7 @@ const filter = ref<Filter>({
   searchValue: '',
   totalCost: 0,
   zipcode: '',
-  searchRadius: null as number | null,
+  searchRadius: 100,
   commercialSeller: false,
   seller: '',
   keywords: [] as string[],
@@ -112,7 +108,10 @@ const filter = ref<Filter>({
   location: '',
   id: 0,
   notificationType: 'Unknown',
-  notificationTarget: '',
+  notificationTarget: 'helloworld',
+  country: t('selectedCountry'),
+  condition: '',
+  deliveryMethod: '',
 })
 
 watch([filter, selectedMarketplaces], (_) => {
@@ -168,6 +167,9 @@ async function loadEditParam() {
       return
     }
 
+    console.log(activeFilter)
+
+    filter.value.notificationTarget = activeFilter.target ?? ''
     filter.value.name = activeFilter.name ?? ''
     filter.value.id = activeFilter.id ?? 0
     filter.value.notificationType = activeFilter.targetType ?? 'Unknown'
@@ -199,12 +201,7 @@ async function loadEditParam() {
           break
         }
         case 'IncludePlatforms':
-          console.log(item.value)
-          if (['Ebay', 'Kleinanzeigen'].includes(item.value!)) {
-            filter.value.marketplace = item.value!
-            break
-          }
-          filter.value.marketplace = 'all'
+          parseIncludedPlatforms(item.value ?? '')
           break
         case 'CommercialSeller':
           filter.value.commercialSeller = Boolean(item.value)
@@ -212,10 +209,19 @@ async function loadEditParam() {
         case 'SearchTerm':
           filter.value.searchValue = item.value ?? ''
           break
+        case 'Condition':
+          filter.value.condition = item.value ?? ''
+          break
+        case 'DeliveryMethod':
+          filter.value.deliveryMethod = item.value ?? ''
+          break
         case 'TotalCost': {
           const [min, _max] = item.value!.split('-')
           filter.value.totalCost = Number(min)
           break
+        }
+        case 'Country': {
+          filter.value.country = item.value ?? ''
         }
       }
     })
@@ -226,11 +232,22 @@ async function loadEditParam() {
   }
 }
 
+async function parseIncludedPlatforms(marketplaceString: string) {
+  selectedMarketplaces.value = []
+  marketplaceString.split(',').map((marketplaceName) => {
+    const marketplaceItem = marketplaces.find(m => m.value == marketplaceName)
+    if (marketplaceItem)
+      selectedMarketplaces.value.push(marketplaceItem)
+  })
+}
+
 async function saveFilter() {
   try {
     savingFilter.value = true
     const f = await filterToCreate()
 
+    console.log(f)
+    return
     if (!f)
       return
     await filterStore.saveFilter(f)
@@ -278,10 +295,22 @@ async function filterToCreate(): Promise<ListingListener | null> {
 async function handleFilters(): Promise<{ name: string, value: any }[]> {
   const rawFilter = toRaw(filter.value)
   const filters: { name: string, value: any }[] = []
+  console.log(rawFilter)
 
-  if (rawFilter.minPrice != 0 || rawFilter.maxPrice || rawFilter.maxPrice == 0) {
+  // t('selectedCountry') is the default value
+  if (rawFilter.country != t('selectedCountry'))
+    filters.push({ name: 'Country', value: rawFilter.country })
+
+  if (rawFilter.minPrice != 0 || rawFilter.maxPrice || rawFilter.maxPrice == 0)
     filters.push({ name: 'PriceRange', value: `${Number(rawFilter.minPrice)}-${Number(rawFilter.maxPrice)}` })
+
+  if (rawFilter.condition != '') {
+    filters.push({ name: 'Condition', value: rawFilter.condition })
   }
+
+  if (rawFilter.deliveryMethod != '')
+    filters.push({ name: 'DeliveryMethod', value: rawFilter.deliveryMethod })
+
   if (!selectedMarketplaces.value.map(item => item.value).includes('all')) {
     filters.push({
       name: 'IncludePlatforms',
@@ -289,18 +318,17 @@ async function handleFilters(): Promise<{ name: string, value: any }[]> {
     })
   }
 
-  if (rawFilter.commercialSeller) {
+  if (rawFilter.commercialSeller)
     filters.push({ name: 'CommercialSeller', value: true })
-  }
+
   if (rawFilter.zipcode != '' && rawFilter.marketplace != 'ebay') {
     const location = await handleSearchRadius()
     filters.push({ name: 'Radius', value: `${location[0]};${location[1]};${rawFilter.searchRadius};${rawFilter.zipcode}` })
   }
 
   filters.push({ name: 'SearchTerm', value: rawFilter.searchValue })
-  if (rawFilter.totalCost != 0) {
+  if (rawFilter.totalCost != 0)
     filters.push({ name: 'TotalCost', value: `${rawFilter.totalCost}-${rawFilter.totalCost}` })
-  }
 
   if (rawFilter.keywords.length != 0)
     filters.push({ name: 'ContainsKeyWord', value: rawFilter.keywords.join(',') })
@@ -318,6 +346,11 @@ async function handleSearchRadius(): Promise<[string, string]> {
     const url = `https://nominatim.openstreetmap.org/search?postalcode=${filter.value.zipcode}&country=${data.country_name}&format=json`
     const response2 = await fetch(url)
     const data2 = await response2.json()
+    if (data2.length == 0) {
+      push.error(t('enteringZipCodeError'))
+      savingFilter.value = false
+      return ['', '']
+    }
     return [data2[0].lat, data2[0].lon]
   }
   catch (error) {
@@ -338,6 +371,6 @@ async function connectPushNotifications(): Promise<string> {
 onMounted(async () => {
   await useUserStore().checkAuth(useFirebaseAuth()!)
   await Promise.allSettled([filterStore.loadFilters()])
-  loadEditParam()
+  await loadEditParam()
 })
 </script>

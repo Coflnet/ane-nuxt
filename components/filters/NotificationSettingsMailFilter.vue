@@ -1,7 +1,7 @@
 <template>
   <FiltersNotificationSettingItem
     v-model="emailAddress"
-    :filter="filter"
+    :filter="model!"
     :config="{
       notificationType: 'Email',
       predefinedValue: userStore.notificationSettings.email.address,
@@ -26,10 +26,15 @@ import type { Filter } from '~/types/FilterType'
 
 const userStore = useUserStore()
 
-const props = defineProps<{ filter: Filter }>()
+const model = defineModel<Filter>()
 
-const emailAddress = ref(props.filter.notificationTarget || '')
+const emailAddress = ref(model.value!.notificationTarget || '')
 const isValidEmail = ref(true)
+
+watch(() => model.value!.notificationTarget,
+  () => {
+    emailAddress.value = model.value?.notificationTarget ?? ''
+  })
 
 const validateEmail = () => {
   if (!emailAddress.value) {
@@ -41,7 +46,7 @@ const validateEmail = () => {
   isValidEmail.value = emailPattern.test(emailAddress.value)
 
   if (isValidEmail.value) {
-    props.filter.notificationTarget = emailAddress.value
+    model.value!.notificationTarget = emailAddress.value
     // store email address for predefined values
     userStore.notificationSettings.email.address = emailAddress.value
   }
@@ -53,7 +58,7 @@ watch(emailAddress, (newValue) => {
   }
   else {
     isValidEmail.value = true
-    props.filter.notificationTarget = ''
+    model.value!.notificationTarget = ''
   }
 })
 </script>
