@@ -77,6 +77,7 @@ async function getCurrentSubscription() {
 
   try {
     const result = await getSubscription({ composable: '$fetch', headers: { Authorization: apiToken } })
+    console.log(result)
     if (result.length == 0) {
       if (currentPlan.value !== 'basic')
         resetSubscription()

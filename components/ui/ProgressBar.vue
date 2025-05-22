@@ -15,11 +15,12 @@
 
     <!-- Floating indicator -->
     <div
+      v-if="progressPercentage > 10"
       class="absolute top-0 -ml-0.5 transform -translate-x-1/2 transition-all duration-300 ease-in-out"
       :style="{ left: `${progressPercentage}%` }"
     >
       <div
-        class="font-medium transform rounded-lg border bg-slate-700 border-slate-600 text-sm p-1 -mt-1 text-gray-200"
+        class="font-medium transform rounded-lg border bg-slate-700 border-slate-600 text-sm p-1 -mt-1 text-gray-200 z-50"
       >
         {{ indicatorText }}
       </div>
