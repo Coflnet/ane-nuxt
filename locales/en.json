@@ -459,5 +459,7 @@
   "remainingSearches": "Remaining Searches",
   "notificationsChannels": "Notification Channels",
   "loadRemainingError": "Error loading premium searches",
-  "timeTillReset": "Resets in {n} days"
+  "timeTillReset": "Resets in {n} days",
+  "premium": "Premium",
+  "premiumHoverExplanation": "Premium marketplaces use 'Premium seaches' ..."
 }

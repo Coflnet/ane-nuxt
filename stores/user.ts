@@ -314,6 +314,8 @@ export const useUserStore = defineStore('user', () => {
     notificationSettings,
     cachedAuctions,
     currentPlan,
+    subscriptionStartDate,
+    noPremium,
 
     // Getters
     isLoggedIn,

@@ -79,7 +79,7 @@ const filterStore = useFilterStore()
 const userStore = useUserStore()
 const firebaseApp = useFirebaseApp()
 const savingFilter = ref(false)
-const selectedMarketplaces = ref<{ value: string, label: string }[]>([{ value: 'all', label: 'allMarket' }])
+const selectedMarketplaces = ref<{ value: string, label: string, premium?: boolean }[]>([{ value: 'all', label: 'allMarket' }])
 
 const localePath = useLocalePath()
 
@@ -109,7 +109,7 @@ const filter = ref<Filter>({
   id: 0,
   notificationType: 'Unknown',
   notificationTarget: 'helloworld',
-  country: t('selectedCountry'),
+  country: 'EU,US,GB',
   condition: '',
   deliveryMethod: '',
 })
@@ -297,8 +297,8 @@ async function handleFilters(): Promise<{ name: string, value: any }[]> {
   const filters: { name: string, value: any }[] = []
   console.log(rawFilter)
 
-  // t('selectedCountry') is the default value
-  if (rawFilter.country != t('selectedCountry'))
+  // 'EU,US,GB' is the default value
+  if (rawFilter.country != 'EU,US,GB')
     filters.push({ name: 'Country', value: rawFilter.country })
 
   if (rawFilter.minPrice != 0 || rawFilter.maxPrice || rawFilter.maxPrice == 0)
