@@ -265,6 +265,7 @@ export const useUserStore = defineStore('user', () => {
       if (subscriptionStartDate.value == '' && noPremium.value == null)
         await getSubscriptionEndDate()
 
+      console.log(response)
       return {
         remaining: response.activeSearchesLeft ?? 0,
         total: response.totalActiveSearches ?? 0,
