@@ -44,7 +44,7 @@
               filters.getSimplifiedFilters[auction.listenerId ?? 0] }}
           </td>
           <td class="px-4 py-3 text-sm font-medium text-white">
-            {{ $t('dollarSign') }}{{ auction.listingData?.price }}
+            {{ useFormat().formatCurrency(auction.listingData?.price ?? 0) }}
           </td>
           <td
             v-if="!overview"
@@ -80,6 +80,7 @@
 import { useWindowSize } from '@vueuse/core'
 import humanizeDuration from 'humanize-duration'
 import type { FilterMatch } from '~/src/api-client'
+import { useFormat } from '~/composable/useFormat'
 
 const { width } = useWindowSize()
 const { locale } = useI18n()
