@@ -66,12 +66,12 @@
       <section class="prose prose-lg max-w-none">
         <h3 class="mb-4">
           <UiHeaderLabel
-            :label="$t(`${marketplaceName}.howItWorks.title`)"
+            :label="$t(`marketplaceSteps.step1`)"
             :accent="true"
           />
         </h3>
         <div class="mb-6">
-          <UiFooterLabel :label="$t(`${marketplaceName}.howItWorks.bodyText`)" />
+          <UiFooterLabel :label="$t('marketplaceSteps.bodyText')" />
         </div>
 
         <!-- Steps -->
@@ -84,10 +84,12 @@
             </div>
             <div>
               <UiHeaderLabel
-                :label="$t(`${marketplaceName}.howItWorks.step1.title`)"
+                :label="$t('marketplaceSteps.step1.title', { name: $t(`${marketplaceName}.name`) })"
                 :accent="false"
               />
-              <UiFooterLabel :label="$t(`${marketplaceName}.howItWorks.step1.description`)" />
+              <UiFooterLabel
+                :label="$t(`marketplaceSteps.step1.description`, { name: $t(`${marketplaceName}.name`) })"
+              />
             </div>
           </div>
 
@@ -99,10 +101,12 @@
             </div>
             <div>
               <UiHeaderLabel
-                :label="$t(`${marketplaceName}.howItWorks.step2.title`)"
+                :label="$t('marketplaceSteps.step2.title', { name: $t(`${marketplaceName}.name`) })"
                 :accent="false"
               />
-              <UiFooterLabel :label="$t(`${marketplaceName}.howItWorks.step2.description`)" />
+              <UiFooterLabel
+                :label="$t(`marketplaceSteps.step2.description`, { name: $t(`${marketplaceName}.name`) })"
+              />
             </div>
           </div>
 
@@ -114,10 +118,12 @@
             </div>
             <div>
               <UiHeaderLabel
-                :label="$t(`${marketplaceName}.howItWorks.step3.title`)"
+                :label="$t('marketplaceSteps.step3.title', { name: $t(`${marketplaceName}.name`) })"
                 :accent="false"
               />
-              <UiFooterLabel :label="$t(`${marketplaceName}.howItWorks.step3.description`)" />
+              <UiFooterLabel
+                :label="$t('marketplaceSteps.step3.description', { name: $t(`${marketplaceName}.name`) })"
+              />
             </div>
           </div>
         </div>

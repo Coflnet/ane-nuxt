@@ -457,6 +457,7 @@
   "recentMatches": "Recent Matches",
   "createOrAdjustFilters": "Try adjusting your filters or creating a new one",
   "facebook": {
+    "name": "Facebook Marketplace",
     "title": "Facebook Marketplace Filters & Notifications",
     "subtitle": "Never miss great deals on Facebook Marketplace with smart filters and instant notifications",
     "introduction": {
@@ -475,22 +476,7 @@
         "description": "Get notified immediately when new items matching your criteria are posted on Facebook Marketplace, giving you the first opportunity to purchase."
       }
     },
-    "howItWorks": {
-      "title": "How It Works",
-      "bodyText": "Getting started with Facebook Marketplace monitoring is simple and takes just a few minutes to set up your personalized filters.",
-      "step1": {
-        "title": "Set Your Criteria",
-        "description": "Define your search parameters including keywords, price range, location radius, and item categories for Facebook Marketplace."
-      },
-      "step2": {
-        "title": "Activate Monitoring",
-        "description": "Our system continuously scans Facebook Marketplace for new listings that match your specified criteria."
-      },
-      "step3": {
-        "title": "Receive Notifications",
-        "description": "Get instant alerts via email, SMS, or push notifications when relevant items appear on Facebook Marketplace."
-      }
-    },
+    "howItWorks": "How It Works",
     "benefits": {
       "title": "Why Use Facebook Marketplace Filters?",
       "bodyText": "Save time and never miss great deals with our intelligent monitoring system designed specifically for Facebook Marketplace users.",
@@ -517,6 +503,21 @@
         "title": "Is this service affiliated with Facebook?",
         "answer": "No, we are an independent service that helps users monitor Facebook Marketplace more efficiently. We are not affiliated with or endorsed by Facebook."
       }
+    }
+  },
+  "marketplaceSteps": {
+    "bodyText": "Getting started with {name} monitoring is simple and takes just a few minutes to set up your personalized filters.",
+    "step1": {
+      "title": "Set Your Criteria",
+      "description": "Define your search parameters including keywords, price range, location radius, and item categories and more for {name}"
+    },
+    "step2": {
+      "title": "Activate Monitoring",
+      "description": "Our system continuously scans {name} for new listings that match your specified criteria."
+    },
+    "step3": {
+      "title": "Receive Notifications",
+      "description": "Get instant alerts via email, SMS, or push notifications when relevant items appear on {name}"
     }
   },
   "overviewDescription": "View a overview of your actions that matched your filters and more",

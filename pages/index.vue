@@ -579,7 +579,6 @@
           v-intersect="fadeIn"
           class="grid grid-cols-2 md:grid-cols-3 gap-8"
         >
-          >
           <a :href="localePath('/marketplaces/ebay')">
             <div
               class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"
