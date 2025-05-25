@@ -49,6 +49,7 @@ import type { FilterMatch } from '~/src/api-client'
 import type { TopFilter } from '~/types/FilterType'
 
 const localePath = useLocalePath()
+const { t } = useI18n()
 
 const loading = ref(true)
 
@@ -116,5 +117,12 @@ onMounted(async () => {
   loadStats()
   filterStore.loadFilters()
   loading.value = false
+})
+
+useSeoMeta({
+  title: () => t('aneDashboard'),
+  ogTitle: () => t('aneDashboard'),
+  description: () => t('overviewDescription'),
+  ogDescription: () => t('overviewDescription'),
 })
 </script>
