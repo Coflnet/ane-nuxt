@@ -586,13 +586,16 @@
               {{ $t('marketplaces.platforms.ebay') }}
             </div>
           </div>
-          <div
-            class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"
-          >
-            <div class="text-xl font-semibold text-gray-200">
-              {{ $t('marketplaces.platforms.facebook') }}
+          <a :href="localePath('/marketplaces/facebook')">
+            <div
+              class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"
+            >
+              <div class="text-xl font-semibold text-gray-200">
+                {{ $t('marketplaces.platforms.facebook') }}
+              </div>
             </div>
-          </div>
+          </a>
+
           <div
             class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"
           >

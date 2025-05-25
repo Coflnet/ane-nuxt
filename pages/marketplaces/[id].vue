@@ -40,7 +40,7 @@
 
         <!-- Feature list -->
         <div class="grid md:grid-cols-2 gap-6">
-          <div class="bg-gray-50 p-6 rounded-lg">
+          <UiDefaultContainer class="p-6">
             <div class="mb-2">
               <UiHeaderLabel
                 :label="$t(`${marketplaceName}.features.filtering.title`)"
@@ -48,9 +48,9 @@
               />
             </div>
             <UiFooterLabel :label="$t(`${marketplaceName}.features.filtering.description`)" />
-          </div>
+          </UiDefaultContainer>
 
-          <div class="bg-gray-50 p-6 rounded-lg">
+          <UiDefaultContainer class="p-6">
             <div class="mb-2">
               <UiHeaderLabel
                 :label="$t(`${marketplaceName}.features.notifications.title`)"
@@ -58,7 +58,7 @@
               />
             </div>
             <UiFooterLabel :label="$t(`${marketplaceName}.features.notifications.description`)" />
-          </div>
+          </UiDefaultContainer>
         </div>
       </section>
 
