@@ -579,13 +579,16 @@
           v-intersect="fadeIn"
           class="grid grid-cols-2 md:grid-cols-3 gap-8"
         >
-          <div
-            class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"
           >
-            <div class="text-xl font-semibold text-gray-200">
-              {{ $t('marketplaces.platforms.ebay') }}
+          <a :href="localePath('/marketplaces/ebay')">
+            <div
+              class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"
+            >
+              <div class="text-xl font-semibold text-gray-200">
+                {{ $t('marketplaces.platforms.ebay') }}
+              </div>
             </div>
-          </div>
+          </a>
           <a :href="localePath('/marketplaces/facebook')">
             <div
               class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"
@@ -596,27 +599,38 @@
             </div>
           </a>
 
-          <div
-            class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"
-          >
-            <div class="text-xl font-semibold text-gray-200">
-              {{ $t('marketplaces.platforms.craigslist') }}
+          <a :href="localePath('/marketplaces/craigslist')">
+            <div
+              class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"
+            >
+              <div class="text-xl font-semibold text-gray-200">
+                {{ $t('marketplaces.platforms.craigslist') }}
+              </div>
             </div>
-          </div>
-          <div
-            class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"
-          >
-            <div class="text-xl font-semibold text-gray-200">
-              {{ $t('marketplaces.platforms.kleinanzeigen') }}
+
+          </a>
+
+          <a :href="localePath('/marketplaces/kleinanzeigen')">
+            <div
+              class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"
+            >
+              <div class="text-xl font-semibold text-gray-200">
+                {{ $t('marketplaces.platforms.kleinanzeigen') }}
+              </div>
             </div>
-          </div>
-          <div
-            class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"
-          >
-            <div class="text-xl font-semibold text-gray-200">
-              {{ $t('marketplaces.platforms.autoscout24') }}
+
+          </a>
+
+          <a :href="localePath('/marketplaces/autoscout24')">
+            <div
+              class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"
+            >
+              <div class="text-xl font-semibold text-gray-200">
+                {{ $t('marketplaces.platforms.autoscout24') }}
+              </div>
             </div>
-          </div>
+
+          </a>
           <div
             class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"
           >

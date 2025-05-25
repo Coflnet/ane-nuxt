@@ -39,7 +39,7 @@
         </div>
 
         <!-- Feature list -->
-        <div class="grid md:grid-cols-2 gap-6">
+        <UiGrid :grid-size="2">
           <UiDefaultContainer class="p-6">
             <div class="mb-2">
               <UiHeaderLabel
@@ -59,7 +59,7 @@
             </div>
             <UiFooterLabel :label="$t(`${marketplaceName}.features.notifications.description`)" />
           </UiDefaultContainer>
-        </div>
+        </UiGrid>
       </section>
 
       <!-- How it works section -->
