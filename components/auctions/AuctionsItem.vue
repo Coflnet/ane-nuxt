@@ -33,7 +33,13 @@
     </div>
 
     <div class="flex items-center justify-between mb-3">
-      <UiHeaderLabel :label="`$${auction.listingData!.price}`" />
+      <UiHeaderLabel
+        :label="useFormat().formatCurrency(
+          auction.listingData!.price ?? 0,
+          auction.listingData?.currency ?? '',
+          useI18n().locale.value,
+        )"
+      />
     </div>
 
     <div class="flex items-center justify-between pt-3 border-t border-slate-700">
@@ -59,6 +65,7 @@
 <script setup lang="ts">
 import { Icon, UiHeaderLabel } from '#components'
 import type { FilterMatch } from '#hey-api'
+import { useFormat } from '~/composable/useFormat'
 
 const { locale } = useI18n()
 
