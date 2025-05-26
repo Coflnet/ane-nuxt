@@ -476,36 +476,16 @@
         "description": "Get notified immediately when new items matching your criteria are posted on Facebook Marketplace, giving you the first opportunity to purchase."
       }
     },
-    "howItWorks": "How It Works",
     "benefits": {
       "title": "Why Use Facebook Marketplace Filters?",
       "bodyText": "Save time and never miss great deals with our intelligent monitoring system designed specifically for Facebook Marketplace users.",
       "benefit1": "Save hours of manual searching through Facebook Marketplace listings",
       "benefit2": "Be the first to know about new items that match your interests",
       "benefit3": "Find better deals faster with automated price and condition monitoring"
-    },
-    "gettingStarted": {
-      "title": "Start Monitoring Facebook Marketplace Today",
-      "bodyText": "Join thousands of users who have transformed their Facebook Marketplace experience with our smart filtering and notification system.",
-      "callToAction": "Set up your first Facebook Marketplace filter in under 2 minutes and start receiving notifications for the items you want most."
-    },
-    "faq": {
-      "title": "Frequently Asked Questions",
-      "question1": {
-        "title": "How often does the system check Facebook Marketplace?",
-        "answer": "Our system monitors Facebook Marketplace continuously, checking for new listings every few minutes to ensure you don't miss any opportunities."
-      },
-      "question2": {
-        "title": "Can I set multiple filters for different items on Facebook Marketplace?",
-        "answer": "Yes, you can create unlimited filters for different categories, price ranges, and locations on Facebook Marketplace to monitor various items simultaneously."
-      },
-      "question3": {
-        "title": "Is this service affiliated with Facebook?",
-        "answer": "No, we are an independent service that helps users monitor Facebook Marketplace more efficiently. We are not affiliated with or endorsed by Facebook."
-      }
     }
   },
   "marketplaceSteps": {
+    "howItWorks": "How It Works",
     "bodyText": "Getting started with {name} monitoring is simple and takes just a few minutes to set up your personalized filters.",
     "step1": {
       "title": "Set Your Criteria",
@@ -520,6 +500,21 @@
       "description": "Get instant alerts via email, SMS, or push notifications when relevant items appear on {name}"
     }
   },
+  "marketplacesFaq": {
+    "title": "Frequently Asked Questions",
+    "question1": {
+      "title": "How often does the system check {name}?",
+      "answer": "Our system monitors {name} continuously, checking for new listings every few minutes to ensure you don't miss any opportunities."
+    },
+    "question2": {
+      "title": "Can I set multiple filters for different items on {name}?",
+      "answer": "Yes, you can create unlimited filters for different categories, price ranges, and locations on {name} to monitor various items simultaneously."
+    },
+    "question3": {
+      "title": "Is this service affiliated with Facebook?",
+      "answer": "No, we are an independent service that helps users monitor {name} more efficiently. We are not affiliated with or endorsed by {name}"
+    }
+  },
   "overviewDescription": "View a overview of your actions that matched your filters and more",
   "aneDashboard": "ANE Dashboard",
   "auctionsDescription": "View the actions that matched your custom filters",
@@ -527,5 +522,7 @@
   "aneCreate": "ANE Create filter",
   "createDescription": "Create custom filters to get notifications about new actions created on many marketplaces",
   "filtersDescription": "Manage your custom filters",
-  "aneFilters": "ANE Filters"
+  "aneFilters": "ANE Filters",
+  "aneMarketplaces": "ANE {name}",
+  "aneDescription": "Create custom filters and receive notifications for {name}. Never miss great deals again with our advanced marketplace monitoring tools."
 }
