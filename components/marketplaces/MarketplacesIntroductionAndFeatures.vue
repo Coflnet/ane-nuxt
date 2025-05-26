@@ -14,7 +14,7 @@
     <section class="prose prose-lg max-w-none">
       <h3 class="mb-4 mt-8">
         <UiHeaderLabel
-          :label="$t(`marketplacesFeatures.title`)"
+          :label="$t(`marketplacesFeatures.title`, { name: $t(`${marketplaceName}.name`) })"
           :accent="true"
         />
       </h3>
