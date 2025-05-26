@@ -33,7 +33,13 @@
     </div>
 
     <div class="flex items-center justify-between mb-3">
-      <UiHeaderLabel :label="useFormat().formatCurrency(auction.listingData!.price ?? 0)" />
+      <UiHeaderLabel
+        :label="useFormat().formatCurrency(
+          auction.listingData!.price ?? 0,
+          auction.listingData?.currency ?? '',
+          useI18n().locale.value,
+        )"
+      />
     </div>
 
     <div class="flex items-center justify-between pt-3 border-t border-slate-700">

@@ -1,10 +1,10 @@
 export function useFormat() {
-  const formatCurrency = (value: number, currency: string = 'USD', options?: Intl.NumberFormatOptions): string => {
+  const formatCurrency = (value: number, currency: string, locale: string): string => {
     const isInteger = value % 1 === 0
 
     const defaultCurrencyOptions: Intl.NumberFormatOptions = {
       style: 'currency',
-      currency,
+      currency: currency || 'EUR', // Use currency directly, default to EUR if empty
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }
@@ -14,9 +14,9 @@ export function useFormat() {
       defaultCurrencyOptions.maximumFractionDigits = 0
     }
 
-    const finalOptions = { ...defaultCurrencyOptions, ...options }
+    const finalOptions = { ...defaultCurrencyOptions }
 
-    return new Intl.NumberFormat('en-US', finalOptions).format(value)
+    return new Intl.NumberFormat(locale == 'en' ? 'en' : 'de', finalOptions).format(value)
   }
 
   return {
