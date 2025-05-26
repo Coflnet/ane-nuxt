@@ -4,10 +4,10 @@
       :src="auction.listingData!.imageUrls![0] ?? ''"
       alt="Auction thumbnail"
       class="w-full h-48 object-cover rounded-t-lg"
-      :class="auction.listingData!.imageUrls![0] == '' ? 'hidden' : ''"
+      :class="auction.listingData!.imageUrls!.length == 0 ? 'hidden' : ''"
     >
     <div
-      :class="auction.listingData!.imageUrls![0] == '' ? '' : 'hidden'"
+      :class="auction.listingData!.imageUrls!.length == 0 ? '' : 'hidden'"
       class="h-48 items-center flex flex-col justify-center"
     >
       <Icon
