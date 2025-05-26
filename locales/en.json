@@ -464,18 +464,6 @@
       "title": "Transform Your Facebook Marketplace Experience",
       "bodyText": "Facebook Marketplace is one of the largest online marketplaces where millions of people buy and sell items daily. With our advanced filtering system, you can cut through the noise and find exactly what you're looking for without spending hours scrolling through irrelevant listings."
     },
-    "features": {
-      "title": "Powerful Features for Facebook Marketplace",
-      "description": "Our platform provides comprehensive tools to enhance your Facebook Marketplace browsing experience with intelligent automation and real-time monitoring.",
-      "filtering": {
-        "title": "Advanced Filtering",
-        "description": "Create custom filters based on price range, location, keywords, item condition, and more to find exactly what you need on Facebook Marketplace."
-      },
-      "notifications": {
-        "title": "Instant Notifications",
-        "description": "Get notified immediately when new items matching your criteria are posted on Facebook Marketplace, giving you the first opportunity to purchase."
-      }
-    },
     "benefits": {
       "title": "Why Use Facebook Marketplace Filters?",
       "bodyText": "Save time and never miss great deals with our intelligent monitoring system designed specifically for Facebook Marketplace users.",
@@ -513,6 +501,18 @@
     "question3": {
       "title": "Is this service affiliated with Facebook?",
       "answer": "No, we are an independent service that helps users monitor {name} more efficiently. We are not affiliated with or endorsed by {name}"
+    }
+  },
+  "marketplacesFeatures": {
+    "title": "Powerful Features for Facebook Marketplace",
+    "description": "Our platform provides comprehensive tools to enhance your {name} browsing experience with intelligent automation and real-time monitoring.",
+    "filtering": {
+      "title": "Advanced Filtering",
+      "description": "Create custom filters based on price range, location, keywords, item condition, and more to find exactly what you need on {name}."
+    },
+    "notifications": {
+      "title": "Instant Notifications",
+      "description": "Get notified immediately when new items matching your criteria are posted on {name}, giving you the first opportunity to purchase."
     }
   },
   "overviewDescription": "View a overview of your actions that matched your filters and more",

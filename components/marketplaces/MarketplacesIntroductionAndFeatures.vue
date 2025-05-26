@@ -14,12 +14,12 @@
     <section class="prose prose-lg max-w-none">
       <h3 class="mb-4 mt-8">
         <UiHeaderLabel
-          :label="$t(`${marketplaceName}.features.title`)"
+          :label="$t(`marketplacesFeatures.title`)"
           :accent="true"
         />
       </h3>
       <div class="mb-6">
-        <UiFooterLabel :label="$t(`${marketplaceName}.features.description`)" />
+        <UiFooterLabel :label="$t('marketplacesFeatures.description')" />
       </div>
 
       <!-- Feature list -->
@@ -27,21 +27,23 @@
         <UiDefaultContainer class="p-6">
           <div class="mb-2">
             <UiHeaderLabel
-              :label="$t(`${marketplaceName}.features.filtering.title`)"
+              :label="$t('marketplacesFeatures.filtering.title', { name: $t(`${marketplaceName}.name`) })"
               :accent="false"
             />
           </div>
-          <UiFooterLabel :label="$t(`${marketplaceName}.features.filtering.description`)" />
+          <UiFooterLabel :label="$t('marketplacesFeatures.description', { name: $t(`${marketplaceName}.name`) })" />
         </UiDefaultContainer>
 
         <UiDefaultContainer class="p-6">
           <div class="mb-2">
             <UiHeaderLabel
-              :label="$t(`${marketplaceName}.features.notifications.title`)"
+              :label="$t('marketplacesFeatures.notifications.title', { name: $t(`${marketplaceName}.name`) })"
               :accent="false"
             />
           </div>
-          <UiFooterLabel :label="$t(`${marketplaceName}.features.notifications.description`)" />
+          <UiFooterLabel
+            :label="$t('marketplacesFeatures.notifications.description', { name: $t(`${marketplaceName}.name`) })"
+          />
         </UiDefaultContainer>
       </UiGrid>
     </section>
