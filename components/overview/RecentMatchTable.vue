@@ -44,7 +44,11 @@
               filters.getSimplifiedFilters[auction.listenerId ?? 0] }}
           </td>
           <td class="px-4 py-3 text-sm font-medium text-white">
-            {{ useFormat().formatCurrency(auction.listingData?.price ?? 0) }}
+            {{ useFormat().formatCurrency(
+              auction.listingData?.price ?? 0,
+              auction.listingData?.currency ?? '',
+              useI18n().locale.value,
+            ) }}
           </td>
           <td
             v-if="!overview"
