@@ -14,7 +14,7 @@
   />
   <div class="flex justify-end mt-1.5 mb-3">
     <a
-      href="/forgot-password"
+      :href="localePath('/forgot-password')"
       class="text-blue-600 text-sm"
     >{{ $t('forgotPassword') }}</a>
   </div>
