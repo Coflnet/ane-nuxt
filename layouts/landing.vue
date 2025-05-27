@@ -2,7 +2,7 @@
   <div class="flex flex-col min-h-screen">
     <nav class=" py-4 sticky top-0 z-50 bg-gray-900/80 backdrop-blur-md border-b border-gray-800">
       <div class="flex items-center justify-between container mx-auto">
-        <div class="flex items-center">
+        <div class="flex items-center ml-4">
           <UiLogo />
         </div>
         <div class="hidden md:block">
@@ -40,17 +40,17 @@
         </div>
         <div class="md:hidden">
           <button
-            class="text-gray-300"
+            class="text-gray-300 mr-4"
             @click="mobileMenuOpen = !mobileMenuOpen"
           >
             <Icon
               v-if="!mobileMenuOpen"
-              name="menu"
+              name="tabler:menu"
               class="w-6 h-6"
             />
             <Icon
               v-else
-              name="x"
+              name="tabler:x"
               class="w-6 h-6"
             />
           </button>
@@ -59,34 +59,34 @@
       <!-- Mobile menu -->
       <div
         v-if="mobileMenuOpen"
-        class="md:hidden mt-4 space-y-4"
+        class="md:hidden mt-4 space-y-4 text-center"
       >
         <a
           href="/#features"
           class="block text-gray-300 hover:text-indigo-400 py-2"
-        >{{ $t('nav.features') }}</a>
+        >{{ $t('featuresHeader') }}</a>
         <a
           href="/#how-it-works"
           class="block text-gray-300 hover:text-indigo-400 py-2"
-        >{{ $t('nav.howItWorks') }}</a>
+        >{{ $t('howItWorksHeader') }}</a>
         <a
           href="/#pricing"
           class="block text-gray-300 hover:text-indigo-400 py-2"
-        >{{ $t('nav.pricing') }}</a>
+        >{{ $t('pricingHeader') }}</a>
         <a
           href="/#faq"
           class="block text-gray-300 hover:text-indigo-400 py-2"
-        >{{ $t('nav.faq') }}</a>
+        >{{ $t('faqHeader') }}</a>
         <a
           :href="localePath('/login')"
           class="block px-4 py-2 rounded-full bg-gray-700 text-white hover:bg-gray-600 transition-all text-center my-2"
         >{{
-          $t('nav.signIn') }}</a>
+          $t('signIn') }}</a>
         <a
           :href="localePath('/filters/create')"
           class="block px-4 py-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition-all text-center shadow-lg shadow-indigo-900/20"
         >{{
-          $t('nav.getStarted') }}</a>
+          $t('getStarted') }}</a>
       </div>
     </nav>
 
