@@ -549,7 +549,7 @@
     },
     "step3": {
       "title": "Receive Notifications",
-      "description": "Get instant alerts via email, SMS, or push notifications when relevant items appear on {name}"
+      "description": "Get instant alerts via email, push notifications or discord when relevant items appear on {name}"
     }
   },
   "marketplacesFaq": {
@@ -560,7 +560,7 @@
     },
     "question2": {
       "title": "Can I set multiple filters for different items on {name}?",
-      "answer": "Yes, you can create unlimited filters for different categories, price ranges, and locations on {name} to monitor various items simultaneously."
+      "answer": "Yes, you can create multiple filters for different categories, price ranges, and locations on {name} to monitor various items simultaneously."
     },
     "question3": {
       "title": "Is this service affiliated with {name}?",
@@ -582,7 +582,7 @@
   "overviewDescription": "View a overview of your actions that matched your filters and more",
   "aneDashboard": "ANE Dashboard",
   "auctionsDescription": "View the actions that matched your custom filters",
-  "aneAuctions": "ANE Auctions",
+  "aneAuctions": "ANE Found Deals",
   "aneCreate": "ANE Create filter",
   "createDescription": "Create custom filters to get notifications about new actions created on many marketplaces",
   "filtersDescription": "Manage your custom filters",
