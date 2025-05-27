@@ -40,8 +40,7 @@
             v-if="overview"
             class="px-4 py-3 text-sm font-medium text-white hidden md:table-cell"
           >
-            {{
-              filters.getSimplifiedFilters[auction.listenerId ?? 0] }}
+            {{ filters.getSimplifiedFilters[auction.listenerId ?? 0]![0] }}
           </td>
           <td class="px-4 py-3 text-sm font-medium text-white">
             {{ useFormat().formatCurrency(
@@ -85,6 +84,8 @@ import { useWindowSize } from '@vueuse/core'
 import humanizeDuration from 'humanize-duration'
 import type { FilterMatch } from '~/src/api-client'
 import { useFormat } from '~/composable/useFormat'
+
+const localePath = useLocalePath()
 
 const { width } = useWindowSize()
 const { locale } = useI18n()

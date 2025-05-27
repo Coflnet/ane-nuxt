@@ -52,7 +52,6 @@
             {{ filterStore.getSimplifiedFilters[auction.listenerId ?? 0]![0] }}
           </UiLinkLabel>
         </div>
-
       </div>
     </div>
   </a>
