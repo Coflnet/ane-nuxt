@@ -38,5 +38,4 @@ export interface Filter {
   country: string
   condition: string
   deliveryMethod: string
-
 }
