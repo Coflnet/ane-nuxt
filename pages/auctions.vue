@@ -22,6 +22,7 @@ import { useInfiniteScroll } from '@vueuse/core'
 import { useListingStore } from '@/stores/listing'
 import type { FilterMatch } from '~/src/api-client'
 
+const { t } = useI18n()
 const localePath = useLocalePath()
 const listingStore = useListingStore()
 
@@ -62,5 +63,12 @@ onMounted(async () => {
     },
   })
   loading.value = false
+})
+
+useSeoMeta({
+  title: () => t('aneAuctions'),
+  ogTitle: () => t('aneAuctions'),
+  description: () => t('auctionsDescription'),
+  ogDescription: () => t('auctionsDescription'),
 })
 </script>

@@ -147,15 +147,15 @@
   "viewHistoricalData": "See historical price data and trends to identify the best buying and selling opportunities.",
   "vintageCameraLens": "Vintage Camera Lens",
   "vintageCollector": "Vintage Collector",
-  "vintageCollectorDecription": "ANE has completely changed how I source vintage items. I've found rare pieces at 60% below market value because I was notified the moment they were listed.", 
+  "vintageCollectorDecription": "ANE has completely changed how I source vintage items. I've found rare pieces at 60% below market value because I was notified the moment they were listed.",
   "thatEmailInUse": "This email is already in use try signin or using a different email",
-  "faqHeader": "FAQ", 
+  "faqHeader": "FAQ",
   "smartWayToFindDeals": "The smart way to find deals and make profits on online marketplaces.",
   "hero": {
     "badge": "#1 Marketplace Monitoring Tool",
     "marketingTextNeverMissADeal": {
-    "text": "Never miss a {deal} again",
-    "deal": "Deal"
+      "text": "Never miss a {deal} again",
+      "deal": "Deal"
     },
     "description": "Create custom notifiers across multiple marketplaces and get instant alerts when items matching your criteria appear. Stay ahead of the competition with real-time updates.",
     "startFree": "Start for Free",
@@ -379,8 +379,8 @@
       "third": {
         "question": "How many marketplaces can I monitor at once?",
         "answer": "All plans allow you to monitor all supported marketplaces simultaneously. The difference between plans is the number of active notifiers you can have and the frequency of notifications."
-      }, 
-      "fourth":{
+      },
+      "fourth": {
         "question": "Can I customize the types of notifications I receive?",
         "answer": "Included in all tiers you can customize many things like adding blacklisted and whitelisted keywords, price range, search radius and more"
       },
@@ -395,7 +395,7 @@
     },
     "moreQuestions": "Still have questions?",
     "contactSupport": "Contact Support"
-  }, 
+  },
   "cta": {
     "title": "Ready to Never Miss a Deal Again?",
     "description": "Join thousands of collectors and resellers who use our platform to stay ahead of the competition. Start for free today!",
@@ -455,5 +455,138 @@
   "allDelivery": "All Delivery Methods",
   "deliveryMethod": "Delivery Method",
   "recentMatches": "Recent Matches",
-  "createOrAdjustFilters": "Try adjusting your filters or creating a new one"
+  "createOrAdjustFilters": "Try adjusting your filters or creating a new one",
+  "facebook": {
+    "name": "Facebook Marketplace",
+    "title": "Facebook Marketplace Filters & Notifications",
+    "subtitle": "Never miss great deals on Facebook Marketplace with smart filters and instant notifications",
+    "introduction": {
+      "title": "Transform Your Facebook Marketplace Experience",
+      "bodyText": "Facebook Marketplace is one of the largest online marketplaces where millions of people buy and sell items daily. With our advanced filtering system, you can cut through the noise and find exactly what you're looking for without spending hours scrolling through irrelevant listings."
+    },
+    "benefits": {
+      "title": "Why Use Facebook Marketplace Filters?",
+      "bodyText": "Save time and never miss great deals with our intelligent monitoring system designed specifically for Facebook Marketplace users.",
+      "benefit1": "Save hours of manual searching through Facebook Marketplace listings",
+      "benefit2": "Be the first to know about new items that match your interests",
+      "benefit3": "Find better deals faster with automated price and condition monitoring"
+    }
+  },
+  "ebay": {
+    "name": "eBay",
+    "title": "eBay Filters & Notifications",
+    "subtitle": "Get the best deals on eBay with custom filters and real-time alerts",
+    "introduction": {
+      "title": "Maximize Your eBay Shopping Experience",
+      "bodyText": "eBay is a vast marketplace with millions of listings. Our platform helps you navigate this sea of options by allowing you to set up personalized filters that match your specific needs, ensuring you never miss a great deal."
+    },
+    "benefits": {
+      "title": "Why Use eBay Filters?",
+      "bodyText": "With our eBay filters, you can streamline your shopping experience and focus on the items that matter most to you.",
+      "benefit1": "Quickly find items that match your exact criteria",
+      "benefit2": "Receive instant notifications when new listings are posted",
+      "benefit3": "Save time and effort with automated monitoring"
+    }
+  },
+  "craigslist": {
+    "name": "Craigslist",
+    "title": "Craigslist Filters & Notifications",
+    "subtitle": "Discover hidden gems on Craigslist with smart filters and alerts",
+    "introduction": {
+      "title": "Unlock the Potential of Craigslist",
+      "bodyText": "Craigslist is a treasure trove of local listings, but finding the right items can be challenging. Our platform simplifies this process by allowing you to create custom filters that match your interests, ensuring you never miss out on great deals."
+    },
+    "benefits": {
+      "title": "Why Use Craigslist Filters?",
+      "bodyText": "Our Craigslist filters help you quickly find relevant listings and stay updated on new postings.",
+      "benefit1": "Easily search for items in your local area",
+      "benefit2": "Get notified about new listings that match your criteria",
+      "benefit3": "Save time with automated searches"
+    }
+  },
+  "kleinanzeigen": {
+    "name": "Kleinanzeigen",
+    "title": "Kleinanzeigen Filters & Notifications",
+    "subtitle": "Find the best deals on Kleinanzeigen with custom filters and real-time alerts",
+    "introduction": {
+      "title": "Enhance Your Kleinanzeigen Experience",
+      "bodyText": "Kleinanzeigen is a popular marketplace for buying and selling items locally. Our platform allows you to set up personalized filters that help you quickly find what you're looking for, making your shopping experience more efficient."
+    },
+    "benefits": {
+      "title": "Why Use Kleinanzeigen Filters?",
+      "bodyText": "With our Kleinanzeigen filters, you can easily navigate through listings and stay informed about new items that match your interests.",
+      "benefit1": "Quickly locate items in your area that meet your criteria",
+      "benefit2": "Receive instant notifications for new listings (usually within a minute after listing)",
+      "benefit3": "Automate your searches to save time"
+    }
+  },
+  "autoscout24": {
+    "name": "Autoscout24",
+    "title": "Autoscout24 Filters & Notifications",
+    "subtitle": "Find your dream car on Autoscout24 with custom filters and real-time alerts",
+    "introduction": {
+      "title": "Simplify Your Car Search on Autoscout24",
+      "bodyText": "Autoscout24 is one of the largest online car marketplaces in Europe. Our platform helps you set up personalized filters to find the perfect vehicle without wasting time on irrelevant listings."
+    },
+    "benefits": {
+      "title": "Why Use Autoscout24 Filters?",
+      "bodyText": "Our Autoscout24 filters allow you to focus on the cars that matter most to you, ensuring you never miss a great deal.",
+      "benefit1": "Easily search for cars based on make, model, price, and location",
+      "benefit2": "Get notified when new listings that match your criteria are posted",
+      "benefit3": "Save time with automated monitoring of your preferred vehicles"
+    }
+  },
+  "marketplaceSteps": {
+    "howItWorks": "How It Works",
+    "bodyText": "Getting started with {name} monitoring is simple and takes just a few minutes to set up your personalized filters.",
+    "step1": {
+      "title": "Set Your Criteria",
+      "description": "Define your search parameters including keywords, price range, location radius, and item categories and more for {name}"
+    },
+    "step2": {
+      "title": "Activate Monitoring",
+      "description": "Our system continuously scans {name} for new listings that match your specified criteria."
+    },
+    "step3": {
+      "title": "Receive Notifications",
+      "description": "Get instant alerts via email, push notifications or discord when relevant items appear on {name}"
+    }
+  },
+  "marketplacesFaq": {
+    "title": "Frequently Asked Questions",
+    "question1": {
+      "title": "How often does the system check {name}?",
+      "answer": "Our system monitors {name} continuously, checking for new listings as often as possible to ensure you don't miss any deals or opportunities."
+    },
+    "question2": {
+      "title": "Can I set multiple filters for different items on {name}?",
+      "answer": "Yes, you can create multiple filters for different categories, price ranges, and locations on {name} to monitor various items simultaneously."
+    },
+    "question3": {
+      "title": "Is this service affiliated with {name}?",
+      "answer": "No, we are an independent service that helps users monitor {name} more conveniently and efficiently. We are not affiliated with or endorsed by {name}"
+    }
+  },
+  "marketplacesFeatures": {
+    "title": "Powerful Features for {name}",
+    "description": "Our platform provides comprehensive tools to enhance your {name} browsing experience with intelligent automation and real-time monitoring.",
+    "filtering": {
+      "title": "Advanced Filtering",
+      "description": "Create custom filters based on price range, location, keywords, item condition, and more to find exactly what you need on {name}."
+    },
+    "notifications": {
+      "title": "Instant Notifications",
+      "description": "Get notified immediately when new items matching your criteria are posted on {name}, giving you the first opportunity to purchase."
+    }
+  },
+  "overviewDescription": "View a overview of your actions that matched your filters and more",
+  "aneDashboard": "ANE Dashboard",
+  "auctionsDescription": "View the actions that matched your custom filters",
+  "aneAuctions": "ANE Found Deals",
+  "aneCreate": "ANE Create filter",
+  "createDescription": "Create custom filters to get notifications about new actions created on many marketplaces",
+  "filtersDescription": "Manage your custom filters",
+  "aneFilters": "ANE Filters",
+  "aneMarketplaces": "ANE {name}",
+  "aneDescription": "Create custom filters and receive notifications for {name}. Never miss great deals again with our advanced marketplace monitoring tools."
 }

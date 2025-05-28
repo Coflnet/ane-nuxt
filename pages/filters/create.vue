@@ -373,4 +373,11 @@ onMounted(async () => {
   await Promise.allSettled([filterStore.loadFilters()])
   await loadEditParam()
 })
+
+useSeoMeta({
+  title: () => t('aneCreate'),
+  ogTitle: () => t('aneCreate'),
+  description: () => t('createDescription'),
+  ogDescription: () => t('createDescription'),
+})
 </script>
