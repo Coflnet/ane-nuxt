@@ -37,7 +37,7 @@
 
     <UiGrid :grid-size="2">
       <OverviewTopFilters :top-filters="topFilters" />
-      <OverviewNotificationChannels />
+      <OverviewPremiumSearchesRemaining />
     </UiGrid>
   </div>
 </template>
