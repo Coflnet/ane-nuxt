@@ -3,20 +3,7 @@
     <FiltersCreateHeader :is-new-filter="isNewFilter" />
     <UiDefaultContainer class="mb-6 p-6">
       <form @submit.prevent="saveFilter">
-        <UiGrid :grid-size="2">
-          <UiInput
-            v-model="filter.searchValue"
-            :name="$t('searchValue')"
-            :placeholder="$t('cameraEg')"
-            :label="$t('searchValue')"
-          />
-          <UiMultiSelect
-            v-model="selectedMarketplaces"
-            :options="marketplaces"
-            :label="$t('marketplaces')"
-            override-value="all"
-          />
-        </UiGrid>
+        <FiltersSearchValueMarketplaceFilter :model-value="filter" />
 
         <FiltersPriceConditionFilter v-model="filter" />
         <FiltersCreateCountrySection :model-value="filter" />
@@ -66,10 +53,8 @@
 import lodash from 'lodash'
 import { getMessaging, getToken } from 'firebase/messaging'
 import { useFirebaseApp } from 'vuefire'
-import NotificationSettingsFilter from '~/components/filters/NotificationSettingsFilter.vue'
 import type { FilterMatch, ListingListener } from '~/src/api-client'
 import type { Filter } from '~/types/FilterType'
-import { marketplaces } from '~/constants/Marketplaces'
 
 const { debounce } = lodash
 
@@ -79,7 +64,6 @@ const filterStore = useFilterStore()
 const userStore = useUserStore()
 const firebaseApp = useFirebaseApp()
 const savingFilter = ref(false)
-const selectedMarketplaces = ref<{ value: string, label: string, premium?: boolean }[]>([{ value: 'all', label: 'allMarket' }])
 
 const localePath = useLocalePath()
 
@@ -108,13 +92,14 @@ const filter = ref<Filter>({
   location: '',
   id: 0,
   notificationType: 'Unknown',
-  notificationTarget: 'helloworld',
+  notificationTarget: '',
   country: 'EU,US,GB',
   condition: '',
   deliveryMethod: '',
+  frequency: 'day',
 })
 
-watch([filter, selectedMarketplaces], (_) => {
+watch([filter], (_) => {
   debouncedTestFilter()
 }, { deep: true })
 
@@ -201,7 +186,7 @@ async function loadEditParam() {
           break
         }
         case 'IncludePlatforms':
-          parseIncludedPlatforms(item.value ?? '')
+          filter.value.marketplace = item.value ?? ''
           break
         case 'CommercialSeller':
           filter.value.commercialSeller = Boolean(item.value)
@@ -230,15 +215,6 @@ async function loadEditParam() {
     console.error(e)
     push.error(`${t('weRanIssue')}\n ${e}`)
   }
-}
-
-async function parseIncludedPlatforms(marketplaceString: string) {
-  selectedMarketplaces.value = []
-  marketplaceString.split(',').map((marketplaceName) => {
-    const marketplaceItem = marketplaces.find(m => m.value == marketplaceName)
-    if (marketplaceItem)
-      selectedMarketplaces.value.push(marketplaceItem)
-  })
 }
 
 async function saveFilter() {
@@ -304,19 +280,14 @@ async function handleFilters(): Promise<{ name: string, value: any }[]> {
   if (rawFilter.minPrice != 0 || rawFilter.maxPrice || rawFilter.maxPrice == 0)
     filters.push({ name: 'PriceRange', value: `${Number(rawFilter.minPrice)}-${Number(rawFilter.maxPrice)}` })
 
-  if (rawFilter.condition != '') {
+  if (rawFilter.condition != '')
     filters.push({ name: 'Condition', value: rawFilter.condition })
-  }
 
   if (rawFilter.deliveryMethod != '')
     filters.push({ name: 'DeliveryMethod', value: rawFilter.deliveryMethod })
 
-  if (!selectedMarketplaces.value.map(item => item.value).includes('all')) {
-    filters.push({
-      name: 'IncludePlatforms',
-      value: selectedMarketplaces.value.map(i => i.value).join(','),
-    })
-  }
+  if (rawFilter.marketplace != '')
+    filters.push({ name: 'IncludePlatforms', value: rawFilter.marketplace })
 
   if (rawFilter.commercialSeller)
     filters.push({ name: 'CommercialSeller', value: true })

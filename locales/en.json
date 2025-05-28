@@ -461,5 +461,6 @@
   "loadRemainingError": "Error loading premium searches",
   "timeTillReset": "Resets in {n} days",
   "premium": "Premium",
-  "premiumHoverExplanation": "Premium marketplaces use 'Premium seaches' ..."
+  "premiumHoverExplanation": "Premium marketplaces use 'Premium seaches' ...",
+  "frequency": "Premium Search Frequency"
 }

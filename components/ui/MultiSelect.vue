@@ -1,11 +1,23 @@
 <template>
   <div class="relative w-full ">
     <!-- Dropdown toggle button -->
-    <UiHeaderLabel
-      :label="label"
-      :sm="true"
-      :accent="true"
-    />
+    <div class="flex">
+      <UiHeaderLabel
+        :label="label"
+        :accent="true"
+        :sm="true"
+      />
+      <UiTooltipHover
+        v-if="hoverText"
+        :text="hoverText"
+      >
+        <div
+          class="border bg-slate-700 text-white border-slate-800 text-sm rounded-full size-6 text-center ml-2 -translate-y-0.5"
+        >
+          ?
+        </div>
+      </UiTooltipHover>
+    </div>
     <Listbox
       v-model="selectedItems"
       multiple
@@ -72,6 +84,7 @@ const props = defineProps<{
   options: Options[]
   overrideValue?: string
   label?: string
+  hoverText?: string
 }>()
 
 const emit = defineEmits<{
