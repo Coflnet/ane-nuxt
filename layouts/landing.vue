@@ -3,7 +3,7 @@
     <nav class=" py-4 sticky top-0 z-50 bg-gray-900/80 backdrop-blur-md border-b border-gray-800">
       <div class="flex items-center justify-between container mx-auto">
         <div class="flex items-center ml-4">
-          <UiLogo />
+          <UiLogo location="/" />
         </div>
         <div class="hidden md:block">
           <div class="flex items-center space-x-8">

@@ -13,7 +13,6 @@
       <div class="container mx-auto px-6 py-20 md:py-32">
         <div class="flex flex-col md:flex-row items-center">
           <div
-            v-intersect="fadeInLeft"
             class="md:w-1/2 mb-12 md:mb-0"
           >
             <div class="inline-block px-3 py-1 rounded-full bg-indigo-900 text-indigo-400 font-medium text-sm mb-6">
@@ -45,7 +44,6 @@
             </div>
           </div>
           <div
-            v-intersect="fadeInRight"
             class="md:w-1/2"
           >
             <div class="relative">
@@ -53,7 +51,7 @@
                 class="absolute -inset-0.5 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl blur opacity-30 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse"
               />
               <img
-                src="../public/DashboardPreview.png"
+                src="../public/DashboardPreview.webp"
                 alt="Dashboard Preview"
                 class="relative rounded-2xl shadow-2xl border border-gray-800"
               >
@@ -83,7 +81,6 @@
 
     <!-- Stats Section -->
     <section
-      v-intersect="fadeIn"
       class="py-12 bg-gray-900 border-y border-gray-800"
     >
       <div class="container mx-auto px-6">
@@ -131,7 +128,6 @@
     >
       <div class="container mx-auto px-6">
         <div
-          v-intersect="fadeIn"
           class="text-center mb-20"
         >
           <div class="inline-block px-3 py-1 rounded-full bg-indigo-900 text-indigo-400 font-medium text-sm mb-6">
