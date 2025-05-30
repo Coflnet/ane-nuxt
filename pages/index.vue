@@ -12,9 +12,7 @@
 
       <div class="container mx-auto px-6 py-20 md:py-32">
         <div class="flex flex-col md:flex-row items-center">
-          <div
-            class="md:w-1/2 mb-12 md:mb-0"
-          >
+          <div class="md:w-1/2 mb-12 md:mb-0">
             <div class="inline-block px-3 py-1 rounded-full bg-indigo-900 text-indigo-400 font-medium text-sm mb-6">
               {{ $t('hero.badge') }}
             </div>
@@ -43,18 +41,16 @@
               </a>
             </div>
           </div>
-          <div
-            class="md:w-1/2"
-          >
+          <div class="md:w-1/2">
             <div class="relative">
               <div
                 class="absolute -inset-0.5 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl blur opacity-30 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse"
               />
-              <img
+              <NuxtImg
                 src="../public/DashboardPreview.webp"
                 alt="Dashboard Preview"
                 class="relative rounded-2xl shadow-2xl border border-gray-800"
-              >
+              />
               <div
                 class="absolute -right-6 -bottom-6 bg-gray-800 rounded-2xl shadow-xl p-4 flex items-center space-x-2"
               >
@@ -80,9 +76,7 @@
     </section>
 
     <!-- Stats Section -->
-    <section
-      class="py-12 bg-gray-900 border-y border-gray-800"
-    >
+    <section class="py-12 bg-gray-900 border-y border-gray-800">
       <div class="container mx-auto px-6">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
           <div class="text-center">
@@ -127,9 +121,7 @@
       class="py-20 md:py-32 bg-gray-950"
     >
       <div class="container mx-auto px-6">
-        <div
-          class="text-center mb-20"
-        >
+        <div class="text-center mb-20">
           <div class="inline-block px-3 py-1 rounded-full bg-indigo-900 text-indigo-400 font-medium text-sm mb-6">
             {{ $t('features.badge') }}
           </div>
