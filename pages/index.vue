@@ -47,9 +47,14 @@
                 class="absolute -inset-0.5 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl blur opacity-30 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse"
               />
               <NuxtImg
-                src="../public/DashboardPreview.webp"
+                src="/DashboardPreview.webp"
                 alt="Dashboard Preview"
                 class="relative rounded-2xl shadow-2xl border border-gray-800"
+                width="1000"
+                height="550"
+                sizes="sm:100vw md:75vw lg:50vw"
+                format="webp,avif"
+                priority="true"
               />
               <div
                 class="absolute -right-6 -bottom-6 bg-gray-800 rounded-2xl shadow-xl p-4 flex items-center space-x-2"
