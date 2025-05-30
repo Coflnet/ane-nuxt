@@ -1,6 +1,6 @@
 <template>
-  <a :href="auctionUrl">
-    <div class="relative">
+  <div class="relative">
+    <a :href="auctionUrl">
       <img
         :src="auction.listingData!.imageUrls![0] ?? ''"
         alt="Auction thumbnail"
@@ -24,37 +24,47 @@
           {{ auction.listingData!.platform }}
         </span>
       </div>
-    </div>
+    </a>
+  </div>
 
-    <div class="p-4">
-      <div class="flex items-start justify-between mb-2">
-        <h3 class="font-medium text-lg text-white line-clamp-2">
-          {{ auction.listingData!.title }}
-        </h3>
-      </div>
-
-      <div class="flex items-center justify-between mb-3">
-        <UiHeaderLabel
-          :label="useFormat().formatCurrency(
-            auction.listingData!.price ?? 0,
-            auction.listingData?.currency ?? '',
-            useI18n().locale.value,
-          )"
-        />
-      </div>
-
-      <div class="flex items-center justify-between pt-3 border-t border-slate-700">
-        <div class="flex items-center space-x-1">
-          <span class="text-sm text-slate-400">{{ $t('matchFilter') }}</span>
-          <UiLinkLabel
-            :href="localePath(`/filters/create?id=${filterStore.getSimplifiedFilters[auction.listenerId ?? 0]![1]}`)"
-          >
-            {{ filterStore.getSimplifiedFilters[auction.listenerId ?? 0]![0] }}
-          </UiLinkLabel>
+  <div class="p-4">
+    <div class="flex justify-between">
+      <a :href="auctionUrl">
+        <div class="flex items-start justify-between mb-2">
+          <h3 class="font-medium text-lg text-white line-clamp-2">
+            {{ auction.listingData!.title }}
+          </h3>
         </div>
+      </a>
+      <AuctionsItemPopover>
+        <Icon
+          class="size-5 text-slate-400"
+          name="tabler:dots-vertical"
+        />
+      </AuctionsItemPopover>
+    </div>
+
+    <div class="flex items-center justify-between mb-3">
+      <UiHeaderLabel
+        :label="useFormat().formatCurrency(
+          auction.listingData!.price ?? 0,
+          auction.listingData?.currency ?? '',
+          useI18n().locale.value,
+        )"
+      />
+    </div>
+
+    <div class="flex items-center justify-between pt-3 border-t border-slate-700">
+      <div class="flex items-center space-x-1">
+        <span class="text-sm text-slate-400">{{ $t('matchFilter') }}</span>
+        <UiLinkLabel
+          :href="localePath(`/filters/create?id=${filterStore.getSimplifiedFilters[auction.listenerId ?? 0]![1]}`)"
+        >
+          {{ filterStore.getSimplifiedFilters[auction.listenerId ?? 0]![0] }}
+        </UiLinkLabel>
       </div>
     </div>
-  </a>
+  </div>
 </template>
 
 <script setup lang="ts">
