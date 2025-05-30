@@ -142,7 +142,7 @@
           <!-- Feature 1 -->
           <div
             v-intersect="fadeInUp"
-            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800 transition-all hover:shadow-2xl hover:-translate-y-1"
+            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800 transition-all hover:shadow-2xl hover:-translate-y-1 opacity-0"
           >
             <div
               class="w-14 h-14 bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-indigo-900/20"
@@ -186,7 +186,7 @@
           <!-- Feature 2 -->
           <div
             v-intersect="fadeInUp"
-            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800 transition-all hover:shadow-2xl hover:-translate-y-1"
+            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800 transition-all hover:shadow-2xl hover:-translate-y-1 opacity-0"
           >
             <div
               class="w-14 h-14 bg-gradient-to-br from-purple-600 to-purple-800 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-purple-900/20"
@@ -230,7 +230,7 @@
           <!-- Feature 3 -->
           <div
             v-intersect="fadeInUp"
-            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800 transition-all hover:shadow-2xl hover:-translate-y-1"
+            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800 transition-all hover:shadow-2xl hover:-translate-y-1 opacity-0"
           >
             <div
               class="w-14 h-14 bg-gradient-to-br from-indigo-600 to-purple-800 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-indigo-900/20"
@@ -282,7 +282,7 @@
       <div class="container mx-auto px-6">
         <div
           v-intersect="fadeIn"
-          class="text-center mb-20"
+          class="text-center mb-20 opacity-0"
         >
           <div class="inline-block px-3 py-1 rounded-full bg-indigo-900 text-indigo-400 font-medium text-sm mb-6">
             {{ $t('howItWorks.badge') }}
@@ -303,7 +303,7 @@
             <!-- Step 1 -->
             <div
               v-intersect="fadeInUp"
-              class="relative"
+              class="relative opacity-0"
             >
               <div
                 class="w-16 h-16 bg-gray-900 rounded-full border-4 border-indigo-500 flex items-center justify-center text-2xl font-bold text-indigo-400 mx-auto mb-6 relative z-10"
@@ -323,7 +323,7 @@
             <!-- Step 2 -->
             <div
               v-intersect="fadeInUp"
-              class="relative"
+              class="relative opacity-0"
             >
               <div
                 class="w-16 h-16 bg-gray-900 rounded-full border-4 border-indigo-500 flex items-center justify-center text-2xl font-bold text-indigo-400 mx-auto mb-6 relative z-10"
@@ -343,7 +343,7 @@
             <!-- Step 3 -->
             <div
               v-intersect="fadeInUp"
-              class="relative"
+              class="relative opacity-0"
             >
               <div
                 class="w-16 h-16 bg-gray-900 rounded-full border-4 border-indigo-500 flex items-center justify-center text-2xl font-bold text-indigo-400 mx-auto mb-6 relative z-10"
@@ -363,7 +363,7 @@
             <!-- Step 4 -->
             <div
               v-intersect="fadeInUp"
-              class="relative"
+              class="relative opacity-0"
             >
               <div
                 class="w-16 h-16 bg-gray-900 rounded-full border-4 border-indigo-500 flex items-center justify-center text-2xl font-bold text-indigo-400 mx-auto mb-6 relative z-10"
@@ -384,7 +384,7 @@
 
         <div
           v-intersect="fadeIn"
-          class="mt-16 text-center"
+          class="mt-16 text-center opacity-0"
         >
           <a
             :href="localePath('/filters/create')"
@@ -401,7 +401,7 @@
       <div class="container mx-auto px-6">
         <div
           v-intersect="fadeIn"
-          class="text-center mb-20"
+          class="text-center mb-20 opacity-0"
         >
           <div class="inline-block px-3 py-1 rounded-full bg-indigo-900 text-indigo-400 font-medium text-sm mb-6">
             {{ $t('useCases.badge') }}
@@ -418,7 +418,7 @@
           <!-- Use Case 1 -->
           <div
             v-intersect="fadeInUp"
-            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800"
+            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800 opacity-0"
           >
             <div
               class="w-14 h-14 bg-gradient-to-br from-purple-600 to-purple-800 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-purple-900/20"
@@ -462,7 +462,7 @@
           <!-- Use Case 2 -->
           <div
             v-intersect="fadeInUp"
-            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800"
+            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800 opacity-0"
           >
             <div
               class="w-14 h-14 bg-gradient-to-br from-violet-600 to-violet-800 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-violet-900/20"
@@ -506,7 +506,7 @@
           <!-- Use Case 3 -->
           <div
             v-intersect="fadeInUp"
-            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800"
+            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800 opacity-0"
           >
             <div
               class="w-14 h-14 bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-indigo-900/20"
@@ -555,7 +555,7 @@
       <div class="container mx-auto px-6">
         <div
           v-intersect="fadeIn"
-          class="text-center mb-16"
+          class="text-center mb-16 opacity-0"
         >
           <div class="inline-block px-3 py-1 rounded-full bg-indigo-900 text-indigo-400 font-medium text-sm mb-6">
             {{ $t('marketplaces.badge') }}
@@ -570,7 +570,7 @@
 
         <div
           v-intersect="fadeIn"
-          class="grid grid-cols-2 md:grid-cols-3 gap-8"
+          class="grid grid-cols-2 md:grid-cols-3 gap-8 opacity-0"
         >
           <a :href="localePath('/marketplaces/ebay')">
             <div
@@ -639,7 +639,7 @@
       <div class="container mx-auto px-6">
         <div
           v-intersect="fadeIn"
-          class="text-center mb-16"
+          class="text-center mb-16 opacity-0"
         >
           <div class="inline-block px-3 py-1 rounded-full bg-indigo-900 text-indigo-400 font-medium text-sm mb-6">
             {{ $t('testimonials.badge') }}
@@ -656,7 +656,7 @@
           <!-- Testimonial 1 -->
           <div
             v-intersect="fadeInUp"
-            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800"
+            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800 opacity-0"
           >
             <p class="text-gray-300 mb-6 italic">
               {{ $t('testimonials.items.first.quote') }}
@@ -701,7 +701,7 @@
           <!-- Testimonial 2 -->
           <div
             v-intersect="fadeInUp"
-            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800"
+            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800 opacity-0"
           >
             <p class="text-gray-300 mb-6 italic">
               {{ $t('testimonials.items.second.quote') }}
@@ -746,7 +746,7 @@
           <!-- Testimonial 3 -->
           <div
             v-intersect="fadeInUp"
-            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800"
+            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800 opacity-0"
           >
             <p class="text-gray-300 mb-6 italic">
               {{ $t('testimonials.items.third.quote') }}
@@ -799,7 +799,7 @@
       <div class="container mx-auto px-6">
         <div
           v-intersect="fadeIn"
-          class="text-center mb-16"
+          class="text-center mb-16 opacity-0"
         >
           <div class="inline-block px-3 py-1 rounded-full bg-indigo-900 text-indigo-400 font-medium text-sm mb-6">
             {{ $t('pricing.badge') }}
@@ -816,7 +816,7 @@
           <!-- Free Plan -->
           <div
             v-intersect="fadeInUp"
-            class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700 transition-all hover:shadow-2xl hover:-translate-y-1"
+            class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700 transition-all hover:shadow-2xl hover:-translate-y-1 opacity-0"
           >
             <div class="text-center mb-6">
               <h3 class="text-2xl font-bold text-white mb-2">
@@ -883,7 +883,7 @@
           <!-- Collector Plan -->
           <div
             v-intersect="fadeInUp"
-            class="bg-gray-800 p-8 rounded-2xl shadow-2xl border border-indigo-800 transform scale-105 relative z-10"
+            class="bg-gray-800 p-8 rounded-2xl shadow-2xl border border-indigo-800 transform scale-105 relative z-10 opacity-0"
           >
             <div
               class="absolute top-0 right-0 bg-indigo-600 text-white px-4 py-1 rounded-bl-lg rounded-tr-lg text-sm font-medium"
@@ -954,7 +954,7 @@
           <!-- Flipper Plan -->
           <div
             v-intersect="fadeInUp"
-            class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700 relative transition-all hover:shadow-2xl hover:-translate-y-1"
+            class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700 relative transition-all hover:shadow-2xl hover:-translate-y-1 opacity-0"
           >
             <div
               class="absolute top-0 right-0 bg-gray-600 text-white px-4 py-1 rounded-bl-lg rounded-tr-lg text-sm font-medium"
@@ -1025,7 +1025,7 @@
 
         <div
           v-intersect="fadeIn"
-          class="mt-16 bg-gray-800 p-8 rounded-2xl shadow-lg border border-gray-700"
+          class="mt-16 bg-gray-800 p-8 rounded-2xl shadow-lg border border-gray-700 opacity-0"
         >
           <h3 class="text-xl font-semibold text-white mb-4 text-center">
             {{ $t('pricing.allPlansInclude.title') }}
@@ -1065,7 +1065,7 @@
       <div class="container mx-auto px-6">
         <div
           v-intersect="fadeIn"
-          class="text-center mb-16"
+          class="text-center mb-16 opacity-0"
         >
           <div class="inline-block px-3 py-1 rounded-full bg-indigo-900 text-indigo-400 font-medium text-sm mb-6">
             {{ $t('faq.badge') }}
@@ -1082,7 +1082,7 @@
           <!-- FAQ Item 1 -->
           <div
             v-intersect="fadeIn"
-            class="bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-800"
+            class="bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-800 opacity-0"
           >
             <h3 class="text-xl font-semibold text-white mb-3">
               {{ $t('faq.items.first.question') }}
@@ -1093,7 +1093,7 @@
           </div>
           <div
             v-intersect="fadeIn"
-            class="bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-800"
+            class="bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-800 opacity-0"
           >
             <h3 class="text-xl font-semibold text-white mb-3">
               {{ $t('faq.items.second.question') }}
@@ -1106,7 +1106,7 @@
           <!-- FAQ Item 3 -->
           <div
             v-intersect="fadeIn"
-            class="bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-800"
+            class="bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-800 opacity-0"
           >
             <h3 class="text-xl font-semibold text-white mb-3">
               {{ $t('faq.items.third.question') }}
@@ -1117,7 +1117,7 @@
           </div>
           <div
             v-intersect="fadeIn"
-            class="bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-800"
+            class="bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-800 opacity-0"
           >
             <h3 class="text-xl font-semibold text-white mb-3">
               {{ $t('faq.items.fourth.question') }}
@@ -1129,7 +1129,7 @@
           <!-- FAQ Item 5 -->
           <div
             v-intersect="fadeIn"
-            class="bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-800"
+            class="bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-800 opacity-0"
           >
             <h3 class="text-xl font-semibold text-white mb-3">
               {{ $t('faq.items.fifth.question') }}
@@ -1142,7 +1142,7 @@
           <!-- FAQ Item 6 -->
           <div
             v-intersect="fadeIn"
-            class="bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-800"
+            class="bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-800 opacity-0"
           >
             <h3 class="text-xl font-semibold text-white mb-3">
               {{ $t('faq.items.sixth.question') }}
@@ -1155,7 +1155,7 @@
 
         <div
           v-intersect="fadeIn"
-          class="mt-12 text-center"
+          class="mt-12 text-center opacity-0"
         >
           <p class="text-gray-300 mb-4">
             {{ $t('faq.moreQuestions') }}
@@ -1175,7 +1175,7 @@
       <div class="container mx-auto px-6">
         <div
           v-intersect="fadeIn"
-          class="bg-gradient-to-r from-indigo-800 to-purple-800 rounded-3xl p-12 text-center text-white relative overflow-hidden"
+          class="bg-gradient-to-r from-indigo-800 to-purple-800 rounded-3xl p-12 text-center text-white relative overflow-hidden opacity-0"
         >
           <div
             class="absolute -top-24 -right-24 w-96 h-96 bg-white rounded-full mix-blend-overlay filter blur-3xl opacity-10 animate-blob"
@@ -1332,13 +1332,27 @@
 </template>
 
 <script setup lang="ts">
-import { Bell, Filter, TrendingUp, Check, Star, User } from 'lucide-vue-next'
-import { ref, onMounted } from 'vue'
+import { User } from 'lucide-vue-next'
 import { useIntersectionObserver } from '@vueuse/core'
 import { definePageMeta } from '#imports'
 
 const localePath = useLocalePath()
-const mobileMenuOpen = ref(false)
+
+const vIntersect = {
+  mounted: (el: Element, binding: any) => {
+    const callback = binding.value
+    const { stop } = useIntersectionObserver(
+      el,
+      ([{ isIntersecting }]) => {
+        if (isIntersecting) {
+          callback(el)
+          stop()
+        }
+      },
+      { threshold: 0.1 },
+    )
+  },
+}
 
 // Animation functions
 const fadeIn = (el: Element) => {
@@ -1351,40 +1365,6 @@ const fadeInUp = (el: Element) => {
   el.classList.add('transition-all', 'duration-1000')
   el.classList.remove('opacity-0', 'translate-y-10')
   el.classList.add('opacity-100', 'translate-y-0')
-}
-
-const fadeInLeft = (el: Element) => {
-  el.classList.add('transition-all', 'duration-1000')
-  el.classList.remove('opacity-0', 'translate-x-10')
-  el.classList.add('opacity-100', 'translate-x-0')
-}
-
-const fadeInRight = (el: Element) => {
-  el.classList.add('transition-all', 'duration-1000')
-  el.classList.remove('opacity-0', '-translate-x-10')
-  el.classList.add('opacity-100', 'translate-x-0')
-}
-
-// Custom directive for intersection observer
-const vIntersect = {
-  mounted: (el: Element, binding: any) => {
-    const callback = binding.value
-
-    // Set initial state
-    el.classList.add('opacity-0')
-
-    // Use VueUse's intersection observer
-    const { stop } = useIntersectionObserver(
-      el,
-      ([{ isIntersecting }]) => {
-        if (isIntersecting) {
-          callback(el)
-          stop() // Stop observing once animation is triggered
-        }
-      },
-      { threshold: 0.1 },
-    )
-  },
 }
 
 definePageMeta({
