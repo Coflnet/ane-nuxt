@@ -33,15 +33,11 @@
 
 <script setup lang="ts">
 import type { Filter } from '~/types/FilterType'
+import { deliveryKind } from '~/constants/CreateFilterConstants'
 
 const model = defineModel<Filter>()
 
 const deliveryKindSelected = ref<{ value: string, label: string }[]>([])
-const deliveryKind = [
-  { value: 'all', label: 'allDelivery' },
-  { value: 'shipping', label: 'shippingDelivery' },
-  { value: 'pickup', label: 'pickupDelivery' },
-]
 
 watch(() => model.value!.deliveryMethod, () => {
   deliveryKindSelected.value = []

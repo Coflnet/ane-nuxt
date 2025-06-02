@@ -13,7 +13,7 @@
   "advancedNotification": "Advanced Notification Engine for auction marketplaces",
   "advanvedFilters": "Advanced Filters",
   "again": "Again",
-  "allMarket": "All Marketplaces",
+  "allMarket": "All Free Marketplaces",
   "alreadyHaveAccount": "Already have an account?",
   "and": "and",
   "apiRef": "API Reference",
@@ -462,5 +462,10 @@
   "timeTillReset": "Resets in {n} days",
   "premium": "Premium",
   "premiumHoverExplanation": "Premium marketplaces use 'Premium seaches' ...",
-  "frequency": "Premium Search Frequency"
+  "frequency": "Premium Search Frequency",
+  "frequency10Minutes": "Every 10 minutes",
+  "frequency1Hour": "Every Hour",
+  "frequency6Hour": "Every 6 Hours",
+  "frequency1PerDay": "Once per day",
+  "noReset": "Upgrade your plan to get more Premium Searches"
 }

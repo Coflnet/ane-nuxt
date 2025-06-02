@@ -256,7 +256,6 @@ export const useUserStore = defineStore('user', () => {
 
   async function loadRemainingSearches(): Promise<{ remaining: number, total: number, refreshData: number }> {
     const apiToken = `Bearer ${token.value}`
-    console.log(apiToken)
     try {
       const response = await getStats({
         composable: '$fetch',
@@ -265,10 +264,9 @@ export const useUserStore = defineStore('user', () => {
       if (subscriptionStartDate.value == '' && noPremium.value == null)
         await getSubscriptionEndDate()
 
-      console.log(response)
       return {
-        remaining: response.activeSearchesLeft ?? 0,
-        total: response.totalActiveSearches ?? 0,
+        remaining: response.totalActiveSearches ?? 0,
+        total: response.activeRefillAmount ?? 0,
         refreshData: getTimeTillSubscriptionRenewal(subscriptionStartDate.value),
       }
     }
@@ -291,7 +289,7 @@ export const useUserStore = defineStore('user', () => {
   }
 
   function getTimeTillSubscriptionRenewal(startDateString: string) {
-    if (subscriptionStartDate.value == '') return -1
+    if (subscriptionStartDate.value == '') return 0
     const startDate = new Date(startDateString)
     const endDate = new Date(startDate.getTime() + 30 * 24 * 60 * 60 * 1000) // Add 30 days
     const today = new Date()

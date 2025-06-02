@@ -70,9 +70,12 @@ export type MatchStats = {
     totalMatches?: number | null;
     activeSearchesLeft?: number | null;
     totalActiveSearches?: number | null;
+    listenerCount?: number | null;
+    listenerLimit?: number | null;
+    activeRefillAmount?: number | null;
 };
 
-export type Platform = 'Unknown' | 'Ebay' | 'Kleinanzeigen' | 'Marktplaats' | 'Willhaben' | 'Shpock' | 'MarktDe' | 'Vinted' | 'Facebook' | 'Poshmark' | 'Mercari' | 'Depop' | 'Mobile' | 'AutoScout24' | 'WirKaufenDeinAuto' | 'AutoDe' | 'Gebrauchtwagen12';
+export type Platform = 'Unknown' | 'Ebay' | 'Kleinanzeigen' | 'Marktplaats' | 'Willhaben' | 'Shpock' | 'MarktDe' | 'Vinted' | 'Facebook' | 'Poshmark' | 'Mercari' | 'Depop' | 'Mobile' | 'AutoScout24' | 'WirKaufenDeinAuto' | 'AutoDe' | 'Gebrauchtwagen12' | 'Craigslist' | 'OfferUp' | 'OLX' | 'Quoka' | 'Gumtree' | 'Kijiji' | 'Carousell' | 'Carvana' | 'Autotrader' | 'CarsGuide' | 'Nextdoor' | 'Lebecoin' | 'Wallapop';
 
 export type PriceKind = 'Unknown' | 'BuyItemNow' | 'Auction' | 'Negotiatable' | 'IncludesTax';
 
@@ -85,7 +88,16 @@ export type ProblemDetails = {
     [key: string]: unknown | (string | null) | (string | null) | (number | null) | (string | null) | (string | null) | undefined;
 };
 
-export type SearchState = 'None' | 'Disabled';
+export type ResultReport = {
+    match?: FilterMatch;
+    message?: string | null;
+    /**
+     * Optional contact option, default to email
+     */
+    contact?: string | null;
+};
+
+export type SearchState = 'None' | 'Disabled' | 'DisabledError';
 
 export type StoredListing = {
     platform?: Platform;
@@ -299,6 +311,57 @@ export type GetOptionsResponses = {
 };
 
 export type GetOptionsResponse = GetOptionsResponses[keyof GetOptionsResponses];
+
+export type ReportMatchData = {
+    body?: ResultReport;
+    path?: never;
+    query?: never;
+    url: '/api/filters/report';
+};
+
+export type ReportMatchErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type ReportMatchError = ReportMatchErrors[keyof ReportMatchErrors];
+
+export type ReportMatchResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type ReportMatchResponse = ReportMatchResponses[keyof ReportMatchResponses];
 
 export type AddFilterData = {
     body?: ListingListener;

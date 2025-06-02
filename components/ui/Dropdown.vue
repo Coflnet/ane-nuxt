@@ -9,7 +9,7 @@
     <select
       :id="id"
       v-model="model"
-      class="w-full px-4 py-2 rounded-lg border border-slate-600 bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-400"
+      class="w-full px-4 py-2.5 rounded-lg border border-slate-600 bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-400"
       required
     >
       <option

@@ -16,8 +16,9 @@
     />
     <!-- Search Frequency -->
     <UiDropdown
+      v-if="premiumMarkets"
       v-model="model!.frequency"
-      :options="[{ value: 'day', label: 'frequencyDay' }, { value: '12hour', label: 'every12Frequency' }]"
+      :options="frequency"
       :label="$t('frequency')"
     />
   </UiGrid>
@@ -25,7 +26,7 @@
 
 <script setup lang="ts">
 import type { Filter } from '~/types/FilterType'
-import { marketplaces } from '~/constants/Marketplaces'
+import { marketplaces, frequency } from '~/constants/CreateFilterConstants'
 
 const premiumMarkets = ref(false)
 const model = defineModel<Filter>()
@@ -52,7 +53,10 @@ watch(selectedMarketplaces, () => {
 
 watch(selectedMarketplaces, (_) => {
   premiumMarkets.value = false
-  if (selectedMarketplaces.value.some(marketplace => marketplace.premium == true))
+  if (selectedMarketplaces.value.some(marketplace => marketplace.premium == true)) {
     premiumMarkets.value = true
+    // the default value or every 10 minutes
+    model.value!.frequency = '*/10 * * * *'
+  }
 }, { deep: true })
 </script>

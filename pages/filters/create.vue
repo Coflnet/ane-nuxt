@@ -32,7 +32,7 @@
             :place-holder="$t('addBlackListPressEnter')"
           />
         </UiExpandOption>
-        <NotificationSettingsFilter v-model="filter" />
+        <FiltersNotificationSettingsFilter v-model="filter" />
 
         <FiltersCreateConfirmCreation
           :is-new-filter="isNewFilter"
@@ -96,7 +96,7 @@ const filter = ref<Filter>({
   country: 'EU,US,GB',
   condition: '',
   deliveryMethod: '',
-  frequency: 'day',
+  frequency: '',
 })
 
 watch([filter], (_) => {
@@ -205,9 +205,11 @@ async function loadEditParam() {
           filter.value.totalCost = Number(min)
           break
         }
-        case 'Country': {
+        case 'Frequency':
+          filter.value.frequency = item.value ?? ''
+          break
+        case 'Country':
           filter.value.country = item.value ?? ''
-        }
       }
     })
   }
@@ -276,6 +278,9 @@ async function handleFilters(): Promise<{ name: string, value: any }[]> {
   // 'EU,US,GB' is the default value
   if (rawFilter.country != 'EU,US,GB')
     filters.push({ name: 'Country', value: rawFilter.country })
+
+  if (rawFilter.frequency != '')
+    filters.push({ name: 'Frequency', value: rawFilter.frequency })
 
   if (rawFilter.minPrice != 0 || rawFilter.maxPrice || rawFilter.maxPrice == 0)
     filters.push({ name: 'PriceRange', value: `${Number(rawFilter.minPrice)}-${Number(rawFilter.maxPrice)}` })
