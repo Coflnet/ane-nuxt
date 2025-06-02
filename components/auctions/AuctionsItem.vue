@@ -36,7 +36,7 @@
           </h3>
         </div>
       </a>
-      <AuctionsItemPopover>
+      <AuctionsItemPopover :auction="auction">
         <Icon
           class="size-5 text-slate-400"
           name="tabler:dots-vertical"

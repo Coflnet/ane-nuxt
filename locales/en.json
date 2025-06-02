@@ -147,15 +147,15 @@
   "viewHistoricalData": "See historical price data and trends to identify the best buying and selling opportunities.",
   "vintageCameraLens": "Vintage Camera Lens",
   "vintageCollector": "Vintage Collector",
-  "vintageCollectorDecription": "ANE has completely changed how I source vintage items. I've found rare pieces at 60% below market value because I was notified the moment they were listed.", 
+  "vintageCollectorDecription": "ANE has completely changed how I source vintage items. I've found rare pieces at 60% below market value because I was notified the moment they were listed.",
   "thatEmailInUse": "This email is already in use try signin or using a different email",
-  "faqHeader": "FAQ", 
+  "faqHeader": "FAQ",
   "smartWayToFindDeals": "The smart way to find deals and make profits on online marketplaces.",
   "hero": {
     "badge": "#1 Marketplace Monitoring Tool",
     "marketingTextNeverMissADeal": {
-    "text": "Never miss a {deal} again",
-    "deal": "Deal"
+      "text": "Never miss a {deal} again",
+      "deal": "Deal"
     },
     "description": "Create custom notifiers across multiple marketplaces and get instant alerts when items matching your criteria appear. Stay ahead of the competition with real-time updates.",
     "startFree": "Start for Free",
@@ -379,8 +379,8 @@
       "third": {
         "question": "How many marketplaces can I monitor at once?",
         "answer": "All plans allow you to monitor all supported marketplaces simultaneously. The difference between plans is the number of active notifiers you can have and the frequency of notifications."
-      }, 
-      "fourth":{
+      },
+      "fourth": {
         "question": "Can I customize the types of notifications I receive?",
         "answer": "Included in all tiers you can customize many things like adding blacklisted and whitelisted keywords, price range, search radius and more"
       },
@@ -395,7 +395,7 @@
     },
     "moreQuestions": "Still have questions?",
     "contactSupport": "Contact Support"
-  }, 
+  },
   "cta": {
     "title": "Ready to Never Miss a Deal Again?",
     "description": "Join thousands of collectors and resellers who use our platform to stay ahead of the competition. Start for free today!",
@@ -455,5 +455,8 @@
   "allDelivery": "All Delivery Methods",
   "deliveryMethod": "Delivery Method",
   "recentMatches": "Recent Matches",
-  "createOrAdjustFilters": "Try adjusting your filters or creating a new one"
+  "createOrAdjustFilters": "Try adjusting your filters or creating a new one",
+  "thisAuctionDoesntMatch": "This auction doesn't match my filter",
+  "tellUsWhatsWrongs": "Tell us what went wrong or didn't match",
+  "reportSuccessfull": "Your report was successful \n This is your report ID: {id}"
 }

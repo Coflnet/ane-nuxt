@@ -18,6 +18,7 @@
         <UiIcon
           name="tabler:chevron-down"
           :bold="true"
+          :large="true"
           :class="[{ 'rotate-180': isOpen }, 'transition-all']"
         />
       </ListboxButton>

@@ -13,15 +13,23 @@
       leave-to-class="translate-y-1 opacity-0"
     >
       <PopoverPanel
-        class="absolute z-10 mt-1 rounded-lg border border-slate-600 bg-slate-800 shadow-lg overflow-auto -translate-x-1/2 p-3 min-w-72"
+        class="absolute z-10 rounded-lg border border-slate-600 bg-slate-800 shadow-lg overflow-auto md:-translate-x-1/2 p-3 min-w-72
+        -translate-x-3/4"
       >
         <Disclosure v-slot="{ open }">
-          <DisclosureButton>
-            <div class="flex ">
+          <DisclosureButton class="mt-1">
+            <div class="flex">
               <UiHeaderLabel
                 :sm="true"
-                :label="$t('thisAuctionDoesntMatch')"
-              />
+                class="items-center flex"
+              >
+                <UiIcon
+                  name="tabler:question-circle"
+                  class="mr-2"
+                  :large="true"
+                />
+                {{ $t('thisAuctionDoesntMatch') }}
+              </UiHeaderLabel>
             </div>
           </DisclosureButton>
           <div
@@ -39,7 +47,8 @@
             <UiButton
               :disabled="auctionBadText == ''"
               :primary="true"
-              class="w-full "
+              class="w-full"
+              @on-click="sendWrongMatchMessage"
             >
               Submit
             </UiButton>
@@ -51,7 +60,9 @@
 </template>
 
 <script setup lang="ts">
-import { Popover, PopoverButton, PopoverPanel, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue'
+import { Popover, PopoverButton, PopoverPanel, Disclosure, DisclosureButton } from '@headlessui/vue'
+
+const { t } = useI18n()
 
 const auctionBadText = ref('')
 
@@ -62,10 +73,12 @@ async function sendWrongMatchMessage() {
   // Destructure props.auction to get a plain object
   const { auction: plainAuction } = props
 
-  await reportMatch({
+  const response = await reportMatch({
     composable: '$fetch',
     headers: { Authorization: apiToken },
-    body: { match: plainAuction, message: auctionBadText },
+    body: { match: plainAuction as any, message: auctionBadText },
   })
+
+  push.success(t('reportSuccessfull', { id: response }))
 }
 </script>
