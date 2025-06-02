@@ -201,12 +201,12 @@
   "pickupDelivery": "Abholung",
   "allDelivery": "Alle Versandarten",
   "deliveryMethod": "Versandart",
-  "faqHeader": "FAQ", 
+  "faqHeader": "FAQ",
   "hero": {
     "badge": "#1 Marktplatz-Überwachungstool",
     "marketingTextNeverMissADeal": {
-    "text": "Verpasse nie wieder ein {deal}",
-    "deal": "Schnäppchen"
+      "text": "Verpasse nie wieder ein {deal}",
+      "deal": "Schnäppchen"
     },
     "description": "Erstelle benutzerdefinierte Benachrichtigungen für mehrere Marktplätze und erhalte sofortige Warnungen, wenn Artikel erscheinen, die deinen Kriterien entsprechen. Bleibe der Konkurrenz mit Echtzeit-Updates einen Schritt voraus.",
     "startFree": "Kostenlos starten",
@@ -333,13 +333,13 @@
       "facebook": "Facebook",
       "craigslist": "Craigslist",
       "more": "+ Viele mehr"
-        }
-      },
-      "testimonials": {
-        "badge": "Kundenstimmen",
-        "title": "Das sagen unsere Nutzer",
-        "description": "Verlassen Sie sich nicht nur auf unser Wort. Das sagen unsere Kunden über ANE.",
-        "items": {
+    }
+  },
+  "testimonials": {
+    "badge": "Kundenstimmen",
+    "title": "Das sagen unsere Nutzer",
+    "description": "Verlassen Sie sich nicht nur auf unser Wort. Das sagen unsere Kunden über ANE.",
+    "items": {
       "first": {
         "quote": "ANE has completely changed how I collect vintage video games. I was able to find a rare sealed copy of Chrono Trigger that I'd been hunting for years!",
         "name": "Michael Thompson",
@@ -431,7 +431,7 @@
         "question": "Wie viele Marktplätze kann ich gleichzeitig überwachen?",
         "answer": "Alle Pläne ermöglichen es Ihnen, alle unterstützten Marktplätze gleichzeitig zu überwachen. Der Unterschied zwischen den Plänen besteht in der Anzahl der aktiven Suchen, die Sie haben können, und der Häufigkeit der Benachrichtigungen."
       },
-      "fourth":{
+      "fourth": {
         "question": "Kann ich die Arten der Benachrichtigungen anpassen, die ich erhalte?",
         "answer": "In allen Stufen können Sie viele Dinge anpassen, z. B. das Hinzufügen von Blacklist- und Whitelist-Schlüsselwörtern, Preisspannen, Suchradius und mehr."
       },
@@ -461,5 +461,8 @@
   },
   "monitorAuctionAndFilters": "Überwachen Sie Ihre Auktionsfilter und Benachrichtigungen",
   "recentMatches": "Kürzlich gefunden",
-  "createOrAdjustFilters": "Bearbeite deine Filter oder füge neue hinzu"
+  "createOrAdjustFilters": "Bearbeite deine Filter oder füge neue hinzu",
+  "thisAuctionDoesntMatch": "Diese Auktion passt nicht zu meinem Filter",
+  "tellUsWhatsWrongs": "Sag uns, was schief gelaufen ist oder nicht gepasst hat",
+  "reportSuccessfull": "Dein Meldung war erfolgreich \n Das ist deine Melde-Nummer: {id}"
 }
