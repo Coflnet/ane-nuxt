@@ -1,8 +1,7 @@
 {
-  "XActiveFilters": "{n} aktive Filter",
-  "XMinuteDelay": "{n} Minuten Verzögerung",
-  "3activeFilters": "",
-  "XactiveFilters": "{n} aktive Filter",
+  "XActiveFilters": "{amount} aktive Filter",
+  "XMinuteDelay": "{amount} Minuten Verzögerung",
+  "XactiveFilters": "{amount} aktive Filter",
   "actions": "Aktionen",
   "active": "Aktiv",
   "activeFilters": "Aktive Filter",

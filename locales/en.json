@@ -1,7 +1,7 @@
 {
-  "XActiveFilters": "{n} active filters",
-  "XMinuteDelay": "{n} minute delay",
-  "XactiveFilters": "{n} active filters",
+  "XActiveFilters": "{amount} active filters",
+  "XMinuteDelay": "{amount} minute delay",
+  "XactiveFilters": "{amount} active filters",
   "actions": "Actions",
   "active": "Active",
   "activeFilters": "Active Filters",
@@ -588,5 +588,6 @@
   "filtersDescription": "Manage your custom filters",
   "aneFilters": "ANE Filters",
   "aneMarketplaces": "ANE {name}",
-  "aneDescription": "Create custom filters and receive notifications for {name}. Never miss great deals again with our advanced marketplace monitoring tools."
+  "aneDescription": "Create custom filters and receive notifications for {name}. Never miss great deals again with our advanced marketplace monitoring tools.",
+  "XincludedPremiumSearches": "Included Premium Searches {amount}"
 }

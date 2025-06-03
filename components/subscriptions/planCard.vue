@@ -68,6 +68,7 @@
 </template>
 
 <script setup lang="ts">
+import { useFormat } from '~/composable/useFormat'
 import { planPrices, type Feature, type Plan, type PlanId } from '~/constants/SubscriptionConstants'
 
 const { t } = useI18n()
@@ -75,7 +76,7 @@ const loadingUrlButtonState = ref(false)
 
 const featureText = (feature: Feature) => {
   if (feature.amount)
-    return t(feature.text, feature.amount)
+    return t(feature.text, { amount: useFormat().formatNumber(feature.amount, useI18n().locale.value) })
   return t(feature.text)
 }
 
