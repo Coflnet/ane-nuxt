@@ -70,9 +70,12 @@ export type MatchStats = {
     totalMatches?: number | null;
     activeSearchesLeft?: number | null;
     totalActiveSearches?: number | null;
+    listenerCount?: number | null;
+    listenerLimit?: number | null;
+    activeRefillAmount?: number | null;
 };
 
-export type Platform = 'Unknown' | 'Ebay' | 'Kleinanzeigen' | 'Marktplaats' | 'Willhaben' | 'Shpock' | 'MarktDe' | 'Vinted' | 'Facebook' | 'Poshmark' | 'Mercari' | 'Depop' | 'Mobile' | 'AutoScout24' | 'WirKaufenDeinAuto' | 'AutoDe' | 'Gebrauchtwagen12';
+export type Platform = 'Unknown' | 'Ebay' | 'Kleinanzeigen' | 'Marktplaats' | 'Willhaben' | 'Shpock' | 'MarktDe' | 'Vinted' | 'Facebook' | 'Poshmark' | 'Mercari' | 'Depop' | 'Mobile' | 'AutoScout24' | 'WirKaufenDeinAuto' | 'AutoDe' | 'Gebrauchtwagen12' | 'Craigslist' | 'OfferUp' | 'OLX' | 'Quoka' | 'Gumtree' | 'Kijiji' | 'Carousell' | 'Carvana' | 'Autotrader' | 'CarsGuide' | 'Nextdoor' | 'Lebecoin' | 'Wallapop';
 
 export type PriceKind = 'Unknown' | 'BuyItemNow' | 'Auction' | 'Negotiatable' | 'IncludesTax';
 
@@ -94,7 +97,7 @@ export type ResultReport = {
     contact?: string | null;
 };
 
-export type SearchState = 'None' | 'Disabled';
+export type SearchState = 'None' | 'Disabled' | 'DisabledError';
 
 export type StoredListing = {
     platform?: Platform;

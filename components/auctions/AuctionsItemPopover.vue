@@ -13,7 +13,7 @@
       leave-to-class="translate-y-1 opacity-0"
     >
       <PopoverPanel
-        class="absolute z-10 rounded-lg border border-slate-600 bg-slate-800 shadow-lg overflow-auto md:-translate-x-1/2 p-3 min-w-72
+        class="absolute z-10 rounded-lg border border-slate-600 bg-slate-800 shadow-xl shadow-black/30 overflow-auto md:-translate-x-1/2 p-3 min-w-72
         -translate-x-3/4"
       >
         <Disclosure v-slot="{ open }">
