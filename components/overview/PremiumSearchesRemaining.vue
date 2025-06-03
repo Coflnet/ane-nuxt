@@ -4,8 +4,13 @@
       <UiHeaderLabel :label="$t('remainingSearches')" />
     </div>
     <div class="flex flex-col h-full justify-center pb-4">
-      <UiProgressBar :progress="usedSearches" :min="0" :max="currentSearches" :end-label="`Searches ${currentSearches}`"
-        :indicator-text="`${$t('remainingRequests')} ${currentSearches - usedSearches}`" />
+      <UiProgressBar
+        :progress="usedSearches"
+        :min="0"
+        :max="currentSearches"
+        :end-label="`Searches ${currentSearches}`"
+        :indicator-text="`${$t('remainingRequests')} ${currentSearches - usedSearches}`"
+      />
       <UiFooterLabel :label="daysRemaining == 0 ? $t('noReset') : $t('timeTillReset', daysRemaining)" />
     </div>
   </UiDefaultContainer>
@@ -21,7 +26,6 @@ async function loadPremiumSearches() {
   daysRemaining.value = remainingSearchResult.refreshData
   currentSearches.value = remainingSearchResult.total
   usedSearches.value = remainingSearchResult.remaining
-  console.log(currentSearches.value)
 }
 
 onMounted(() => {

@@ -152,8 +152,6 @@ async function loadEditParam() {
       return
     }
 
-    console.log(activeFilter)
-
     filter.value.notificationTarget = activeFilter.target ?? ''
     filter.value.name = activeFilter.name ?? ''
     filter.value.id = activeFilter.id ?? 0
@@ -224,8 +222,6 @@ async function saveFilter() {
     savingFilter.value = true
     const f = await filterToCreate()
 
-    console.log(f)
-    return
     if (!f)
       return
     await filterStore.saveFilter(f)
@@ -236,6 +232,9 @@ async function saveFilter() {
     savingFilter.value = false
     console.error(e)
     push.error(t('weRanIssue'))
+  }
+  finally {
+    savingFilter.value = true
   }
 }
 
@@ -273,7 +272,6 @@ async function filterToCreate(): Promise<ListingListener | null> {
 async function handleFilters(): Promise<{ name: string, value: any }[]> {
   const rawFilter = toRaw(filter.value)
   const filters: { name: string, value: any }[] = []
-  console.log(rawFilter)
 
   // 'EU,US,GB' is the default value
   if (rawFilter.country != 'EU,US,GB')
