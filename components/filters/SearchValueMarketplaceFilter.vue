@@ -11,7 +11,7 @@
     <UiMultiSelect
       v-model="selectedMarketplaces"
       :options="marketplaces"
-      :label="$t('marketplaces')"
+      :label="$t('marketplace')"
       override-value="all"
     />
     <!-- Search Frequency -->

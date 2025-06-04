@@ -26,7 +26,7 @@
         {{ $t('anyCountry') }}
       </option>
       <option value="EU">
-        {{ $t('Europe') }}
+        {{ $t('europe') }}
       </option>
       <option value="US">
         {{ $t('unitedStates') }}

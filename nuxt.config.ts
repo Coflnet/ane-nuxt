@@ -8,6 +8,7 @@ export default defineNuxtConfig({
     '@hey-api/nuxt',
     'notivue/nuxt',
     '@nuxt/eslint',
+    '@nuxtjs/leaflet',
   ],
 
   ssr: true,
@@ -91,4 +92,3 @@ export default defineNuxtConfig({
 
   },
 })
-

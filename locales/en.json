@@ -467,5 +467,11 @@
   "frequency1Hour": "Every Hour",
   "frequency6Hour": "Every 6 Hours",
   "frequency1PerDay": "Once per day",
-  "noReset": "Upgrade your plan to get more Premium Searches"
+  "noReset": "Upgrade your plan to get more Premium Searches",
+  "Ebay": "Ebay",
+  "Kleinanzeigen": "Kleinanzeigen",
+  "invalidDiscordWebhook": "Please enter a valid webhook url",
+  "invalidEmail": "Please enter a valid email address",
+  "marketplace": "Marketplaces",
+  "notificationSettingsRadius": "Radius: {amount} KM"
 }

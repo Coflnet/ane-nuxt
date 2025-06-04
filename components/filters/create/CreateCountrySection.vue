@@ -19,14 +19,7 @@
         :footer="$t('yourZip')"
       />
 
-      <UiInput
-        v-model="model!.searchRadius"
-        :disabled="model?.zipcode == ''"
-        :label="$t('searchRadius')"
-        type="numeric"
-        :placeholder="$t('radiusEq', 80)"
-        :footer="$t('searchRadiusAroundYou')"
-      />
+      <FiltersNotificationSettingsRadius :model-value="model" />
     </div>
   </UiGrid>
 </template>
