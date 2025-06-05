@@ -1,11 +1,33 @@
 <template>
-  <UiButton
-    :disabled="model?.zipcode === ''"
-    class="w-full mb-4"
-    @on-click="handleWindowState"
-  >
-    {{ t('setRadius') }}
-  </UiButton>
+  <div class="w-full">
+    <UiHeaderLabel
+      :label="$t('searchRadius')"
+      :accent="true"
+      :sm="true"
+    />
+    <UiTooltipHover
+      :text="$t('searchRadiusTooltip')"
+      :disabled="model?.zipcode !== ''"
+    >
+      <UiButton
+        :disabled="model?.zipcode === ''"
+        class="w-full"
+        @on-click="handleWindowState"
+      >
+        <UiIcon
+          name="tabler:current-location"
+          class="mr-3"
+          :bold="true"
+        />
+        {{ t('setRadius') }}
+      </UiButton>
+    </UiTooltipHover>
+    <UiFooterLabel
+      :label="$t('searchRadiusAroundYou')"
+      :xs="true"
+    />
+  </div>
+
   <Teleport to="body">
     <div
       v-if="openMapWindow"

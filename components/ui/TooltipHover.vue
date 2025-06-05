@@ -11,6 +11,7 @@
     </button>
 
     <div
+      v-if="!disabled"
       :class="{
         'opacity-0 scale-95 hidden': !isOpen,
         'opacity-100 scale-100 block': isOpen,
@@ -24,34 +25,38 @@
   </div>
 </template>
 
-<script setup>
-defineProps({
-  text: String,
-})
+<script setup lang="ts">
+import { ref, onMounted, onUnmounted } from 'vue'
 
-const isOpen = ref(false)
-let timeoutId = null
+defineProps<{
+  text?: string
+  disabled?: boolean }>()
 
-const toggleTooltip = () => {
+const isOpen = ref<boolean>(false)
+let timeoutId: number | null = null
+
+const toggleTooltip = (): void => {
   isOpen.value = !isOpen.value
 }
 
-const showTooltip = () => {
+const showTooltip = (): void => {
   if (timeoutId) {
     clearTimeout(timeoutId)
   }
   isOpen.value = true
 }
 
-const hideTooltip = () => {
+const hideTooltip = (): void => {
   timeoutId = setTimeout(() => {
     isOpen.value = false
   }, 100)
 }
 
-const handleClickOutside = (event) => {
-  const tooltipTrigger = event.target.closest('.group')
-  if (!tooltipTrigger || !tooltipTrigger.contains(event.target)) {
+const handleClickOutside = (event: MouseEvent): void => {
+  const target = event.target as HTMLElement
+  const tooltipTrigger = target.closest('.group')
+
+  if (!tooltipTrigger || !tooltipTrigger.contains(target)) {
     isOpen.value = false
   }
 }
