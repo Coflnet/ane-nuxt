@@ -8,7 +8,7 @@
     </label>
 
     <UiTooltipHover
-      :disabled="disabled"
+      :disabled="!disabled"
       :text="$t('hasBasicPlanRestriction')"
     >
       <select

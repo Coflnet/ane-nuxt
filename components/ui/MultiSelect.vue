@@ -53,7 +53,10 @@
 
           <div class="w-full justify-between flex">
             <span class="text-white">{{ $t(item.label) }}</span>
-            <UiTooltipHover :text="$t('premiumHoverExplanation')">
+            <UiTooltipHover
+              :text="$t('premiumHoverExplanation')"
+              class="max-w-28"
+            >
               <div
                 v-if="item.premium"
                 class="rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 px-4 text-white font-medium"
