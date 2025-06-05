@@ -465,4 +465,137 @@
   "thisAuctionDoesntMatch": "Diese Auktion passt nicht zu meinem Filter",
   "tellUsWhatsWrongs": "Sag uns, was schief gelaufen ist oder nicht gepasst hat",
   "reportSuccessfull": "Dein Meldung war erfolgreich \n Das ist deine Melde-Nummer: {id}"
+  "facebook": {
+    "name": "Facebook Marketplace",
+    "title": "Facebook Marketplace Filter & Benachrichtigungen",
+    "subtitle": "Verpasse keine tollen Angebote auf dem Facebook Marketplace mehr – mit intelligenten Filtern und Sofortbenachrichtigungen",
+    "introduction": {
+      "title": "Verändere dein Facebook Marketplace-Erlebnis",
+      "bodyText": "Der Facebook Marketplace ist einer der größten Online-Marktplätze, auf dem täglich Millionen von Menschen Artikel kaufen und verkaufen. Mit unserem fortschrittlichen Filtersystem kannst du den Lärm durchdringen und genau das finden, wonach du suchst, ohne stundenlang durch irrelevante Angebote scrollen zu müssen."
+    },
+    "benefits": {
+      "title": "Warum Facebook Marketplace Filter verwenden?",
+      "bodyText": "Spare Zeit und verpasse keine tollen Angebote mehr mit unserem intelligenten Überwachungssystem, das speziell für Facebook Marketplace-Nutzer entwickelt wurde.",
+      "benefit1": "Spare Stunden manueller Suche in Facebook Marketplace-Angeboten",
+      "benefit2": "Erfahre als Erster von neuen Artikeln, die deinen Interessen entsprechen",
+      "benefit3": "Finde bessere Angebote schneller durch automatische Preis- und Zustandsüberwachung"
+    }
+  },
+  "ebay": {
+    "name": "eBay",
+    "title": "eBay Filter & Benachrichtigungen",
+    "subtitle": "Erhalte die besten Angebote auf eBay mit benutzerdefinierten Filtern und Echtzeit-Benachrichtigungen",
+    "introduction": {
+      "title": "Maximiere dein eBay-Einkaufserlebnis",
+      "bodyText": "eBay ist ein riesiger Marktplatz mit Millionen von Angeboten. Unsere Plattform hilft dir, dich in diesem Meer von Optionen zurechtzufinden, indem du personalisierte Filter einrichten kannst, die deinen spezifischen Bedürfnissen entsprechen und sicherstellen, dass du kein tolles Angebot verpasst."
+    },
+    "benefits": {
+      "title": "Warum eBay Filter verwenden?",
+      "bodyText": "Mit unseren eBay-Filtern kannst du dein Einkaufserlebnis optimieren und dich auf die Artikel konzentrieren, die dir am wichtigsten sind.",
+      "benefit1": "Finde schnell Artikel, die genau deinen Kriterien entsprechen",
+      "benefit2": "Erhalte zeitnahe Benachrichtigungen, wenn neue Angebote veröffentlicht werden",
+      "benefit3": "Spare Zeit und Mühe durch automatische Überwachung"
+    }
+  },
+  "craigslist": {
+    "name": "Craigslist",
+    "title": "Craigslist Filter & Benachrichtigungen: Optimierte Suche",
+    "subtitle": "Entdecken Sie verborgene Schätze auf Craigslist mit intelligenten Filtern und präzisen Benachrichtigungen",
+    "introduction": {
+      "title": "Erschließen Sie das volle Potenzial von Craigslist",
+      "bodyText": "Craigslist ist eine Fundgrube für lokale Angebote, doch die Suche nach den passenden Artikeln kann herausfordernd sein. Unsere Plattform revolutioniert diesen Prozess, indem Sie maßgeschneiderte Filter erstellen können, die exakt Ihren Interessen entsprechen und sicherstellen, dass Ihnen keine Top-Angebote entgehen."
+    },
+    "benefits": {
+      "title": "Warum Craigslist Filter nutzen? Ihre entscheidenden Vorteile:",
+      "bodyText": "Unsere hochentwickelten Craigslist-Filter ermöglichen es Ihnen, relevante Angebote blitzschnell zu identifizieren und stets über die neuesten Einträge informiert zu sein.",
+      "benefit1": "Effiziente und zielgerichtete lokale Artikelsuche",
+      "benefit2": "Sofortige Benachrichtigungen für exakt passende neue Angebote",
+      "benefit3": "Maximale Zeitersparnis durch automatisierte und intelligente Suchvorgänge"
+    }
+  },
+  "kleinanzeigen": {
+    "name": "Kleinanzeigen",
+    "title": "Kleinanzeigen Filter & Benachrichtigungen: Effizient Top-Deals sichern",
+    "subtitle": "Finden Sie die besten Angebote auf Kleinanzeigen mit benutzerdefinierten Filtern und Echtzeit-Benachrichtigungen – seien Sie der Erste!",
+    "introduction": {
+      "title": "Optimieren Sie Ihr Kleinanzeigen-Erlebnis auf Expertenniveau",
+      "bodyText": "Kleinanzeigen ist ein führender Marktplatz für den lokalen An- und Verkauf. Unsere Plattform ermöglicht Ihnen die Einrichtung hochpersonalisierter Filter, die Ihnen helfen, blitzschnell zu finden, wonach Sie suchen, und Ihr Einkaufserlebnis auf maximale Effizienz zu trimmen."
+    },
+    "benefits": {
+      "title": "Warum Kleinanzeigen Filter verwenden? Ihre strategischen Vorteile:",
+      "bodyText": "Mit unseren intelligenten Kleinanzeigen-Filtern navigieren Sie mühelos durch Angebote und bleiben stets über neue, für Sie relevante Artikel informiert – ein entscheidender Vorteil.",
+      "benefit1": "Schnelle und präzise lokale Artikelsuche nach Ihren exakten Kriterien",
+      "benefit2": "Sofortige Benachrichtigungen bei neuen Angeboten (i.d.R. innerhalb einer Minute nach Veröffentlichung)",
+      "benefit3": "Automatisierte Suchen für maximale Zeitersparnis und Wettbewerbsvorsprung"
+    }
+  },
+  "autoscout24": {
+    "name": "Autoscout24",
+    "title": "Autoscout24 Filter & Benachrichtigungen: Ihr Traumauto schneller und smarter finden",
+    "subtitle": "Finden Sie Ihr Traumauto auf Autoscout24 mit maßgeschneiderten Filtern und Echtzeit-Benachrichtigungen – verpassen Sie keine Chance!",
+    "introduction": {
+      "title": "Revolutionieren Sie Ihre Autosuche auf Autoscout24",
+      "bodyText": "Autoscout24 ist einer der größten Online-Automarktplätze Europas. Unsere Plattform unterstützt Sie dabei, personalisierte Hochleistungsfilter einzurichten, um das perfekte Fahrzeug zu finden, ohne wertvolle Zeit mit irrelevanten Angeboten zu verschwenden."
+    },
+    "benefits": {
+      "title": "Warum Autoscout24 Filter nutzen? Ihre überzeugenden Vorteile:",
+      "bodyText": "Unsere Autoscout24-Filter ermöglichen es Ihnen, sich exakt auf die Fahrzeuge zu konzentrieren, die für Sie relevant sind, und stellen sicher, dass Ihnen kein Top-Angebot entgeht.",
+      "benefit1": "Gezielte und effiziente Fahrzeugsuche nach Marke, Modell, Preis und Standort",
+      "benefit2": "Unverzügliche Benachrichtigungen bei neuen, exakt passenden Fahrzeugangeboten",
+      "benefit3": "Erhebliche Zeitersparnis durch automatische Überwachung Ihrer Wunschfahrzeuge"
+    }
+  },
+  "marketplaceSteps": {
+    "howItWorks": "So funktioniert's",
+    "bodyText": "Mit der {name}-Überwachung starten: Richten Sie in wenigen Minuten Ihre personalisierten Suchfilter ein und verpassen Sie keine Angebote mehr.",
+    "step1": {
+      "title": "Suchkriterien festlegen",
+      "description": "Definieren Sie Ihre Suchparameter für {name}: Schlüsselwörter, Preisspanne, Umkreis, Artikelkategorien und mehr."
+    },
+    "step2": {
+      "title": "Überwachung aktivieren",
+      "description": "Unser System scannt {name} kontinuierlich nach neuen Angeboten, die Ihren Kriterien entsprechen."
+    },
+    "step3": {
+      "title": "Sofort-Benachrichtigungen erhalten",
+      "description": "Erhalten Sie Echtzeit-Benachrichtigungen per E-Mail, Push-Benachrichtigungen oder Discord, sobald passende Artikel auf {name} erscheinen."
+    }
+  },
+  "marketplacesFaq": {
+    "title": "Häufig gestellte Fragen (FAQ) zu {name}",
+    "question1": {
+      "title": "Wie oft prüft das System {name} auf neue Angebote?",
+      "answer": "Unser System überwacht {name} fortlaufend und prüft so oft wie möglich auf neue Angebote, damit Ihnen keine Schnäppchen oder Gelegenheiten entgehen."
+    },
+    "question2": {
+      "title": "Kann ich mehrere Suchfilter für verschiedene Artikel auf {name} einrichten?",
+      "answer": "Ja, Sie können mehrere Filter für unterschiedliche Kategorien, Preisspannen und Standorte auf {name} erstellen, um verschiedene Artikel gleichzeitig zu beobachten."
+    },
+    "question3": {
+      "title": "Steht dieser Dienst in Verbindung mit {name}?",
+      "answer": "Nein, wir sind ein unabhängiger Anbieter, der Nutzern hilft, {name} komfortabler und effizienter zu überwachen. Wir sind nicht mit {name} verbunden und werden nicht von {name} unterstützt."
+    }
+  },
+  "marketplacesFeatures": {
+    "title": "Leistungsstarke Funktionen für {name}",
+    "description": "Unsere Plattform bietet umfassende Tools, um Ihr {name}-Erlebnis durch intelligente Automatisierung und Echtzeitüberwachung zu verbessern.",
+    "filtering": {
+      "title": "Erweiterte Filterfunktionen",
+      "description": "Erstellen Sie benutzerdefinierte Filter basierend auf Preisspanne, Standort, Schlüsselwörtern, Artikelzustand und mehr, um genau das zu finden, was Sie auf {name} benötigen."
+    },
+    "notifications": {
+      "title": "Schnelle Benachrichtigungen",
+      "description": "Werden Sie zeitnah benachrichtigt, wenn neue Artikel, die Ihren Kriterien entsprechen, auf {name} veröffentlicht werden, und erhalten Sie so die erste Kaufgelegenheit."
+    }
+  },
+  "overviewDescription": "Übersicht Ihrer Aktionen, die Ihren Filtern entsprachen, und weitere Informationen anzeigen",
+  "aneDashboard": "ANE Dashboard",
+  "auctionsDescription": "Aktionen anzeigen, die Ihren benutzerdefinierten Filtern entsprachen",
+  "aneAuctions": "ANE Gefundene Angebote",
+  "aneCreate": "ANE Filter erstellen",
+  "createDescription": "Erstellen Sie benutzerdefinierte Filter, um Benachrichtigungen über neue Aktionen auf vielen Marktplätzen zu erhalten",
+  "filtersDescription": "Verwalten Sie Ihre benutzerdefinierten Filter",
+  "aneFilters": "ANE Filter",
+  "aneMarketplaces": "ANE {name}",
+  "aneDescription": "Erstellen Sie benutzerdefinierte Filter und erhalten Sie Benachrichtigungen für {name}. Verpassen Sie nie wieder großartige Angebote mit unseren fortschrittlichen Marktplatz-Überwachungstools."
 }

@@ -37,4 +37,5 @@ export interface Filter {
   notificationTarget: string
   country: string
   condition: string
+  deliveryMethod: string
 }

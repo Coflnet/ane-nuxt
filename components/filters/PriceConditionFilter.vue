@@ -9,7 +9,7 @@
       override-value="all"
     />
 
-    <div class="flex items-center mb-4 space-x-2 col-span-2">
+    <div class="flex items-center mb-4 space-x-2 col-span-2 mt-4">
       <UiInput
         v-model="model!.minPrice"
         :label="$t('priceRange')"

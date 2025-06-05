@@ -1,5 +1,6 @@
 <template>
   <UiGrid
+    :grid-shink="true"
     :grid-size="3"
     class="mt-3"
   >
