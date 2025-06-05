@@ -463,7 +463,7 @@
   "premium": "Premium",
   "premiumHoverExplanation": "Premium marketplaces use 'Premium seaches' ...",
   "frequency": "Premium Search Frequency",
-  "frequency10Minutes": "Every 10 minutes",
+  "frequency20Minutes": "Every 20 minutes",
   "frequency1Hour": "Every Hour",
   "frequency6Hour": "Every 6 Hours",
   "frequency1PerDay": "Once per day",
@@ -473,5 +473,7 @@
   "invalidDiscordWebhook": "Please enter a valid webhook url",
   "invalidEmail": "Please enter a valid email address",
   "marketplace": "Marketplaces",
-  "notificationSettingsRadius": "Radius: {amount} KM"
+  "notificationSettingsRadius": "Radius: {amount} KM",
+  "setRadius": "Set Radius",
+  "hasBasicPlanRestriction": "Basic plan is restricted to one search every 6 hours"
 }

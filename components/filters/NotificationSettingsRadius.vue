@@ -1,6 +1,10 @@
 <template>
-  <UiButton @on-click="handleWindowState">
-    hello world
+  <UiButton
+    :disabled="model?.zipcode === ''"
+    class="w-full mb-4"
+    @on-click="handleWindowState"
+  >
+    {{ t('setRadius') }}
   </UiButton>
   <Teleport to="body">
     <div
@@ -48,6 +52,7 @@
               <UiButton
                 class="ml-6"
                 :primary="true"
+                @on-click="handleWindowState"
               >
                 {{ t('confirm') }}
               </UiButton>

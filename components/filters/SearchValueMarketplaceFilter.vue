@@ -20,6 +20,7 @@
       v-model="model!.frequency"
       :options="frequency"
       :label="$t('frequency')"
+      :disabled="hasBasicPlan"
     />
   </UiGrid>
 </template>
@@ -27,6 +28,8 @@
 <script setup lang="ts">
 import type { Filter } from '~/types/FilterType'
 import { marketplaces, frequency } from '~/constants/CreateFilterConstants'
+
+const hasBasicPlan = useUserStore().currentPlan?.product == 'basic' || !useUserStore().currentPlan?.product
 
 const premiumMarkets = ref(false)
 const model = defineModel<Filter>()
@@ -56,7 +59,9 @@ watch(selectedMarketplaces, (_) => {
   if (selectedMarketplaces.value.some(marketplace => marketplace.premium == true)) {
     premiumMarkets.value = true
     // the default value or every 10 minutes
-    model.value!.frequency = '*/10 * * * *'
+    model.value!.frequency = '*/20 * * * *'
+    if (useUserStore().currentPlan?.product == 'basic' || !useUserStore().currentPlan?.product)
+      model.value!.frequency = '0 */6 * * *'
   }
 }, { deep: true })
 </script>

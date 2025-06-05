@@ -6,7 +6,7 @@ export const marketplaces = [
 ]
 
 export const frequency = [
-  { value: '*/10 * * * *', label: 'frequency10Minutes' },
+  { value: '*/20 * * * *', label: 'frequency20Minutes' },
   { value: '0 * * * *', label: 'frequency1Hour' },
   { value: '0 */6 * * *', label: 'frequency6Hour' },
   { value: '0 16 * * *', label: 'frequency1PerDay' },

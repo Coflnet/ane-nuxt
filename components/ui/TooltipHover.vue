@@ -1,8 +1,8 @@
 <template>
-  <div class="relative flex items-center group">
+  <div class="relative flex items-center group w-full justify-center">
     <button
       type="button"
-      class="inline-flex items-center justify-center"
+      class="inline-flex items-center justify-center w-full"
       @click.stop="toggleTooltip"
       @mouseenter="showTooltip"
       @mouseleave="hideTooltip"
@@ -17,7 +17,7 @@
         'group-hover:opacity-100 group-hover:scale-100 group-hover:block': true,
       }"
       class="absolute transition-all font-medium transform rounded-lg border bg-slate-700 text-white border-slate-600
-        text-sm px-2 py-1 w-64 -translate-x-1/3 mb-16 text-center z-50 -mt-6"
+        text-sm px-2 py-1 w-64   bottom-full text-center z-50 mb-2"
     >
       {{ text }}
     </div>

@@ -1,7 +1,10 @@
 <template>
   <button
     :type="type ?? 'button'"
-    :class="buttonClasses"
+    :class="[
+      buttonClasses,
+      { 'opacity-50 cursor-not-allowed': disabled },
+    ]"
     :disabled="!!proccessing || !!disabled"
     class="mt-4 md:mt-0 px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 justify-center"
     @click="emit('onClick')"
