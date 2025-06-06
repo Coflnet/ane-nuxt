@@ -34,7 +34,6 @@ export const plans: Plan[] = [
       { text: 'XactiveFilters', amount: 3, included: true },
       { text: 'pushNotifications', included: true },
       { text: 'XMinuteDelay', amount: 30, included: true },
-      { text: 'XincludedPremiumSearches', amount: 100, included: true },
       { text: 'priceCalculation', included: false },
     ],
   },
