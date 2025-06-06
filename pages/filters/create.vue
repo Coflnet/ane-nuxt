@@ -246,8 +246,6 @@ async function saveFilter() {
     savingFilter.value = true
     const f = await filterToCreate()
 
-    console.log(f)
-    return
     if (!f)
       return
     await filterStore.saveFilter(f)
@@ -258,6 +256,9 @@ async function saveFilter() {
     savingFilter.value = false
     console.error(e)
     push.error(t('weRanIssue'))
+  }
+  finally {
+    savingFilter.value = false
   }
 }
 
