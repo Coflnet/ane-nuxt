@@ -593,5 +593,6 @@
   "filtersDescription": "Verwalten Sie Ihre benutzerdefinierten Filter",
   "aneFilters": "ANE Filter",
   "aneMarketplaces": "ANE {name}",
-  "aneDescription": "Erstellen Sie benutzerdefinierte Filter und erhalten Sie Benachrichtigungen für {name}. Verpassen Sie nie wieder großartige Angebote mit unseren fortschrittlichen Marktplatz-Überwachungstools."
+  "aneDescription": "Erstellen Sie benutzerdefinierte Filter und erhalten Sie Benachrichtigungen für {name}. Verpassen Sie nie wieder großartige Angebote mit unseren fortschrittlichen Marktplatz-Überwachungstools.",
+  "XincludedPremiumSearches": "Premium-Suchen inklusive: {amount}"
 }
