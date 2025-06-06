@@ -19,7 +19,19 @@ export function useFormat() {
     return new Intl.NumberFormat(locale == 'en' ? 'en' : 'de', finalOptions).format(value)
   }
 
+  const formatNumber = (value: number, locale: string): string => {
+    const effectiveLocale = locale === 'en' ? 'en-US' : 'de-DE'
+
+    const numberOptions: Intl.NumberFormatOptions = {
+      style: 'decimal',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 3,
+    }
+
+    return new Intl.NumberFormat(effectiveLocale, numberOptions).format(value)
+  }
   return {
     formatCurrency,
+    formatNumber,
   }
 }

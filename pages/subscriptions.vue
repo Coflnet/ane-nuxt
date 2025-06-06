@@ -84,6 +84,14 @@ async function getCurrentSubscription() {
     }
     currentPlan.value = result[0]?.product as PlanId
     userStore.currentPlan = result[0]
+    if (result[0]?.endsAt == '')
+      return
+
+    if (new Date(result[0]?.endsAt ?? '') < new Date()) {
+      resetSubscription()
+      return
+    }
+
     if (result[0]?.endsAt !== '')
       endDate.value = new Date(result[0]?.endsAt ?? '')
   }

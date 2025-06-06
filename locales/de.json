@@ -1,8 +1,7 @@
 {
-  "XActiveFilters": "{n} aktive Filter",
-  "XMinuteDelay": "{n} Minuten Verzögerung",
-  "3activeFilters": "",
-  "XactiveFilters": "{n} aktive Filter",
+  "XActiveFilters": "{amount} aktive Filter",
+  "XMinuteDelay": "{amount} Minuten Verzögerung",
+  "XactiveFilters": "{amount} aktive Filter",
   "actions": "Aktionen",
   "active": "Aktiv",
   "activeFilters": "Aktive Filter",
@@ -594,5 +593,6 @@
   "filtersDescription": "Verwalten Sie Ihre benutzerdefinierten Filter",
   "aneFilters": "ANE Filter",
   "aneMarketplaces": "ANE {name}",
-  "aneDescription": "Erstellen Sie benutzerdefinierte Filter und erhalten Sie Benachrichtigungen für {name}. Verpassen Sie nie wieder großartige Angebote mit unseren fortschrittlichen Marktplatz-Überwachungstools."
+  "aneDescription": "Erstellen Sie benutzerdefinierte Filter und erhalten Sie Benachrichtigungen für {name}. Verpassen Sie nie wieder großartige Angebote mit unseren fortschrittlichen Marktplatz-Überwachungstools.",
+  "XincludedPremiumSearches": "Premium-Suchen inklusive: {amount}"
 }
