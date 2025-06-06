@@ -6,12 +6,18 @@
     </div>
     <UiDefaultContainer class="p-6">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div v-for="(auction, index) in loadedAuctions" :key="index"
-          class="border border-slate-700 rounded-lg  hover:shadow-md transition-shadow">
+        <div
+          v-for="(auction, index) in loadedAuctions"
+          :key="index"
+          class="border border-slate-700 rounded-lg  hover:shadow-md transition-shadow"
+        >
           <AuctionsItem :auction="auction" />
         </div>
       </div>
-      <AuctionsLoadingState :no-auctions="loadedAuctions.length === 0 && !loading" :loading="loading" />
+      <AuctionsLoadingState
+        :no-auctions="loadedAuctions.length === 0 && !loading"
+        :loading="loading"
+      />
     </UiDefaultContainer>
   </div>
 </template>
@@ -49,6 +55,8 @@ async function loadMore() {
 }
 
 onMounted(async () => {
+  if (useFilterStore().getUserFilters.length == 0)
+    await useFilterStore().loadFilters()
   await useUserStore().checkAuth(useFirebaseAuth()!)
   await listingStore.loadMatches()
   loadedAuctions.value = listingStore.recentMatches
