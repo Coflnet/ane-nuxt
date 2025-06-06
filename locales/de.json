@@ -463,7 +463,7 @@
   "createOrAdjustFilters": "Bearbeite deine Filter oder füge neue hinzu",
   "thisAuctionDoesntMatch": "Diese Auktion passt nicht zu meinem Filter",
   "tellUsWhatsWrongs": "Sag uns, was schief gelaufen ist oder nicht gepasst hat",
-  "reportSuccessfull": "Dein Meldung war erfolgreich \n Das ist deine Melde-Nummer: {id}"
+  "reportSuccessfull": "Dein Meldung war erfolgreich \n Das ist deine Melde-Nummer: {id}",
   "facebook": {
     "name": "Facebook Marketplace",
     "title": "Facebook Marketplace Filter & Benachrichtigungen",
