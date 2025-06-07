@@ -1,6 +1,9 @@
 <template>
   <Popover>
-    <PopoverButton class="outline-none">
+    <PopoverButton
+      class="outline-none"
+      aria-label="Report Wrong Match Popover"
+    >
       <slot />
     </PopoverButton>
 
@@ -17,7 +20,10 @@
         -translate-x-3/4"
       >
         <Disclosure v-slot="{ open }">
-          <DisclosureButton class="mt-1">
+          <DisclosureButton
+            class="mt-1"
+            aria-label="Report Wrong Match Dropdown"
+          >
             <div class="flex">
               <UiHeaderLabel
                 :sm="true"
@@ -38,6 +44,7 @@
           >
             <textarea
               v-model="auctionBadText"
+              aria-label="Report Wrong Match Textarea"
               class="bg-transparent rounded-lg border border-slate-600 m-2 p-1 text-white placeholder-gray-500"
               rows="3"
               cols="30"

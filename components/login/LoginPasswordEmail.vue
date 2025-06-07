@@ -2,12 +2,14 @@
   <UiInput
     v-model="email"
     type="email"
+    name="email"
     :placeholder="$t('email')"
     :radius-error="emailPassError"
   />
   <UiInput
     v-model="password"
     type="password"
+    name="password"
     :placeholder="$t('password')"
     class="mt-3"
     :radius-error="emailPassError"

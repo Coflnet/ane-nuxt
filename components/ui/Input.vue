@@ -44,6 +44,7 @@ const props = defineProps({
   footer: String,
   error: Boolean,
   disabled: Boolean,
+  labelAria: String,
 })
 
 const model = defineModel()

@@ -5,6 +5,7 @@
     class="relative w-14"
   >
     <button
+      aria-label="Profile Dropdown Button"
       class="flex items-center space-x-1 text-slate-300 hover:text-indigo-400 focus:outline-none"
       @click="isProfileMenuOpen = !isProfileMenuOpen"
     >
@@ -41,6 +42,7 @@
         </div>
 
         <UiTextButton
+          aria-label="Profile Logout Button"
           class="m-1 mt-2"
           @on-click="logout"
         >
@@ -50,20 +52,25 @@
           />
           {{ $t('signOut') }}
         </UiTextButton>
-        <UiTextButton
-          class="m-1 mt-2"
-          @on-click="navigateTo(localePath('/subscriptions'))"
+
+        <UiLinkButton
+          aria-label="Profile Subscriptions Navigation Button"
+          :white="true"
+          :primary="true"
+          :to="localePath('/subscriptions')"
         >
+          {{ $t('appHeaderAuctions') }}
           <Icon
             name="tabler:calendar-week"
             class="w-4 h-4 mr-2"
           />
           {{ $t('subscriptions') }}
-        </UiTextButton>
+        </UiLinkButton>
 
         <UiTextButton
           v-for="locale in availableLocales"
           :key="locale.code"
+          aria-label="Profile Switch Locale Button"
           class="m-1 mt-2"
           @on-click="navigateTo(switchLocalePath(locale.code))"
         >

@@ -4,6 +4,7 @@
       <input
         id="none-notification"
         v-model="model!.notificationType"
+        aria-label="None Notification Type"
         type="radio"
         value="Unknown"
         class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300"

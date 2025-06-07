@@ -1,41 +1,46 @@
 <template>
   <div class="items-center">
-    <button @click="isModalOpen = true" class="mt-0.5 ml-1">
+    <button
+      :aria-label="`Delete Filter ${props.itemId}`"
+      class="mt-0.5 ml-1"
+      @click="isModalOpen = true"
+    >
       <UiIcon name="tabler:trash" />
     </button>
 
-    <UiConformationPopup :footer="$t('areYouSureDeletion')" :header="$t('confirmDeletion')" :model-value="isModalOpen"
-      @confirm="deleteFilterId" @cancel="isModalOpen = false" />
-
+    <UiConformationPopup
+      :footer="$t('areYouSureDeletion')"
+      :header="$t('confirmDeletion')"
+      :model-value="isModalOpen"
+      @confirm="deleteFilterId"
+      @cancel="isModalOpen = false"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { deleteFilter } from '~/src/api-client';
+import { ref } from 'vue'
+import { deleteFilter } from '~/src/api-client'
 
-const props = defineProps({ itemId: Number });
+const props = defineProps({ itemId: Number })
 
 const userStore = useUserStore()
-var apiToken = `Bearer ${userStore.token}`;
-const filterStore = useFilterStore();
-const deleting = ref(false);
+const apiToken = `Bearer ${userStore.token}`
+const filterStore = useFilterStore()
+const deleting = ref(false)
 
-
-const isModalOpen = ref(false);
+const isModalOpen = ref(false)
 
 const deleteFilterId = async () => {
-  deleting.value = true;
+  deleting.value = true
   await deleteFilter({
     path: { id: props.itemId ?? 0 },
-    composable: "$fetch",
+    composable: '$fetch',
     headers: { Authorization: apiToken },
   })
-  await filterStore.loadFilters();
-  push.success("Filter successfully deleted");
-  isModalOpen.value = false;
-  deleting.value = false;
+  await filterStore.loadFilters()
+  push.success('Filter successfully deleted')
+  isModalOpen.value = false
+  deleting.value = false
 }
-
-
 </script>

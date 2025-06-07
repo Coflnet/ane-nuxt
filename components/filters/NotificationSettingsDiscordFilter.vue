@@ -1,6 +1,7 @@
 <template>
   <FiltersNotificationSettingItem
     v-model="webhookUrl"
+    label-aria="Discord Webhook URL"
     :filter="model!"
     :config="{
       notificationType: 'DiscordWebhook',

@@ -1,44 +1,56 @@
 <template>
   <ClientOnly>
     <div class="flex items-center space-x-4">
-      <UiTextButton
-        data-testid="home-navigation-button"
-        @on-click="navigateTo(localePath('/overview'))"
+      <UiLinkButton
+        aria-label="Home Navigation Button"
+        :white="true"
+        :to="localePath('/overview')"
       >
         {{ $t('appHeaderHome') }}
-      </UiTextButton>
+      </UiLinkButton>
 
-      <UiTextButton
-        data-testid=""
-        @on-click="navigateTo(localePath('/filters'))"
+      <UiLinkButton
+        aria-label="Filters Navigation Button"
+        :white="true"
+        :to="localePath('/filters')"
       >
         {{ $t('appHeaderFilters') }}
-      </UiTextButton>
+      </UiLinkButton>
 
-      <UiButton
+      <UiLinkButton
+        aria-label="Auctions Navigation Button"
+        :white="true"
         :primary="true"
-        @on-click="navigateTo(localePath('/auctions'))"
+        :to="localePath('/auctions')"
       >
         {{ $t('appHeaderAuctions') }}
-      </UiButton>
+      </UiLinkButton>
 
       <!-- User section -->
-      <AppHeaderProfileDropdown v-if="userStore.isLoggedIn" />
+      <AppHeaderProfileDropdown
+        v-if="userStore.isLoggedIn"
+      />
 
       <div
         v-else
         class="flex space-x-3"
       >
-        <UiTextButton @on-click="navigateTo(localePath('/login'))">
+        <UiLinkButton
+          aria-label="Sign In Navigation Button"
+          :white="true"
+          :to="localePath('/login')"
+        >
           {{ $t('signIn') }}
-        </UiTextButton>
+        </UiLinkButton>
 
-        <UiButton
+        <UiLinkButton
+          aria-label="Register Navigation Button"
+          :white="true"
           :primary="true"
-          @on-click="navigateTo(localePath('/register'))"
+          :to="localePath('/register')"
         >
           {{ $t('register') }}
-        </UiButton>
+        </UiLinkButton>
       </div>
     </div>
   </ClientOnly>

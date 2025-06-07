@@ -6,12 +6,14 @@
         <UiGrid :grid-size="2">
           <UiInput
             v-model="filter.searchValue"
+            label-aria="Search Value Input"
             :name="$t('searchValue')"
             :placeholder="$t('cameraEg')"
             :label="$t('searchValue')"
           />
           <UiMultiSelect
             v-model="selectedMarketplaces"
+            label-aria="Marketplaces Input"
             :options="marketplaces"
             :label="$t('marketplaces')"
             override-value="all"
@@ -31,14 +33,7 @@
         </div>
         <UiExpandOption class="mt-1">
           <FiltersKeywordFilter
-            :model-value="filter.keywords"
-            :label="$t('searchKeywords')"
-            :footer="$t('addKeyDescription')"
-            :place-holder="$t('addKeywordPressEnter')"
-          />
-
-          <FiltersKeywordFilter
-            class="my-6"
+            class="my-4"
             :model-value="filter.blacklist"
             :label="$t('blackKeywords')"
             :footer="$t('addblacklistKeywords')"
