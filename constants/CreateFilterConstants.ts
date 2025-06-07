@@ -1,10 +1,11 @@
 export const marketplaces = [
   { value: 'all', label: 'allMarket' },
-  { value: 'Ebay', label: 'Ebay', premium: true },
+  { value: 'Ebay', label: 'Ebay' },
   { value: 'Kleinanzeigen', label: 'Kleinanzeigen' },
   { value: 'AutoScout24', label: 'autoScout' },
+  { value: 'Facebook', label: 'facebookMarketplace', premium: true },
+  { value: 'Craigslist', label: 'craigslist' },
 ]
-
 export const frequency = [
   { value: '*/20 * * * *', label: 'frequency20Minutes' },
   { value: '0 * * * *', label: 'frequency1Hour' },

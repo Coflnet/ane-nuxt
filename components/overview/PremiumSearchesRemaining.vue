@@ -11,7 +11,9 @@
         :end-label="`Searches ${currentSearches}`"
         :indicator-text="`${$t('remainingRequests')} ${currentSearches - usedSearches}`"
       />
-      <UiFooterLabel :label="daysRemaining == 0 ? $t('noReset') : $t('timeTillReset', daysRemaining)" />
+      <UiLinkLabel href="/subscriptions">
+        <UiFooterLabel :label="daysRemaining == 0 ? $t('noReset') : $t('timeTillReset', daysRemaining)" />
+      </UiLinkLabel>
     </div>
   </UiDefaultContainer>
 </template>

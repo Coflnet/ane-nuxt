@@ -461,7 +461,7 @@
   "loadRemainingError": "Error loading premium searches",
   "timeTillReset": "Resets in {n} days",
   "premium": "Premium",
-  "premiumHoverExplanation": "Premium marketplaces use 'Premium seaches' ...",
+  "premiumHoverExplanation": "Premium marketplaces use Premium seaches",
   "frequency": "Premium Search Frequency",
   "frequency20Minutes": "Every 20 minutes",
   "frequency1Hour": "Every Hour",
@@ -476,5 +476,7 @@
   "notificationSettingsRadius": "Radius: {amount} KM",
   "setRadius": "Set Radius",
   "hasBasicPlanRestriction": "Basic plan is restricted to one search every 6 hours",
-  "searchRadiusTooltip": "A zip code is required for search radius to function"
+  "searchRadiusTooltip": "A zip code is required for search radius to function",
+  "facebookMarketplace": "Facebook Marketplace",
+  "craigslist": "Craigslist"
 }
