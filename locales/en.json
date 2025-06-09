@@ -319,8 +319,8 @@
         "price": "$0",
         "billing": "Forever free",
         "features": {
-          "notifiers": "Up to 3 search notifiers",
-          "filters": "Access to multiple marketplaces",
+          "notifiers": "Up to 3 Filters",
+          "premiumSearches": "100 Premium Searches On Signup",
           "email": "All notifications channels",
           "updates": "Notifications within 1 hour",
           "analytics": "Advanced analytics"
@@ -333,8 +333,8 @@
         "price": "$9.99",
         "billing": "per month",
         "features": {
-          "notifiers": "Up to 20 search notifiers",
-          "filters": "Access to all marketplaces",
+          "notifiers": "Up to 20 Filters",
+          "premiumSearches": "3500 Premium Searches",
           "notifications": "All notifications channels",
           "updates": "Notifications within 10 minutes",
           "priceCalculation": "Price Calculation"
@@ -347,11 +347,11 @@
         "price": "??,99€",
         "billing": "per month",
         "features": {
-          "notifiers": "High amount search notifiers",
-          "filters": "Access to marketplaces",
+          "notifiers": "500 Filters",
+          "premiumSearches": "35000 Premium Searches",
           "notifications": "All notification channels",
           "updates": "Notifications within the minute",
-          "analytics": "Price calculation",
+          "analytics": "Price calculation"
         },
         "cta": "Coming Soon"
       }
@@ -360,7 +360,7 @@
       "title": "All Plans Include",
       "security": "Secure data encryption",
       "support": "Email support",
-      "updates": "Regular updates",
+      "updates": "Regular updates"
     }
   },
   "faq": {
