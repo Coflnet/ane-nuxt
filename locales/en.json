@@ -592,5 +592,6 @@
   "aneFilters": "ANE Filters",
   "aneMarketplaces": "ANE {name}",
   "aneDescription": "Create custom filters and receive notifications for {name}. Never miss great deals again with our advanced marketplace monitoring tools.",
-  "XincludedPremiumSearches": "Included Premium Searches {amount}"
+  "XincludedPremiumSearches": "Included Premium Searches {amount}",
+  "appHeaderBeta": "Beta"
 }
