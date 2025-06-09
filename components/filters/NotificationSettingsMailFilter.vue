@@ -1,6 +1,7 @@
 <template>
   <FiltersNotificationSettingItem
     v-model="emailAddress"
+    label-aria="Email Address"
     :filter="model!"
     :config="{
       notificationType: 'Email',

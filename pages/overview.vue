@@ -10,16 +10,18 @@
         </h1>
         <UiFooterLabel :label="$t('monitorAuctionAndFilters')" />
       </div>
-      <UiButton
+      <UiLinkButton
+        aria-label="Create Navigation Button"
+        :white="true"
         :primary="true"
-        @on-click="navigateTo(localePath('/filters/create'))"
+        :to="localePath('/filters/create')"
       >
         <Icon
           name="tabler:plus"
-          class="size-5"
+          class="size-5 mr-2"
         />
         <span class="mr-1">{{ $t('createFilter') }}</span>
-      </UiButton>
+      </UiLinkButton>
     </div>
 
     <OverviewStats

@@ -18,6 +18,7 @@
     <select
       id="country"
       v-model="model!.country"
+      label-aria="Country Select"
       class="w-full px-4 py-2.5 rounded-lg border border-slate-600 bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-400"
       autocomplete="country"
       name="country"
@@ -25,7 +26,10 @@
       <option value="EU,US,GB">
         {{ $t('anyCountry') }}
       </option>
-      <option value="EU">
+      <option
+        value="EU"
+        aria-label="Europe"
+      >
         {{ $t('Europe') }}
       </option>
       <option value="US">

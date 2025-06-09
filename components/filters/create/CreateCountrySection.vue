@@ -7,6 +7,7 @@
     <UiCountryDropDown :model-value="model" />
     <UiMultiSelect
       v-model="deliveryKindSelected"
+      label-aria="Delivery Method Select"
       :label="$t('deliveryMethod')"
       :options="deliveryKind"
       override-value="all"
@@ -14,6 +15,7 @@
     <div class="flex space-x-4">
       <UiInput
         v-model="model!.zipcode"
+        label-aria="Zip Code Input"
         :label="$t('zipCode')"
         type="number"
         :placeholder="$t('zipCodeEq')"
@@ -23,6 +25,7 @@
       <UiInput
         v-model="model!.searchRadius"
         :disabled="model?.zipcode == ''"
+        label-aria="Search Radius Input"
         :label="$t('searchRadius')"
         type="numeric"
         :placeholder="$t('radiusEq', 80)"

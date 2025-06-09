@@ -14,6 +14,7 @@
           v-for="(auction, index) in props.matches"
           :key="index"
           class="border-b border-slate-700 hover:bg-slate-700/50 cursor-pointer"
+          :aria-label="`Auction ${auction.listingData?.title ?? 'Unknown'}`"
           @click="tableClicked(auction)"
         >
           <td class="px-4 py-3 text-sm text-white">
@@ -40,7 +41,7 @@
             v-if="overview"
             class="px-4 py-3 text-sm font-medium text-white hidden md:table-cell"
           >
-            {{ filters.getSimplifiedFilters[auction.listenerId ?? 0]![0] }}
+            {{ filters.getSimplifiedFilters?.[auction.listenerId ?? 0]?.[0] ?? '' }}
           </td>
           <td class="px-4 py-3 text-sm font-medium text-white">
             {{ useFormat().formatCurrency(

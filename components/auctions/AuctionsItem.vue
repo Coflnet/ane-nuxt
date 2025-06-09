@@ -1,6 +1,9 @@
 <template>
   <div class="relative">
-    <a :href="auctionUrl">
+    <a
+      :href="auctionUrl"
+      aria-label="Auction link"
+    >
       <img
         :src="auction.listingData!.imageUrls![0] ?? ''"
         alt="Auction thumbnail"
