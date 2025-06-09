@@ -3,10 +3,23 @@
     <div class="container mx-auto px-4 py-4">
       <div class="flex items-center justify-between">
         <div class="flex items-center w-full md:w-24 justify-between">
-          <UiLogo location="/overview" />
-          <button class="mr-3 text-white md:hidden focus:outline-none" @click="toggleMobileMenu"
-            aria-label="Toggle navigation menu">
-            <Icon name="lucide:menu" class="w-6 h-6" />
+          <div class="flex items-center">
+            <UiLogo location="/overview" />
+            <div
+              class="ml-2 px-2 py-0.5 bg-blue-500 text-white text-xs font-semibold rounded-full"
+            >
+              {{ $t('appHeaderBeta') }}
+            </div>
+          </div>
+          <button
+            class="mr-3 text-white md:hidden focus:outline-none"
+            aria-label="Toggle navigation menu"
+            @click="toggleMobileMenu"
+          >
+            <Icon
+              name="lucide:menu"
+              class="w-6 h-6"
+            />
           </button>
         </div>
 
@@ -17,11 +30,17 @@
     </div>
 
     <!-- Mobile sidebar navigation -->
-    <AppHeaderMobileNavMenu :is-open="isMobileMenuOpen" @close="closeMobileMenu" />
+    <AppHeaderMobileNavMenu
+      :is-open="isMobileMenuOpen"
+      @close="closeMobileMenu"
+    />
 
     <!-- Overlay when mobile menu is open -->
-    <div v-if="isMobileMenuOpen" class="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden" @click="closeMobileMenu">
-    </div>
+    <div
+      v-if="isMobileMenuOpen"
+      class="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"
+      @click="closeMobileMenu"
+    />
   </header>
 </template>
 
@@ -36,7 +55,8 @@ const toggleMobileMenu = () => {
   // Prevent scrolling when menu is open
   if (isMobileMenuOpen.value) {
     document.body.style.overflow = 'hidden'
-  } else {
+  }
+  else {
     document.body.style.overflow = ''
   }
 }
