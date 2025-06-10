@@ -254,19 +254,20 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  async function loadRemainingSearches(): Promise<{ remaining: number, total: number, refreshData: number }> {
+  async function loadRemainingSearches(): Promise<{ used: number, total: number, refreshData: number }> {
     const apiToken = `Bearer ${token.value}`
     try {
       const response = await getStats({
         composable: '$fetch',
         headers: { Authorization: apiToken },
       })
+
       if (subscriptionStartDate.value == '' && noPremium.value == null)
         await getSubscriptionEndDate()
 
       return {
-        remaining: response.totalActiveSearches ?? 0,
-        total: response.activeRefillAmount ?? 0,
+        used: response.searchesUsedMonthly ?? 0,
+        total: response.searchesAvailableMonthly ?? 0,
         refreshData: getTimeTillSubscriptionRenewal(subscriptionStartDate.value),
       }
     }
@@ -274,7 +275,7 @@ export const useUserStore = defineStore('user', () => {
       console.error(error)
       push.error(useI18n().t('loadRemainingError'))
     }
-    return { remaining: 0, total: 0, refreshData: 0 }
+    return { used: 0, total: 0, refreshData: 0 }
   }
 
   async function getSubscriptionEndDate() {

@@ -73,6 +73,8 @@ export type MatchStats = {
     listenerCount?: number | null;
     listenerLimit?: number | null;
     activeRefillAmount?: number | null;
+    searchesUsedMonthly?: number | null;
+    searchesAvailableMonthly?: number | null;
 };
 
 export type Platform = 'Unknown' | 'Ebay' | 'Kleinanzeigen' | 'Marktplaats' | 'Willhaben' | 'Shpock' | 'MarktDe' | 'Vinted' | 'Facebook' | 'Poshmark' | 'Mercari' | 'Depop' | 'Mobile' | 'AutoScout24' | 'WirKaufenDeinAuto' | 'AutoDe' | 'Gebrauchtwagen12' | 'Craigslist' | 'OfferUp' | 'OLX' | 'Quoka' | 'Gumtree' | 'Kijiji' | 'Carousell' | 'Carvana' | 'Autotrader' | 'CarsGuide' | 'Nextdoor' | 'Lebecoin' | 'Wallapop';

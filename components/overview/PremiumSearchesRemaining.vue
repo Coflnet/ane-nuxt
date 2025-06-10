@@ -1,7 +1,7 @@
 <template>
   <UiDefaultContainer class="p-6 justify-center min-h-52">
     <div class="w-full justify-between flex">
-      <UiHeaderLabel :label="$t('remainingSearches')" />
+      <UiHeaderLabel :label="$t('usedSearches')" />
     </div>
     <div class="flex flex-col h-full justify-center pb-4">
       <UiProgressBar
@@ -27,7 +27,7 @@ async function loadPremiumSearches() {
   const remainingSearchResult = await useUserStore().loadRemainingSearches()
   daysRemaining.value = remainingSearchResult.refreshData
   currentSearches.value = remainingSearchResult.total
-  usedSearches.value = remainingSearchResult.remaining
+  usedSearches.value = remainingSearchResult.used
 }
 
 onMounted(() => {
