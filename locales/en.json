@@ -350,7 +350,7 @@
           "filters": "Access to marketplaces",
           "notifications": "All notification channels",
           "updates": "Notifications within the minute",
-          "analytics": "Price calculation",
+          "analytics": "Price calculation"
         },
         "cta": "Coming Soon"
       }
@@ -359,7 +359,7 @@
       "title": "All Plans Include",
       "security": "Secure data encryption",
       "support": "Email support",
-      "updates": "Regular updates",
+      "updates": "Regular updates"
     }
   },
   "faq": {
@@ -455,7 +455,6 @@
   "deliveryMethod": "Delivery Method",
   "recentMatches": "Recent Matches",
   "createOrAdjustFilters": "Try adjusting your filters or creating a new one",
-<<<<<<< HEAD
   "remainingRequests": "Remaining Premium Searches",
   "usedSearches": "Used Searches",
   "notificationsChannels": "Notification Channels",
@@ -479,8 +478,7 @@
   "hasBasicPlanRestriction": "Basic plan is restricted to one search every 6 hours",
   "searchRadiusTooltip": "A zip code is required for search radius to function",
   "facebookMarketplace": "Facebook Marketplace",
-  "craigslist": "Craigslist"
-=======
+  "craigslistMarketplace": "Craigslist",
   "thisAuctionDoesntMatch": "This auction doesn't match my filter",
   "tellUsWhatsWrongs": "Tell us what went wrong or didn't match",
   "reportSuccessfull": "Your report was successful \n This is your report ID: {id}",
@@ -619,5 +617,4 @@
   "aneDescription": "Create custom filters and receive notifications for {name}. Never miss great deals again with our advanced marketplace monitoring tools.",
   "XincludedPremiumSearches": "Included Premium Searches {amount}",
   "appHeaderBeta": "Beta"
->>>>>>> main
 }

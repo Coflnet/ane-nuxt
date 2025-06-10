@@ -4,7 +4,7 @@ export const marketplaces = [
   { value: 'Kleinanzeigen', label: 'Kleinanzeigen' },
   { value: 'AutoScout24', label: 'autoScout' },
   { value: 'Facebook', label: 'facebookMarketplace', premium: true },
-  { value: 'Craigslist', label: 'craigslist' },
+  { value: 'Craigslist', label: 'craigslistMarketplace' },
 ]
 export const frequency = [
   { value: '*/20 * * * *', label: 'frequency20Minutes' },
