@@ -14,8 +14,8 @@ export const useFilterStore = defineStore('filter', () => {
   const filterOptions = ref<NamedOption[]>([])
 
   const getSimplifiedFilters = computed(() => {
-    const simplifiedFilters: { [id: string]: string } = {}
-    filters.value.map(i => simplifiedFilters[i.id ?? ''] = i.name ?? '')
+    const simplifiedFilters: { [id: string]: [string, number] } = {}
+    filters.value.map(i => simplifiedFilters[i.id ?? ''] = [i.name ?? '', i.id ?? 0])
     return simplifiedFilters
   })
 

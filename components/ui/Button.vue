@@ -39,6 +39,8 @@ const props = defineProps<{
 }>()
 
 const buttonClasses = computed(() => {
+  if (props.disabled)
+    return 'bg-slate-600 text-gray-400 cursor-not-allowed'
   if (props.warning)
     return 'bg-red-600 text-white hover:bg-red-700'
   if (props.primary)

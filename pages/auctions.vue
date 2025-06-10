@@ -28,6 +28,7 @@ import { useInfiniteScroll } from '@vueuse/core'
 import { useListingStore } from '@/stores/listing'
 import type { FilterMatch } from '~/src/api-client'
 
+const { t } = useI18n()
 const localePath = useLocalePath()
 const listingStore = useListingStore()
 
@@ -54,6 +55,8 @@ async function loadMore() {
 }
 
 onMounted(async () => {
+  if (useFilterStore().getUserFilters.length == 0)
+    await useFilterStore().loadFilters()
   await useUserStore().checkAuth(useFirebaseAuth()!)
   await listingStore.loadMatches()
   loadedAuctions.value = listingStore.recentMatches
@@ -68,5 +71,12 @@ onMounted(async () => {
     },
   })
   loading.value = false
+})
+
+useSeoMeta({
+  title: () => t('aneAuctions'),
+  ogTitle: () => t('aneAuctions'),
+  description: () => t('auctionsDescription'),
+  ogDescription: () => t('auctionsDescription'),
 })
 </script>

@@ -1,6 +1,9 @@
 <template>
   <div class="my-component">
-    <UiTextButton @on-click="toggleExpanded()">
+    <UiTextButton
+      label-aria="Advanced Options Toggle"
+      @on-click="toggleExpanded()"
+    >
       <UiFooterLabel
         :label="$t('advancedOptions')"
         :white="true"

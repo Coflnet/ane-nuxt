@@ -188,6 +188,18 @@ export const useUserStore = defineStore('user', () => {
       const result = isLogin ? await signInWithEmailAndPassword(clientAuth, email, password) : await createUserWithEmailAndPassword(clientAuth, email, password)
       const loggedInUser = result.user
 
+      const response = await loginFirebase({
+        composable: '$fetch',
+        body: { authToken: await result.user.getIdToken() },
+      })
+
+      if (response.authToken === null) {
+        console.error('Invalid auth token received from server')
+        return
+      }
+
+      token.value = response.authToken ?? ''
+
       if (loggedInUser) {
         user.value = {
           id: loggedInUser.uid,

@@ -10,16 +10,18 @@
         </h1>
         <UiFooterLabel :label="$t('monitorAuctionAndFilters')" />
       </div>
-      <UiButton
+      <UiLinkButton
+        aria-label="Create Navigation Button"
+        :white="true"
         :primary="true"
-        @on-click="navigateTo(localePath('/filters/create'))"
+        :to="localePath('/filters/create')"
       >
         <Icon
           name="tabler:plus"
-          class="size-5"
+          class="size-5 mr-2"
         />
         <span class="mr-1">{{ $t('createFilter') }}</span>
-      </UiButton>
+      </UiLinkButton>
     </div>
 
     <OverviewStats
@@ -49,6 +51,7 @@ import type { FilterMatch } from '~/src/api-client'
 import type { TopFilter } from '~/types/FilterType'
 
 const localePath = useLocalePath()
+const { t } = useI18n()
 
 const loading = ref(true)
 
@@ -116,5 +119,12 @@ onMounted(async () => {
   loadStats()
   filterStore.loadFilters()
   loading.value = false
+})
+
+useSeoMeta({
+  title: () => t('aneDashboard'),
+  ogTitle: () => t('aneDashboard'),
+  description: () => t('overviewDescription'),
+  ogDescription: () => t('overviewDescription'),
 })
 </script>

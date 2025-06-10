@@ -11,7 +11,7 @@
     <UiFooterLabel class="mt-4 flex">
       {{ isLogin ? $t('dontHaveAccount') : $t('alreadyHaveAccount') }}
       <UiLinkLabel
-        :href="isLogin ? '/register' : '/login'"
+        :href="isLogin ? localePath('/register') : localePath('/login')"
         class="ml-1"
       >
         {{ isLogin ? $t('signUp') : $t('signIn') }}
@@ -22,6 +22,8 @@
 
 <script setup lang="ts">
 import { UiDefaultContainer } from '#components'
+
+const localePath = useLocalePath()
 
 defineProps({ isLogin: Boolean })
 </script>

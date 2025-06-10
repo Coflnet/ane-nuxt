@@ -7,6 +7,7 @@
     ]"
   >
     {{ label }}
+    <slot />
   </p>
 </template>
 

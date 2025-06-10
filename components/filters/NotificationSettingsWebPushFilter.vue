@@ -1,6 +1,7 @@
 <template>
   <FiltersNotificationSettingItem
     :filter="model!"
+    label-aria="Web Push Notifications"
     :config="{
       notificationType: 'FireBase',
       predefinedValue: '',

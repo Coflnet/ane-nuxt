@@ -2,7 +2,11 @@
   <a
     :href="href"
     :target
-    class="text-indigo-400 hover:underline flex items-center cursor-pointer"
+    class="flex items-center"
+    :class="{
+      'text-white hover:text-indigo-300': white,
+      'text-indigo-400 hover:text-indigo-500 hover:underline ': !white,
+    }"
   >
     <slot />
   </a>
@@ -12,5 +16,6 @@
 defineProps({
   href: String,
   target: String,
+  white: Boolean,
 })
 </script>

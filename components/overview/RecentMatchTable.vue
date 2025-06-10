@@ -14,6 +14,7 @@
           v-for="(auction, index) in props.matches"
           :key="index"
           class="border-b border-slate-700 hover:bg-slate-700/50 cursor-pointer"
+          :aria-label="`Auction ${auction.listingData?.title ?? 'Unknown'}`"
           @click="tableClicked(auction)"
         >
           <td class="px-4 py-3 text-sm text-white">
@@ -40,11 +41,14 @@
             v-if="overview"
             class="px-4 py-3 text-sm font-medium text-white hidden md:table-cell"
           >
-            {{
-              filters.getSimplifiedFilters[auction.listenerId ?? 0] }}
+            {{ filters.getSimplifiedFilters?.[auction.listenerId ?? 0]?.[0] ?? '' }}
           </td>
           <td class="px-4 py-3 text-sm font-medium text-white">
-            {{ $t('dollarSign') }}{{ auction.listingData?.price }}
+            {{ useFormat().formatCurrency(
+              auction.listingData?.price ?? 0,
+              auction.listingData?.currency ?? '',
+              useI18n().locale.value,
+            ) }}
           </td>
           <td
             v-if="!overview"
@@ -80,6 +84,9 @@
 import { useWindowSize } from '@vueuse/core'
 import humanizeDuration from 'humanize-duration'
 import type { FilterMatch } from '~/src/api-client'
+import { useFormat } from '~/composable/useFormat'
+
+const localePath = useLocalePath()
 
 const { width } = useWindowSize()
 const { locale } = useI18n()

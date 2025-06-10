@@ -9,6 +9,7 @@ export default defineNuxtConfig({
     'notivue/nuxt',
     '@nuxt/eslint',
     '@nuxtjs/leaflet',
+    '@nuxt/image',
   ],
 
   ssr: true,
@@ -18,6 +19,11 @@ export default defineNuxtConfig({
     'notivue/notification.css',
     'notivue/animations.css',
   ],
+
+  routeRules: {
+    '/': { prerender: true },
+  },
+
   future: {
     compatibilityVersion: 4,
   },
@@ -92,3 +98,4 @@ export default defineNuxtConfig({
 
   },
 })
+

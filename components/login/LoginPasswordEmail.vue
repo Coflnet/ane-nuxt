@@ -2,19 +2,21 @@
   <UiInput
     v-model="email"
     type="email"
+    name="email"
     :placeholder="$t('email')"
     :radius-error="emailPassError"
   />
   <UiInput
     v-model="password"
     type="password"
+    name="password"
     :placeholder="$t('password')"
     class="mt-3"
     :radius-error="emailPassError"
   />
   <div class="flex justify-end mt-1.5 mb-3">
     <a
-      href="/forgot-password"
+      :href="localePath('/forgot-password')"
       class="text-blue-600 text-sm"
     >{{ $t('forgotPassword') }}</a>
   </div>

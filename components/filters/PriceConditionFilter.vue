@@ -3,15 +3,17 @@
   <div class="grid grid-cols-2 md:grid-cols-4 gap-x-8 pt-2 mt-4">
     <UiMultiSelect
       v-model="condiditonSelected"
+      label-aria="Condition Select"
       class="col-span-2"
       :label="$t('condition')"
       :options="condidtion"
       override-value="all"
     />
 
-    <div class="flex items-center mb-4 space-x-2 col-span-2">
+    <div class="flex items-center mb-4 space-x-2 col-span-2 mt-4">
       <UiInput
         v-model="model!.minPrice"
+        label-aria="Min Price Input"
         :label="$t('priceRange')"
         type="number"
         placeholder=""
@@ -19,6 +21,7 @@
       <span class="text-slate-400 mt-3.5">-</span>
       <UiInput
         v-model="model!.maxPrice"
+        label-aria="Max Price Input"
         class="mt-5"
         type="number"
         placeholder="0"

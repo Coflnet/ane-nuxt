@@ -1,96 +1,5 @@
 <template>
   <div class="min-h-screen bg-gray-950">
-    <!-- Navigation -->
-    <nav class=" py-4 sticky top-0 z-50 bg-gray-900/80 backdrop-blur-md border-b border-gray-800">
-      <div class="flex items-center justify-between container mx-auto">
-        <div class="flex items-center">
-          <UiLogo />
-        </div>
-        <div class="hidden md:block">
-          <div class="flex items-center space-x-8">
-            <a
-              href="#features"
-              class="text-gray-300 hover:text-indigo-400 transition-colors"
-            >{{ $t('featuresHeader')
-            }}</a>
-            <a
-              href="#how-it-works"
-              class="text-gray-300 hover:text-indigo-400 transition-colors"
-            >{{
-              $t('howItWorksHeader') }}</a>
-            <a
-              href="#pricing"
-              class="text-gray-300 hover:text-indigo-400 transition-colors"
-            >{{ $t('pricingHeader')
-            }}</a>
-            <a
-              href="#faq"
-              class="text-gray-300 hover:text-indigo-400 transition-colors"
-            >{{ $t('faqHeader') }}</a>
-            <a
-              :href="localePath('/login')"
-              class="px-4 py-2 rounded-full bg-gray-700 text-white hover:bg-gray-600 transition-all"
-            >{{
-              $t('signIn') }}</a>
-            <a
-              :href="localePath('/filters/create')"
-              class="px-4 py-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-900/20"
-            >{{
-              $t('getStarted') }}</a>
-          </div>
-        </div>
-        <div class="md:hidden">
-          <button
-            class="text-gray-300"
-            @click="mobileMenuOpen = !mobileMenuOpen"
-          >
-            <Icon
-              v-if="!mobileMenuOpen"
-              name="menu"
-              class="w-6 h-6"
-            />
-            <Icon
-              v-else
-              name="x"
-              class="w-6 h-6"
-            />
-          </button>
-        </div>
-      </div>
-      <!-- Mobile menu -->
-      <div
-        v-if="mobileMenuOpen"
-        class="md:hidden mt-4 space-y-4"
-      >
-        <a
-          href="#features"
-          class="block text-gray-300 hover:text-indigo-400 py-2"
-        >{{ $t('nav.features') }}</a>
-        <a
-          href="#how-it-works"
-          class="block text-gray-300 hover:text-indigo-400 py-2"
-        >{{ $t('nav.howItWorks') }}</a>
-        <a
-          href="#pricing"
-          class="block text-gray-300 hover:text-indigo-400 py-2"
-        >{{ $t('nav.pricing') }}</a>
-        <a
-          href="#faq"
-          class="block text-gray-300 hover:text-indigo-400 py-2"
-        >{{ $t('nav.faq') }}</a>
-        <a
-          href="#"
-          class="block px-4 py-2 rounded-full bg-gray-700 text-white hover:bg-gray-600 transition-all text-center my-2"
-        >{{
-          $t('nav.signIn') }}</a>
-        <a
-          :href="localePath('/filters/create')"
-          class="block px-4 py-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition-all text-center shadow-lg shadow-indigo-900/20"
-        >{{
-          $t('nav.getStarted') }}</a>
-      </div>
-    </nav>
-
     <!-- Hero Section -->
     <section class="relative overflow-hidden">
       <div class="absolute inset-0 bg-gradient-to-br from-gray-900 to-gray-950 -z-10" />
@@ -103,10 +12,7 @@
 
       <div class="container mx-auto px-6 py-20 md:py-32">
         <div class="flex flex-col md:flex-row items-center">
-          <div
-            v-intersect="fadeInLeft"
-            class="md:w-1/2 mb-12 md:mb-0"
-          >
+          <div class="md:w-1/2 mb-12 md:mb-0">
             <div class="inline-block px-3 py-1 rounded-full bg-indigo-900 text-indigo-400 font-medium text-sm mb-6">
               {{ $t('hero.badge') }}
             </div>
@@ -135,19 +41,21 @@
               </a>
             </div>
           </div>
-          <div
-            v-intersect="fadeInRight"
-            class="md:w-1/2"
-          >
+          <div class="md:w-1/2">
             <div class="relative">
               <div
                 class="absolute -inset-0.5 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl blur opacity-30 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse"
               />
-              <img
-                src="../public/DashboardPreview.png"
+              <NuxtImg
+                src="/DashboardPreview.webp"
                 alt="Dashboard Preview"
                 class="relative rounded-2xl shadow-2xl border border-gray-800"
-              >
+                width="1000"
+                height="550"
+                sizes="sm:100vw md:75vw lg:50vw"
+                format="webp,avif"
+                priority="true"
+              />
               <div
                 class="absolute -right-6 -bottom-6 bg-gray-800 rounded-2xl shadow-xl p-4 flex items-center space-x-2"
               >
@@ -173,10 +81,7 @@
     </section>
 
     <!-- Stats Section -->
-    <section
-      v-intersect="fadeIn"
-      class="py-12 bg-gray-900 border-y border-gray-800"
-    >
+    <section class="py-12 bg-gray-900 border-y border-gray-800">
       <div class="container mx-auto px-6">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
           <div class="text-center">
@@ -221,10 +126,7 @@
       class="py-20 md:py-32 bg-gray-950"
     >
       <div class="container mx-auto px-6">
-        <div
-          v-intersect="fadeIn"
-          class="text-center mb-20"
-        >
+        <div class="text-center mb-20">
           <div class="inline-block px-3 py-1 rounded-full bg-indigo-900 text-indigo-400 font-medium text-sm mb-6">
             {{ $t('features.badge') }}
           </div>
@@ -240,7 +142,7 @@
           <!-- Feature 1 -->
           <div
             v-intersect="fadeInUp"
-            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800 transition-all hover:shadow-2xl hover:-translate-y-1"
+            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800 transition-all hover:shadow-2xl hover:-translate-y-1 opacity-0"
           >
             <div
               class="w-14 h-14 bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-indigo-900/20"
@@ -284,7 +186,7 @@
           <!-- Feature 2 -->
           <div
             v-intersect="fadeInUp"
-            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800 transition-all hover:shadow-2xl hover:-translate-y-1"
+            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800 transition-all hover:shadow-2xl hover:-translate-y-1 opacity-0"
           >
             <div
               class="w-14 h-14 bg-gradient-to-br from-purple-600 to-purple-800 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-purple-900/20"
@@ -328,7 +230,7 @@
           <!-- Feature 3 -->
           <div
             v-intersect="fadeInUp"
-            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800 transition-all hover:shadow-2xl hover:-translate-y-1"
+            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800 transition-all hover:shadow-2xl hover:-translate-y-1 opacity-0"
           >
             <div
               class="w-14 h-14 bg-gradient-to-br from-indigo-600 to-purple-800 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-indigo-900/20"
@@ -380,7 +282,7 @@
       <div class="container mx-auto px-6">
         <div
           v-intersect="fadeIn"
-          class="text-center mb-20"
+          class="text-center mb-20 opacity-0"
         >
           <div class="inline-block px-3 py-1 rounded-full bg-indigo-900 text-indigo-400 font-medium text-sm mb-6">
             {{ $t('howItWorks.badge') }}
@@ -401,7 +303,7 @@
             <!-- Step 1 -->
             <div
               v-intersect="fadeInUp"
-              class="relative"
+              class="relative opacity-0"
             >
               <div
                 class="w-16 h-16 bg-gray-900 rounded-full border-4 border-indigo-500 flex items-center justify-center text-2xl font-bold text-indigo-400 mx-auto mb-6 relative z-10"
@@ -421,7 +323,7 @@
             <!-- Step 2 -->
             <div
               v-intersect="fadeInUp"
-              class="relative"
+              class="relative opacity-0"
             >
               <div
                 class="w-16 h-16 bg-gray-900 rounded-full border-4 border-indigo-500 flex items-center justify-center text-2xl font-bold text-indigo-400 mx-auto mb-6 relative z-10"
@@ -441,7 +343,7 @@
             <!-- Step 3 -->
             <div
               v-intersect="fadeInUp"
-              class="relative"
+              class="relative opacity-0"
             >
               <div
                 class="w-16 h-16 bg-gray-900 rounded-full border-4 border-indigo-500 flex items-center justify-center text-2xl font-bold text-indigo-400 mx-auto mb-6 relative z-10"
@@ -461,7 +363,7 @@
             <!-- Step 4 -->
             <div
               v-intersect="fadeInUp"
-              class="relative"
+              class="relative opacity-0"
             >
               <div
                 class="w-16 h-16 bg-gray-900 rounded-full border-4 border-indigo-500 flex items-center justify-center text-2xl font-bold text-indigo-400 mx-auto mb-6 relative z-10"
@@ -482,7 +384,7 @@
 
         <div
           v-intersect="fadeIn"
-          class="mt-16 text-center"
+          class="mt-16 text-center opacity-0"
         >
           <a
             :href="localePath('/filters/create')"
@@ -499,7 +401,7 @@
       <div class="container mx-auto px-6">
         <div
           v-intersect="fadeIn"
-          class="text-center mb-20"
+          class="text-center mb-20 opacity-0"
         >
           <div class="inline-block px-3 py-1 rounded-full bg-indigo-900 text-indigo-400 font-medium text-sm mb-6">
             {{ $t('useCases.badge') }}
@@ -516,7 +418,7 @@
           <!-- Use Case 1 -->
           <div
             v-intersect="fadeInUp"
-            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800"
+            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800 opacity-0"
           >
             <div
               class="w-14 h-14 bg-gradient-to-br from-purple-600 to-purple-800 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-purple-900/20"
@@ -560,7 +462,7 @@
           <!-- Use Case 2 -->
           <div
             v-intersect="fadeInUp"
-            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800"
+            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800 opacity-0"
           >
             <div
               class="w-14 h-14 bg-gradient-to-br from-violet-600 to-violet-800 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-violet-900/20"
@@ -604,7 +506,7 @@
           <!-- Use Case 3 -->
           <div
             v-intersect="fadeInUp"
-            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800"
+            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800 opacity-0"
           >
             <div
               class="w-14 h-14 bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-indigo-900/20"
@@ -653,7 +555,7 @@
       <div class="container mx-auto px-6">
         <div
           v-intersect="fadeIn"
-          class="text-center mb-16"
+          class="text-center mb-16 opacity-0"
         >
           <div class="inline-block px-3 py-1 rounded-full bg-indigo-900 text-indigo-400 font-medium text-sm mb-6">
             {{ $t('marketplaces.badge') }}
@@ -668,43 +570,59 @@
 
         <div
           v-intersect="fadeIn"
-          class="grid grid-cols-2 md:grid-cols-3 gap-8"
+          class="grid grid-cols-2 md:grid-cols-3 gap-8 opacity-0"
         >
-          <div
-            class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"
-          >
-            <div class="text-xl font-semibold text-gray-200">
-              {{ $t('marketplaces.platforms.ebay') }}
+          <a :href="localePath('/marketplaces/ebay')">
+            <div
+              class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"
+            >
+              <div class="text-xl font-semibold text-gray-200">
+                {{ $t('marketplaces.platforms.ebay') }}
+              </div>
             </div>
-          </div>
-          <div
-            class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"
-          >
-            <div class="text-xl font-semibold text-gray-200">
-              {{ $t('marketplaces.platforms.facebook') }}
+          </a>
+          <a :href="localePath('/marketplaces/facebook')">
+            <div
+              class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"
+            >
+              <div class="text-xl font-semibold text-gray-200">
+                {{ $t('marketplaces.platforms.facebook') }}
+              </div>
             </div>
-          </div>
-          <div
-            class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"
-          >
-            <div class="text-xl font-semibold text-gray-200">
-              {{ $t('marketplaces.platforms.craigslist') }}
+          </a>
+
+          <a :href="localePath('/marketplaces/craigslist')">
+            <div
+              class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"
+            >
+              <div class="text-xl font-semibold text-gray-200">
+                {{ $t('marketplaces.platforms.craigslist') }}
+              </div>
             </div>
-          </div>
-          <div
-            class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"
-          >
-            <div class="text-xl font-semibold text-gray-200">
-              {{ $t('marketplaces.platforms.kleinanzeigen') }}
+
+          </a>
+
+          <a :href="localePath('/marketplaces/kleinanzeigen')">
+            <div
+              class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"
+            >
+              <div class="text-xl font-semibold text-gray-200">
+                {{ $t('marketplaces.platforms.kleinanzeigen') }}
+              </div>
             </div>
-          </div>
-          <div
-            class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"
-          >
-            <div class="text-xl font-semibold text-gray-200">
-              {{ $t('marketplaces.platforms.autoscout24') }}
+
+          </a>
+
+          <a :href="localePath('/marketplaces/autoscout24')">
+            <div
+              class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"
+            >
+              <div class="text-xl font-semibold text-gray-200">
+                {{ $t('marketplaces.platforms.autoscout24') }}
+              </div>
             </div>
-          </div>
+
+          </a>
           <div
             class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"
           >
@@ -721,7 +639,7 @@
       <div class="container mx-auto px-6">
         <div
           v-intersect="fadeIn"
-          class="text-center mb-16"
+          class="text-center mb-16 opacity-0"
         >
           <div class="inline-block px-3 py-1 rounded-full bg-indigo-900 text-indigo-400 font-medium text-sm mb-6">
             {{ $t('testimonials.badge') }}
@@ -738,7 +656,7 @@
           <!-- Testimonial 1 -->
           <div
             v-intersect="fadeInUp"
-            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800"
+            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800 opacity-0"
           >
             <p class="text-gray-300 mb-6 italic">
               {{ $t('testimonials.items.first.quote') }}
@@ -783,7 +701,7 @@
           <!-- Testimonial 2 -->
           <div
             v-intersect="fadeInUp"
-            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800"
+            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800 opacity-0"
           >
             <p class="text-gray-300 mb-6 italic">
               {{ $t('testimonials.items.second.quote') }}
@@ -828,7 +746,7 @@
           <!-- Testimonial 3 -->
           <div
             v-intersect="fadeInUp"
-            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800"
+            class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800 opacity-0"
           >
             <p class="text-gray-300 mb-6 italic">
               {{ $t('testimonials.items.third.quote') }}
@@ -881,7 +799,7 @@
       <div class="container mx-auto px-6">
         <div
           v-intersect="fadeIn"
-          class="text-center mb-16"
+          class="text-center mb-16 opacity-0"
         >
           <div class="inline-block px-3 py-1 rounded-full bg-indigo-900 text-indigo-400 font-medium text-sm mb-6">
             {{ $t('pricing.badge') }}
@@ -898,7 +816,7 @@
           <!-- Free Plan -->
           <div
             v-intersect="fadeInUp"
-            class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700 transition-all hover:shadow-2xl hover:-translate-y-1"
+            class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700 transition-all hover:shadow-2xl hover:-translate-y-1 opacity-0"
           >
             <div class="text-center mb-6">
               <h3 class="text-2xl font-bold text-white mb-2">
@@ -965,7 +883,7 @@
           <!-- Collector Plan -->
           <div
             v-intersect="fadeInUp"
-            class="bg-gray-800 p-8 rounded-2xl shadow-2xl border border-indigo-800 transform scale-105 relative z-10"
+            class="bg-gray-800 p-8 rounded-2xl shadow-2xl border border-indigo-800 transform scale-105 relative z-10 opacity-0"
           >
             <div
               class="absolute top-0 right-0 bg-indigo-600 text-white px-4 py-1 rounded-bl-lg rounded-tr-lg text-sm font-medium"
@@ -1036,7 +954,7 @@
           <!-- Flipper Plan -->
           <div
             v-intersect="fadeInUp"
-            class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700 relative transition-all hover:shadow-2xl hover:-translate-y-1"
+            class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700 relative transition-all hover:shadow-2xl hover:-translate-y-1 opacity-0"
           >
             <div
               class="absolute top-0 right-0 bg-gray-600 text-white px-4 py-1 rounded-bl-lg rounded-tr-lg text-sm font-medium"
@@ -1107,7 +1025,7 @@
 
         <div
           v-intersect="fadeIn"
-          class="mt-16 bg-gray-800 p-8 rounded-2xl shadow-lg border border-gray-700"
+          class="mt-16 bg-gray-800 p-8 rounded-2xl shadow-lg border border-gray-700 opacity-0"
         >
           <h3 class="text-xl font-semibold text-white mb-4 text-center">
             {{ $t('pricing.allPlansInclude.title') }}
@@ -1147,7 +1065,7 @@
       <div class="container mx-auto px-6">
         <div
           v-intersect="fadeIn"
-          class="text-center mb-16"
+          class="text-center mb-16 opacity-0"
         >
           <div class="inline-block px-3 py-1 rounded-full bg-indigo-900 text-indigo-400 font-medium text-sm mb-6">
             {{ $t('faq.badge') }}
@@ -1164,7 +1082,7 @@
           <!-- FAQ Item 1 -->
           <div
             v-intersect="fadeIn"
-            class="bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-800"
+            class="bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-800 opacity-0"
           >
             <h3 class="text-xl font-semibold text-white mb-3">
               {{ $t('faq.items.first.question') }}
@@ -1175,7 +1093,7 @@
           </div>
           <div
             v-intersect="fadeIn"
-            class="bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-800"
+            class="bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-800 opacity-0"
           >
             <h3 class="text-xl font-semibold text-white mb-3">
               {{ $t('faq.items.second.question') }}
@@ -1188,7 +1106,7 @@
           <!-- FAQ Item 3 -->
           <div
             v-intersect="fadeIn"
-            class="bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-800"
+            class="bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-800 opacity-0"
           >
             <h3 class="text-xl font-semibold text-white mb-3">
               {{ $t('faq.items.third.question') }}
@@ -1199,7 +1117,7 @@
           </div>
           <div
             v-intersect="fadeIn"
-            class="bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-800"
+            class="bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-800 opacity-0"
           >
             <h3 class="text-xl font-semibold text-white mb-3">
               {{ $t('faq.items.fourth.question') }}
@@ -1211,7 +1129,7 @@
           <!-- FAQ Item 5 -->
           <div
             v-intersect="fadeIn"
-            class="bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-800"
+            class="bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-800 opacity-0"
           >
             <h3 class="text-xl font-semibold text-white mb-3">
               {{ $t('faq.items.fifth.question') }}
@@ -1224,7 +1142,7 @@
           <!-- FAQ Item 6 -->
           <div
             v-intersect="fadeIn"
-            class="bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-800"
+            class="bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-800 opacity-0"
           >
             <h3 class="text-xl font-semibold text-white mb-3">
               {{ $t('faq.items.sixth.question') }}
@@ -1237,7 +1155,7 @@
 
         <div
           v-intersect="fadeIn"
-          class="mt-12 text-center"
+          class="mt-12 text-center opacity-0"
         >
           <p class="text-gray-300 mb-4">
             {{ $t('faq.moreQuestions') }}
@@ -1257,7 +1175,7 @@
       <div class="container mx-auto px-6">
         <div
           v-intersect="fadeIn"
-          class="bg-gradient-to-r from-indigo-800 to-purple-800 rounded-3xl p-12 text-center text-white relative overflow-hidden"
+          class="bg-gradient-to-r from-indigo-800 to-purple-800 rounded-3xl p-12 text-center text-white relative overflow-hidden opacity-0"
         >
           <div
             class="absolute -top-24 -right-24 w-96 h-96 bg-white rounded-full mix-blend-overlay filter blur-3xl opacity-10 animate-blob"
@@ -1414,13 +1332,27 @@
 </template>
 
 <script setup lang="ts">
-import { Bell, Filter, TrendingUp, Check, Star, User } from 'lucide-vue-next'
-import { ref, onMounted } from 'vue'
+import { User } from 'lucide-vue-next'
 import { useIntersectionObserver } from '@vueuse/core'
 import { definePageMeta } from '#imports'
 
 const localePath = useLocalePath()
-const mobileMenuOpen = ref(false)
+
+const vIntersect = {
+  mounted: (el: Element, binding: any) => {
+    const callback = binding.value
+    const { stop } = useIntersectionObserver(
+      el,
+      ([{ isIntersecting }]) => {
+        if (isIntersecting) {
+          callback(el)
+          stop()
+        }
+      },
+      { threshold: 0.1 },
+    )
+  },
+}
 
 // Animation functions
 const fadeIn = (el: Element) => {
@@ -1433,40 +1365,6 @@ const fadeInUp = (el: Element) => {
   el.classList.add('transition-all', 'duration-1000')
   el.classList.remove('opacity-0', 'translate-y-10')
   el.classList.add('opacity-100', 'translate-y-0')
-}
-
-const fadeInLeft = (el: Element) => {
-  el.classList.add('transition-all', 'duration-1000')
-  el.classList.remove('opacity-0', 'translate-x-10')
-  el.classList.add('opacity-100', 'translate-x-0')
-}
-
-const fadeInRight = (el: Element) => {
-  el.classList.add('transition-all', 'duration-1000')
-  el.classList.remove('opacity-0', '-translate-x-10')
-  el.classList.add('opacity-100', 'translate-x-0')
-}
-
-// Custom directive for intersection observer
-const vIntersect = {
-  mounted: (el: Element, binding: any) => {
-    const callback = binding.value
-
-    // Set initial state
-    el.classList.add('opacity-0')
-
-    // Use VueUse's intersection observer
-    const { stop } = useIntersectionObserver(
-      el,
-      ([{ isIntersecting }]) => {
-        if (isIntersecting) {
-          callback(el)
-          stop() // Stop observing once animation is triggered
-        }
-      },
-      { threshold: 0.1 },
-    )
-  },
 }
 
 definePageMeta({

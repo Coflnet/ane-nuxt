@@ -1,11 +1,13 @@
 <template>
   <UiGrid
+    :grid-shink="true"
     :grid-size="3"
     class="mt-3"
   >
     <UiCountryDropDown :model-value="model" />
     <UiMultiSelect
       v-model="deliveryKindSelected"
+      label-aria="Delivery Method Select"
       :label="$t('deliveryMethod')"
       :options="deliveryKind"
       override-value="all"
@@ -13,6 +15,7 @@
     <div class="flex space-x-4">
       <UiInput
         v-model="model!.zipcode"
+        label-aria="Zip Code Input"
         :label="$t('zipCode')"
         type="number"
         :placeholder="$t('zipCodeEq')"

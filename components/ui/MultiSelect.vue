@@ -23,6 +23,7 @@
       multiple
     >
       <ListboxButton
+        :aria-label="labelAria ?? 'Multi Select Dropdown'"
         class="w-full px-4 py-2 rounded-lg border border-slate-600 bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-400 flex items-center justify-between"
         @click="isOpen = !isOpen"
       >
@@ -30,6 +31,7 @@
         <UiIcon
           name="tabler:chevron-down"
           :bold="true"
+          :large="true"
           :class="[{ 'rotate-180': isOpen }, 'transition-all']"
         />
       </ListboxButton>
@@ -39,6 +41,7 @@
         <ListboxOption
           v-for="item in options"
           :key="item.value"
+          :aria-label="`${labelAria} Item`"
           :value="item"
           class="flex items-center px-4 py-2 cursor-pointer hover:bg-slate-700 focus:bg-slate-700 focus:outline-none"
           :class="{ 'bg-slate-700': isSelected(item) }"
@@ -88,6 +91,7 @@ const props = defineProps<{
   overrideValue?: string
   label?: string
   hoverText?: string
+  labelAria?: string
 }>()
 
 const emit = defineEmits<{

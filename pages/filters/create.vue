@@ -18,14 +18,7 @@
         </div>
         <UiExpandOption class="mt-1">
           <FiltersKeywordFilter
-            :model-value="filter.keywords"
-            :label="$t('searchKeywords')"
-            :footer="$t('addKeyDescription')"
-            :place-holder="$t('addKeywordPressEnter')"
-          />
-
-          <FiltersKeywordFilter
-            class="my-6"
+            class="my-4"
             :model-value="filter.blacklist"
             :label="$t('blackKeywords')"
             :footer="$t('addblacklistKeywords')"
@@ -234,7 +227,7 @@ async function saveFilter() {
     push.error(t('weRanIssue'))
   }
   finally {
-    savingFilter.value = true
+    savingFilter.value = false
   }
 }
 
@@ -346,5 +339,12 @@ onMounted(async () => {
   await useUserStore().checkAuth(useFirebaseAuth()!)
   await Promise.allSettled([filterStore.loadFilters()])
   await loadEditParam()
+})
+
+useSeoMeta({
+  title: () => t('aneCreate'),
+  ogTitle: () => t('aneCreate'),
+  description: () => t('createDescription'),
+  ogDescription: () => t('createDescription'),
 })
 </script>
