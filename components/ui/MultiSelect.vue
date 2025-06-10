@@ -1,11 +1,23 @@
 <template>
   <div class="relative w-full ">
     <!-- Dropdown toggle button -->
-    <UiHeaderLabel
-      :label="label"
-      :sm="true"
-      :accent="true"
-    />
+    <div class="flex">
+      <UiHeaderLabel
+        :label="label"
+        :accent="true"
+        :sm="true"
+      />
+      <UiTooltipHover
+        v-if="hoverText"
+        :text="hoverText"
+      >
+        <div
+          class="border bg-slate-700 text-white border-slate-800 text-sm rounded-full size-6 text-center ml-2 -translate-y-0.5"
+        >
+          ?
+        </div>
+      </UiTooltipHover>
+    </div>
     <Listbox
       v-model="selectedItems"
       multiple
@@ -24,7 +36,7 @@
         />
       </ListboxButton>
       <ListboxOptions
-        class="absolute z-10 mt-1 w-full rounded-lg border border-slate-600 bg-slate-800 shadow-lg max-h-60 overflow-auto"
+        class="absolute z-10 mt-1 w-full rounded-lg border border-slate-600 bg-slate-800 shadow-lg max-h-60"
       >
         <ListboxOption
           v-for="item in options"
@@ -42,7 +54,20 @@
             />
           </div>
 
-          <span class="text-white">{{ $t(item.label) }}</span>
+          <div class="w-full justify-between flex">
+            <span class="text-white">{{ $t(item.label) }}</span>
+            <UiTooltipHover
+              :text="$t('premiumHoverExplanation')"
+              class="max-w-28"
+            >
+              <div
+                v-if="item.premium"
+                class="rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 px-4 text-white font-medium"
+              >
+                {{ $t('premium') }}
+              </div>
+            </UiTooltipHover>
+          </div>
         </ListboxOption>
       </ListboxOptions>
     </Listbox>
@@ -53,21 +78,28 @@
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/vue'
 import { UiHeaderLabel } from '#components'
 
+interface Options {
+  value: string
+  label: string
+  premium?: boolean
+}
+
 const { t } = useI18n()
-const model = defineModel<{ value: string, label: string }[]>()
+const model = defineModel<Options[]>()
 const props = defineProps<{
-  options: { value: string, label: string }[]
+  options: Options[]
   overrideValue?: string
   label?: string
+  hoverText?: string
   labelAria?: string
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: { value: string, label: string }[]): void
+  (e: 'update:modelValue', value: Options[]): void
 }>()
 
 const isOpen = ref(false)
-const selectedItems = ref<{ value: string, label: string }[]>([])
+const selectedItems = ref<Options[]>([])
 
 // create the string that is displayed on the button eq. Ebay, AutoScout24
 const selectedLabels = computed(() => {
@@ -86,12 +118,12 @@ const selectedLabels = computed(() => {
   return `${selected.slice(0, 3).join(', ')} +${selected.length - 3}`
 })
 
-const isSelected = (value: { value: string, label: string }): boolean => {
+const isSelected = (value: Options): boolean => {
   return selectedItems.value.includes(value)
 }
 
 // Toggle selection of an item
-const toggleSelection = (value: { value: string, label: string }) => {
+const toggleSelection = (value: Options) => {
   // deselect all other options when the overrideValue is selected
   if (value.value === props.overrideValue) {
     selectedItems.value = [value]

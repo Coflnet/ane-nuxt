@@ -6,7 +6,10 @@
         :accent="true"
         :sm="true"
       />
-      <UiTooltipHover :text="$t('countryShipping')">
+      <UiTooltipHover
+        :text="$t('countryShipping')"
+        class="max-w-8"
+      >
         <div
           class="border bg-slate-700 text-white border-slate-800 text-sm rounded-full size-6 text-center ml-2 -translate-y-0.5"
         >
@@ -26,11 +29,8 @@
       <option value="EU,US,GB">
         {{ $t('anyCountry') }}
       </option>
-      <option
-        value="EU"
-        aria-label="Europe"
-      >
-        {{ $t('Europe') }}
+      <option value="EU">
+        {{ $t('europe') }}
       </option>
       <option value="US">
         {{ $t('unitedStates') }}

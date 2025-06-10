@@ -22,30 +22,18 @@
         :footer="$t('yourZip')"
       />
 
-      <UiInput
-        v-model="model!.searchRadius"
-        :disabled="model?.zipcode == ''"
-        label-aria="Search Radius Input"
-        :label="$t('searchRadius')"
-        type="numeric"
-        :placeholder="$t('radiusEq', 80)"
-        :footer="$t('searchRadiusAroundYou')"
-      />
+      <FiltersNotificationSettingsRadius :model-value="model" />
     </div>
   </UiGrid>
 </template>
 
 <script setup lang="ts">
 import type { Filter } from '~/types/FilterType'
+import { deliveryKind } from '~/constants/CreateFilterConstants'
 
 const model = defineModel<Filter>()
 
 const deliveryKindSelected = ref<{ value: string, label: string }[]>([])
-const deliveryKind = [
-  { value: 'all', label: 'allDelivery' },
-  { value: 'shipping', label: 'shippingDelivery' },
-  { value: 'pickup', label: 'pickupDelivery' },
-]
 
 watch(() => model.value!.deliveryMethod, () => {
   deliveryKindSelected.value = []

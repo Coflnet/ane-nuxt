@@ -587,6 +587,16 @@
       "description": "Werden Sie zeitnah benachrichtigt, wenn neue Artikel, die Ihren Kriterien entsprechen, auf {name} veröffentlicht werden, und erhalten Sie so die erste Kaufgelegenheit."
     }
   },
+  "premiumHoverExplanation": "Premium-Marktplätze nutzen Premium-Suchen",
+  "frequency": "Häufigkeit der Premium-Suche",
+  "frequency20Minutes": "Alle 20 Minuten",
+  "frequency1Hour": "Jede Stunde",
+  "frequency6Hour": "Alle 6 Stunden",
+  "frequency1PerDay": "Einmal pro Tag",
+  "noReset": "Aktualisiere dein Abo, um mehr Premium-Suchen zu erhalten",
+  "remainingRequests": "Verbleibende Premium-Suchen",
+  "usedSearches": "Verwendete Premium Suchanfragen",
+  "totalSearches": "von {amount}",
   "overviewDescription": "Übersicht Ihrer Aktionen, die Ihren Filtern entsprachen, und weitere Informationen anzeigen",
   "aneDashboard": "ANE Dashboard",
   "auctionsDescription": "Aktionen anzeigen, die Ihren benutzerdefinierten Filtern entsprachen",

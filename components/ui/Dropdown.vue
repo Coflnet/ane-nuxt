@@ -6,20 +6,28 @@
     >
       {{ label }}
     </label>
-    <select
-      :id="id"
-      v-model="model"
-      class="w-full px-4 py-2 rounded-lg border border-slate-600 bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-400"
-      required
+
+    <UiTooltipHover
+      :disabled="!disabled"
+      :text="$t('hasBasicPlanRestriction')"
     >
-      <option
-        v-for="option in options"
-        :key="option.value"
-        :value="option.value"
+      <select
+        :id="id"
+        v-model="model"
+        class="w-full px-4 py-2.5 rounded-lg border border-slate-600 bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-400"
+        :class="disabled ? 'cursor-not-allowed opacity-80' : ''"
+        required
+        :disabled="disabled"
       >
-        {{ $t(option.label) }}
-      </option>
-    </select>
+        <option
+          v-for="option in options"
+          :key="option.value"
+          :value="option.value"
+        >
+          {{ $t(option.label) }}
+        </option>
+      </select>
+    </UiTooltipHover>
   </div>
 </template>
 
@@ -30,5 +38,6 @@ defineProps<{
   options?: { value: string, label: string }[]
   id?: string
   label?: string
+  disabled?: boolean
 }>()
 </script>

@@ -32,14 +32,9 @@
 
 <script setup lang='ts'>
 import type { Filter } from '~/types/FilterType'
+import { condidtion } from '~/constants/CreateFilterConstants'
 
 const condiditonSelected = ref<{ value: string, label: string }[]>([])
-const condidtion = [
-  { value: 'all', label: 'allCondition' },
-  { value: 'New', label: 'newCondition' },
-  { value: 'used', label: 'usedCondition' },
-  { value: 'refurbished', label: 'refurbishedCondition' },
-  { value: 'broken', label: 'forPartsCondition' }]
 
 const model = defineModel<Filter>()
 

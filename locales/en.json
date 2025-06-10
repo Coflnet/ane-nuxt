@@ -13,7 +13,7 @@
   "advancedNotification": "Advanced Notification Engine for auction marketplaces",
   "advanvedFilters": "Advanced Filters",
   "again": "Again",
-  "allMarket": "All Marketplaces",
+  "allMarket": "All Free Marketplaces",
   "alreadyHaveAccount": "Already have an account?",
   "and": "and",
   "apiRef": "API Reference",
@@ -90,7 +90,6 @@
   "noAuctions": "No Auctions found",
   "noImageForAuction": "This Auction has no image",
   "none": "None",
-  "notificationsChannels": "Notification Channels",
   "password": "Password",
   "planUpdated": "Plan updated successfully",
   "powerfulTools": "Powerful Tools for",
@@ -351,7 +350,7 @@
           "filters": "Access to marketplaces",
           "notifications": "All notification channels",
           "updates": "Notifications within the minute",
-          "analytics": "Price calculation",
+          "analytics": "Price calculation"
         },
         "cta": "Coming Soon"
       }
@@ -360,7 +359,7 @@
       "title": "All Plans Include",
       "security": "Secure data encryption",
       "support": "Email support",
-      "updates": "Regular updates",
+      "updates": "Regular updates"
     }
   },
   "faq": {
@@ -456,6 +455,30 @@
   "deliveryMethod": "Delivery Method",
   "recentMatches": "Recent Matches",
   "createOrAdjustFilters": "Try adjusting your filters or creating a new one",
+  "remainingRequests": "Remaining Premium Searches",
+  "usedSearches": "Used Premium Searches",
+  "notificationsChannels": "Notification Channels",
+  "loadRemainingError": "Error loading premium searches",
+  "timeTillReset": "Resets in {n} days",
+  "premium": "Premium",
+  "premiumHoverExplanation": "Premium marketplaces use Premium seaches",
+  "frequency": "Premium Search Frequency",
+  "frequency20Minutes": "Every 20 minutes",
+  "frequency1Hour": "Every Hour",
+  "frequency6Hour": "Every 6 Hours",
+  "frequency1PerDay": "Once per day",
+  "noReset": "Upgrade your plan to get more Premium Searches",
+  "Ebay": "Ebay",
+  "Kleinanzeigen": "Kleinanzeigen",
+  "invalidDiscordWebhook": "Please enter a valid webhook url",
+  "invalidEmail": "Please enter a valid email address",
+  "marketplace": "Marketplaces",
+  "notificationSettingsRadius": "Radius: {amount} KM",
+  "setRadius": "Set Radius",
+  "hasBasicPlanRestriction": "Basic plan is restricted to one search every 6 hours",
+  "searchRadiusTooltip": "A zip code is required for search radius to function",
+  "facebookMarketplace": "Facebook Marketplace",
+  "craigslistMarketplace": "Craigslist",
   "thisAuctionDoesntMatch": "This auction doesn't match my filter",
   "tellUsWhatsWrongs": "Tell us what went wrong or didn't match",
   "reportSuccessfull": "Your report was successful \n This is your report ID: {id}",
@@ -582,6 +605,7 @@
       "description": "Get notified immediately when new items matching your criteria are posted on {name}, giving you the first opportunity to purchase."
     }
   },
+  "totalSearches": "Searches {amount}",
   "overviewDescription": "View a overview of your actions that matched your filters and more",
   "aneDashboard": "ANE Dashboard",
   "auctionsDescription": "View the actions that matched your custom filters",

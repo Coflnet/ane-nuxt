@@ -8,6 +8,7 @@ export default defineNuxtConfig({
     '@hey-api/nuxt',
     'notivue/nuxt',
     '@nuxt/eslint',
+    '@nuxtjs/leaflet',
     '@nuxt/image',
   ],
 
@@ -97,3 +98,4 @@ export default defineNuxtConfig({
 
   },
 })
+

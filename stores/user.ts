@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { createUserWithEmailAndPassword, type EmailAuthCredential, EmailAuthProvider, GoogleAuthProvider, linkWithCredential, linkWithPopup, signInAnonymously, signInWithEmailAndPassword, signInWithPopup, type Auth, updateProfile, type UserCredential, getAdditionalUserInfo } from 'firebase/auth'
 import { navigateTo } from '#app'
-import { loginFirebase } from '~/src/api-client'
+import { getStats, loginFirebase } from '~/src/api-client'
 import type { ActiveSubscription } from '#hey-api'
 
 // Types
@@ -52,6 +52,8 @@ export const useUserStore = defineStore('user', () => {
   const cachedAuctions = ref<CachedAuctions | null>(null)
   const cachedFilters = ref<{ [id: number]: string }>()
   const currentPlan = ref<ActiveSubscription | null>()
+  const subscriptionStartDate = ref('')
+  const noPremium = ref<boolean | null>(null)
 
   const notificationSettings = ref<NotificationSettings>({
     discord: {
@@ -264,6 +266,53 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  async function loadRemainingSearches(): Promise<{ used: number, total: number, refreshData: number }> {
+    const apiToken = `Bearer ${token.value}`
+    try {
+      const response = await getStats({
+        composable: '$fetch',
+        headers: { Authorization: apiToken },
+      })
+
+      if (subscriptionStartDate.value == '' && noPremium.value == null)
+        await getSubscriptionEndDate()
+
+      return {
+        used: response.searchesUsedMonthly ?? 0,
+        total: response.searchesAvailableMonthly ?? 0,
+        refreshData: getTimeTillSubscriptionRenewal(subscriptionStartDate.value),
+      }
+    }
+    catch (error) {
+      console.error(error)
+      push.error(useI18n().t('loadRemainingError'))
+    }
+    return { used: 0, total: 0, refreshData: 0 }
+  }
+
+  async function getSubscriptionEndDate() {
+    const apiToken = `Bearer ${token.value}`
+    const result = await getSubscription({ composable: '$fetch', headers: { Authorization: apiToken } })
+    if (result.length == 0) {
+      noPremium.value = true
+      return
+    }
+
+    subscriptionStartDate.value = result[0]?.createdAt ?? ''
+  }
+
+  function getTimeTillSubscriptionRenewal(startDateString: string) {
+    if (subscriptionStartDate.value == '') return 0
+    const startDate = new Date(startDateString)
+    const endDate = new Date(startDate.getTime() + 30 * 24 * 60 * 60 * 1000) // Add 30 days
+    const today = new Date()
+
+    const timeLeft = endDate.getTime() - today.getTime()
+    const daysLeft = Math.ceil(timeLeft / (1000 * 60 * 60 * 24))
+
+    return daysLeft > 0 ? daysLeft : 0
+  }
+
   // Return all state, getters, and actions
   return {
     user,
@@ -277,6 +326,8 @@ export const useUserStore = defineStore('user', () => {
     notificationSettings,
     cachedAuctions,
     currentPlan,
+    subscriptionStartDate,
+    noPremium,
 
     // Getters
     isLoggedIn,
@@ -293,6 +344,7 @@ export const useUserStore = defineStore('user', () => {
     saveFilterCache,
     loadFilterCache,
     signInWithEmailPassword,
+    loadRemainingSearches,
   }
 }, {
   persist: true,

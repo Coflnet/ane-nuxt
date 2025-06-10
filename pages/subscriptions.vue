@@ -56,6 +56,7 @@ async function changePlan(plan: string) {
     headers: { Authorization: apiToken },
   })
 
+  useUserStore().noPremium = false
   await navigateTo(url, { external: true })
 }
 
