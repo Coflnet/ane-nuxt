@@ -456,7 +456,7 @@
   "recentMatches": "Recent Matches",
   "createOrAdjustFilters": "Try adjusting your filters or creating a new one",
   "remainingRequests": "Remaining Premium Searches",
-  "usedSearches": "Used Searches",
+  "usedSearches": "Used Premium Searches",
   "notificationsChannels": "Notification Channels",
   "loadRemainingError": "Error loading premium searches",
   "timeTillReset": "Resets in {n} days",
@@ -605,6 +605,7 @@
       "description": "Get notified immediately when new items matching your criteria are posted on {name}, giving you the first opportunity to purchase."
     }
   },
+  "totalSearches": "Searches {amount}",
   "overviewDescription": "View a overview of your actions that matched your filters and more",
   "aneDashboard": "ANE Dashboard",
   "auctionsDescription": "View the actions that matched your custom filters",
