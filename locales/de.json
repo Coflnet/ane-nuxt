@@ -357,9 +357,9 @@
     }
   },
   "pricing": {
-    "badge": "Preispläne",
+    "badge": "Abo-Preise",
     "title": "Einfache, transparente Preise",
-    "description": "Wähle den Plan, der zu deinen Bedürfnissen passt. Keine versteckten Gebühren oder langfristigen Verpflichtungen. Alle Pläne beinhalten unsere Kernfunktionen.",
+    "description": "Wähle den Plan, der zu deinen Bedürfnissen passt. Keine versteckten Gebühren oder langfristigen Verpflichtungen. Alle Abos beinhalten unsere Kernfunktionen.",
     "popular": "Beliebt",
     "comingSoon": "Bald verfügbar",
     "plans": {
@@ -369,8 +369,9 @@
         "price": "0€",
         "billing": "Für immer kostenlos",
         "features": {
-          "notifiers": "Bis zu 3 Filter",
+          "notifiers": "Bis zu 3 Suchaufträge",
           "filters": "Zugang zu mehreren Marktplätzen",
+          "premiumSearches": "100 Premium-Suchen bei der Anmeldung",
           "email": "Alle Benachrichtigungskanäle",
           "updates": "Benachrichtigungen innerhalb von einer Stunde",
           "analytics": "Erweiterte Analysen"
@@ -383,9 +384,10 @@
         "price": "9,99€",
         "billing": "pro Monat",
         "features": {
-          "notifiers": "Bis zu 20 Filter",
+          "notifiers": "Bis zu 20 Suchaufträge",
           "filters": "Zugang zu allen Marktplätzen",
           "notifications": "Alle Benachrichtigungskanäle",
+          "premiumSearches": "3500 Premium-Suchanfragen",
           "updates": "Benachrichtigungen innerhalb von 10 Minuten",
           "priceCalculation": "Preisberechnung"
         },
@@ -397,8 +399,9 @@
         "price": "??,99€",
         "billing": "pro Monat",
         "features": {
-          "notifiers": "Unbegrenzte aktive Benachrichtigungen",
+          "notifiers": "Mehr gleichzeitige Suchaufträge",
           "filters": "Zugang zu Marktplätzen",
+          "premiumSearches": "Mehr Premium-Suchanfragen",
           "notifications": "Alle Benachrichtigungskanäle",
           "updates": "Benachrichtigungen innerhalb einer Minute",
           "analytics": "Preisberechnung"
@@ -407,7 +410,7 @@
       }
     },
     "allPlansInclude": {
-      "title": "Alle Pläne beinhalten",
+      "title": "Alle Abos beinhalten",
       "security": "Datenschutz auf höchstem Niveau",
       "support": "Support",
       "updates": "Regelmäßige Updates"
@@ -428,7 +431,7 @@
       },
       "third": {
         "question": "Wie viele Marktplätze kann ich gleichzeitig überwachen?",
-        "answer": "Alle Pläne ermöglichen es Ihnen, alle unterstützten Marktplätze gleichzeitig zu überwachen. Der Unterschied zwischen den Plänen besteht in der Anzahl der aktiven Suchen, die Sie haben können, und der Häufigkeit der Benachrichtigungen."
+        "answer": "Alle Abos ermöglichen es Ihnen, alle unterstützten Marktplätze gleichzeitig zu überwachen. Der Unterschied zwischen den Abos besteht in der Anzahl der aktiven Suchen, die Sie haben können, und der Häufigkeit der Benachrichtigungen."
       },
       "fourth": {
         "question": "Kann ich die Arten der Benachrichtigungen anpassen, die ich erhalte?",
