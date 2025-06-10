@@ -846,7 +846,7 @@
                     name="tabler:circle-dashed-check"
                     class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                   />
-                  <span class="text-gray-300">{{ $t('pricing.plans.free.features.filters') }}</span>
+                  <span class="text-gray-300">{{ $t('pricing.plans.free.features.premiumSearches') }}</span>
                 </li>
                 <li class="flex items-start">
                   <Icon
@@ -918,7 +918,7 @@
                     name="tabler:circle-dashed-check"
                     class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                   />
-                  <span class="text-gray-300">{{ $t('pricing.plans.collector.features.filters') }}</span>
+                  <span class="text-gray-300">{{ $t('pricing.plans.collector.features.premiumSearches') }}</span>
                 </li>
                 <li class="flex items-start">
                   <Icon
@@ -989,7 +989,7 @@
                     name="tabler:circle-dashed-check"
                     class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                   />
-                  <span class="text-gray-300">{{ $t('pricing.plans.flipper.features.filters') }}</span>
+                  <span class="text-gray-300">{{ $t('pricing.plans.flipper.features.premiumSearches') }}</span>
                 </li>
                 <li class="flex items-start">
                   <Icon
