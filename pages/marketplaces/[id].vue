@@ -41,8 +41,4 @@ useSeoMeta({
   description: () => t('aneDescription', { name: t(`${marketplaceName.value}Marketplace`) }),
   ogDescription: () => t('aneDescription', { name: t(`${marketplaceName.value}Marketplace`) }),
 })
-
-onMounted(() => {
-  console.log(t(`${marketplaceName.value}Marketplace`))
-})
 </script>
