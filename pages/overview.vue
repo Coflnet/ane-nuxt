@@ -10,18 +10,7 @@
         </h1>
         <UiFooterLabel :label="$t('monitorAuctionAndFilters')" />
       </div>
-      <UiLinkButton
-        aria-label="Create Navigation Button"
-        :white="true"
-        :primary="true"
-        :to="localePath('/filters/create')"
-      >
-        <Icon
-          name="tabler:plus"
-          class="size-5 mr-2"
-        />
-        <span class="mr-1">{{ $t('createFilter') }}</span>
-      </UiLinkButton>
+      <UiCreateFilterButton />
     </div>
 
     <OverviewStats
@@ -52,6 +41,7 @@ import type { TopFilter } from '~/types/FilterType'
 
 const localePath = useLocalePath()
 const { t } = useI18n()
+const user = useUserStore()
 
 const loading = ref(true)
 

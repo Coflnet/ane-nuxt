@@ -608,5 +608,6 @@
   "aneMarketplaces": "ANE {name}",
   "aneDescription": "Erstellen Sie benutzerdefinierte Filter und erhalten Sie Benachrichtigungen für {name}. Verpassen Sie nie wieder großartige Angebote mit unseren fortschrittlichen Marktplatz-Überwachungstools.",
   "XincludedPremiumSearches": "Premium-Suchen inklusive: {amount}",
-  "appHeaderBeta": "Beta"
+  "appHeaderBeta": "Beta",
+  "noAvailableFilters": "Du hast keine verfügbaren Filter. Upgrade deinen Plan, um mehr Filter zu erstellen."
 }
