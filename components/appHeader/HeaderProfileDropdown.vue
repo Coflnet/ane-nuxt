@@ -55,11 +55,10 @@
 
         <UiLinkButton
           aria-label="Profile Subscriptions Navigation Button"
+          class="m-1 mt-2"
           :white="true"
-          :primary="true"
           :to="localePath('/subscriptions')"
         >
-          {{ $t('appHeaderAuctions') }}
           <Icon
             name="tabler:calendar-week"
             class="w-4 h-4 mr-2"
