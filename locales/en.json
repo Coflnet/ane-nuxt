@@ -318,7 +318,7 @@
         "price": "$0",
         "billing": "Forever free",
         "features": {
-          "notifiers": "Up to 3 Filters",
+          "notifiers": "Up to 3 custom searches",
           "premiumSearches": "100 Premium Searches On Signup",
           "email": "All notifications channels",
           "updates": "Notifications within 1 hour",
@@ -332,7 +332,7 @@
         "price": "$9.99",
         "billing": "per month",
         "features": {
-          "notifiers": "Up to 20 Filters",
+          "notifiers": "Up to 20 custom searches",
           "premiumSearches": "3500 Premium Searches",
           "notifications": "All notifications channels",
           "updates": "Notifications within 10 minutes",
@@ -346,8 +346,8 @@
         "price": "??,99€",
         "billing": "per month",
         "features": {
-          "notifiers": "500 Filters",
-          "premiumSearches": "35000 Premium Searches",
+          "notifiers": "More custom searches",
+          "premiumSearches": "More Premium Searches",
           "notifications": "All notification channels",
           "updates": "Notifications within the minute",
           "analytics": "Price calculation"
@@ -409,7 +409,7 @@
   },
   "fillOutAllFields": "Please fill out all fields",
   "errorRequesting": "There was an error creating your subscription",
-  "autoScout": "AutoScout24",
+  "autoScoutMarketplace": "AutoScout24",
   "selectMarket": "Select Marketplace",
   "account": "Account",
   "noFilters": "You dont have any filters",
@@ -468,8 +468,8 @@
   "frequency6Hour": "Every 6 Hours",
   "frequency1PerDay": "Once per day",
   "noReset": "Upgrade your plan to get more Premium Searches",
-  "Ebay": "Ebay",
-  "Kleinanzeigen": "Kleinanzeigen",
+  "ebayMarketplace": "eBay",
+  "kleinanzeigenMarketplace": "Kleinanzeigen",
   "invalidDiscordWebhook": "Please enter a valid webhook url",
   "invalidEmail": "Please enter a valid email address",
   "marketplace": "Marketplaces",

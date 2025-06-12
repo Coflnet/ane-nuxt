@@ -44,3 +44,11 @@ npm preview
 ```
 
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+
+## Glossary
+| Term | German| Definition |
+|---|---|
+| custom searches | Suchauftrag | A single search order for x with y filters |
+| Filter | Filter | Metadata for a custom search narrowing it, eg. the search term and location |
+| Premium Search | Premium Suchanfrage | A single search request to a platform that restricts searches |
+| Plan | Abo | The service tier the user is on |

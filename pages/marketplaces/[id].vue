@@ -36,9 +36,9 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: () => t('aneMarketplaces', { name: t(marketplaceName.value) }),
-  ogTitle: () => t('aneMarketplaces', { name: marketplaceName.value }),
-  description: () => t('aneDescription', { name: marketplaceName.value }),
-  ogDescription: () => t('aneDescription', { name: marketplaceName.value }),
+  title: () => t('aneMarketplaces', { name: t(`${marketplaceName.value}Marketplace`) }),
+  ogTitle: () => t('aneMarketplaces', { name: t(`${marketplaceName.value}Marketplace`) }),
+  description: () => t('aneDescription', { name: t(`${marketplaceName.value}Marketplace`) }),
+  ogDescription: () => t('aneDescription', { name: t(`${marketplaceName.value}Marketplace`) }),
 })
 </script>

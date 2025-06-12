@@ -9,6 +9,7 @@
       <input
         :id="name"
         v-model="model"
+        :aria-label="labelAria"
         :disabled="disabled"
         :type="type"
         :placeholder="props.placeholder ?? ''"

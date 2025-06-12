@@ -17,7 +17,6 @@
         v-model="model!.zipcode"
         label-aria="Zip Code Input"
         :label="$t('zipCode')"
-        type="number"
         :placeholder="$t('zipCodeEq')"
         :footer="$t('yourZip')"
       />
