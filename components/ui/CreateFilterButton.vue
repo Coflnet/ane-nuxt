@@ -20,8 +20,9 @@ const localePath = useLocalePath()
 function checkForAvaiableFilters(url: string) {
   const user = useUserStore()
   // Check if the user has remaining filters
-  if (user.remainingFilters <= 1) {
+  if (user.remainingFilters > 0) {
     navigateTo(url)
+    return
   }
   push.error(t('noAvailableFilters'))
 }

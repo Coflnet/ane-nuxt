@@ -278,8 +278,7 @@ export const useUserStore = defineStore('user', () => {
       if (subscriptionStartDate.value == '' && noPremium.value == null)
         await getSubscriptionEndDate()
 
-      remainingFilters.value = response.listenerLimit ?? 3 - (response.listenerCount ?? 0)
-      console.log(response)
+      remainingFilters.value = (response.listenerLimit ?? 3) - (response.listenerCount ?? 0)
 
       return {
         used: response.searchesUsedMonthly ?? 0,
