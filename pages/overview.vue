@@ -39,9 +39,7 @@ import type { FilterMatch } from '~/src/api-client'
 
 import type { TopFilter } from '~/types/FilterType'
 
-const localePath = useLocalePath()
 const { t } = useI18n()
-const user = useUserStore()
 
 const loading = ref(true)
 
