@@ -41,7 +41,7 @@
         <ListboxOption
           v-for="item in options"
           :key="item.value"
-          :aria-label="`${labelAria} Item`"
+          :aria-label="`${item.label} Item`"
           :value="item"
           class="flex items-center px-4 py-2 cursor-pointer hover:bg-slate-700 focus:bg-slate-700 focus:outline-none"
           :class="{ 'bg-slate-700': isSelected(item) }"
