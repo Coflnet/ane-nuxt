@@ -10,6 +10,8 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     '@nuxtjs/leaflet',
     '@nuxt/image',
+    '@nuxtjs/sitemap',
+    '@nuxtjs/robots',
   ],
 
   ssr: true,
@@ -19,6 +21,11 @@ export default defineNuxtConfig({
     'notivue/notification.css',
     'notivue/animations.css',
   ],
+
+  site: {
+    url: 'https://ane.deals.com',
+    name: 'Ane Deals',
+  },
 
   routeRules: {
     '/': { prerender: true },
@@ -98,4 +105,3 @@ export default defineNuxtConfig({
 
   },
 })
-
