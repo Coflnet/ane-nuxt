@@ -25,10 +25,3 @@ export const deliveryKind = [
   { value: 'shipping', label: 'shippingDelivery' },
   { value: 'pickup', label: 'pickupDelivery' },
 ]
-
-export function checkForAvaiableFilters(url: string) {
-  const user = useUserStore()
-  console.log(user.remainingFilters)
-  if (user.remainingFilters <= 1)
-    navigateTo(url)
-}
