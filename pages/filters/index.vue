@@ -10,18 +10,8 @@
         </h1>
         <UiFooterLabel :label="$t('manageFilters')" />
       </div>
-      <UiLinkButton
-        aria-label="Create Navigation Button"
-        :white="true"
-        :primary="true"
-        :to="localePath('/filters/create')"
-      >
-        <Icon
-          name="tabler:plus"
-          class="size-5 mr-2"
-        />
-        <span class="mr-1">{{ $t('createFilter') }}</span>
-      </UiLinkButton>
+
+      <UiCreateFilterButton />
     </div>
 
     <UiDefaultContainer class="p-6">
@@ -60,7 +50,6 @@
 <script setup lang="ts">
 import type { FilterFace } from '~/types/FilterType'
 
-const localePath = useLocalePath()
 const { t } = useI18n()
 const filterStore = useFilterStore()
 

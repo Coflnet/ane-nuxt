@@ -54,6 +54,7 @@ export const useUserStore = defineStore('user', () => {
   const currentPlan = ref<ActiveSubscription | null>()
   const subscriptionStartDate = ref('')
   const noPremium = ref<boolean | null>(null)
+  const remainingFilters = ref<number>(3)
 
   const notificationSettings = ref<NotificationSettings>({
     discord: {
@@ -277,6 +278,8 @@ export const useUserStore = defineStore('user', () => {
       if (subscriptionStartDate.value == '' && noPremium.value == null)
         await getSubscriptionEndDate()
 
+      remainingFilters.value = (response.listenerLimit ?? 3) - (response.listenerCount ?? 0)
+
       return {
         used: response.searchesUsedMonthly ?? 0,
         total: response.searchesAvailableMonthly ?? 0,
@@ -328,6 +331,7 @@ export const useUserStore = defineStore('user', () => {
     currentPlan,
     subscriptionStartDate,
     noPremium,
+    remainingFilters,
 
     // Getters
     isLoggedIn,

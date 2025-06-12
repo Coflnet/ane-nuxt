@@ -3,13 +3,6 @@
     <!-- Hero Section -->
     <section class="relative overflow-hidden">
       <div class="absolute inset-0 bg-gradient-to-br from-gray-900 to-gray-950 -z-10" />
-      <div
-        class="absolute -top-24 -right-24 w-96 h-96 bg-indigo-900 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"
-      />
-      <div
-        class="absolute -bottom-24 -left-24 w-96 h-96 bg-purple-900 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"
-      />
-
       <div class="container mx-auto px-6 py-20 md:py-32">
         <div class="flex flex-col md:flex-row items-center">
           <div class="md:w-1/2 mb-12 md:mb-0">

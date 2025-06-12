@@ -612,6 +612,7 @@
   "aneDescription": "Erstellen Sie benutzerdefinierte Filter und erhalten Sie Benachrichtigungen für {name}. Verpassen Sie nie wieder großartige Angebote mit unseren fortschrittlichen Marktplatz-Überwachungstools.",
   "XincludedPremiumSearches": "Premium-Suchen inklusive: {amount}",
   "appHeaderBeta": "Beta",
+  "noAvailableFilters": "Deine verfügbaren Filter sind aufgebraucht. Aktualisiere dein Abo, um mehr Filter zu erstellen.",
   "ebayMarketplace": "eBay",
   "kleinanzeigenMarketplace": "Kleinanzeigen"
 }
