@@ -3,7 +3,7 @@
     <button
       :aria-label="`Delete Filter ${props.itemId}`"
       class="mt-0.5 ml-1"
-      @click="isModalOpen = true "
+      @click="isModalOpen = true"
     >
       <UiIcon name="tabler:trash" />
     </button>

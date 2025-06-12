@@ -20,7 +20,7 @@
           <div class="flex justify-end space-x-3 mt-6">
             <UiButton
               aria-label="Cancel Deletion"
-              @on-click="$emit('cancel')"
+              @on-click="handleCancel"
             >
               {{ $t('cancel') }}
             </UiButton>
@@ -28,7 +28,7 @@
               aria-label="Confirm Deletion"
               :warning="true"
               :proccessing="loading"
-              @on-click="$emit('confirm')"
+              @on-click="handleConfirm"
             >
               {{
                 $t('delete') }}
@@ -41,19 +41,30 @@
 </template>
 
 <script setup lang="ts">
-// No need for 'ref' here anymore as loading is a prop
-defineEmits(['confirm', 'cancel'])
+import { ref, watch } from 'vue' // Import 'watch'
+
+const emits = defineEmits(['confirm', 'cancel'])
 
 const modalValue = defineModel()
+const loading = ref(false)
 
-// Define loading as a prop
-defineProps({
-  header: String,
-  footer: String,
-  loading: { // Add the loading prop
-    type: Boolean,
-    default: false,
-  },
+defineProps({ header: String, footer: String })
+
+const handleConfirm = () => {
+  loading.value = true
+  emits('confirm')
+}
+
+const handleCancel = () => {
+  loading.value = false
+  emits('cancel')
+  modalValue.value = false
+}
+
+watch(modalValue, (newValue) => {
+  if (!newValue) {
+    loading.value = false
+  }
 })
 </script>
 
