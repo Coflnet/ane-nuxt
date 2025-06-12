@@ -28,7 +28,7 @@
               aria-label="Confirm Deletion"
               :warning="true"
               :proccessing="loading"
-              @on-click="$emit('confirm'); loading = true"
+              @on-click="$emit('confirm')"
             >
               {{
                 $t('delete') }}
@@ -41,10 +41,19 @@
 </template>
 
 <script setup lang="ts">
+// No need for 'ref' here anymore as loading is a prop
 defineEmits(['confirm', 'cancel'])
 
 const modalValue = defineModel()
-const loading = ref(false)
 
-defineProps({ header: String, footer: String })
+// Define loading as a prop
+defineProps({
+  header: String,
+  footer: String,
+  loading: { // Add the loading prop
+    type: Boolean,
+    default: false,
+  },
+})
 </script>
+
