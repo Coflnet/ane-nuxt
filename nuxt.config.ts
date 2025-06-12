@@ -23,8 +23,8 @@ export default defineNuxtConfig({
   ],
 
   site: {
-    url: 'https://ane.coflnet.com',
-    name: 'Ane Notifier',
+    url: 'https://ane.deals.com',
+    name: 'Ane Deals',
   },
 
   routeRules: {
@@ -105,4 +105,3 @@ export default defineNuxtConfig({
 
   },
 })
-
