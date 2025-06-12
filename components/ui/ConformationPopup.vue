@@ -41,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue' // Import 'watch'
+import { ref, watch } from 'vue'
 
 const emits = defineEmits(['confirm', 'cancel'])
 
@@ -67,4 +67,3 @@ watch(modalValue, (newValue) => {
   }
 })
 </script>
-
