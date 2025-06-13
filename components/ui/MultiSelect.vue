@@ -77,12 +77,7 @@
 <script setup lang="ts">
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/vue'
 import { UiHeaderLabel } from '#components'
-
-interface Options {
-  value: string
-  label: string
-  premium?: boolean
-}
+import type { Options } from '~/constants/CreateFilterConstants'
 
 const { t } = useI18n()
 const model = defineModel<Options[]>()
@@ -138,4 +133,9 @@ const toggleSelection = (value: Options) => {
 onMounted(() => {
   toggleSelection(props.options![0]!)
 })
+
+// Select the first option when changing select marketplaces to different options
+watch(() => props.options, (newOptions) => {
+  toggleSelection(newOptions[0]!)
+}, { immediate: true })
 </script>

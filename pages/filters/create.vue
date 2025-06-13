@@ -48,6 +48,7 @@ import { getMessaging, getToken } from 'firebase/messaging'
 import { useFirebaseApp } from 'vuefire'
 import type { FilterMatch, ListingListener } from '~/src/api-client'
 import type { Filter } from '~/types/FilterType'
+import { constructOptionsFromString, detectLocationNA, filterFreeMarketplaces, marketplaces, usMarketplaces, valididateAllMarketplace } from '~/constants/CreateFilterConstants'
 
 const { debounce } = lodash
 
@@ -176,9 +177,16 @@ async function loadEditParam() {
           filter.value.maxPrice = Number(max)
           break
         }
-        case 'IncludePlatforms':
+        case 'IncludePlatforms': {
+          // construct the selected marketplaces from the string to test if it is all marketplaces selected
+          const constuctedArray = constructOptionsFromString(item.value ?? '')
+          if (valididateAllMarketplace(constuctedArray)) {
+            filter.value.marketplace = 'all'
+            break
+          }
           filter.value.marketplace = item.value ?? ''
           break
+        }
         case 'CommercialSeller':
           filter.value.commercialSeller = Boolean(item.value)
           break
@@ -264,6 +272,7 @@ async function filterToCreate(): Promise<ListingListener | null> {
 
 async function handleFilters(): Promise<{ name: string, value: any }[]> {
   const rawFilter = toRaw(filter.value)
+  console.log(rawFilter)
   const filters: { name: string, value: any }[] = []
 
   // 'EU,US,GB' is the default value
@@ -282,8 +291,16 @@ async function handleFilters(): Promise<{ name: string, value: any }[]> {
   if (rawFilter.deliveryMethod != '')
     filters.push({ name: 'DeliveryMethod', value: rawFilter.deliveryMethod })
 
-  if (rawFilter.marketplace != '')
+  if (rawFilter.marketplace != 'all') {
     filters.push({ name: 'IncludePlatforms', value: rawFilter.marketplace })
+  }
+  else {
+    // input marketplace depending on location
+    const isUs = await detectLocationNA()
+    const marketplacesArray = filterFreeMarketplaces(isUs ? usMarketplaces : marketplaces)
+    console.log('marketplacesArray', marketplacesArray)
+    filters.push({ name: 'IncludePlatforms', value: marketplacesArray.map(m => m.value).join(',') })
+  }
 
   if (rawFilter.commercialSeller)
     filters.push({ name: 'CommercialSeller', value: true })
