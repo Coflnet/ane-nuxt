@@ -614,5 +614,7 @@
   "appHeaderBeta": "Beta",
   "noAvailableFilters": "Deine verfügbaren Filter sind aufgebraucht. Aktualisiere dein Abo, um mehr Filter zu erstellen.",
   "ebayMarketplace": "eBay",
-  "kleinanzeigenMarketplace": "Kleinanzeigen"
+  "kleinanzeigenMarketplace": "Kleinanzeigen",
+  "copyReferralCode": "Empfehlungscode kopieren",
+  "copyReferralCodeSuccess": "Empfehlungscode in die Zwischenablage kopiert"
 }
