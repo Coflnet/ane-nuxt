@@ -272,7 +272,6 @@ async function filterToCreate(): Promise<ListingListener | null> {
 
 async function handleFilters(): Promise<{ name: string, value: any }[]> {
   const rawFilter = toRaw(filter.value)
-  console.log(rawFilter)
   const filters: { name: string, value: any }[] = []
 
   // 'EU,US,GB' is the default value
@@ -298,7 +297,6 @@ async function handleFilters(): Promise<{ name: string, value: any }[]> {
     // input marketplace depending on location
     const isUs = await detectLocationNA()
     const marketplacesArray = filterFreeMarketplaces(isUs ? usMarketplaces : marketplaces)
-    console.log('marketplacesArray', marketplacesArray)
     filters.push({ name: 'IncludePlatforms', value: marketplacesArray.map(m => m.value).join(',') })
   }
 
