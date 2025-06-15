@@ -614,5 +614,8 @@
   "appHeaderBeta": "Beta",
   "noAvailableFilters": "Deine verfügbaren Filter sind aufgebraucht. Aktualisiere dein Abo, um mehr Filter zu erstellen.",
   "ebayMarketplace": "eBay",
-  "kleinanzeigenMarketplace": "Kleinanzeigen"
+  "kleinanzeigenMarketplace": "Kleinanzeigen",
+  "weRanIntoAnError": "Es ist ein Fehler aufgetreten. Sollte dies weiterhin der Fall sein, wenden Sie sich bitte an den Support.",
+  "issueGettingLocationData": "Beim Abrufen Ihrer Standortdaten ist ein Problem aufgetreten.",
+  "invalidZipCode": "Es gab ein Problem mit Ihrer Postleitzahl. Bitte überprüfen Sie, ob sie gültig ist, und versuchen Sie es erneut."
 }

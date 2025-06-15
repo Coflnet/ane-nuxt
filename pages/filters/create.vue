@@ -323,16 +323,14 @@ async function handleFilters(): Promise<{ name: string, value: any }[]> {
 async function handleSearchRadius(): Promise<[string, string]> {
   // If you are looking at this... I am sorry
   try {
-    const apiToken = `Bearer ${useUserStore().token}`
     const locationData = await getLocation(
       {
         path: { zip: filter.value.zipcode },
         composable: '$fetch',
-        headers: { Authorization: apiToken },
       },
     )
 
-    if (!locationData.lat || !locationData.lon) {
+    if (locationData.lat == 0 && locationData.lon == 0) {
       push.error(t('invalidZipCode'))
       radiusError.value = true
       return ['', '']

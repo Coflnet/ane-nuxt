@@ -115,21 +115,19 @@ function handleWindowState() {
 
 async function loadSearchRadius() {
   try {
-    const apiToken = `Bearer ${useUserStore().token}`
     const locationData = await getLocation(
       {
         path: { zip: model!.value!.zipcode },
         composable: '$fetch',
-        headers: { Authorization: apiToken },
       },
     )
 
-    if (!locationData.lat || !locationData.lon) {
+    if (locationData.lat == 0 && locationData.lon == 0) {
       push.error(t('invalidZipCode'))
       return ['', '']
     }
 
-    userLocation.value = [locationData.lat, locationData.lon]
+    userLocation.value = [locationData.lat ?? 0, locationData.lon ?? 0]
     model!.value!.searchRadius = 40
   }
   catch (error) {
