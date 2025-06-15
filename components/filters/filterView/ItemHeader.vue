@@ -3,6 +3,7 @@
     <div>
       <UiHeaderLabel :label="filter.name" />
       <UiFooterLabel
+        class="truncate w-48"
         :label="filter.marketplace || 'Ebay'"
         :xs="true"
       />
