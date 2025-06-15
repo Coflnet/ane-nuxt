@@ -10,7 +10,7 @@
     <!-- Marketplace select -->
     <UiMultiSelect
       v-model="selectedMarketplaces"
-      :options="marketplaces"
+      :options="resolvedMarketplaceOptions"
       :label="$t('marketplace')"
       override-value="all"
     />
@@ -27,14 +27,23 @@
 
 <script setup lang="ts">
 import type { Filter } from '~/types/FilterType'
-import { marketplaces, frequency } from '~/constants/CreateFilterConstants'
+import type { Options } from '~/constants/CreateFilterConstants'
+import { marketplaces, usMarketplaces, frequency, detectLocationNA } from '~/constants/CreateFilterConstants'
 
 const hasBasicPlan = useUserStore().currentPlan?.product == 'basic' || !useUserStore().currentPlan?.product
 
 const premiumMarkets = ref(false)
 const model = defineModel<Filter>()
 
-const selectedMarketplaces = ref<{ value: string, label: string, premium?: boolean }[]>([])
+const resolvedMarketplaceOptions = ref<Options[]>(marketplaces)
+
+// set visible marketplace based on user location
+const fetchMarketplaceOptions = async () => {
+  const isUs = await detectLocationNA()
+  resolvedMarketplaceOptions.value = isUs ? usMarketplaces : marketplaces
+}
+
+const selectedMarketplaces = ref<Options[]>([])
 
 watch(() => model.value!.marketplace, () => {
   selectedMarketplaces.value = []
@@ -48,7 +57,7 @@ watch(() => model.value!.marketplace, () => {
 // constuct the string send to backend here instead of in handleFilters()
 watch(selectedMarketplaces, () => {
   if (selectedMarketplaces.value.map(item => item.value).includes('all')) {
-    model.value!.marketplace = ''
+    model.value!.marketplace = 'all'
     return
   }
   model.value!.marketplace = selectedMarketplaces.value.map(i => i.value).join(',')
@@ -64,4 +73,8 @@ watch(selectedMarketplaces, (_) => {
       model.value!.frequency = '0 */6 * * *'
   }
 }, { deep: true })
+
+onMounted(() => {
+  fetchMarketplaceOptions()
+})
 </script>
