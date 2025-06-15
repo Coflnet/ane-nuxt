@@ -108,7 +108,7 @@ async function testFilter() {
     const f = await filterToCreate()
 
     if (!f) {
-      push.error('Please fill out all required fields')
+      push.error(t('errorCreatingFilter'))
       return
     }
     const res = await filterStore.testFilter(f)
@@ -330,7 +330,7 @@ async function handleSearchRadius(): Promise<[string, string]> {
       },
     )
 
-    if (locationData.lat == 0 && locationData.lon == 0) {
+    if (locationData.lat == 0 || !locationData.lon) {
       push.error(t('invalidZipCode'))
       radiusError.value = true
       return ['', '']

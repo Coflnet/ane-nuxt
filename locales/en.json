@@ -620,6 +620,16 @@
   "appHeaderBeta": "Beta",
   "noAvailableFilters": "You have no remaining filters upgrade your plan to create more filters",
   "weRanIntoAnError": "We ran into an error, If this continues please contact support",
-  "issueGettingLocationData": "There was an issue getting your location data",
-  "invalidZipCode": "There was an issue with your zip code, please verify it is valid and try again"
+  "issueGettingLocationData": "There was an issue getting your location data from your zip code. If the issue persists, please contact support.",
+  "invalidZipCode": "There was an issue with your zip code, please verify it is valid and try again",
+  "errorCreatingFilter": "There was an error creating your filter, please verify your inputs. If the issue persists, please contact support.",
+  "weRanIntoAnErrorCreatingFilter": "We ran into an error creating your filter, please verify your inputs. If the issue persists, please contact support.",
+  "weRanIntoErrorSavingFilter": "We ran into an error saving your filter, please verify your inputs. If the issue persists, please contact support.",
+  "enterEmailAdress": "Please enter your email address",
+  "passwordResetSent": "Password reset link sent to your email address",
+  "passwordResetError": "There was an error sending the password reset link, please try again",
+  "fillOutRequestedFields": "Please fill out the requested fields",
+  "errorCreatingAccountCreateOne": "There was an error creating your account \n If you have not made a account yet try making one",
+  "errorCreatingSubscription": "There was an error creating your subscription, please try again or contact support",
+  "filterNotFound": "Filter not found if this continues please contact support"
 }

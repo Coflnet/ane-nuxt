@@ -616,6 +616,6 @@
   "ebayMarketplace": "eBay",
   "kleinanzeigenMarketplace": "Kleinanzeigen",
   "weRanIntoAnError": "Es ist ein Fehler aufgetreten. Sollte dies weiterhin der Fall sein, wenden Sie sich bitte an den Support.",
-  "issueGettingLocationData": "Beim Abrufen Ihrer Standortdaten ist ein Problem aufgetreten.",
+  "issueGettingLocationData": "Beim Abrufen Ihrer Standortdaten über Ihre Postleitzahl ist ein Problem aufgetreten. Sollte das Problem weiterhin bestehen, wenden Sie sich bitte an den Support.",
   "invalidZipCode": "Es gab ein Problem mit Ihrer Postleitzahl. Bitte überprüfen Sie, ob sie gültig ist, und versuchen Sie es erneut."
 }
