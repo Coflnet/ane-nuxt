@@ -36,7 +36,7 @@
         />
       </ListboxButton>
       <ListboxOptions
-        class="absolute z-10 mt-1 w-full rounded-lg border border-slate-600 bg-slate-800 shadow-lg max-h-60"
+        class="absolute z-10 mt-1 w-full rounded-lg border border-slate-600 bg-slate-800 shadow-lg"
       >
         <ListboxOption
           v-for="item in options"
