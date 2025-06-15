@@ -10,7 +10,8 @@ export const marketplaces: Options[] = [
   { value: 'Kleinanzeigen', label: 'Kleinanzeigen' },
   { value: 'AutoScout24', label: 'autoScout' },
   { value: 'Facebook', label: 'facebookMarketplace', premium: true },
-  { value: 'Craigslist', label: 'craigslistMarketplace' },
+  { value: 'Marktplaats', label: 'Marktplaats' },
+  { value: 'Willhaben', label: 'Willhaben' },
 ]
 
 export const usMarketplaces: Options[] = [
