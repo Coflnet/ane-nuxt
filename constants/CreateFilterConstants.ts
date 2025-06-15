@@ -59,9 +59,12 @@ function arraysHaveSameElements(arr1: Options[], arr2: Options[]): boolean {
 
 // Validate if you are in na or eu for which marketplaces to display
 export async function detectLocationNA(): Promise<boolean> {
-  const response = await fetch('https://ipapi.co/json/')
-  const ipData = await response.json()
-  if (ipData.continent_code == 'NA') return true
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  const continent = timeZone.split('/')[0]
+
+  if (continent == 'America') {
+    return true
+  }
   return false
 }
 

@@ -214,7 +214,7 @@ async function loadEditParam() {
   }
   catch (e) {
     console.error(e)
-    push.error(`${t('weRanIssue')}\n ${e}`)
+    push.error(`${t('weRanIntoAnError')}\n ${e}`)
   }
 }
 
@@ -232,7 +232,7 @@ async function saveFilter() {
   catch (e) {
     savingFilter.value = false
     console.error(e)
-    push.error(t('weRanIssue'))
+    push.error(t('weRanIntoAnError'))
   }
   finally {
     savingFilter.value = false
@@ -323,22 +323,25 @@ async function handleFilters(): Promise<{ name: string, value: any }[]> {
 async function handleSearchRadius(): Promise<[string, string]> {
   // If you are looking at this... I am sorry
   try {
-    const response = await fetch('https://ipapi.co/json/')
-    const data = await response.json()
-    const url = `https://nominatim.openstreetmap.org/search?postalcode=${filter.value.zipcode}&country=${data.country_name}&format=json`
-    const response2 = await fetch(url)
-    const data2 = await response2.json()
-    if (data2.length == 0) {
-      push.error(t('enteringZipCodeError'))
-      savingFilter.value = false
+    const locationData = await getLocation(
+      {
+        path: { zip: filter.value.zipcode },
+        composable: '$fetch',
+      },
+    )
+
+    if (locationData.lat == 0 && locationData.lon == 0) {
+      push.error(t('invalidZipCode'))
+      radiusError.value = true
       return ['', '']
     }
-    return [data2[0].lat, data2[0].lon]
+
+    return [String(locationData.lat), String(locationData.lon)]
   }
   catch (error) {
     console.error('Error fetching country:', error)
     savingFilter.value = false
-    push.error(`${t('weRanIssue')}\n ${error}`)
+    push.error(`${t('issueGettingLocationData')}\n ${error}`)
   }
   return ['', '']
 }
