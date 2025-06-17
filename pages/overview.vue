@@ -71,8 +71,9 @@ async function loadStats() {
   filterStore.getUserFilters.map((i) => {
     matches += i.matchCount ?? 0
     if (!topFilters.value.hasOwnProperty(i.id ?? '')) {
-      topFilters.value[String(i.id) ?? '' as string] = {
+      topFilters.value[String(i.id) as string] = {
         name: i.name ?? '',
+        id: String(i.id),
         matches: i.matchCount ?? 0,
         keywords: [],
       }

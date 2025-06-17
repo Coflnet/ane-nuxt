@@ -1,23 +1,16 @@
 <template>
   <div class="flex items-start justify-between mb-3">
-    <div>
+    <a
+      :href="localePath(`/filters/create?id=${useFilterStore().getSimplifiedFilters[filter.id ?? '']![1]}`)"
+    >
       <UiHeaderLabel :label="filter.name" />
       <UiFooterLabel
         class="truncate w-48"
         :label="filter.marketplace || 'Ebay'"
         :xs="true"
       />
-    </div>
+    </a>
     <div class="flex flex-row gap-x-1">
-      <div class="flex items-center space-x-1">
-        <UiLinkButton
-          :aria-label="`Edit Filter ${filter.name}`"
-          :white="true"
-          :to="localePath(`/filters/create?id=${filter.id}`)"
-        >
-          <UiIcon name="tabler:edit" />
-        </UiLinkButton>
-      </div>
       <div class="flex items-center space-x-1">
         <FiltersFilterCardDelete :item-id="filter.id" />
       </div>
