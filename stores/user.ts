@@ -84,6 +84,8 @@ export const useUserStore = defineStore('user', () => {
   const getNotificationSettings = computed(() => notificationSettings.value)
   const isUserAnonymous = computed(() => isAnonymous.value)
 
+  const createdAccount = computed(() => isAnonymous.value || isAuthenticated.value)
+
   const localePath = useLocalePath()
 
   async function loginWithGoogle(clientAuth: Auth, login: boolean): Promise<{ success: boolean, error?: string | null, newUser?: boolean }> {
@@ -332,6 +334,7 @@ export const useUserStore = defineStore('user', () => {
     subscriptionStartDate,
     noPremium,
     remainingFilters,
+    createdAccount,
 
     // Getters
     isLoggedIn,
