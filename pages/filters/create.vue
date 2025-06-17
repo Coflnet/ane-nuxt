@@ -149,8 +149,6 @@ async function loadEditParam() {
     filter.value.id = activeFilter.id ?? 0
     filter.value.notificationType = activeFilter.targetType ?? 'Unknown'
 
-    console.log(activeFilter)
-
     activeFilter.filters.forEach((item) => {
       switch (item.name) {
         case 'Radius': {
@@ -335,7 +333,7 @@ async function handleSearchRadius(): Promise<[string, string]> {
       },
     )
 
-    if (locationData.lat == 0 || !locationData.lon) {
+    if (locationData.lat == 0 && locationData.lon == 0) {
       push.error(t('invalidZipCode'))
       radiusError.value = true
       return ['', '']
