@@ -2,6 +2,7 @@
   <a
     :href="href"
     :target
+    :aria-label="labelAria"
     class="flex items-center"
     :class="{
       'text-white hover:text-indigo-300': white,
@@ -17,5 +18,6 @@ defineProps({
   href: String,
   target: String,
   white: Boolean,
+  labelAria: String,
 })
 </script>

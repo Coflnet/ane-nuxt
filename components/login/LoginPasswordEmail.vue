@@ -22,6 +22,7 @@
   </div>
   <UiButton
     class="w-full text-center"
+    aria-label="Sign in"
     :primary="true"
     @click="login"
   >
@@ -38,6 +39,7 @@ const props = defineProps({ isLogin: Boolean })
 const auth = useFirebaseAuth()
 
 const userStore = useUserStore()
+const { t } = useI18n()
 
 const emailPassError = ref(false)
 const localePath = useLocalePath()
@@ -46,15 +48,16 @@ const redirectTo = router.currentRoute.value.query.redirectTo as string | undefi
 
 async function login() {
   if (!email.value || !password.value) {
-    push.error('Please fill in all fields')
+    push.error(t('fillOutRequestedFields'))
     emailPassError.value = true
     return
   }
 
   emailPassError.value = false
   const result = await userStore.signInWithEmailPassword(auth!, email.value, password.value, props.isLogin)
-  if (!result.success) {
-    push.error(`There was an error creating your account \n If you have not made a account yet try making one`)
+
+  if (!result || !result.success) {
+    push.error(t('errorCreateAccountAlreadyRegistered'))
     return
   }
   userStore.isAuthenticated = true

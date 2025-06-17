@@ -3,7 +3,7 @@
     <FiltersCreateHeader :is-new-filter="isNewFilter" />
     <UiDefaultContainer class="mb-6 p-6">
       <form @submit.prevent="saveFilter">
-        <FiltersSearchValueMarketplaceFilter :model-value="filter" />
+        <FiltersSearchValueMarketplaceFilter v-model="filter" />
 
         <FiltersPriceConditionFilter v-model="filter" />
         <FiltersCreateCountrySection :model-value="filter" />
@@ -107,10 +107,8 @@ async function testFilter() {
   try {
     const f = await filterToCreate()
 
-    if (!f) {
-      push.error('Please fill out all required fields')
+    if (!f)
       return
-    }
     const res = await filterStore.testFilter(f)
     if (res) {
       // this is required because recnet match container is used for both this the test endpoint and overview table
@@ -179,12 +177,15 @@ async function loadEditParam() {
         }
         case 'IncludePlatforms': {
           // construct the selected marketplaces from the string to test if it is all marketplaces selected
+          console.log(item.value)
           const constuctedArray = constructOptionsFromString(item.value ?? '')
           if (valididateAllMarketplace(constuctedArray)) {
             filter.value.marketplace = 'all'
+            console.log ('break')
             break
           }
           filter.value.marketplace = item.value ?? ''
+          console.log(filter.value.marketplace, ' hi')
           break
         }
         case 'CommercialSeller':
@@ -223,8 +224,10 @@ async function saveFilter() {
     savingFilter.value = true
     const f = await filterToCreate()
 
-    if (!f)
+    if (!f) {
+      console.log('aborting')
       return
+    }
     await filterStore.saveFilter(f)
     push.success('Filter successfully saved')
     navigateTo(localePath('/overview'))
