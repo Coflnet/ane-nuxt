@@ -2,6 +2,7 @@
   <div>
     <FiltersFilterViewItemHeader :filter="filter" />
     <a
+      aria-label="Edit Filter"
       :href="localePath(`/filters/create?id=${useFilterStore().getSimplifiedFilters[filter.id ?? '']![1]}`)"
     >
       <FiltersFilterViewItemSettings :filter="filter" />
