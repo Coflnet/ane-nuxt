@@ -630,5 +630,6 @@
   "fillOutRequestedFields": "Please fill out the requested fields",
   "errorCreateAccountAlreadyRegistered": "There was an issue creating your account, it seems this email is already registered. Please try logging in or use a different email.",
   "errorCreatingSubscription": "There was an error creating your subscription, please try again or contact support",
-  "filterNotFound": "Filter not found if this continues please contact support"
+  "filterNotFound": "Filter not found if this continues please contact support",
+  "overview": "Overview"
 }

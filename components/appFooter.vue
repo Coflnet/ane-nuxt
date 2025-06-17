@@ -6,46 +6,68 @@
           <div class="flex items-center space-x-2">
             <UiLogo />
           </div>
-          <UiFooterLabel :label="$t('advancedNotification')" :xs="true" />
+          <UiFooterLabel
+            :label="$t('advancedNotification')"
+            :xs="true"
+          />
         </div>
 
         <div class="flex items-center space-x-12">
           <div class="">
-            <h3 class="font-medium text-white mb-2">{{ $t('resources') }}</h3>
+            <h3 class="font-medium text-white mb-2">
+              {{ $t('resources') }}
+            </h3>
             <ul class="space-y-2">
               <li>
-                <UiTextButton @on-click="navigateTo('https://ane.coflnet.com/api/index.html')" :gray="true" :sm="true">
+                <UiLinkLabel
+                  :href="'https://ane.coflnet.com/api/index.html'"
+                  :gray="true"
+                >
                   {{ $t('apiRef') }}
-                </UiTextButton>
+                </UiLinkLabel>
               </li>
               <li>
-                <UiTextButton @on-click="navigateTo('https://discord.gg/vdjgMWDDzW')" :gray="true" :sm="true">
+                <UiLinkLabel
+                  :href="'https://discord.gg/vdjgMWDDzW'"
+                  :gray="true"
+                >
                   {{ $t('support') }}
-                </UiTextButton>
+                </UiLinkLabel>
               </li>
             </ul>
           </div>
 
           <div>
-            <h3 class="font-medium text-white mb-2">{{ $t('company') }}</h3>
+            <h3 class="font-medium text-white mb-2">
+              {{ $t('company') }}
+            </h3>
             <ul class="space-y-2">
               <li>
-                <UiTextButton @on-click="navigateTo('https://coflnet.com/privacy')" :gray="true" :sm="true">
+                <UiLinkLabel
+                  :href="'https://coflnet.com/privacy'"
+                  :gray="true"
+                >
                   {{ $t('privacy') }}
-                </UiTextButton>
+                </UiLinkLabel>
               </li>
               <li>
-                <UiTextButton @on-click="navigateTo('https://coflnet.com/terms-of-service')" :gray="true" :sm="true">
+                <UiLinkLabel
+                  :href="'https://coflnet.com/terms-of-service'"
+                  :gray="true"
+                >
                   {{ $t('tos') }}
-                </UiTextButton>
+                </UiLinkLabel>
               </li>
             </ul>
           </div>
         </div>
       </div>
 
-      <UiFooterLabel class="border-t mt-8 pt-6 border-slate-700 text-center"
-        :label="$t('yearRights', new Date().getFullYear())" :sm="true" />
+      <UiFooterLabel
+        class="border-t mt-8 pt-6 border-slate-700 text-center"
+        :label="$t('yearRights', new Date().getFullYear())"
+        :sm="true"
+      />
     </div>
   </footer>
 </template>
