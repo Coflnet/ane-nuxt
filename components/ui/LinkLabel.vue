@@ -7,7 +7,7 @@
     :class="{
       'text-white hover:text-indigo-300': white,
       'text-indigo-400 hover:text-indigo-500 hover:underline ': !white,
-      'text-slate-400 hover:hover:text-indigo-400': gray,
+      'text-slate-400 hover:text-indigo-400': gray,
     }"
   >
     <slot />

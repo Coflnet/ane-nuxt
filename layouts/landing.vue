@@ -37,7 +37,8 @@
               aria-label="Header Get Started"
               class="px-4 py-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-900/20"
             >
-              {{ useUserStore().isLoggedIn ? $t('getStarted') : $t('overview') }}</a>
+              {{ useUserStore().isLoggedIn ? $t('overview') : $t('getStarted') }}
+            </a>
           </div>
         </div>
         <div class="md:hidden">
@@ -88,7 +89,7 @@
           :href="localePath(useUserStore().isLoggedIn ? '/filters/create' : '/overview')"
           class="block px-4 py-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition-all text-center shadow-lg shadow-indigo-900/20"
         >
-          {{ useUserStore().isLoggedIn ? $t('overview') :$t('getStarted') }}
+          {{ useUserStore().isLoggedIn ? $t('overview') : $t('getStarted') }}
         </a>
       </div>
     </nav>

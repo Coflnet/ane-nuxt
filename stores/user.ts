@@ -84,7 +84,7 @@ export const useUserStore = defineStore('user', () => {
   const getNotificationSettings = computed(() => notificationSettings.value)
   const isUserAnonymous = computed(() => isAnonymous.value)
 
-  const createdAccount = computed(() => isAnonymous.value || isAnonymous.value)
+  const createdAccount = computed(() => isAnonymous.value || isAuthenticated.value)
 
   const localePath = useLocalePath()
 
@@ -334,6 +334,7 @@ export const useUserStore = defineStore('user', () => {
     subscriptionStartDate,
     noPremium,
     remainingFilters,
+    createdAccount,
 
     // Getters
     isLoggedIn,
