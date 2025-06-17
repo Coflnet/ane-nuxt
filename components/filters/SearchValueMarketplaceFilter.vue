@@ -35,20 +35,14 @@ const hasBasicPlan = useUserStore().currentPlan?.product == 'basic' || !useUserS
 const premiumMarkets = ref(false)
 const model = defineModel<Filter>()
 
-const resolvedMarketplaceOptions = ref<Options[]>(marketplaces)
-
-// set visible marketplace based on user location
-const fetchMarketplaceOptions = async () => {
-  const isUs = await detectLocationNA()
-  resolvedMarketplaceOptions.value = isUs ? usMarketplaces : marketplaces
-}
+const resolvedMarketplaceOptions = ref<Options[]>(detectLocationNA() ? usMarketplaces : marketplaces)
 
 const selectedMarketplaces = ref<Options[]>([])
 
 watch(() => model.value!.marketplace, () => {
   selectedMarketplaces.value = []
   model.value?.marketplace.split(',').map((condidtionName) => {
-    const item = marketplaces.find(m => m.value == condidtionName)
+    const item = resolvedMarketplaceOptions.value.find(m => m.value == condidtionName)
     if (item)
       selectedMarketplaces.value.push(item)
   })
@@ -73,8 +67,4 @@ watch(selectedMarketplaces, (_) => {
       model.value!.frequency = '0 */6 * * *'
   }
 }, { deep: true })
-
-onMounted(() => {
-  fetchMarketplaceOptions()
-})
 </script>

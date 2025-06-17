@@ -47,7 +47,7 @@ export function valididateAllMarketplace(inputMarketplaces: Options[]): boolean 
   const hasPremiumMarketplace = inputMarketplaces.some(marketplace => marketplace.premium === true)
   if (hasPremiumMarketplace) return false
 
-  const allFreeMarketpllaces = filterFreeMarketplaces(inputMarketplaces)
+  const allFreeMarketpllaces = filterFreeMarketplaces(detectLocationNA() ? usMarketplaces : marketplaces)
 
   // check if the input is the same as the default free marketplaces
   return arraysHaveSameElements(allFreeMarketpllaces, inputMarketplaces)
@@ -58,7 +58,7 @@ function arraysHaveSameElements(arr1: Options[], arr2: Options[]): boolean {
 }
 
 // Validate if you are in na or eu for which marketplaces to display
-export async function detectLocationNA(): Promise<boolean> {
+export function detectLocationNA(): boolean {
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
   const continent = timeZone.split('/')[0]
 

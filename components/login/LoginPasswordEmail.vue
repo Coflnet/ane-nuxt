@@ -22,6 +22,7 @@
   </div>
   <UiButton
     class="w-full text-center"
+    aria-label="Sign in"
     :primary="true"
     @click="login"
   >
@@ -56,7 +57,7 @@ async function login() {
   const result = await userStore.signInWithEmailPassword(auth!, email.value, password.value, props.isLogin)
 
   if (!result || !result.success) {
-    push.error(t('errorCreatingAccountCreateOne'))
+    push.error(t('errorCreateAccountAlreadyRegistered'))
     return
   }
   userStore.isAuthenticated = true

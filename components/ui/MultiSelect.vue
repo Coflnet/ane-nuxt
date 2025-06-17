@@ -96,6 +96,10 @@ const emit = defineEmits<{
 const isOpen = ref(false)
 const selectedItems = ref<Options[]>([])
 
+watch(() => model, () => {
+  selectedItems.value = model.value!
+}, { deep: true })
+
 // create the string that is displayed on the button eq. Ebay, AutoScout24
 const selectedLabels = computed(() => {
   if (selectedItems.value.length === 0) return ''
@@ -133,9 +137,4 @@ const toggleSelection = (value: Options) => {
 onMounted(() => {
   toggleSelection(props.options![0]!)
 })
-
-// Select the first option when changing select marketplaces to different options
-watch(() => props.options, (newOptions) => {
-  toggleSelection(newOptions[0]!)
-}, { immediate: true })
 </script>

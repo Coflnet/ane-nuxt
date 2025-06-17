@@ -629,7 +629,7 @@
   "passwordResetSent": "Password reset link sent to your email address",
   "passwordResetError": "There was an error sending the password reset link, please try again",
   "fillOutRequestedFields": "Please fill out the requested fields",
-  "errorCreatingAccountCreateOne": "There was an error creating your account \n If you have not made a account yet try making one",
+  "errorCreateAccountAlreadyRegistered": "There was an issue creating your account, it seems this email is already registered. Please try logging in or use a different email.",
   "errorCreatingSubscription": "There was an error creating your subscription, please try again or contact support",
   "filterNotFound": "Filter not found if this continues please contact support"
 }

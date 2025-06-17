@@ -28,11 +28,13 @@
             >{{ $t('faqHeader') }}</a>
             <a
               :href="localePath('/login')"
+              aria-label="Header Sign In"
               class="px-4 py-2 rounded-full bg-gray-700 text-white hover:bg-gray-600 transition-all"
             >{{
               $t('signIn') }}</a>
             <a
               :href="localePath('/filters/create')"
+              aria-label="Header Get Started"
               class="px-4 py-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-900/20"
             >{{
               $t('getStarted') }}</a>
