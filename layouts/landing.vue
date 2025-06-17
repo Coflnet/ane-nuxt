@@ -3,7 +3,7 @@
     <nav class=" py-4 sticky top-0 z-50 bg-gray-900/80 backdrop-blur-md border-b border-gray-800">
       <div class="flex items-center justify-between container mx-auto">
         <div class="flex items-center ml-4">
-          <UiLogo :location="localePath(useUserStore().isLoggedIn ? '/' : '/overview')" />
+          <UiLogo :location="localePath(useUserStore().isLoggedIn ? '/overview': '/')" />
         </div>
         <div class="hidden md:block">
           <div class="flex items-center space-x-8">
@@ -33,7 +33,7 @@
             >{{
               $t('signIn') }}</a>
             <a
-              :href="localePath(useUserStore().isLoggedIn ? '/filters/create' : '/overview')"
+              :href="localePath(useUserStore().isLoggedIn ? '/overview' : '/filters/create')"
               aria-label="Header Get Started"
               class="px-4 py-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-900/20"
             >
