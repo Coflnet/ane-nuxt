@@ -41,7 +41,7 @@ const auth = useFirebaseAuth()
 
 async function resetPassword() {
   if (!email.value) {
-    push.error(t('enterEmailAdress'))
+    push.error(t('enterEmailAddress'))
     return
   }
   sendPasswordResetEmail(auth!, email.value)

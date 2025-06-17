@@ -47,10 +47,10 @@ export function valididateAllMarketplace(inputMarketplaces: Options[]): boolean 
   const hasPremiumMarketplace = inputMarketplaces.some(marketplace => marketplace.premium === true)
   if (hasPremiumMarketplace) return false
 
-  const allFreeMarketpllaces = filterFreeMarketplaces(detectLocationNA() ? usMarketplaces : marketplaces)
+  const allFreeMarketplaces = filterFreeMarketplaces(detectLocationNA() ? usMarketplaces : marketplaces)
 
   // check if the input is the same as the default free marketplaces
-  return arraysHaveSameElements(allFreeMarketpllaces, inputMarketplaces)
+  return arraysHaveSameElements(allFreeMarketplaces, inputMarketplaces)
 }
 
 function arraysHaveSameElements(arr1: Options[], arr2: Options[]): boolean {
