@@ -108,7 +108,6 @@
   "priceRange": "Preisbereich",
   "privacy": "Datenschutz",
   "privacyPolicy": "Datenrichterklärung",
-  "pushNotifications": "E-Mail, Discord & Push-Benachrichtigungen",
   "radiusEq": "z.B. {n}",
   "realTimeAlerts": "Echtzeit Benachrichtigungen",
   "receiveInstantAlerts": "\"Receive instant alerts when matching items are listed. Choose from email, discord, or push notifications.\"",
@@ -629,5 +628,7 @@
   "filterNotFound": "Filter nicht gefunden. Sollte dies weiterhin auftreten, wenden Sie sich bitte an den Support.",
   "setRadius": "Radius auswählen",
   "confirm": "Bestätigen",
-  "overview": "Überblick"
+  "overview": "Überblick",
+  "pushNotifications": "Alle Benachrichtigungskanäle",
+  "XPremiumSearchesOnSignUp": "{amount} Premium-Suchen bei der Registrierung"
 }
