@@ -15,6 +15,7 @@
     <div class="flex space-x-4">
       <UiInput
         v-model="model!.zipcode"
+        :disabled="model?.deliveryMethod.includes('shipping')"
         label-aria="Zip Code Input"
         :label="$t('zipCode')"
         :placeholder="$t('zipCodeEq')"
@@ -46,7 +47,7 @@ watch(() => model.value!.deliveryMethod, () => {
 // constuct the string send to backend here instead of in handleFilters()
 watch(deliveryKindSelected, () => {
   if (deliveryKindSelected.value.map(item => item.value).includes('all')) {
-    model.value!.deliveryMethod = ''
+    model.value!.deliveryMethod = 'all'
     return
   }
   model.value!.deliveryMethod = deliveryKindSelected.value.map(i => i.value).join(',')

@@ -262,7 +262,7 @@ async function filterToCreate(): Promise<ListingListener | null> {
   }
 
   const filterToCreate = {
-    name: rawFilter.name == '' ? rawFilter.searchValue : rawFilter.name,
+    name: rawFilter.searchValue.slice(0, 12),
     userId: '',
     id: filter.value.id,
     target: rawFilter.notificationTarget,
