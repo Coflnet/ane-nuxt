@@ -51,7 +51,7 @@ watch(() => model.value!.condition, () => {
 // constuct the string send to backend here instead of in handleFilters()
 watch(condiditonSelected, () => {
   if (condiditonSelected.value.map(item => item.value).includes('all')) {
-    model.value!.condition = ''
+    model.value!.condition = 'all'
     return
   }
   model.value!.condition = condiditonSelected.value.map(i => i.value).join(',')
