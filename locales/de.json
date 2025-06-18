@@ -1,10 +1,9 @@
 {
-  "XActiveFilters": "{amount} aktive Filter",
+  "XActiveFilters": "{amount} benutzerdefinierte Suchanfragen",
   "XMinuteDelay": "{amount} Minuten Verzögerung",
-  "XactiveFilters": "{amount} aktive Filter",
   "actions": "Aktionen",
   "active": "Aktiv",
-  "activeFilters": "Aktive Filter",
+  "activeFilters": "Benutzerdefinierte Suchanfragen",
   "add": "Hinzufügen",
   "addblacklistKeywords": "Keywörter hinzufügen, die von den Suchergebnissen ausgeschlossen werden",
   "addBlackListPressEnter": "Wort schreiben und Eingabe drücken",
