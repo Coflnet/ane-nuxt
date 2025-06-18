@@ -27,7 +27,7 @@
         </span>
       </div>
       <div class="mt-4">
-        <span class="text-4xl font-extrabold text-white">${{ plan.price }}</span>
+        <span class="text-4xl font-extrabold text-white">€{{ plan.price }}</span>
         <span class="text-gray-400 ml-1">{{ $t('month') }}</span>
       </div>
       <p class="mt-4 text-gray-400">

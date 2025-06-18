@@ -1,10 +1,9 @@
 {
-  "XActiveFilters": "{amount} aktive Filter",
+  "XActiveFilters": "{amount} benutzerdefinierte Suchanfragen",
   "XMinuteDelay": "{amount} Minuten Verzögerung",
-  "XactiveFilters": "{amount} aktive Filter",
   "actions": "Aktionen",
   "active": "Aktiv",
-  "activeFilters": "Aktive Filter",
+  "activeFilters": "Benutzerdefinierte Suchanfragen",
   "add": "Hinzufügen",
   "addblacklistKeywords": "Keywörter hinzufügen, die von den Suchergebnissen ausgeschlossen werden",
   "addBlackListPressEnter": "Wort schreiben und Eingabe drücken",
@@ -108,7 +107,6 @@
   "priceRange": "Preisbereich",
   "privacy": "Datenschutz",
   "privacyPolicy": "Datenrichterklärung",
-  "pushNotifications": "E-Mail, Discord & Push-Benachrichtigungen",
   "radiusEq": "z.B. {n}",
   "realTimeAlerts": "Echtzeit Benachrichtigungen",
   "receiveInstantAlerts": "\"Receive instant alerts when matching items are listed. Choose from email, discord, or push notifications.\"",
@@ -629,5 +627,7 @@
   "filterNotFound": "Filter nicht gefunden. Sollte dies weiterhin auftreten, wenden Sie sich bitte an den Support.",
   "setRadius": "Radius auswählen",
   "confirm": "Bestätigen",
-  "overview": "Überblick"
+  "overview": "Überblick",
+  "pushNotifications": "Alle Benachrichtigungskanäle",
+  "XPremiumSearchesOnSignUp": "{amount} Premium-Suchen bei der Registrierung"
 }
