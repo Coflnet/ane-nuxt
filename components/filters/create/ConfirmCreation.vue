@@ -35,16 +35,15 @@
 <script setup lang="ts">
 defineProps({ isNewFilter: Boolean, saving: Boolean })
 
-const initialViewportHeight = window.innerHeight
-
 const floatingButtonBottom = ref('24px')
+let initialViewportHeight: number | undefined
 
 const handleResize = () => {
   if (window.innerWidth < 768) {
     const currentViewportHeight = window.innerHeight
 
     // move the button up if the keyboard it open
-    if (currentViewportHeight < initialViewportHeight - 200) {
+    if (initialViewportHeight && currentViewportHeight < initialViewportHeight - 200) {
       floatingButtonBottom.value = `${initialViewportHeight - currentViewportHeight + 24}px`
     }
     else {
@@ -69,6 +68,8 @@ const handleVisualViewportResize = () => {
 }
 
 onMounted(() => {
+  initialViewportHeight = window.innerHeight
+
   if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', handleVisualViewportResize)
   }

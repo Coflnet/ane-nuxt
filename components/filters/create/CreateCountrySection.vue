@@ -15,6 +15,7 @@
     <div class="flex space-x-4">
       <UiInput
         v-model="model!.zipcode"
+        :disabled="model?.deliveryMethod.includes('shipping')"
         label-aria="Zip Code Input"
         :label="$t('zipCode')"
         :placeholder="$t('zipCodeEq')"
