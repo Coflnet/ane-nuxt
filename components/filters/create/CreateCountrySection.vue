@@ -46,7 +46,7 @@ watch(() => model.value!.deliveryMethod, () => {
 // constuct the string send to backend here instead of in handleFilters()
 watch(deliveryKindSelected, () => {
   if (deliveryKindSelected.value.map(item => item.value).includes('all')) {
-    model.value!.deliveryMethod = ''
+    model.value!.deliveryMethod = 'all'
     return
   }
   model.value!.deliveryMethod = deliveryKindSelected.value.map(i => i.value).join(',')
