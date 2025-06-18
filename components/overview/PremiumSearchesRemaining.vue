@@ -8,7 +8,7 @@
         :progress="usedSearches"
         :min="0"
         :max="currentSearches"
-        :end-label="$t('totalSearches', {amount:currentSearches})"
+        :end-label="$t('totalSearches', { amount: currentSearches })"
         :indicator-text="`${$t('remainingRequests')} ${currentSearches - usedSearches}`"
       />
       <UiLinkLabel href="/subscriptions">

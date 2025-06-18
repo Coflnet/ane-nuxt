@@ -620,5 +620,8 @@
   "appHeaderBeta": "Beta",
   "noAvailableFilters": "You have no remaining filters upgrade your plan to create more filters",
   "copyReferralCode": "Copy Referral Code",
-  "copyReferralCodeSuccess": "Referral code copied to clipboard"
+  "copyReferralCodeSuccess": "Referral code copied to clipboard",
+  "youGotRefered": "You Got Refered",
+  "someoneInvitedYou": "Someone has invited you to use ANE!",
+  "referedDetails": "After you login you will gain a additional 180 premium requests"
 }

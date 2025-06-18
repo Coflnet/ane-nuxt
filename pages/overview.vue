@@ -30,6 +30,7 @@
       <OverviewTopFilters :top-filters="topFilters" />
       <OverviewPremiumSearchesRemaining />
     </UiGrid>
+    <OverviewReferedPopup v-model="openRefered" />
   </div>
 </template>
 
@@ -40,6 +41,13 @@ import type { FilterMatch } from '~/src/api-client'
 import type { TopFilter } from '~/types/FilterType'
 
 const { t } = useI18n()
+
+const router = useRouter()
+const refered = router.currentRoute.value.query.refer as string | undefined
+
+const openRefered = computed(() => {
+  return refered == null
+})
 
 const loading = ref(true)
 
