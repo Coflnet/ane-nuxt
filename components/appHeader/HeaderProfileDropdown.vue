@@ -102,7 +102,7 @@ async function logout() {
   await userStore.logout()
   isProfileMenuOpen.value = true
   localStorage.clear()
-  navigateTo(localePath('/register'))
+  navigateTo(localePath('/login'))
 }
 
 onMounted(async () => {
