@@ -16,74 +16,9 @@
       {{ isNewFilter ? $t('createFilter') : $t('updateFilter') }}
     </UiButton>
   </div>
-  <div
-    class="block md:hidden fixed right-6"
-    :style="{ bottom: floatingButtonBottom }"
-  >
-    <UiButton
-      :primary="true"
-      aria-label="Save Filter"
-      type="submit"
-      :proccessing="saving"
-      class="shadow-xl shadow-black/30"
-    >
-      {{ isNewFilter ? $t('createFilter') : $t('updateFilter') }}
-    </UiButton>
-  </div>
 </template>
 
 <script setup lang="ts">
 defineProps({ isNewFilter: Boolean, saving: Boolean })
-
-const floatingButtonBottom = ref('24px')
-let initialViewportHeight: number | undefined
-
-const handleResize = () => {
-  if (window.innerWidth < 768) {
-    const currentViewportHeight = window.innerHeight
-
-    // move the button up if the keyboard it open
-    if (initialViewportHeight && currentViewportHeight < initialViewportHeight - 200) {
-      floatingButtonBottom.value = `${initialViewportHeight - currentViewportHeight + 24}px`
-    }
-    else {
-      floatingButtonBottom.value = '24px'
-    }
-  }
-}
-
-const handleVisualViewportResize = () => {
-  if (window.visualViewport) {
-    const keyboardOpen = window.visualViewport.height < window.innerHeight
-    if (keyboardOpen) {
-      floatingButtonBottom.value = `${(window.innerHeight - window.visualViewport.height) + 24}px`
-    }
-    else {
-      floatingButtonBottom.value = '24px'
-    }
-  }
-  else {
-    handleResize()
-  }
-}
-
-onMounted(() => {
-  initialViewportHeight = window.innerHeight
-
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', handleVisualViewportResize)
-  }
-  else {
-    window.addEventListener('resize', handleResize)
-  }
-})
-
-onUnmounted(() => {
-  if (window.visualViewport) {
-    window.visualViewport.removeEventListener('resize', handleVisualViewportResize)
-  }
-  else {
-    window.removeEventListener('resize', handleResize)
-  }
-})
 </script>
+
