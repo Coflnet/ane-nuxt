@@ -1,6 +1,15 @@
 <template>
   <div>
     <FiltersCreateHeader :is-new-filter="isNewFilter" />
+    <UiButton
+      :primary="true"
+      aria-label="Save Filter"
+      class="w-full block md:hidden mb-4"
+      @on-click="saveFilter"
+    >
+      {{ isNewFilter ? $t('createFilter') : $t('updateFilter') }}
+    </UiButton>
+
     <UiDefaultContainer class="mb-6 p-6">
       <form @submit.prevent="saveFilter">
         <FiltersSearchValueMarketplaceFilter v-model="filter" />
