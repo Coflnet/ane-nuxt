@@ -66,6 +66,8 @@
           {{ $t('subscriptions') }}
         </UiLinkButton>
 
+        <AppHeaderCopyReferralCodeButton />
+
         <UiTextButton
           v-for="locale in availableLocales"
           :key="locale.code"
@@ -79,7 +81,6 @@
           />
           {{ locale.name }}
         </UiTextButton>
-        <AppHeaderCopyReferralCodeButton />
       </div>
     </transition>
   </div>
