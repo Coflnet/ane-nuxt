@@ -623,5 +623,7 @@
   "copyReferralCodeSuccess": "Referral code copied to clipboard",
   "youGotRefered": "You Got Refered",
   "someoneInvitedYou": "Someone has invited you to use ANE!",
-  "referedDetails": "After you login you will gain a additional 180 premium requests"
+  "referedDetails": "After you login you will gain a additional 180 premium requests",
+  "maybeLater": "Maybe Later",
+  "startUsingApp": "You can start using ANE for free no credit card or email required"
 }

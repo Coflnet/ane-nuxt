@@ -42,12 +42,7 @@ import type { TopFilter } from '~/types/FilterType'
 
 const { t } = useI18n()
 
-const router = useRouter()
-const refered = router.currentRoute.value.query.refer as string | undefined
-
-const openRefered = computed(() => {
-  return refered == null
-})
+const openRefered = ref(false)
 
 const loading = ref(true)
 
@@ -111,6 +106,7 @@ function getAverageMatchesPerHour(matches: FilterMatch[]) {
 
 onMounted(async () => {
   await useUserStore().checkAuth(useFirebaseAuth()!)
+
   await Promise.allSettled([filterStore.loadFilters(), listingStore.loadMatches()])
   loadStats()
   filterStore.loadFilters()

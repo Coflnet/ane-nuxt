@@ -55,6 +55,8 @@ export const useUserStore = defineStore('user', () => {
   const subscriptionStartDate = ref('')
   const noPremium = ref<boolean | null>(null)
   const remainingFilters = ref<number>(3)
+  const acceptingReferralCode = ref<string>('')
+  const userReferralCode = ref<string>('')
 
   const notificationSettings = ref<NotificationSettings>({
     discord: {
@@ -332,6 +334,8 @@ export const useUserStore = defineStore('user', () => {
     subscriptionStartDate,
     noPremium,
     remainingFilters,
+    acceptingReferralCode,
+    userReferralCode,
 
     // Getters
     isLoggedIn,
