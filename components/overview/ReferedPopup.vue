@@ -1,7 +1,7 @@
 <template>
   <Teleport to="body">
     <div
-      v-if="model"
+      v-if="open"
       class="fixed inset-0 z-50 overflow-y-auto"
     >
       <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" />
@@ -77,7 +77,7 @@ const localePath = useLocalePath()
 const open = ref(false)
 
 const router = useRouter()
-const referred = router.currentRoute.value.query.refer as string | undefined
+const referred = router.currentRoute.value.query.ref as string | undefined
 
 function closePopup() {
   open.value = false

@@ -79,17 +79,7 @@
           />
           {{ locale.name }}
         </UiTextButton>
-        <UiTextButton
-          aria-label="Profile Copy Refferal Code Button"
-          class="m-1 mt-2"
-          @on-click="copyReferralCode"
-        >
-          <Icon
-            name="tabler:clipboard-copy"
-            class="w-4 h-4 mr-2"
-          />
-          {{ $t('copyReferralCode') }}
-        </UiTextButton>
+        <AppHeaderCopyReferralCodeButton />
       </div>
     </transition>
   </div>
@@ -114,14 +104,6 @@ async function logout() {
   isProfileMenuOpen.value = true
   localStorage.clear()
   navigateTo(localePath('/register'))
-}
-
-function copyReferralCode() {
-  const referralCode = 'Refferal Code'
-  if (referralCode) {
-    navigator.clipboard.writeText(referralCode)
-    push.success(t('copyReferralCodeSuccess'))
-  }
 }
 
 onMounted(async () => {

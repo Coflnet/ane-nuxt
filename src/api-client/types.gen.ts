@@ -7,6 +7,16 @@ export type ActiveSubscription = {
     endsAt?: string | null;
 };
 
+export type DetailedLocation = {
+    lat?: number;
+    lon?: number;
+    name?: string | null;
+    /**
+     * The country code of the location, e.g., "US" for the United States.
+     */
+    country?: string | null;
+};
+
 export type FilterInfo = {
     name?: string | null;
     value?: string | null;
@@ -24,6 +34,16 @@ export type FilterOptions = {
 };
 
 export type FilterType = 'Options' | 'NumberRange' | 'Text' | 'Date' | 'Radius' | 'Bool' | 'MultiSelect';
+
+export type InviteLink = {
+    userId?: string;
+    id?: string;
+    name?: string | null;
+    text?: string | null;
+    createdAt?: string;
+    expiresAt?: string;
+    usageCount?: number;
+};
 
 export type Listing = {
     priceKind?: PriceKind;
@@ -88,6 +108,10 @@ export type ProblemDetails = {
     detail?: string | null;
     instance?: string | null;
     [key: string]: unknown | (string | null) | (string | null) | (number | null) | (string | null) | (string | null) | undefined;
+};
+
+export type ReferralInfo = {
+    invitedCount?: number;
 };
 
 export type ResultReport = {
@@ -624,6 +648,110 @@ export type TestFilterResponses = {
 
 export type TestFilterResponse = TestFilterResponses[keyof TestFilterResponses];
 
+export type GetLocationData = {
+    body?: never;
+    path: {
+        zip: string;
+    };
+    query?: never;
+    url: '/api/location/{zip}';
+};
+
+export type GetLocationErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetLocationError = GetLocationErrors[keyof GetLocationErrors];
+
+export type GetLocationResponses = {
+    /**
+     * OK
+     */
+    200: DetailedLocation;
+};
+
+export type GetLocationResponse = GetLocationResponses[keyof GetLocationResponses];
+
+export type GetCountryData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/country';
+};
+
+export type GetCountryErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetCountryError = GetCountryErrors[keyof GetCountryErrors];
+
+export type GetCountryResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type GetCountryResponse = GetCountryResponses[keyof GetCountryResponses];
+
 export type GetMatchesData = {
     body?: never;
     path?: never;
@@ -983,6 +1111,266 @@ export type DoRedirectErrors = {
 export type DoRedirectError = DoRedirectErrors[keyof DoRedirectErrors];
 
 export type DoRedirectResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type GetInfoData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/referral/info';
+};
+
+export type GetInfoErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetInfoError = GetInfoErrors[keyof GetInfoErrors];
+
+export type GetInfoResponses = {
+    /**
+     * OK
+     */
+    200: ReferralInfo;
+};
+
+export type GetInfoResponse = GetInfoResponses[keyof GetInfoResponses];
+
+export type CreateLinkData = {
+    body?: never;
+    path?: never;
+    query?: {
+        name?: string;
+        text?: string;
+    };
+    url: '/api/referral/link';
+};
+
+export type CreateLinkErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type CreateLinkError = CreateLinkErrors[keyof CreateLinkErrors];
+
+export type CreateLinkResponses = {
+    /**
+     * OK
+     */
+    200: InviteLink;
+};
+
+export type CreateLinkResponse = CreateLinkResponses[keyof CreateLinkResponses];
+
+export type ListLinksData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/referral/links';
+};
+
+export type ListLinksErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type ListLinksError = ListLinksErrors[keyof ListLinksErrors];
+
+export type ListLinksResponses = {
+    /**
+     * OK
+     */
+    200: Array<InviteLink>;
+};
+
+export type ListLinksResponse = ListLinksResponses[keyof ListLinksResponses];
+
+export type GetLinkData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/referral/link/{id}';
+};
+
+export type GetLinkErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetLinkError = GetLinkErrors[keyof GetLinkErrors];
+
+export type GetLinkResponses = {
+    /**
+     * OK
+     */
+    200: InviteLink;
+};
+
+export type GetLinkResponse = GetLinkResponses[keyof GetLinkResponses];
+
+export type UseLinkData = {
+    body?: never;
+    path?: never;
+    query?: {
+        inviter?: string;
+    };
+    url: '/api/referral/use';
+};
+
+export type UseLinkErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type UseLinkError = UseLinkErrors[keyof UseLinkErrors];
+
+export type UseLinkResponses = {
     /**
      * OK
      */

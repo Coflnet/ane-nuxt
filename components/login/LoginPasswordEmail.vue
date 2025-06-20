@@ -44,6 +44,8 @@ const localePath = useLocalePath()
 const router = useRouter()
 const redirectTo = router.currentRoute.value.query.redirectTo as string | undefined
 
+const { t } = useI18n()
+
 async function login() {
   if (!email.value || !password.value) {
     push.error('Please fill in all fields')
@@ -59,6 +61,17 @@ async function login() {
   }
   userStore.isAuthenticated = true
   userStore.isAnonymous = false
+  if (userStore.acceptingReferralCode != null) {
+    const useRefferalResult = await userStore.useRefferalCode()
+    if (useRefferalResult) {
+      push.success(t('successfullReffer'))
+      userStore.userReferralCode = ''
+    }
+    else {
+      push.error(t('errorReffering'))
+    }
+  }
+
   navigateTo(localePath(redirectTo ?? props.isLogin ? '/overview' : '/filters/create'))
 }
 </script>
