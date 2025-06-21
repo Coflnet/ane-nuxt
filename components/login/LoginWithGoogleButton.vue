@@ -31,7 +31,7 @@ async function loginWithGoogle() {
     userStore.isAuthenticated = true
     userStore.isAnonymous = false
 
-    if (userStore.acceptingReferralCode != null) {
+    if (userStore.acceptingReferralCode != '') {
       const useRefferalResult = await userStore.useRefferalCode()
       if (useRefferalResult) {
         push.success(t('successfullReffer'))

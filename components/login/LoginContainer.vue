@@ -11,6 +11,7 @@
     <UiFooterLabel class="mt-4 flex">
       {{ isLogin ? $t('dontHaveAccount') : $t('alreadyHaveAccount') }}
       <UiLinkLabel
+        label-aria="toggle-login"
         :href="isLogin ? localePath('/register') : localePath('/login')"
         class="ml-1"
       >

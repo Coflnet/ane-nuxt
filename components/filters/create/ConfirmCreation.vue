@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center justify-end space-x-4 pt-6 border-t border-slate-700 mt-6">
+  <div class="items-center justify-end space-x-4 pt-6 border-t border-slate-700 mt-6 hidden md:flex">
     <NuxtLink
       to="/filters"
       aria-label="Cancel Filter Creation"
@@ -21,3 +21,4 @@
 <script setup lang="ts">
 defineProps({ isNewFilter: Boolean, saving: Boolean })
 </script>
+

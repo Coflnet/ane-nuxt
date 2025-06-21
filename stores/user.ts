@@ -86,6 +86,8 @@ export const useUserStore = defineStore('user', () => {
   const getNotificationSettings = computed(() => notificationSettings.value)
   const isUserAnonymous = computed(() => isAnonymous.value)
 
+  const createdAccount = computed(() => isAnonymous.value || isAuthenticated.value)
+
   const localePath = useLocalePath()
 
   async function generateReferralCode(): Promise<string> {
@@ -365,6 +367,7 @@ export const useUserStore = defineStore('user', () => {
     remainingFilters,
     acceptingReferralCode,
     userReferralCode,
+    createdAccount,
 
     // Getters
     isLoggedIn,

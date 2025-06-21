@@ -1,9 +1,18 @@
 <template>
   <div>
     <FiltersCreateHeader :is-new-filter="isNewFilter" />
+    <UiButton
+      :primary="true"
+      aria-label="Save Filter"
+      class="w-full block md:hidden mb-4"
+      @on-click="saveFilter"
+    >
+      {{ isNewFilter ? $t('createFilter') : $t('updateFilter') }}
+    </UiButton>
+
     <UiDefaultContainer class="mb-6 p-6">
       <form @submit.prevent="saveFilter">
-        <FiltersSearchValueMarketplaceFilter :model-value="filter" />
+        <FiltersSearchValueMarketplaceFilter v-model="filter" />
 
         <FiltersPriceConditionFilter v-model="filter" />
         <FiltersCreateCountrySection :model-value="filter" />
@@ -48,6 +57,7 @@ import { getMessaging, getToken } from 'firebase/messaging'
 import { useFirebaseApp } from 'vuefire'
 import type { FilterMatch, ListingListener } from '~/src/api-client'
 import type { Filter } from '~/types/FilterType'
+import { constructOptionsFromString, detectLocationNA, filterFreeMarketplaces, marketplaces, usMarketplaces, valididateAllMarketplace } from '~/constants/CreateFilterConstants'
 
 const { debounce } = lodash
 
@@ -106,10 +116,8 @@ async function testFilter() {
   try {
     const f = await filterToCreate()
 
-    if (!f) {
-      push.error('Please fill out all required fields')
+    if (!f)
       return
-    }
     const res = await filterStore.testFilter(f)
     if (res) {
       // this is required because recnet match container is used for both this the test endpoint and overview table
@@ -176,9 +184,19 @@ async function loadEditParam() {
           filter.value.maxPrice = Number(max)
           break
         }
-        case 'IncludePlatforms':
+        case 'IncludePlatforms': {
+          // construct the selected marketplaces from the string to test if it is all marketplaces selected
+          console.log(item.value)
+          const constuctedArray = constructOptionsFromString(item.value ?? '')
+          if (valididateAllMarketplace(constuctedArray)) {
+            filter.value.marketplace = 'all'
+            console.log ('break')
+            break
+          }
           filter.value.marketplace = item.value ?? ''
+          console.log(filter.value.marketplace, ' hi')
           break
+        }
         case 'CommercialSeller':
           filter.value.commercialSeller = Boolean(item.value)
           break
@@ -206,7 +224,7 @@ async function loadEditParam() {
   }
   catch (e) {
     console.error(e)
-    push.error(`${t('weRanIssue')}\n ${e}`)
+    push.error(`${t('weRanIntoAnError')}\n ${e}`)
   }
 }
 
@@ -215,8 +233,10 @@ async function saveFilter() {
     savingFilter.value = true
     const f = await filterToCreate()
 
-    if (!f)
+    if (!f) {
+      console.log('aborting')
       return
+    }
     await filterStore.saveFilter(f)
     push.success('Filter successfully saved')
     navigateTo(localePath('/overview'))
@@ -224,7 +244,7 @@ async function saveFilter() {
   catch (e) {
     savingFilter.value = false
     console.error(e)
-    push.error(t('weRanIssue'))
+    push.error(t('weRanIntoAnError'))
   }
   finally {
     savingFilter.value = false
@@ -251,7 +271,7 @@ async function filterToCreate(): Promise<ListingListener | null> {
   }
 
   const filterToCreate = {
-    name: rawFilter.name == '' ? rawFilter.searchValue : rawFilter.name,
+    name: rawFilter.searchValue.slice(0, 12),
     userId: '',
     id: filter.value.id,
     target: rawFilter.notificationTarget,
@@ -282,8 +302,15 @@ async function handleFilters(): Promise<{ name: string, value: any }[]> {
   if (rawFilter.deliveryMethod != '')
     filters.push({ name: 'DeliveryMethod', value: rawFilter.deliveryMethod })
 
-  if (rawFilter.marketplace != '')
+  if (rawFilter.marketplace != 'all') {
     filters.push({ name: 'IncludePlatforms', value: rawFilter.marketplace })
+  }
+  else {
+    // input marketplace depending on location
+    const isUs = await detectLocationNA()
+    const marketplacesArray = filterFreeMarketplaces(isUs ? usMarketplaces : marketplaces)
+    filters.push({ name: 'IncludePlatforms', value: marketplacesArray.map(m => m.value).join(',') })
+  }
 
   if (rawFilter.commercialSeller)
     filters.push({ name: 'CommercialSeller', value: true })
@@ -308,22 +335,25 @@ async function handleFilters(): Promise<{ name: string, value: any }[]> {
 async function handleSearchRadius(): Promise<[string, string]> {
   // If you are looking at this... I am sorry
   try {
-    const response = await fetch('https://ipapi.co/json/')
-    const data = await response.json()
-    const url = `https://nominatim.openstreetmap.org/search?postalcode=${filter.value.zipcode}&country=${data.country_name}&format=json`
-    const response2 = await fetch(url)
-    const data2 = await response2.json()
-    if (data2.length == 0) {
-      push.error(t('enteringZipCodeError'))
-      savingFilter.value = false
+    const locationData = await getLocation(
+      {
+        path: { zip: filter.value.zipcode },
+        composable: '$fetch',
+      },
+    )
+
+    if (locationData.lat == 0 && locationData.lon == 0) {
+      push.error(t('invalidZipCode'))
+      radiusError.value = true
       return ['', '']
     }
-    return [data2[0].lat, data2[0].lon]
+
+    return [String(locationData.lat), String(locationData.lon)]
   }
   catch (error) {
     console.error('Error fetching country:', error)
     savingFilter.value = false
-    push.error(`${t('weRanIssue')}\n ${error}`)
+    push.error(`${t('issueGettingLocationData')}\n ${error}`)
   }
   return ['', '']
 }

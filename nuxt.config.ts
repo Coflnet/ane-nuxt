@@ -23,7 +23,7 @@ export default defineNuxtConfig({
   ],
 
   site: {
-    url: 'https://ane.deals.com',
+    url: 'https://ane.deals',
     name: 'Ane Deals',
   },
 

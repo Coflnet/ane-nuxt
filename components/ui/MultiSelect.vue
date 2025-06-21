@@ -36,7 +36,7 @@
         />
       </ListboxButton>
       <ListboxOptions
-        class="absolute z-10 mt-1 w-full rounded-lg border border-slate-600 bg-slate-800 shadow-lg max-h-60"
+        class="absolute z-10 mt-1 w-full rounded-lg border border-slate-600 bg-slate-800 shadow-lg"
       >
         <ListboxOption
           v-for="item in options"
@@ -57,11 +57,11 @@
           <div class="w-full justify-between flex">
             <span class="text-white">{{ $t(item.label) }}</span>
             <UiTooltipHover
+              v-if="item.premium"
               :text="$t('premiumHoverExplanation')"
               class="max-w-28"
             >
               <div
-                v-if="item.premium"
                 class="rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 px-4 text-white font-medium"
               >
                 {{ $t('premium') }}
@@ -77,12 +77,7 @@
 <script setup lang="ts">
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/vue'
 import { UiHeaderLabel } from '#components'
-
-interface Options {
-  value: string
-  label: string
-  premium?: boolean
-}
+import type { Options } from '~/constants/CreateFilterConstants'
 
 const { t } = useI18n()
 const model = defineModel<Options[]>()
@@ -100,6 +95,10 @@ const emit = defineEmits<{
 
 const isOpen = ref(false)
 const selectedItems = ref<Options[]>([])
+
+watch(() => model, () => {
+  selectedItems.value = model.value!
+}, { deep: true })
 
 // create the string that is displayed on the button eq. Ebay, AutoScout24
 const selectedLabels = computed(() => {

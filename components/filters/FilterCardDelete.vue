@@ -5,7 +5,10 @@
       class="mt-0.5 ml-1"
       @click="isModalOpen = true"
     >
-      <UiIcon name="tabler:trash" />
+      <UiIcon
+        name="tabler:trash"
+        :large="true"
+      />
     </button>
 
     <UiConformationPopup

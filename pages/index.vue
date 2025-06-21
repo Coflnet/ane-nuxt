@@ -27,10 +27,10 @@
             </p>
             <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
               <a
-                :href="localePath('/filters/create')"
+                :href="localePath(useUserStore().isLoggedIn ? '/filters/create' : '/overview')"
                 class="px-8 py-4 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition-all text-center shadow-lg shadow-indigo-900/20 font-medium"
               >
-                {{ $t('hero.startFree') }}
+                {{ useUserStore().isLoggedIn ? $t('overview') : $t('hero.startFree') }}
               </a>
             </div>
           </div>

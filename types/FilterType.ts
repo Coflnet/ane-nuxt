@@ -3,6 +3,7 @@ type TargetType = 'Unknown' | 'FireBase' | 'DiscordWebhook' | 'Email' | 'WhatsAp
 export interface TopFilter {
   name: string
   matches: number
+  id: string
   keywords: string[]
 }
 

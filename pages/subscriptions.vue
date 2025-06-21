@@ -97,7 +97,7 @@ async function getCurrentSubscription() {
       endDate.value = new Date(result[0]?.endsAt ?? '')
   }
   catch (error) {
-    push.error(t('errorRequesting'))
+    push.error(`${t('errorCreatingSubscription')} ${error}`)
     console.error(error)
   }
 }

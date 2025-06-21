@@ -115,15 +115,19 @@ function handleWindowState() {
 
 async function loadSearchRadius() {
   try {
-    const response = await fetch('https://ipapi.co/json/')
-    const data = await response.json()
-    const url = `https://nominatim.openstreetmap.org/search?postalcode=${model!.value!.zipcode}&country=${data.country_name}&format=json`
-    const response2 = await fetch(url)
-    const data2 = await response2.json()
-    if (data2.length == 0) {
-      push.error(t('enteringZipCodeError'))
+    const locationData = await getLocation(
+      {
+        path: { zip: model!.value!.zipcode },
+        composable: '$fetch',
+      },
+    )
+
+    if (locationData.lat == 0 && locationData.lon == 0) {
+      push.error(t('invalidZipCode'))
+      return ['', '']
     }
-    userLocation.value = [data2[0].lat, data2[0].lon]
+
+    userLocation.value = [locationData.lat ?? 0, locationData.lon ?? 0]
     model!.value!.searchRadius = 40
   }
   catch (error) {
