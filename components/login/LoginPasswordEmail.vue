@@ -65,7 +65,7 @@ async function login() {
   if (userStore.acceptingReferralCode != '') {
     const useRefferalResult = await userStore.useRefferalCode()
     if (useRefferalResult) {
-      push.success(t('successfullReffer'))
+      push.success(t('successfullReferral'))
       userStore.userReferralCode = ''
     }
     else {

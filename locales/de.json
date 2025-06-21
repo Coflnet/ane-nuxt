@@ -631,5 +631,13 @@
   "pushNotifications": "Alle Benachrichtigungskanäle",
   "XPremiumSearchesOnSignUp": "{amount} Premium-Suchen bei der Registrierung",
   "copyReferralCode": "Empfehlungscode kopieren",
-  "copyReferralCodeSuccess": "Empfehlungscode in die Zwischenablage kopiert"
+  "copyReferralCodeSuccess": "Empfehlungscode in die Zwischenablage kopiert",
+  "youGotRefered": "Sie wurden geworben",
+  "someoneInvitedYou": "Jemand hat Sie eingeladen, ANE zu nutzen!",
+  "referedDetails": "Nach dem Login erhalten Sie zusätzlich 180 Premium-Anfragen",
+  "maybeLater": "Vielleicht später",
+  "startUsingApp": "Sie können ANE kostenlos nutzen, keine Kreditkarte oder E-Mail erforderlich",
+  "errorCopyingReferralCode": "Beim Abrufen Ihres Empfehlungscodes ist ein Fehler aufgetreten. Bitte aktualisieren Sie die Seite und versuchen Sie es erneut. Wenn das Problem weiterhin besteht, wenden Sie sich bitte an den Support.",
+  "successfullReferral": "Das Einlösen Ihres Empfehlungsbonus war erfolgreich!",
+  "errorReffering": "Beim Einlösen Ihres Empfehlungsbonus ist ein Fehler aufgetreten. Bitte wenden Sie sich an den Support."
 }
