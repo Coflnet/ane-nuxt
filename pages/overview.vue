@@ -30,6 +30,7 @@
       <OverviewTopFilters :top-filters="topFilters" />
       <OverviewPremiumSearchesRemaining />
     </UiGrid>
+    <OverviewReferedPopup v-model="openRefered" />
   </div>
 </template>
 
@@ -40,6 +41,8 @@ import type { FilterMatch } from '~/src/api-client'
 import type { TopFilter } from '~/types/FilterType'
 
 const { t } = useI18n()
+
+const openRefered = ref(false)
 
 const loading = ref(true)
 
@@ -104,6 +107,7 @@ function getAverageMatchesPerHour(matches: FilterMatch[]) {
 
 onMounted(async () => {
   await useUserStore().checkAuth(useFirebaseAuth()!)
+
   await Promise.allSettled([filterStore.loadFilters(), listingStore.loadMatches()])
   loadStats()
   filterStore.loadFilters()

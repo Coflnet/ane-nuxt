@@ -62,6 +62,17 @@ async function login() {
   }
   userStore.isAuthenticated = true
   userStore.isAnonymous = false
+  if (userStore.acceptingReferralCode != '') {
+    const useRefferalResult = await userStore.useRefferalCode()
+    if (useRefferalResult) {
+      push.success(t('successfullReferral'))
+      userStore.acceptingReferralCode = ''
+    }
+    else {
+      push.error(t('errorReffering'))
+    }
+  }
+
   navigateTo(localePath(redirectTo ?? props.isLogin ? '/overview' : '/filters/create'))
 }
 </script>

@@ -31,6 +31,17 @@ async function loginWithGoogle() {
     userStore.isAuthenticated = true
     userStore.isAnonymous = false
 
+    if (userStore.acceptingReferralCode != '') {
+      const useRefferalResult = await userStore.useRefferalCode()
+      if (useRefferalResult) {
+        push.success(t('successfullReferral'))
+        userStore.userReferralCode = ''
+      }
+      else {
+        push.error(t('errorReffering'))
+      }
+    }
+
     navigateTo(localePath(redirectTo ?? googleSignInRequest.newUser ? '/filters/create' : '/overview'))
     return
   }

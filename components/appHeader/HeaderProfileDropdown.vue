@@ -66,6 +66,8 @@
           {{ $t('subscriptions') }}
         </UiLinkButton>
 
+        <AppHeaderCopyReferralCodeButton />
+
         <UiTextButton
           v-for="locale in availableLocales"
           :key="locale.code"
@@ -85,7 +87,7 @@
 </template>
 
 <script setup lang="ts">
-const { locale, locales } = useI18n()
+const { locale, locales, t } = useI18n()
 const localePath = useLocalePath()
 const switchLocalePath = useSwitchLocalePath()
 

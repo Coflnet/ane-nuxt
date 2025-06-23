@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { createUserWithEmailAndPassword, type EmailAuthCredential, EmailAuthProvider, GoogleAuthProvider, linkWithCredential, linkWithPopup, signInAnonymously, signInWithEmailAndPassword, signInWithPopup, type Auth, updateProfile, type UserCredential, getAdditionalUserInfo } from 'firebase/auth'
 import { navigateTo } from '#app'
-import { getStats, loginFirebase } from '~/src/api-client'
+import { getStats, loginFirebase, useLink } from '~/src/api-client'
 import type { ActiveSubscription } from '#hey-api'
 
 // Types
@@ -55,6 +55,8 @@ export const useUserStore = defineStore('user', () => {
   const subscriptionStartDate = ref('')
   const noPremium = ref<boolean | null>(null)
   const remainingFilters = ref<number>(3)
+  const acceptingReferralCode = ref<string>('')
+  const userReferralCode = ref<string>('')
 
   const notificationSettings = ref<NotificationSettings>({
     discord: {
@@ -87,6 +89,35 @@ export const useUserStore = defineStore('user', () => {
   const createdAccount = computed(() => isAnonymous.value || isAuthenticated.value)
 
   const localePath = useLocalePath()
+
+  async function generateReferralCode(): Promise<string> {
+    const apiToken = `Bearer ${token.value}`
+    const refCode = await createLink({
+      composable: '$fetch',
+      query: { name: 'i', text: 'i' },
+      headers: { Authorization: apiToken },
+    })
+
+    return refCode.id ?? ''
+  }
+
+  async function useRefferalCode(): Promise<boolean> {
+    console.log(acceptingReferralCode.value)
+
+    const apiToken = `Bearer ${token.value}`
+    try {
+      await useLink({
+        composable: '$fetch',
+        query: { inviter: acceptingReferralCode.value },
+        headers: { Authorization: apiToken },
+      })
+      return true
+    }
+    catch (error) {
+      console.error(error)
+      return false
+    }
+  }
 
   async function loginWithGoogle(clientAuth: Auth, login: boolean): Promise<{ success: boolean, error?: string | null, newUser?: boolean }> {
     isLoading.value = true
@@ -334,6 +365,8 @@ export const useUserStore = defineStore('user', () => {
     subscriptionStartDate,
     noPremium,
     remainingFilters,
+    acceptingReferralCode,
+    userReferralCode,
     createdAccount,
 
     // Getters
@@ -352,6 +385,8 @@ export const useUserStore = defineStore('user', () => {
     loadFilterCache,
     signInWithEmailPassword,
     loadRemainingSearches,
+    generateReferralCode,
+    useRefferalCode,
   }
 }, {
   persist: true,

@@ -654,7 +654,7 @@ export type GetLocationData = {
         zip: string;
     };
     query?: never;
-    url: '/api/filters/api/location/{zip}';
+    url: '/api/location/{zip}';
 };
 
 export type GetLocationErrors = {
@@ -700,6 +700,57 @@ export type GetLocationResponses = {
 };
 
 export type GetLocationResponse = GetLocationResponses[keyof GetLocationResponses];
+
+export type GetCountryData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/country';
+};
+
+export type GetCountryErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetCountryError = GetCountryErrors[keyof GetCountryErrors];
+
+export type GetCountryResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type GetCountryResponse = GetCountryResponses[keyof GetCountryResponses];
 
 export type GetMatchesData = {
     body?: never;
