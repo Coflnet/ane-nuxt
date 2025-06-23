@@ -296,10 +296,10 @@ async function handleFilters(): Promise<{ name: string, value: any }[]> {
   if (rawFilter.minPrice != 0 || rawFilter.maxPrice || rawFilter.maxPrice == 0)
     filters.push({ name: 'PriceRange', value: `${Number(rawFilter.minPrice)}-${Number(rawFilter.maxPrice)}` })
 
-  if (rawFilter.condition != '')
+  if (rawFilter.condition != 'all')
     filters.push({ name: 'Condition', value: rawFilter.condition })
 
-  if (rawFilter.deliveryMethod != '')
+  if (rawFilter.deliveryMethod != 'all')
     filters.push({ name: 'DeliveryMethod', value: rawFilter.deliveryMethod })
 
   if (rawFilter.marketplace != 'all') {
@@ -307,7 +307,7 @@ async function handleFilters(): Promise<{ name: string, value: any }[]> {
   }
   else {
     // input marketplace depending on location
-    const isUs = await detectLocationNA()
+    const isUs = detectLocationNA()
     const marketplacesArray = filterFreeMarketplaces(isUs ? usMarketplaces : marketplaces)
     filters.push({ name: 'IncludePlatforms', value: marketplacesArray.map(m => m.value).join(',') })
   }
