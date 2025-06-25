@@ -74,7 +74,9 @@ async function confirmCancelSubscription() {
 async function getCurrentSubscription() {
   // accessing the product from the same type that is returned from the api
   currentPlan.value = userStore.currentPlan?.product as PlanId ?? 'basic'
-  endDate.value = userStore.currentPlan?.endsAt ? new Date(userStore.currentPlan?.endsAt) : null
+  console.log(userStore.currentPlan?.endsAt)
+  endDate.value = userStore.currentPlan?.endsAt != null ? new Date(userStore.currentPlan?.endsAt) : null
+  console.log(endDate.value)
 
   try {
     const result = await getSubscription({ composable: '$fetch', headers: { Authorization: apiToken } })
