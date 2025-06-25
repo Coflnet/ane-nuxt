@@ -100,9 +100,10 @@ function handleButtonClick() {
 
 const currentPlanText = computed(() => {
   // check if their is no end date
-  if (Number.isNaN(props.endDate) == false)
+  if (Number.isNaN(props.endDate?.getTime()))
     return t('currentPlan')
-    // Calculate the number of days left until the end date
+
+  // Calculate the number of days left until the end date
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 

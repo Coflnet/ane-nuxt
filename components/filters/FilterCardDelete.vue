@@ -15,6 +15,7 @@
       :footer="$t('areYouSureDeletion')"
       :header="$t('confirmDeletion')"
       :model-value="isModalOpen"
+      :confirm-text="$t('delete')"
       @confirm="deleteFilterId"
       @cancel="isModalOpen = false"
     />

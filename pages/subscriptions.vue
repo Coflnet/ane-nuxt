@@ -22,9 +22,12 @@
     </div>
 
     <UiConformationPopup
-      :footer="$t('confirmCancelSub')"
-      :header="$t('confirmCancel')"
+      :hide-cancel="!subscriptionCanceled"
+      :footer="subscriptionCanceled ? $t('confirmCancelSub') : $t('subscriptionAlreadyCanceledFooter')"
+      :header="subscriptionCanceled ? $t('confirmCancel') : $t('subscriptionAlreadyCanceledHeader')"
+      :primary="!subscriptionCanceled"
       :model-value="confirmCancelation"
+      :confirm-text="subscriptionCanceled ? $t('confirm') : $t('soundsGood')"
       @confirm="confirmCancelSubscription"
       @cancel="confirmCancelation = false"
     />
@@ -41,6 +44,7 @@ const currentPlan = ref<PlanId>('basic')
 const selectedPlan = ref<PlanId | null>(null)
 const confirmCancelation = ref(false)
 const endDate = ref<Date | null>(null)
+const subscriptionCanceled = computed(() => Number.isNaN(endDate.value?.getTime()))
 
 const apiToken = `Bearer ${useUserStore().token}`
 
@@ -61,6 +65,10 @@ async function changePlan(plan: string) {
 }
 
 async function confirmCancelSubscription() {
+  if (!subscriptionCanceled.value) {
+    confirmCancelation.value = false
+    return
+  }
   const result = await getSubscription({ composable: '$fetch', headers: { Authorization: apiToken } })
   await cancelSubscription({
     composable: '$fetch',
@@ -68,7 +76,9 @@ async function confirmCancelSubscription() {
     headers: { Authorization: apiToken },
   })
 
-  push.success(t('cancelSubscriptionSuc'))
+  push.success(t('cancelSubscriptionSuccess'))
+  confirmCancelation.value = false
+  getCurrentSubscription()
 }
 
 async function getCurrentSubscription() {
