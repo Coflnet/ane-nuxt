@@ -99,7 +99,7 @@ function handleButtonClick() {
 }
 
 const currentPlanText = computed(() => {
-  // check if their is no end date
+  // check if there is no end date
   if (Number.isNaN(props.endDate?.getTime()))
     return t('currentPlan')
 
