@@ -19,6 +19,7 @@
 
           <div class="flex justify-end space-x-3 mt-6">
             <UiButton
+              v-if="!hideCancel"
               aria-label="Cancel Deletion"
               @on-click="handleCancel"
             >
@@ -26,12 +27,12 @@
             </UiButton>
             <UiButton
               aria-label="Confirm Deletion"
-              :warning="true"
+              :warning="!primary"
+              :primary="primary"
               :proccessing="loading"
               @on-click="handleConfirm"
             >
-              {{
-                $t('delete') }}
+              {{ confirmText }}
             </UiButton>
           </div>
         </UiDefaultContainer>
@@ -48,7 +49,13 @@ const emits = defineEmits(['confirm', 'cancel'])
 const modalValue = defineModel()
 const loading = ref(false)
 
-defineProps({ header: String, footer: String })
+defineProps({
+  header: String,
+  footer: String,
+  confirmText: String,
+  hideCancel: Boolean,
+  primary: Boolean,
+})
 
 const handleConfirm = () => {
   loading.value = true

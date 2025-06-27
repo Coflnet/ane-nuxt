@@ -31,7 +31,7 @@
   "cameraEg": "e.g., Camera",
   "cancel": "Cancel",
   "company": "Company",
-  "cancelSubscriptionSuc": "Canceling subscription was successful",
+  "cancelSubscriptionSuccess": "Canceling subscription was successful",
   "chooseYourPlan": "Choose Your Plan",
   "collector": "Collector",
   "comingSoon": "Coming soon",
@@ -55,7 +55,7 @@
   "dollarSign": "$",
   "dontHaveAccount": "Don't have an account?",
   "dontSendNotifications": "Don't send any notifications",
-  "downgrade": "Down Grade",
+  "downgrade": "Down Grade (Cancel Subscription)",
   "editFilter": "Edit Filter",
   "email": "Email",
   "endsToday": "Ends today",
@@ -641,5 +641,8 @@
   "startUsingApp": "You can start using ANE for free no credit card or email required",
   "errorCopyingReferralCode": "There was an error getting your referral code please refresh and try again. If this continues please contact support",
   "successfullReferral": "Redeeming your referral bonus was successful!",
-  "errorReffering": "There was a error redeeming your referral bonus please contact support"
+  "errorReffering": "There was a error redeeming your referral bonus please contact support",
+  "subscriptionAlreadyCanceledHeader": "Your subscription is already canceled",
+  "subscriptionAlreadyCanceledFooter": "You have already canceled your subscription but there is still time remaining. Once the time runs out your current plan will change and you wont be charged",
+  "soundsGood": "Sounds Good"
 }
