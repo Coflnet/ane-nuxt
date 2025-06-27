@@ -32,8 +32,15 @@
           :placeholder="placeHolder"
           class="w-full px-3 py-1 border-0 bg-transparent text-white focus:outline-none focus:ring-0"
           @keydown.enter.prevent="addKeyword"
+          @blur="addKeyword"
         >
       </div>
+      <UiButton
+        :primary="true"
+        @on-click="addKeyword"
+      >
+        {{ $t('add') }}
+      </UiButton>
     </UiDefaultInputBox>
 
     <UiFooterLabel
