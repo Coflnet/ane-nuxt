@@ -33,6 +33,13 @@
             :footer="$t('addblacklistKeywords')"
             :place-holder="$t('addBlackListPressEnter')"
           />
+          <FiltersKeywordFilter
+            class="my-4"
+            :model-value="filter.keywords"
+            :label="$t('whitelistKeywords')"
+            :footer="$t('addWhitelistKeywords')"
+            :place-holder="$t('addWhitelistPressEnter')"
+          />
         </UiExpandOption>
         <FiltersNotificationSettingsFilter v-model="filter" />
 

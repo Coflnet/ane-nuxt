@@ -641,5 +641,8 @@
   "startUsingApp": "You can start using ANE for free no credit card or email required",
   "errorCopyingReferralCode": "There was an error getting your referral code please refresh and try again. If this continues please contact support",
   "successfullReferral": "Redeeming your referral bonus was successful!",
-  "errorReffering": "There was a error redeeming your referral bonus please contact support"
+  "errorReffering": "There was a error redeeming your referral bonus please contact support",
+  "whitelistKeywords": "Whitelist words",
+  "addWhitelistKeywords": "Add keywords to include in search results",
+  "addWhitelistPressEnter": "Add whitelist and press Enter"
 }
