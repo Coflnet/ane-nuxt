@@ -639,5 +639,8 @@
   "startUsingApp": "Sie können ANE kostenlos nutzen, keine Kreditkarte oder E-Mail erforderlich",
   "errorCopyingReferralCode": "Beim Abrufen Ihres Empfehlungscodes ist ein Fehler aufgetreten. Bitte aktualisieren Sie die Seite und versuchen Sie es erneut. Wenn das Problem weiterhin besteht, wenden Sie sich bitte an den Support.",
   "successfullReferral": "Das Einlösen Ihres Empfehlungsbonus war erfolgreich!",
-  "errorReffering": "Beim Einlösen Ihres Empfehlungsbonus ist ein Fehler aufgetreten. Bitte wenden Sie sich an den Support."
+  "errorReffering": "Beim Einlösen Ihres Empfehlungsbonus ist ein Fehler aufgetreten. Bitte wenden Sie sich an den Support.",
+  "whitelistKeywords": "Zulassungsliste Schlüsselwörter",
+  "addWhitelistKeywords": "Schlüsselwörter zur Suche hinzufügen",
+  "addWhitelistPressEnter": "Zulassungsliste hinzufügen und Enter drücken"
 }
