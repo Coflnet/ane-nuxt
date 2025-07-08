@@ -88,12 +88,8 @@ export default defineNuxtConfig({
   },
 
   sitemap: {
-    urls: [
-      `${hostName}/marketplaces/ebay`,
-      `${hostName}/marketplaces/facebook`,
-      `${hostName}/marketplaces/craigslist`,
-      `${hostName}/marketplaces/kleinanzeigen`,
-      `${hostName}/marketplaces/autoscout24`,
+    sources: [
+      '/api/__sitemap__/urls',
     ],
   },
 
