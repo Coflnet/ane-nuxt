@@ -11,7 +11,10 @@
     </UiButton>
 
     <UiDefaultContainer class="mb-6 p-6">
-      <form @submit.prevent="saveFilter">
+      <form
+        class="overflow-visible"
+        @submit.prevent="saveFilter"
+      >
         <FiltersSearchValueMarketplaceFilter v-model="filter" />
 
         <FiltersPriceConditionFilter v-model="filter" />
@@ -25,7 +28,7 @@
             :options="option.value.options"
           />
         </div>
-        <UiExpandOption class="mt-1">
+        <UiExpandOption class="mt-1 ">
           <FiltersKeywordFilter
             class="my-4"
             :model-value="filter.blacklist"
@@ -33,12 +36,9 @@
             :footer="$t('addblacklistKeywords')"
             :place-holder="$t('addBlackListPressEnter')"
           />
-          <FiltersKeywordFilter
+          <FiltersWhitelistFilter
             class="my-4"
             :model-value="filter.keywords"
-            :label="$t('whitelistKeywords')"
-            :footer="$t('addWhitelistKeywords')"
-            :place-holder="$t('addWhitelistPressEnter')"
           />
         </UiExpandOption>
         <FiltersNotificationSettingsFilter v-model="filter" />
@@ -94,7 +94,7 @@ const filter = ref<Filter>({
   searchRadius: 100,
   commercialSeller: false,
   seller: '',
-  keywords: [] as string[],
+  keywords: [[]],
   blacklist: [] as string[],
   minPrice: 0,
   maxPrice: 100,
@@ -173,12 +173,13 @@ async function loadEditParam() {
           filter.value.zipcode = zipcode ?? ''
           break
         }
-        case 'ContainsKeyWord':
+        case 'ContainsKeyWord':{
           if (item.value == '') break
-          item?.value?.split(',').forEach((keyword: string) => {
-            filter.value.keywords.push(keyword)
-          })
+          const joinedItems = item.value!.split('|')
+          filter.value.keywords = joinedItems.map((i: string) => i.split(','))
+          console.log(filter.value.keywords)
           break
+        }
         case 'NotContainsKeyWord':
           if (item.value == '') break
           item?.value?.split(',').forEach((keyword: string) => {
@@ -331,9 +332,11 @@ async function handleFilters(): Promise<{ name: string, value: any }[]> {
   if (rawFilter.totalCost != 0)
     filters.push({ name: 'TotalCost', value: `${rawFilter.totalCost}-${rawFilter.totalCost}` })
 
-  if (rawFilter.keywords.length != 0)
-    filters.push({ name: 'ContainsKeyWord', value: rawFilter.keywords.join(',') })
-
+  if (rawFilter.keywords.length != 0) {
+    // first join the text writen in the input fields with a comma than join all the groups or input fields with a pipe
+    const joinedItems = rawFilter.keywords.map(i => i.join(',')).filter(i => i != '')
+    filters.push({ name: 'ContainsKeyWord', value: joinedItems.join('|') })
+  }
   if (rawFilter.blacklist.length != 0)
     filters.push({ name: 'NotContainsKeyWord', value: rawFilter.blacklist.join(',') })
   return filters

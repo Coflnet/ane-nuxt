@@ -13,11 +13,13 @@
         :name="isExpanded ? 'tabler:chevron-up' : 'tabler:chevron-down'"
       />
     </UiTextButton>
-    <div
-      class="overflow-hidden transition-all duration-300 mt-5"
-      :style="{ maxHeight: isExpanded ? '500px' : '0' }"
-    >
-      <slot />
+
+    <div class="relative w-full transition-all">
+      <div
+        v-if="isExpanded"
+      >
+        <slot />
+      </div>
     </div>
   </div>
 </template>

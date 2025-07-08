@@ -644,5 +644,9 @@
   "errorReffering": "There was a error redeeming your referral bonus please contact support",
   "whitelistKeywords": "Whitelist words",
   "addWhitelistKeywords": "Add keywords to include in search results",
-  "addWhitelistPressEnter": "Add whitelist and press Enter"
+  "addWhitelistPressEnter": "Add whitelist and press Enter",
+  "addOr": "Add OR",
+  "or": "OR",
+  "whitelistInfo": "How the whitelist actually works",
+  "whtielistOrInfo": "How the or whitelist thign works"
 }
