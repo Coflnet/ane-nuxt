@@ -41,17 +41,18 @@
           </p>
         </div>
 
-        <UiTextButton
-          aria-label="Profile Logout Button"
+        <UiLinkButton
+          aria-label="Profile Account Navigation Button"
           class="m-1 mt-2"
-          @on-click="logout"
+          :white="true"
+          :to="localePath('/account')"
         >
           <Icon
-            name="tabler:logout-2"
+            name="tabler:user"
             class="w-4 h-4 mr-2"
           />
-          {{ $t('signOut') }}
-        </UiTextButton>
+          {{ $t('account') }}
+        </UiLinkButton>
 
         <UiLinkButton
           aria-label="Profile Subscriptions Navigation Button"
@@ -69,17 +70,16 @@
         <AppHeaderCopyReferralCodeButton />
 
         <UiTextButton
-          v-for="locale in availableLocales"
-          :key="locale.code"
-          aria-label="Profile Switch Locale Button"
+          aria-label="Profile Logout Button"
           class="m-1 mt-2"
-          @on-click="navigateTo(switchLocalePath(locale.code))"
+          :white="true"
+          @on-click="logout"
         >
           <Icon
-            name="tabler:language"
+            name="tabler:logout-2"
             class="w-4 h-4 mr-2"
           />
-          {{ locale.name }}
+          {{ $t('signOut') }}
         </UiTextButton>
       </div>
     </transition>
@@ -87,18 +87,12 @@
 </template>
 
 <script setup lang="ts">
-const { locale, locales, t } = useI18n()
 const localePath = useLocalePath()
-const switchLocalePath = useSwitchLocalePath()
 
 const userStore = useUserStore()
 const isProfileMenuOpen = ref(false)
 const profileMenuRef = ref<HTMLElement | null>(null)
 const loggedIn = ref(false)
-
-const availableLocales = computed(() => {
-  return locales.value.filter(i => i.code !== locale.value)
-})
 
 async function logout() {
   await userStore.logout()
