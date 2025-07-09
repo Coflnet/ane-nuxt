@@ -644,5 +644,14 @@
   "errorReffering": "There was a error redeeming your referral bonus please contact support",
   "subscriptionAlreadyCanceledHeader": "Your subscription is already canceled",
   "subscriptionAlreadyCanceledFooter": "You have already canceled your subscription but there is still time remaining. Once the time runs out your current plan will change and you wont be charged",
-  "soundsGood": "Sounds Good"
+  "soundsGood": "Sounds Good",
+  "accountSettings": "Account Settings",
+  "accountSettingsSubtitle": "Manage your account information and settings",
+  "accountInformation": "Account Information",
+  "accountID": "Account ID",
+  "preferences": "Preferences",
+  "accountActions": "Account Actions",
+  "manageSubscription": "Manage Subscription",
+  "switchLanguage": "Switch Language",
+  "referralCode": "Referral Code"
 }
