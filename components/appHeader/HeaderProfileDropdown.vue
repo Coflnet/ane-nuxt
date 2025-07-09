@@ -68,6 +68,19 @@
         </UiLinkButton>
 
         <AppHeaderCopyReferralCodeButton />
+
+        <UiTextButton
+          aria-label="Profile Logout Button"
+          class="m-1 mt-2"
+          :white="true"
+          @on-click="logout"
+        >
+          <Icon
+            name="tabler:logout-2"
+            class="w-4 h-4 mr-2"
+          />
+          {{ $t('signOut') }}
+        </UiTextButton>
       </div>
     </transition>
   </div>
