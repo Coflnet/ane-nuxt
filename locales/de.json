@@ -5,7 +5,7 @@
   "active": "Aktiv",
   "activeFilters": "Benutzerdefinierte Suchanfragen",
   "add": "Hinzufügen",
-  "addblacklistKeywords": "Keywörter hinzufügen, die von den Suchergebnissen ausgeschlossen werden",
+  "addblacklistKeywords": "Schlüsselwörter hinzufügen, die von den Suchergebnissen ausgeschlossen werden, jede dieser Wörter verhindert das Erscheinen eines Angebots in den Suchergebnissen",
   "addBlackListPressEnter": "Wort schreiben und Eingabe drücken",
   "addKeyDescription": "Füge Suchwörter hinzu, die beschreiben, wonach du suchst",
   "addKeywordPressEnter": "Suchwort hinzufügen und Eingabe drücken",
@@ -25,7 +25,7 @@
   "auctionsPerHour": "Auktionen in der letzten Stunde",
   "backToFilters": "Zurück zu den Filtern",
   "beTheFirst": "Sei der Erste, der unterbewertete Artikel kauft",
-  "blackKeywords": "Blacklist Keywörter",
+  "blackKeywords": "Blacklist Schlüsselwörter",
   "browserNotifications": "Browser-Benachrichtigungen",
   "buyAndSave": "Kaufen & Sparen",
   "buyThingsCheaper": "Finde Artikel schneller und günstiger",
@@ -640,7 +640,11 @@
   "errorCopyingReferralCode": "Beim Abrufen Ihres Empfehlungscodes ist ein Fehler aufgetreten. Bitte aktualisieren Sie die Seite und versuchen Sie es erneut. Wenn das Problem weiterhin besteht, wenden Sie sich bitte an den Support.",
   "successfullReferral": "Das Einlösen Ihres Empfehlungsbonus war erfolgreich!",
   "errorReffering": "Beim Einlösen Ihres Empfehlungsbonus ist ein Fehler aufgetreten. Bitte wenden Sie sich an den Support.",
-  "whitelistKeywords": "Zulassungsliste Schlüsselwörter",
-  "addWhitelistKeywords": "Schlüsselwörter zur Suche hinzufügen",
-  "addWhitelistPressEnter": "Zulassungsliste hinzufügen und Enter drücken"
+  "whitelistKeywords": "Benötigte Schlüsselwörter",
+  "addWhitelistKeywords": "Nur Angebote mit diesen Schlüsselwörtern werden angezeigt",
+  "addWhitelistPressEnter": "Wort hinzufügen und Enter drücken",
+  "addOr": "ODER hinzufügen",
+  "or": "ODER",
+  "whitelistInfo": "Alle diese Wörter müssen irgendwo im Angebot (Titel oder Beschreibung) vorhanden sein",
+  "whtielistOrInfo": "Fügen Sie eine neue Schlüsselwortgruppe hinzu, die mit ODER verbunden ist.\nBeispiel: Für Suchwert `Iphone 16` mit `PRO` ODER `16e`, werden beide Modelle angezeigt (und PRO MAX)"
 }
