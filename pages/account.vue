@@ -7,7 +7,7 @@
           :xl="true"
         />
       </h1>
-      <UiFooterLabel :label="$t('accountSettings.')" />
+      <UiFooterLabel :label="$t('accountSettingsSubtitle')" />
     </div>
 
     <UiDefaultContainer class="p-4">

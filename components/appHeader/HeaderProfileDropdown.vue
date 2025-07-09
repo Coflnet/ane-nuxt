@@ -42,7 +42,7 @@
         </div>
 
         <UiLinkButton
-          aria-label="Profile Subscriptions Navigation Button"
+          aria-label="Profile Account Navigation Button"
           class="m-1 mt-2"
           :white="true"
           :to="localePath('/account')"
