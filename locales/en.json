@@ -653,5 +653,7 @@
   "accountActions": "Account Actions",
   "manageSubscription": "Manage Subscription",
   "switchLanguage": "Switch Language",
-  "referralCode": "Referral Code"
+  "referralCode": "Referral Code",
+  "copy": "Copy",
+  "copied": "Copied"
 }

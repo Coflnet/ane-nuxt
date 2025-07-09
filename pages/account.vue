@@ -35,7 +35,7 @@
             :primary="true"
             @click="copyAccountId"
           >
-            {{ copied ? 'Copied!' : 'Copy' }}
+            {{ copied ? $t('copied') : $t('copy') }}
           </UiButton>
         </div>
       </div>
@@ -50,7 +50,7 @@
             :primary="true"
             @click="copyReferralCode"
           >
-            {{ copied ? 'Copied!' : 'Copy' }}
+            {{ copied ? $t('copied') : $t('copy') }}
           </UiButton>
         </div>
       </div>
