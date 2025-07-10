@@ -99,24 +99,23 @@ function handleButtonClick() {
 }
 
 const currentPlanText = computed(() => {
-  if (props.endDate === null) {
+  // check if there is no end date
+  if (Number.isNaN(props.endDate?.getTime()))
     return t('currentPlan')
-  }
-  else {
-    // Calculate the number of days left until the end date
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
 
-    const endDate = new Date(props.endDate)
-    endDate.setHours(0, 0, 0, 0)
+  // Calculate the number of days left until the end date
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
 
-    const timeDiff = endDate.getTime() - today.getTime()
-    const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24))
+  const endDate = new Date(props.endDate!)
+  endDate.setHours(0, 0, 0, 0)
 
-    if (daysLeft === 0)
-      return t('endsToday')
-    return `${daysLeft} ${t('daysLeft')}`
-  }
+  const timeDiff = endDate.getTime() - today.getTime()
+  const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24))
+
+  if (daysLeft === 0)
+    return t('endsToday')
+  return `${daysLeft} ${t('daysLeft')}`
 })
 
 function getButtonText(): string {
@@ -129,7 +128,7 @@ function getButtonText(): string {
   if (!props.currentPlan)
     return t('selectPlan')
 
-  if (planPrices[props.plan.id] ?? 0 > planPrices[props.currentPlan ?? '']! ?? 0)
+  if (planPrices[props.plan.id] ?? 0 > planPrices[props.currentPlan ?? '']!)
     return t('upgrade')
   return t('downgrade')
 }

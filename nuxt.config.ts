@@ -1,3 +1,5 @@
+const hostName = 'https://ane.deals'
+
 export default defineNuxtConfig({
   modules: [
     '@nuxtjs/tailwindcss',
@@ -23,7 +25,7 @@ export default defineNuxtConfig({
   ],
 
   site: {
-    url: 'https://ane.deals',
+    url: hostName,
     name: 'Ane Deals',
   },
 
@@ -83,6 +85,12 @@ export default defineNuxtConfig({
 
   notivue: {
     position: 'top-right',
+  },
+
+  sitemap: {
+    sources: [
+      '/api/__sitemap__/urls',
+    ],
   },
 
   tailwindcss: { exposeConfig: true },
