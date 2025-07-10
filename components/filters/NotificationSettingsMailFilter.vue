@@ -13,7 +13,7 @@
     }"
     :messages="{
       error: $t('invalidEmail'),
-      footer: $t('sendDiscordNotifications'),
+      footer: $t('sendNotificationsToEmail'),
     }"
     :validation="{
       error: !isValidEmail && !!emailAddress,
