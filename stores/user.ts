@@ -316,7 +316,7 @@ export const useUserStore = defineStore('user', () => {
 
       return {
         used: response.searchesUsedMonthly ?? 0,
-        total: response.searchesAvailableMonthly ?? 0,
+        total: response.activeSearchesLeft ?? 0,
         refreshData: getTimeTillSubscriptionRenewal(subscriptionStartDate.value),
       }
     }
