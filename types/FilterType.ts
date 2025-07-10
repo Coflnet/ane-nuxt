@@ -27,7 +27,7 @@ export interface Filter {
   searchRadius: number | null
   commercialSeller: boolean
   seller: string
-  keywords: string[]
+  keywords: string[][]
   blacklist: string[]
   minPrice: number
   maxPrice: number
