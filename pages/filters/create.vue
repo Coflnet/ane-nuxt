@@ -1,6 +1,9 @@
 <template>
   <div>
-    <FiltersCreateHeader :is-new-filter="isNewFilter" />
+    <FiltersCreateHeader
+      :is-new-filter="isNewFilter"
+      :item-id="filterId"
+    />
     <UiButton
       :primary="true"
       aria-label="Save Filter"
@@ -78,6 +81,8 @@ const savingFilter = ref(false)
 const localePath = useLocalePath()
 
 const route = useRoute()
+
+const filterId = computed(() => Number(route.query.id ?? 0))
 
 const isNewFilter = computed(() => {
   return route.query.id == '' || route.query.id == undefined
