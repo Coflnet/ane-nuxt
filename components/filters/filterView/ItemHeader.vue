@@ -12,6 +12,12 @@
     </a>
     <div class="flex flex-row gap-x-1">
       <div class="flex items-center space-x-1">
+        <UiTextButton @on-click="navigateTo(localePath(`/filters/create?id=${useFilterStore().getSimplifiedFilters[filter.id ?? '']![1]}`))">
+          <UiIcon
+            name="tabler:edit"
+            :large="true"
+          />
+        </UiTextButton>
         <FiltersFilterCardDelete :item-id="filter.id" />
       </div>
     </div>
