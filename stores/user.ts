@@ -58,6 +58,7 @@ export const useUserStore = defineStore('user', () => {
   const acceptingReferralCode = ref<string>('')
   const userReferralCode = ref<string>('')
   const accountId = ref('')
+  const remainingPremiumSearches = ref<number>(100)
 
   const notificationSettings = ref<NotificationSettings>({
     discord: {
@@ -314,6 +315,8 @@ export const useUserStore = defineStore('user', () => {
 
       remainingFilters.value = (response.listenerLimit ?? 3) - (response.listenerCount ?? 0)
 
+      remainingPremiumSearches.value = response.activeSearchesLeft ?? 100
+
       return {
         used: response.searchesUsedMonthly ?? 0,
         total: response.activeSearchesLeft ?? 0,
@@ -378,6 +381,7 @@ export const useUserStore = defineStore('user', () => {
     userReferralCode,
     createdAccount,
     accountId,
+    remainingPremiumSearches,
 
     // Getters
     isLoggedIn,
