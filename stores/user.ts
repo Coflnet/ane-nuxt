@@ -131,7 +131,7 @@ export const useUserStore = defineStore('user', () => {
         isAnonymous.value = false
         return { success: true }
       }
-      return { success: false, error: useI18n().t('thatEmnailInUse') }
+      return { success: false, error: 'thatEmailInUse' }
     }
 
     try {
