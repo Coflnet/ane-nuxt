@@ -57,6 +57,7 @@ export const useUserStore = defineStore('user', () => {
   const remainingFilters = ref<number>(3)
   const acceptingReferralCode = ref<string>('')
   const userReferralCode = ref<string>('')
+  const accountId = ref('')
 
   const notificationSettings = ref<NotificationSettings>({
     discord: {
@@ -349,6 +350,14 @@ export const useUserStore = defineStore('user', () => {
     return daysLeft > 0 ? daysLeft : 0
   }
 
+  async function getUserData(): Promise<{ email: string, id: string }> {
+    const apiToken = `Bearer ${token.value}`
+    const result = await getMe({ composable: '$fetch', headers: { Authorization: apiToken } })
+
+    accountId.value = result.id ?? ''
+    return { email: user.value?.email ?? '', id: result.id ?? '' }
+  }
+
   // Return all state, getters, and actions
   return {
     user,
@@ -368,6 +377,7 @@ export const useUserStore = defineStore('user', () => {
     acceptingReferralCode,
     userReferralCode,
     createdAccount,
+    accountId,
 
     // Getters
     isLoggedIn,
@@ -387,6 +397,7 @@ export const useUserStore = defineStore('user', () => {
     loadRemainingSearches,
     generateReferralCode,
     useRefferalCode,
+    getUserData,
   }
 }, {
   persist: true,

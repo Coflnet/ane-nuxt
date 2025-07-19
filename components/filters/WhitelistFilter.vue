@@ -18,7 +18,7 @@
 
       <div class="flex">
         <UiTooltipHover
-          :text="$t('whtielistOrInfo')"
+          :text="$t('whitelistOrInfo')"
           class="mr-2 mt-1"
         >
           <UiQuestionMarkIcon />

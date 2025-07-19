@@ -332,7 +332,7 @@ async function handleFilters(): Promise<{ name: string, value: any }[]> {
   if (rawFilter.totalCost != 0)
     filters.push({ name: 'TotalCost', value: `${rawFilter.totalCost}-${rawFilter.totalCost}` })
 
-  if (rawFilter.keywords.length != 0) {
+  if (rawFilter.keywords[0]!.length != 0) {
     // first join the text writen in the input fields with a comma than join all the groups or input fields with a pipe
     const joinedItems = rawFilter.keywords.map(i => i.join(',')).filter(i => i != '')
     filters.push({ name: 'ContainsKeyWord', value: joinedItems.join('|') })
