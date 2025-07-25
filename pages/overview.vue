@@ -14,7 +14,7 @@
     </div>
 
     <OverviewStats
-      :filter-count="filterCount"
+      :premium-searches="useUserStore().remainingPremiumSearches"
       :matched-auctions="stats.matchedAuctions"
       :notificationper-hour="stats.notificationperHour"
     />
