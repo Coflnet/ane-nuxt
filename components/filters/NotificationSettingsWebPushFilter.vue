@@ -34,6 +34,18 @@ function checkPushNotificationPermissions() {
   if (import.meta.server)
     return false
 
+  if (useUserStore().isWebView) {
+    window.sendToFlutter({
+      action: 'requestNotifications',
+    })
+    if (useUserStore().notificationToken == '') {
+      window.sendToFlutter({
+        action: 'generateNotificationToken',
+      })
+    }
+    return
+  }
+
   Notification.requestPermission().then((permission) => {
     if (permission === 'granted') {
       console.log('Notification permission granted')

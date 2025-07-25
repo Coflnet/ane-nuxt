@@ -14,11 +14,14 @@
 </template>
 
 <script setup lang="ts">
+import { useIsWebView } from '~/composable/useIsWebView'
+
 const { t } = useI18n()
 const localePath = useLocalePath()
 
 function checkForAvaiableFilters(url: string) {
   const user = useUserStore()
+
   // Check if the user has remaining filters
   if (user.remainingFilters > 0) {
     navigateTo(url)

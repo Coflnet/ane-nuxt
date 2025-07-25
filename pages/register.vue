@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex flex-col ">
+  <div :class="userStore.isWebView ? 'min-h-screen flex flex-col' : ''">
     <LoginContainer :is-login="false" />
   </div>
 </template>
@@ -7,7 +7,10 @@
 <script setup lang="ts">
 const localePath = useLocalePath()
 
+const userStore = useUserStore()
+
 definePageMeta({
   layout: 'landing',
 })
 </script>
+

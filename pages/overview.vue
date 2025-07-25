@@ -36,6 +36,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useIsWebView } from '~/composable/useIsWebView'
 import type { FilterMatch } from '~/src/api-client'
 
 import type { TopFilter } from '~/types/FilterType'
@@ -64,6 +65,8 @@ const filterCount = computed(() => {
 })
 
 const topFilters = ref<{ [id: string]: TopFilter }>({})
+
+const webView = useIsWebView()
 
 async function loadStats() {
   const response = filterStore.getUserFilters
@@ -112,6 +115,11 @@ onMounted(async () => {
   loadStats()
   filterStore.loadFilters()
   loading.value = false
+  if (!useUserStore().isWebView) {
+    useUserStore().isWebView = useIsWebView().value
+  }
+
+  console.log(useUserStore().isAnonymous)
 })
 
 useSeoMeta({

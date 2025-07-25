@@ -95,6 +95,11 @@ const profileMenuRef = ref<HTMLElement | null>(null)
 const loggedIn = ref(false)
 
 async function logout() {
+  if (useUserStore().isWebView == true) {
+    window.sendToFlutter({
+      action: 'logout',
+    })
+  }
   await userStore.logout()
   isProfileMenuOpen.value = true
   localStorage.clear()

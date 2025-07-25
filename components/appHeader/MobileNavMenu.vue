@@ -1,7 +1,7 @@
 <template>
   <div
     class="fixed inset-y-0 left-0 w-64 bg-slate-800 shadow-lg transform transition-transform duration-300 ease-in-out z-30 md:hidden"
-    :class="isOpen ? 'translate-x-0' : '-translate-x-full'"
+    :class="[isOpen ? 'translate-x-0' : '-translate-x-full', isWebView ? 'pt-6' : '']"
   >
     <div class="flex flex-col h-full">
       <!-- Header with close button -->
@@ -28,6 +28,8 @@
 </template>
 
 <script setup lang="ts">
+const isWebView = useUserStore().isWebView
+
 defineProps({
   isOpen: {
     type: Boolean,

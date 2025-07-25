@@ -25,7 +25,6 @@ useHead({
 })
 
 onMounted(async () => {
-  await nextTick()
   if (import.meta.server) return
 
   if ('serviceWorker' in navigator) {

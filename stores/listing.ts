@@ -72,6 +72,10 @@ export const useListingStore = defineStore('listing', () => {
     if (listing === 'Kleinanzeigen') {
       return `https://www.kleinanzeigen.de/s-anzeige/copy/${id}-1-1`
     }
+    if (listing === 'Craigslist') {
+      console.log(id)
+      return `https://${id}`
+    }
     if (listing === 'AutoScout24')
       return `https://www.autoscout24.de/angebote/${id}`
     return ''

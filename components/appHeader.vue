@@ -1,6 +1,9 @@
 <template>
   <header class="bg-slate-900 border-b border-slate-800 relative z-30">
-    <div class="container mx-auto px-4 py-4">
+    <div
+      class="container mx-auto px-4 py-4"
+      :class="isWebView ? 'mt-6' : ''"
+    >
       <div class="flex items-center justify-between">
         <div class="flex items-center w-full md:w-24 justify-between">
           <div class="flex items-center">
@@ -47,6 +50,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
+const isWebView = ref(false)
+
 const isMobileMenuOpen = ref(false)
 
 const toggleMobileMenu = () => {
@@ -60,6 +65,10 @@ const toggleMobileMenu = () => {
     document.body.style.overflow = ''
   }
 }
+
+onMounted(async () => {
+  isWebView.value = useUserStore().isWebView
+})
 
 const closeMobileMenu = () => {
   isMobileMenuOpen.value = false
