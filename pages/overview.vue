@@ -118,8 +118,6 @@ onMounted(async () => {
   if (!useUserStore().isWebView) {
     useUserStore().isWebView = useIsWebView().value
   }
-
-  console.log(useUserStore().isAnonymous)
 })
 
 useSeoMeta({

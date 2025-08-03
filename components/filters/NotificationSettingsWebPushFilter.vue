@@ -5,12 +5,12 @@
     :config="{
       notificationType: 'FireBase',
       predefinedValue: '',
-      name: $t('webPush'),
+      name: userStore.isWebView ? $t('pushNotification') : $t('webPush'),
       icon: 'tabler:mail',
       textInput: false,
     }"
     :messages="{
-      footer: $t('browserNotifications'),
+      footer: userStore.isWebView ? $t('sendPushNotifications') : $t('browserNotifications'),
     }"
     @item-selected="checkPushNotificationPermissions"
   />
@@ -20,6 +20,7 @@
 import type { Filter } from '~/types/FilterType'
 
 const model = defineModel<Filter>()
+const userStore = useUserStore()
 
 if (import.meta.client) {
   watch(() => model.value!.notificationType, async (newValue) => {
@@ -38,6 +39,7 @@ function checkPushNotificationPermissions() {
     window.sendToFlutter({
       action: 'requestNotifications',
     })
+    console.log('sending to flutter ')
     if (useUserStore().notificationToken == '') {
       window.sendToFlutter({
         action: 'generateNotificationToken',

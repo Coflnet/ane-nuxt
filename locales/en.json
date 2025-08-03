@@ -662,5 +662,7 @@
   "switchLanguage": "Switch Language",
   "referralCode": "Referral Code",
   "copy": "Copy",
-  "copied": "Copied"
+  "copied": "Copied",
+  "sendPushNotifications": "Send notifications to your phone",
+  "pushNotification": "Push Notifictions"
 }

@@ -35,6 +35,8 @@ export default defineNuxtPlugin((nuxtApp) => {
         case 'setNotificationToken':
           setNotificationToken(messageData['token'])
           break
+        case 'log':
+          logFunction(messageData['message'])
       }
     }
 
@@ -108,5 +110,10 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   function setNotificationToken(token: string) {
     useUserStore().notificationToken = token
+  }
+
+  function logFunction(message: string) {
+    console.log('got log')
+    push.info(`DEBUG: \n ${message}`)
   }
 })
