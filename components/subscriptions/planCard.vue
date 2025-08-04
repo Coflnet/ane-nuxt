@@ -115,10 +115,16 @@ const currentPlanText = computed(() => {
 
   if (daysLeft === 0)
     return t('endsToday')
+
+  if (daysLeft < 0)
+    return t('currentPlan')
+
   return `${daysLeft} ${t('daysLeft')}`
 })
 
 function getButtonText(): string {
+  console.log(props.currentPlan)
+  console.log(props.plan.id)
   if (props.currentPlan === props.plan.id)
     return currentPlanText.value
 

@@ -669,5 +669,5 @@
   "selectFuzzy": "No Fuzziness",
   "lowFuzzy": "Light Fuzziness",
   "mediumFuzzy": "Medium Fuzziness",
-  "fuzzyInfo": "Amount of letters that can be different from your search value: ( Switch -> Swtich ) \n higher tiers of fuzziness are restricted to paid tiers"
+  "fuzzyInfo": "Amount of letters that can be different from your search( Switch -> Swtich ) \n higher tiers of fuzziness are restricted to paid tiers"
 }

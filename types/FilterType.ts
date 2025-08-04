@@ -40,4 +40,5 @@ export interface Filter {
   condition: string
   deliveryMethod: string
   frequency: string
+  fuzzyness: string
 }
