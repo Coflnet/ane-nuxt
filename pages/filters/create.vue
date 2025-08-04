@@ -68,6 +68,7 @@ import { useFirebaseApp } from 'vuefire'
 import type { FilterMatch, ListingListener } from '~/src/api-client'
 import type { Filter } from '~/types/FilterType'
 import { constructOptionsFromString, detectLocationNA, filterFreeMarketplaces, marketplaces, usMarketplaces, valididateAllMarketplace } from '~/constants/CreateFilterConstants'
+import { useIsWebView } from '~/composable/useIsWebView'
 
 const { debounce } = lodash
 
@@ -374,6 +375,11 @@ async function handleSearchRadius(): Promise<[string, string]> {
 }
 
 async function connectPushNotifications(): Promise<string> {
+  if (useUserStore().isWebView) {
+    const token = useUserStore().notificationToken
+    useUserStore().notificationToken = ''
+    return token
+  }
   const messaging = getMessaging(firebaseApp)
   // vapid key is meant to be public
   const token = await getToken(messaging, { vapidKey: 'BC2o4A75_oGlbklpFN4iVXjdZE3lg6Qci7EZg0NrsRAKyKmySam77NrlUAodBAzKhTECJGj-rgfdbQ0qzWUh9nU' })

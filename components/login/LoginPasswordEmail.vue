@@ -53,6 +53,11 @@ async function login() {
     return
   }
 
+  if (useUserStore().isWebView) {
+    loginEmailPasswordWebView()
+    return
+  }
+
   emailPassError.value = false
   const result = await userStore.signInWithEmailPassword(auth!, email.value, password.value, props.isLogin)
 
@@ -74,5 +79,22 @@ async function login() {
   }
 
   navigateTo(localePath(redirectTo ?? props.isLogin ? '/overview' : '/filters/create'))
+}
+
+async function loginEmailPasswordWebView() {
+  if (useUserStore().isAnonymous && !props.isLogin) {
+    window.sendToFlutter({
+      action: 'upgradeAccount',
+    })
+    return
+  }
+
+  // send google login request to flutter webview
+  window.sendToFlutter({
+    action: 'loginEmailPassword',
+    isLogin: props.isLogin,
+    email: email.value,
+    password: password.value,
+  })
 }
 </script>

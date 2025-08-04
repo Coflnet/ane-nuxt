@@ -90,21 +90,6 @@
       </div>
 
       <div class="flex flex-col space-y-4">
-        <UiHeaderLabel
-          :label="$t('language')"
-          :accent="true"
-        />
-
-        <div class="flex space-x-3">
-          <UiTextButton
-            v-for="locale in availableLocales"
-            :key="locale.code"
-            @on-click="navigateAndClose(switchLocalePath(locale.code))"
-          >
-            {{ locale.name }}
-          </UiTextButton>
-        </div>
-
         <AppHeaderCopyReferralCodeButton />
       </div>
     </div>
@@ -113,13 +98,8 @@
 
 <script setup lang="ts">
 const { locale, locales } = useI18n()
-const switchLocalePath = useSwitchLocalePath()
 const userStore = useUserStore()
 const router = useRouter()
-
-const availableLocales = computed(() => {
-  return locales.value.filter(i => i.code !== locale.value)
-})
 
 const emit = defineEmits(['navigate'])
 

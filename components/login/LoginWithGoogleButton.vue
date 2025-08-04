@@ -23,6 +23,10 @@ const props = defineProps({ login: Boolean })
 const { t } = useI18n()
 
 async function loginWithGoogle() {
+  if (useUserStore().isWebView) {
+    loginWithGoogleWebView()
+    return
+  }
   if (!auth) {
     return
   }
@@ -46,5 +50,18 @@ async function loginWithGoogle() {
     return
   }
   push.error(t(googleSignInRequest.error ?? 'Something is very wrong'))
+}
+
+async function loginWithGoogleWebView() {
+  if (useUserStore().isAnonymous && !props.login) {
+    window.sendToFlutter({
+      action: 'upgradeAccount',
+    })
+    return
+  }
+  // send google login request to flutter webview
+  window.sendToFlutter({
+    action: 'loginGoogle',
+  })
 }
 </script>

@@ -4,6 +4,7 @@ import { createUserWithEmailAndPassword, type EmailAuthCredential, EmailAuthProv
 import { navigateTo } from '#app'
 import { getStats, loginFirebase, useLink } from '~/src/api-client'
 import type { ActiveSubscription } from '#hey-api'
+import { useIsWebView } from '~/composable/useIsWebView'
 
 // Types
 export interface User {
@@ -58,6 +59,8 @@ export const useUserStore = defineStore('user', () => {
   const acceptingReferralCode = ref<string>('')
   const userReferralCode = ref<string>('')
   const accountId = ref('')
+  const isWebView = ref(false)
+  const notificationToken = ref('')
 
   const notificationSettings = ref<NotificationSettings>({
     discord: {
@@ -131,7 +134,7 @@ export const useUserStore = defineStore('user', () => {
         isAnonymous.value = false
         return { success: true }
       }
-      return { success: false, error: 'thatEmailInUse' }
+      return { success: false, error: useI18n().t('thatEmnailInUse') }
     }
 
     try {
@@ -284,6 +287,9 @@ export const useUserStore = defineStore('user', () => {
       return
 
     try {
+      if (isWebView.value) {
+        window.sendToFlutter({ action: 'createAnonymousAccount' })
+      }
       const signInResult = await signInAnonymously(clientAuth)
       const accessToken = await signInResult.user.getIdTokenResult()
 
@@ -378,6 +384,8 @@ export const useUserStore = defineStore('user', () => {
     userReferralCode,
     createdAccount,
     accountId,
+    isWebView,
+    notificationToken,
 
     // Getters
     isLoggedIn,

@@ -1,9 +1,15 @@
 <template>
   <thead>
     <tr class="border-b border-slate-700 text-center">
-      <th v-for="(header, i) in headers" :key="i" class="px-4 py-3 text-left text-sm font-medium text-slate-400">{{
-        $t(header) }}</th>
-      <th></th>
+      <th
+        v-for="(header, i) in headers"
+        :key="i"
+        class="px-4 py-3 text-left text-sm font-medium text-slate-400"
+      >
+        {{
+          $t(header) }}
+      </th>
+      <th />
     </tr>
   </thead>
 </template>
