@@ -43,6 +43,7 @@ export const deliveryKind = [
 
 export const fuzzyOptions = [
   { value: '0', label: 'selectFuzzy' },
+  { value: '1', label: 'singleLetterChanged' },
   { value: '2', label: 'lowFuzzy' },
   { value: '4', label: 'mediumFuzzy' },
 ]

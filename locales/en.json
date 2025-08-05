@@ -667,7 +667,8 @@
   "pushNotification": "Push Notifictions",
   "fuzzy": "Fuzziness",
   "selectFuzzy": "No Fuzziness",
+  "singleLetterChanged": "Single Letter added/removed",
   "lowFuzzy": "Light Fuzziness",
   "mediumFuzzy": "Medium Fuzziness",
-  "fuzzyInfo": "Amount of letters that can be different from your search value: ( Switch -> Swtich ) \n higher tiers of fuzziness are restricted to paid tiers"
+  "fuzzyInfo": "Amount of letters that can be different from your search value: ( Switch -> Swtich ) \n NOTE: changing this value can cause your search to match other products. This setting is restricted to paid tiers"
 }
