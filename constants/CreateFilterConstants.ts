@@ -41,6 +41,13 @@ export const deliveryKind = [
   { value: 'pickup', label: 'pickupDelivery' },
 ]
 
+export const fuzzyOptions = [
+  { value: '0', label: 'selectFuzzy' },
+  { value: '1', label: 'singleLetterChanged' },
+  { value: '2', label: 'lowFuzzy' },
+  { value: '4', label: 'mediumFuzzy' },
+]
+
 // Function to validate if the inputed marketplaces are the same as 'All Free Marketplaces' aka the default free marketplaces
 export function valididateAllMarketplace(inputMarketplaces: Options[]): boolean {
   // return if the inputMarketplaces includes a premium marketplace

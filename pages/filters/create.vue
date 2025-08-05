@@ -43,6 +43,7 @@
             class="my-4"
             :model-value="filter.keywords"
           />
+          <FiltersFuzzyFilter :model-value="filter" />
         </UiExpandOption>
         <FiltersNotificationSettingsFilter v-model="filter" />
 
@@ -113,6 +114,7 @@ const filter = ref<Filter>({
   condition: '',
   deliveryMethod: '',
   frequency: '',
+  fuzzyness: '0',
 })
 
 watch([filter], (_) => {
@@ -228,6 +230,9 @@ async function loadEditParam() {
           filter.value.totalCost = Number(min)
           break
         }
+        case 'Fuzzyness':
+          filter.value.fuzzyness = item.value ?? '2'
+          break
         case 'Frequency':
           filter.value.frequency = item.value ?? ''
           break
@@ -298,7 +303,12 @@ async function filterToCreate(): Promise<ListingListener | null> {
 
 async function handleFilters(): Promise<{ name: string, value: any }[]> {
   const rawFilter = toRaw(filter.value)
-  const filters: { name: string, value: any }[] = []
+  const filters: { name: string, value: string | number | boolean }[] = []
+
+  // '2' is the default value or false
+  if (rawFilter.fuzzyness != '0') {
+    filters.push({ name: 'Fuzzyness', value: rawFilter.fuzzyness })
+  }
 
   // 'EU,US,GB' is the default value
   if (rawFilter.country != 'EU,US,GB')

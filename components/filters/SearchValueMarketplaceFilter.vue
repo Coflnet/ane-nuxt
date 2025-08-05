@@ -20,6 +20,7 @@
       v-model="model!.frequency"
       :options="frequency"
       :label="$t('frequency')"
+      :disabled-string="$t('hasBasicPlanRestriction')"
       :disabled="hasBasicPlan"
     />
   </UiGrid>

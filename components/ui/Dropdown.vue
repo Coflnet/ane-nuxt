@@ -9,7 +9,7 @@
 
     <UiTooltipHover
       :disabled="!disabled"
-      :text="$t('hasBasicPlanRestriction')"
+      :text="disabledString"
     >
       <select
         :id="id"
@@ -23,6 +23,7 @@
           v-for="option in options"
           :key="option.value"
           :value="option.value"
+          :disabled="disabledArray?.includes(option.value)"
         >
           {{ $t(option.label) }}
         </option>
@@ -39,5 +40,7 @@ defineProps<{
   id?: string
   label?: string
   disabled?: boolean
+  disabledString?: string
+  disabledArray?: string[]
 }>()
 </script>
