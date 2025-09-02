@@ -34,10 +34,19 @@ export const useFilterStore = defineStore('filter', () => {
 
     const apiToken = `Bearer ${userStore.token}`
 
-    const loadedFilters = await getFilters({
-      composable: '$fetch',
-      headers: { Authorization: apiToken },
-    })
+    let loadedFilters: ListingListener[] = []
+
+    try {
+      loadedFilters = await getFilters({
+        composable: '$fetch',
+        headers: { Authorization: apiToken },
+      })
+    }
+    catch (error) {
+      if (error.response?.error) {
+
+      }
+    }
 
     if (!loadedFilters) {
       console.error('No filters found')

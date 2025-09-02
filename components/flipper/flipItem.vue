@@ -1,112 +1,105 @@
 <template>
-  <UiDefaultContainer class="shadow-md">
+  <div class="border border-slate-700 rounded-lg  hover:shadow-md transition-shadow w-96 h-full flex flex-col">
     <!-- Item Image -->
-    <div class="relative">
+    <div class="relative ">
       <img
-        :src="item.image"
-        :alt="item.name"
-        class="w-full h-48 object-cover"
+        v-if="item.listing!.imageUrls?.length != 0"
+        :src="item.listing!.imageUrls![0] ?? ''"
+        :alt="item.listing?.title ?? ''"
+        class="w-full h-48 object-cover rounded-t-lg"
       >
+      <div
+        v-else
+        class="h-48 items-center flex flex-col justify-center"
+      >
+        <Icon
+          name="tabler:search"
+          class="w-16 h-16 text-slate-400 mx-auto mb-4 mt-3"
+        />
+        <UiHeaderLabel :label="$t('noImageForAuction')" />
+      </div>
+
       <div class="absolute top-3 left-3">
         <span
           class="px-2 py-1 rounded-full text-xs font-medium"
-          :class="getMarketplaceBadgeClass(item.marketplace)"
+          :class="getAuctionTypeBadgeClass(item.listing?.priceKind ?? '')"
         >
-          {{ item.marketplace }}
+          {{ getAuctionTypeText(item.listing?.priceKind ?? '') }}
         </span>
       </div>
 
       <div class="absolute top-3 right-3">
         <span
           class="px-2 py-1 rounded-full text-xs font-bold"
-          :class="getProfitBadgeClass(item.profit)"
+          :class="getProfitBadgeClass(item.potentialProfit ?? 0)"
         >
-          +${{ item.profit }}
+          +${{ (item.potentialProfit ?? 0).toFixed(2) }}
         </span>
       </div>
 
       <div class="absolute bottom-3 left-3">
-        <span class="bg-black bg-opacity-60 text-white px-2 py-1 rounded text-xs">
-          {{ getTimeAgo(item.listedAt) }}
-        </span>
+        <span class="bg-black bg-opacity-60 text-white px-2 py-1 rounded text-xs" />
       </div>
     </div>
 
     <!-- Item Details -->
-    <div class="p-4">
+    <div class="p-4 flex flex-col flex-1">
       <h3>
         <UiHeaderLabel
-          :label="item.name"
+          :label="item.listing?.title ?? ''"
+          class="truncate whitespace-nowrap"
         />
       </h3>
 
       <div class="flex items-center justify-between mb-3">
-        <div>
+        <div class="text-center">
           <UiFooterLabel
             :label="$t('listedPrice')"
             :xs="true"
           />
           <UiHeaderLabel
-            :label="`$${item.currentPrice}`"
+            :label="`$${item.listing?.price}`"
             :white="true"
           />
         </div>
-        <div class="text-right">
+        <div class="items-center flex flex-col">
           <UiFooterLabel
             :label="$t('marketValue')"
             :xs="true"
           />
           <p class="text-green-400 font-bold text-xl">
-            ${{ item.marketValue }}
+            ${{ item.medianPrice }}
           </p>
         </div>
       </div>
 
-      <!-- Profit Margin -->
-      <div class="mb-4">
-        <div class="flex items-center justify-between mb-1">
+      <div class="flex gap-2 mb-4 text-sm justify-around">
+        <div class="flex space-x-1">
           <UiFooterLabel
-            :label="$t('profitMargin')"
-            :xs="true"
-          />
-          <span class="text-green-400 font-medium">{{ item.profitMargin }}%</span>
-        </div>
-        <div class="w-full bg-slate-700 rounded-full h-2">
-          <div
-            class="bg-gradient-to-r from-green-500 to-green-400 h-2 rounded-full transition-all duration-300"
-            :style="{ width: `${Math.min(item.profitMargin, 100)}%` }"
-          />
-        </div>
-      </div>
-
-      <div class="grid grid-cols-2 gap-2 mb-4 text-sm">
-        <div class="flex">
-          <UiFooterLabel
-            :label="$t('condition:')"
+            :label="$t('category')"
             :xs="true"
           />
           <UiFooterLabel
-            :label="item.condition"
+            :label="item.category ?? ''"
             :xs="true"
             :white="true"
           />
         </div>
 
-        <div class="flex">
+        <div class="flex space-x-1">
           <UiFooterLabel
             :label="$t('location:')"
             :xs="true"
           />
           <UiFooterLabel
-            :label="item.location"
+            :label="item.listing?.country ?? ''"
             :xs="true"
             :white="true"
           />
         </div>
       </div>
 
-      <!-- Action Buttons -->
-      <div class="flex gap-2">
+      <div class="flex flex-col item-end mt-auto">
         <UiButton
           :primary="true"
           class="flex-1"
@@ -116,23 +109,30 @@
         </UiButton>
       </div>
     </div>
-  </UiDefaultContainer>
+  </div>
 </template>
 
 <script setup lang="ts">
-import type { FlipperItem } from '~/types/FlipType'
+defineProps<{ item: Flip }>()
 
-defineProps<{ item: FlipperItem }>()
+const { locale } = useI18n()
 
-// Methods
-const getMarketplaceBadgeClass = (marketplace: string) => {
+const getAuctionTypeBadgeClass = (auctionType: string) => {
   const classes = {
-    eBay: 'bg-blue-600 text-white',
-    Facebook: 'bg-blue-500 text-white',
-    Mercari: 'bg-red-500 text-white',
-    Poshmark: 'bg-pink-500 text-white',
+    BuyItNow: 'bg-blue-500 text-white',
+    Auction: 'bg-red-500 text-white',
+    Negotiatable: 'bg-gray-500 text-white',
   }
-  return classes[marketplace as keyof typeof classes] || 'bg-gray-600 text-white'
+  return classes[auctionType as keyof typeof classes] || 'bg-gray-600 text-white'
+}
+
+const getAuctionTypeText = (auctionType: string) => {
+  const classes = {
+    BuyItNow: 'BIN',
+    Auction: 'Auction',
+    Negotiatable: 'Negotiatable',
+  }
+  return classes[auctionType as keyof typeof classes] || 'Unknown'
 }
 
 const getProfitBadgeClass = (profit: number) => {
@@ -142,43 +142,15 @@ const getProfitBadgeClass = (profit: number) => {
   return 'bg-orange-500 text-white'
 }
 
-const getTimeAgo = (date: Date) => {
-  const now = new Date()
-  const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60))
+const viewItem = (item: Flip) => {
+  const url = useListingStore().getUrl(item.listing?.platform ?? 'Ebay', item.listing?.id ?? '', locale.value)
 
-  if (diffInMinutes < 1) return 'Just now'
-  if (diffInMinutes < 60) return `${diffInMinutes}m ago`
-  if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`
-  return `${Math.floor(diffInMinutes / 1440)}d ago`
-}
-
-const viewItem = (item: FlipperItem) => {
-  window.open('#', '_blank')
+  navigateTo(url, { external: true })
 
   // Add to recent activity
-  recentActivity.value.unshift({
-    id: Math.random().toString(36).substr(2, 9),
-    message: `Viewed "${item.name}" on ${item.marketplace}`,
-    timestamp: new Date(),
-  })
-
-  // Keep only last 10 activities
-  if (recentActivity.value.length > 10) {
-    recentActivity.value = recentActivity.value.slice(0, 10)
-  }
 }
 
-const addToWatchlist = (item: FlipperItem) => {
-  item.isWatched = !item.isWatched
-
-  recentActivity.value.unshift({
-    id: Math.random().toString(36).substr(2, 9),
-    message: `${item.isWatched ? 'Added to' : 'Removed from'} watchlist: "${item.name}"`,
-    timestamp: new Date(),
-  })
-
-  if (recentActivity.value.length > 10) {
-    recentActivity.value = recentActivity.value.slice(0, 10)
-  }
+const addToWatchlist = (item: Flip) => {
+  return
 }
 </script>

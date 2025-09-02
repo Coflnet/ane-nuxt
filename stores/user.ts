@@ -58,6 +58,7 @@ export const useUserStore = defineStore('user', () => {
   const acceptingReferralCode = ref<string>('')
   const userReferralCode = ref<string>('')
   const accountId = ref('')
+  const accessToken = ref<string | null>()
 
   const notificationSettings = ref<NotificationSettings>({
     discord: {
@@ -158,6 +159,7 @@ export const useUserStore = defineStore('user', () => {
       })
 
       token.value = response.authToken ?? ''
+      accessToken.value = credential?.accessToken
 
       isAuthenticated.value = true
 
@@ -167,6 +169,19 @@ export const useUserStore = defineStore('user', () => {
       console.error('Error during Google login:', err)
       return { success: false, error: 'Failed to login. Please try again.' }
     }
+  }
+
+  async function generateNewToken() {
+    if (accessToken.value == null) {
+      push.error('Please logout and log back in')
+      return
+    }
+    const response = await loginFirebase({
+      composable: '$fetch',
+      body: { authToken: accessToken.value },
+    })
+
+    token.value = response.authToken ?? ''
   }
 
   async function upgradeUserAccount(clientAuth: Auth, loginData: GoogleAuthProvider | EmailAuthCredential): Promise<boolean> {
@@ -398,6 +413,7 @@ export const useUserStore = defineStore('user', () => {
     generateReferralCode,
     useRefferalCode,
     getUserData,
+    generateNewToken,
   }
 }, {
   persist: true,

@@ -35,6 +35,17 @@ export type FilterOptions = {
 
 export type FilterType = 'Options' | 'NumberRange' | 'Text' | 'Date' | 'Radius' | 'Bool' | 'MultiSelect';
 
+export type Flip = {
+    category?: string | null;
+    listing?: Listing;
+    serializedListing?: string | null;
+    medianPrice?: number | null;
+    potentialProfit?: number | null;
+    serializedSells?: string | null;
+    foundAt?: string | null;
+    recentSells?: Array<SoldFor> | null;
+};
+
 export type InviteLink = {
     userId?: string;
     id?: string;
@@ -124,6 +135,14 @@ export type ResultReport = {
 };
 
 export type SearchState = 'None' | 'Disabled' | 'DisabledError';
+
+export type SoldFor = {
+    platform?: Platform;
+    key?: string | null;
+    price?: number | null;
+    date?: string | null;
+    id?: string | null;
+};
 
 export type StoredListing = {
     platform?: Platform;
@@ -751,6 +770,61 @@ export type GetCountryResponses = {
 };
 
 export type GetCountryResponse = GetCountryResponses[keyof GetCountryResponses];
+
+export type GetFlipsData = {
+    body?: never;
+    path: {
+        category: string;
+    };
+    query?: {
+        limit?: number;
+    };
+    url: '/api/flips/{category}';
+};
+
+export type GetFlipsErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetFlipsError = GetFlipsErrors[keyof GetFlipsErrors];
+
+export type GetFlipsResponses = {
+    /**
+     * OK
+     */
+    200: Array<Flip>;
+};
+
+export type GetFlipsResponse = GetFlipsResponses[keyof GetFlipsResponses];
 
 export type GetMatchesData = {
     body?: never;

@@ -13,6 +13,8 @@
 </template>
 
 <script setup>
+import { client } from '#hey-api/client.gen'
+
 // App-wide setup
 useHead({
   title: 'ANE - Advanced Notification Engine',

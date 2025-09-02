@@ -83,5 +83,6 @@ export const useListingStore = defineStore('listing', () => {
 
     loadMatches,
     loadMoreMatches,
+    getUrl,
   }
 })
