@@ -668,5 +668,6 @@
   "listedPrice": "Listed Price",
   "marketValue": "Market Value",
   "viewItem": "View Item",
-  "location:": "Location :"
+  "location:": "Location :",
+  "appHeaderFlipper": "Flipper"
 }

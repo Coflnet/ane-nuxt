@@ -75,6 +75,17 @@
             {{ $t('appHeaderFilters') }}
           </UiTextButton>
 
+          <UiTextButton
+            class="justify-start"
+            @on-click="navigateAndClose('/flipper')"
+          >
+            <Icon
+              name="lucide:filter"
+              class="w-5 h-5 mr-2"
+            />
+            {{ $t('appHeaderFlipper') }}
+          </UiTextButton>
+
           <UiButton
             :primary="true"
             class="justify-start"

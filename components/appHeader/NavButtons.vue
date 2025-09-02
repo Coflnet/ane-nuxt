@@ -17,6 +17,14 @@
     </UiLinkButton>
 
     <UiLinkButton
+      aria-label="Filters Navigation Button"
+      :white="true"
+      :to="localePath('/flipper')"
+    >
+      {{ $t('appHeaderFlipper') }}
+    </UiLinkButton>
+
+    <UiLinkButton
       aria-label="Auctions Navigation Button"
       :white="true"
       :primary="true"

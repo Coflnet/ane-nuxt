@@ -1,6 +1,5 @@
 <template>
   <div class="border border-slate-700 rounded-lg  hover:shadow-md transition-shadow w-96 h-full flex flex-col">
-    <!-- Item Image -->
     <div class="relative ">
       <img
         v-if="item.listing!.imageUrls?.length != 0"
@@ -42,7 +41,6 @@
       </div>
     </div>
 
-    <!-- Item Details -->
     <div class="p-4 flex flex-col flex-1">
       <h3>
         <UiHeaderLabel
@@ -146,11 +144,5 @@ const viewItem = (item: Flip) => {
   const url = useListingStore().getUrl(item.listing?.platform ?? 'Ebay', item.listing?.id ?? '', locale.value)
 
   navigateTo(url, { external: true })
-
-  // Add to recent activity
-}
-
-const addToWatchlist = (item: Flip) => {
-  return
 }
 </script>

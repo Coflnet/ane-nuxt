@@ -7,7 +7,6 @@
       />
     </h1>
     <UiDefaultContainer class="mb-6 p-6 relative">
-      <!-- Scroll Container -->
       <div
         ref="scrollContainer"
         class="overflow-x-auto py-4"
@@ -33,13 +32,6 @@
 import { ref, computed, onMounted } from 'vue'
 import { getFlips } from '~/src/api-client'
 
-interface Activity {
-  id: string
-  message: string
-  timestamp: Date
-}
-
-// Reactive data
 const selectedMarketplace = ref('all')
 const items = ref<Flip[]>([])
 const scrollContainer = ref(null)
@@ -70,10 +62,8 @@ onMounted(() => {
   loadFlips()
   if (scrollContainer.value) {
     scrollContainer.value.addEventListener('wheel', (e) => {
-      // Prevent the page from scrolling vertically
       e.preventDefault()
 
-      // Modify the horizontal scroll position
       scrollContainer.value.scrollLeft += e.deltaY
     })
   }
