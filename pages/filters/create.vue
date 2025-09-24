@@ -202,7 +202,6 @@ async function loadEditParam() {
         }
         case 'IncludePlatforms': {
           // construct the selected marketplaces from the string to test if it is all marketplaces selected
-          console.log(item.value)
           const constuctedArray = constructOptionsFromString(item.value ?? '')
           if (valididateAllMarketplace(constuctedArray)) {
             filter.value.marketplace = 'all'

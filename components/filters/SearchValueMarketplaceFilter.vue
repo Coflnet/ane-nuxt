@@ -8,12 +8,22 @@
       :label="$t('searchValue')"
     />
     <!-- Marketplace select -->
-    <UiMultiSelect
-      v-model="selectedMarketplaces"
-      :options="resolvedMarketplaceOptions"
-      :label="$t('marketplace')"
-      override-value="all"
-    />
+    <div class="flex">
+      <div class="mr-6 w-20">
+        <UiCheckbox
+          v-model="isEbay"
+          :label="$t('useEbayMarketplace')"
+        />
+      </div>
+      <UiMultiSelect
+
+        v-model="selectedMarketplaces"
+        :disabled="isEbay"
+        :options="resolvedMarketplaceOptions"
+        :label="$t('marketplace')"
+        override-value="all"
+      />
+    </div>
     <!-- Search Frequency -->
     <UiDropdown
       v-if="premiumMarkets"
@@ -35,12 +45,24 @@ const hasBasicPlan = useUserStore().currentPlan?.product == 'basic' || !useUserS
 
 const premiumMarkets = ref(false)
 const model = defineModel<Filter>()
+const isEbay = ref(false)
 
 const resolvedMarketplaceOptions = ref<Options[]>(detectLocationNA() ? usMarketplaces : marketplaces)
 
 const selectedMarketplaces = ref<Options[]>([])
 
+watch(isEbay, (newVal) => {
+  if (newVal) {
+    model.value!.marketplace = 'Ebay'
+  }
+})
+
 watch(() => model.value!.marketplace, () => {
+  if (model.value?.marketplace == 'Ebay') {
+    isEbay.value = true
+    return
+  }
+
   selectedMarketplaces.value = []
   model.value?.marketplace.split(',').map((condidtionName) => {
     const item = resolvedMarketplaceOptions.value.find(m => m.value == condidtionName)
