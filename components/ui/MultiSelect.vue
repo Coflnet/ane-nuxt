@@ -21,10 +21,12 @@
     <Listbox
       v-model="selectedItems"
       multiple
+      :disabled="disabled"
     >
       <ListboxButton
         :aria-label="labelAria ?? 'Multi Select Dropdown'"
         class="w-full px-4 py-2 rounded-lg border border-slate-600 bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-400 flex items-center justify-between"
+        :class="disabled? 'cursor-not-allowed opacity-70' : 'cursor-pointer'"
         @click="isOpen = !isOpen"
       >
         {{ selectedLabels }}
@@ -87,6 +89,7 @@ const props = defineProps<{
   label?: string
   hoverText?: string
   labelAria?: string
+  disabled?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -102,7 +105,7 @@ watch(() => model, () => {
 
 // create the string that is displayed on the button eq. Ebay, AutoScout24
 const selectedLabels = computed(() => {
-  if (selectedItems.value.length === 0) return ''
+  if (selectedItems.value.length === 0) return t('selectOption')
   const rawSelectedItems = selectedItems.value.map(item => toRaw(item)) // Convert Proxies to raw objects
   const selected = props.options
     .filter(option => rawSelectedItems.some(selectedItem =>

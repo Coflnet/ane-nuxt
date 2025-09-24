@@ -13,7 +13,7 @@
     >
       <Icon
         name="tabler:check"
-        class="size-4 text-slate-100"
+        class="size-6 text-slate-100"
         :class="!modelValue ? 'invisible' : 'visible'"
       />
     </button>
