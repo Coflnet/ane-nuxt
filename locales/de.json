@@ -670,5 +670,7 @@
   "lowFuzzy": "Niedrige Toleranz",
   "mediumFuzzy": "Mittlere Toleranz",
   "fuzzyInfo": "Anzahl der Buchstaben, die sich von deinem Suchwert unterscheiden dürfen: (z.B. Auto -> Auot, entspricht Niedriger Toleranz) \n Vorsicht! Suchwerte mit Toleranz können andere Produkte mit einschließen. Diese Einstellung ist wegen des Rechenaufwands nur für zahlende Nutzer verfügbar.",
-  "hasBasicPlanRestriction": "Das kostenlose Abo ist auf eine Suche alle 6 Stunden beschränkt"
+  "hasBasicPlanRestriction": "Das kostenlose Abo ist auf eine Suche alle 6 Stunden beschränkt",
+  "useEbayMarketplace": "Ebay verwenden",
+  "selectOption": "Option auswählen"
 }
