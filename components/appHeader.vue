@@ -8,9 +8,7 @@
         <div class="flex items-center w-full md:w-24 justify-between">
           <div class="flex items-center">
             <UiLogo location="/overview" />
-            <div
-              class="ml-2 px-2 py-0.5 bg-blue-500 text-white text-xs font-semibold rounded-full"
-            >
+            <div class="ml-2 px-2 py-0.5 bg-blue-500 text-white text-xs font-semibold rounded-full">
               {{ $t('appHeaderBeta') }}
             </div>
           </div>

@@ -1,3 +1,4 @@
+import { isHttpError } from '~/composable/isHttpError'
 import { getMatches, type FilterMatch, type Platform } from '~/src/api-client'
 
 export const useListingStore = defineStore('listing', () => {
@@ -39,11 +40,20 @@ export const useListingStore = defineStore('listing', () => {
   async function loadMoreMatches(loadedItems: FilterMatch[]): Promise<[boolean, FilterMatch[]]> {
     const apiToken = `Bearer ${userStore.token}`
 
-    const response = await getMatches({
-      query: { limit: 21, before: loadedItems.at(-1)?.matchedAt },
-      composable: '$fetch',
-      headers: { Authorization: apiToken },
-    })
+    let response: FilterMatch[] = []
+
+    try {
+      response = await getMatches({
+        query: { limit: 21, before: loadedItems.at(-1)?.matchedAt ?? '' },
+        composable: '$fetch',
+        headers: { Authorization: apiToken },
+      })
+    }
+    catch (error) {
+      if (isHttpError(error) && error.status === 401) {
+        useUserStore().logout()
+      }
+    }
 
     recentMatches.value.push(...response)
 

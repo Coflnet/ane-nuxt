@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { isHttpError } from '~/composable/isHttpError'
 import { getFilters, addFilter, getOptions, testFilter as callTestFilter } from '~/src/api-client'
 import type { ListingListener, FilterOptions } from '~/src/api-client'
 
@@ -34,17 +35,24 @@ export const useFilterStore = defineStore('filter', () => {
 
     const apiToken = `Bearer ${userStore.token}`
 
-    const loadedFilters = await getFilters({
-      composable: '$fetch',
-      headers: { Authorization: apiToken },
-    })
+    try {
+      const loadedFilters = await getFilters({
+        composable: '$fetch',
+        headers: { Authorization: apiToken },
+      })
 
-    if (!loadedFilters) {
-      console.error('No filters found')
-      return
+      if (!loadedFilters) {
+        console.error('No filters found')
+        return
+      }
+
+      filters.value = loadedFilters
     }
-
-    filters.value = loadedFilters
+    catch (error) {
+      if (isHttpError(error) && error.status === 401) {
+        useUserStore().logout()
+      }
+    }
   }
 
   async function saveFilter(filterToCreate: ListingListener) {
@@ -63,6 +71,9 @@ export const useFilterStore = defineStore('filter', () => {
       })
     }
     catch (e) {
+      if (isHttpError(e) && e.status === 401) {
+        useUserStore().logout()
+      }
       console.error('Error adding filter', e)
       throw e
     }
@@ -86,6 +97,9 @@ export const useFilterStore = defineStore('filter', () => {
     }
     catch (e) {
       console.error('Error testing filter', e)
+      if (isHttpError(e) && e.status === 401) {
+        useUserStore().logout()
+      }
       throw e
     }
   }
@@ -107,6 +121,10 @@ export const useFilterStore = defineStore('filter', () => {
     }
     catch (e) {
       console.error('Error loading filter options', e)
+      if (isHttpError(e) && e.status === 401) {
+        useUserStore().logout()
+      }
+
       throw e
     }
   }
