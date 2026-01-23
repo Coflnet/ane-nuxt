@@ -37,6 +37,10 @@ const emit = defineEmits<{
 
 const query = ref(props.initialQuery || '')
 
+watch(() => props.initialQuery, (newQuery) => {
+  query.value = newQuery || ''
+})
+
 function handleSearch() {
   if (query.value.trim()) {
     emit('search', query.value)

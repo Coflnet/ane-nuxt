@@ -9,7 +9,7 @@
         {{ $t('homeSubtitle', 'Compare prices across multiple marketplaces. Save money and the planet.') }}
       </p>
 
-      <ProductSearch @search="onSearch" />
+      <ProductSearch :initial-query="searchQuery" @search="onSearch" />
     </div>
 
     <!-- Results Section (if searching) -->
@@ -91,6 +91,8 @@
 import { searchProducts } from '~/src/api-client'
 
 const router = useRouter()
+const route = useRoute()
+const searchQuery = computed(() => (route.query.q as string) || '')
 const products = ref<any[]>([])
 const loading = ref(false)
 const hasSearched = ref(false)
@@ -102,7 +104,7 @@ const categories = [
   { name: 'Gaming', icon: 'tabler:device-gamepad-2' },
 ]
 
-async function onSearch(query: string) {
+async function performSearch(query: string) {
   loading.value = true
   hasSearched.value = true
   try {
@@ -114,6 +116,19 @@ async function onSearch(query: string) {
     loading.value = false
   }
 }
+
+function onSearch(query: string) {
+  router.push({ query: { ...route.query, q: query } })
+}
+
+watch(() => route.query.q, (newQuery) => {
+  if (newQuery) {
+    performSearch(newQuery as string)
+  } else {
+    products.value = []
+    hasSearched.value = false
+  }
+}, { immediate: true })
 
 function onCategoryClick(category: string) {
   onSearch(category)
