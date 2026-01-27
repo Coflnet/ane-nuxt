@@ -4,7 +4,6 @@ import { createUserWithEmailAndPassword, type EmailAuthCredential, EmailAuthProv
 import { navigateTo } from '#app'
 import { getStats, loginFirebase, useLink } from '~/src/api-client'
 import type { ActiveSubscription } from '#hey-api'
-import { useIsWebView } from '~/composable/useIsWebView'
 
 // Types
 export interface User {

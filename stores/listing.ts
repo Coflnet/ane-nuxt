@@ -24,10 +24,12 @@ export const useListingStore = defineStore('listing', () => {
 
     // Handle there being no image
     // so no need to handle it when accessing the iamge in ui
-    recentMatches.value.map((item) => {
-      if (item.listingData?.imageUrls?.length != 0)
+    recentMatches.value = recentMatches.value.map((item) => {
+      if (item.listingData?.imageUrls?.length !== 0)
         return item
-      item.listingData.imageUrls[0] == ''
+      if (item.listingData?.imageUrls) {
+        item.listingData.imageUrls[0] = ''
+      }
       return item
     })
 

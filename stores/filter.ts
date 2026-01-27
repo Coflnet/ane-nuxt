@@ -59,7 +59,7 @@ export const useFilterStore = defineStore('filter', () => {
       await addFilter({
         composable: '$fetch',
         headers: { Authorization: apiToken },
-        body: filterToCreate as any,
+        body: filterToCreate as unknown as typeof filterToCreate,
       })
     }
     catch (e) {
@@ -79,7 +79,7 @@ export const useFilterStore = defineStore('filter', () => {
       const listings = await callTestFilter({
         composable: '$fetch',
         headers: { Authorization: apiToken },
-        body: filter as any,
+        body: filter as unknown as typeof filter,
       })
 
       return listings

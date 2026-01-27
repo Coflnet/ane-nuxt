@@ -1,6 +1,8 @@
 <template>
-  <div :class="[`grid  md:grid-cols-${gridSize} gap-6`,
-  gridShink ? `grid-cols-1` : `grid-cols-${gridSize - 1}`]">
+  <div
+    :class="[`grid  md:grid-cols-${gridSize} gap-6`,
+             gridShink ? `grid-cols-1` : `grid-cols-${gridSize - 1}`]"
+  >
     <slot />
   </div>
 </template>

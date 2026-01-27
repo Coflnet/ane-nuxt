@@ -83,7 +83,7 @@ async function sendWrongMatchMessage() {
   const response = await reportMatch({
     composable: '$fetch',
     headers: { Authorization: apiToken },
-    body: { match: plainAuction as any, message: auctionBadText },
+    body: { match: plainAuction as unknown as FilterMatch, message: auctionBadText },
   })
 
   push.success(t('reportSuccessfull', { id: response }))

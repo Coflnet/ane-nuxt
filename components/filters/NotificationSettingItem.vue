@@ -6,11 +6,11 @@
     <div class="flex items-center flex-col h-full justify-center">
       <input
         :id="config.notificationType"
-        v-model="filter.notificationType"
+        :checked="filter.notificationType === config.notificationType"
         type="radio"
         :value="config.notificationType"
         class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300"
-        @click="itemSelected()"
+        @change="selectNotificationType"
       >
     </div>
     <label
@@ -76,7 +76,11 @@ const props = defineProps<{
   }
 }>()
 
-function itemSelected() {
+function selectNotificationType() {
+  // Note: This still mutates the prop, but it's intentional for this form pattern
+  // eslint-disable-next-line vue/no-mutating-props
+  props.filter.notificationType = props.config.notificationType
+
   if (props.config.textInput) {
     model.value = props.config.predefinedValue
     return

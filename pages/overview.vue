@@ -66,8 +66,6 @@ const filterCount = computed(() => {
 
 const topFilters = ref<{ [id: string]: TopFilter }>({})
 
-const webView = useIsWebView()
-
 async function loadStats() {
   const response = filterStore.getUserFilters
   stats.value.activeFilters = response.length
@@ -76,7 +74,7 @@ async function loadStats() {
   let matches = 0
   filterStore.getUserFilters.map((i) => {
     matches += i.matchCount ?? 0
-    if (!topFilters.value.hasOwnProperty(i.id ?? '')) {
+    if (!Object.hasOwn(topFilters.value, i.id ?? '')) {
       topFilters.value[String(i.id) as string] = {
         name: i.name ?? '',
         id: String(i.id),

@@ -9,22 +9,38 @@
         {{ $t('homeSubtitle', 'Compare prices across multiple marketplaces. Save money and the planet.') }}
       </p>
 
-      <ProductSearch :initial-query="searchQuery" @search="onSearch" />
+      <ProductSearch
+        :initial-query="searchQuery"
+        @search="onSearch"
+      />
     </div>
 
     <!-- Results Section (if searching) -->
-    <div v-if="loading || products.length > 0 || hasSearched" class="max-w-6xl mx-auto">
+    <div
+      v-if="loading || products.length > 0 || hasSearched"
+      class="max-w-6xl mx-auto"
+    >
       <div class="flex items-center justify-between mb-6">
         <h2 class="text-2xl font-semibold text-slate-200">
           {{ loading ? 'Searching...' : products.length > 0 ? 'Search Results' : 'No results found' }}
         </h2>
       </div>
 
-      <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div v-for="i in 6" :key="i" class="h-64 bg-slate-800/50 rounded-xl animate-pulse" />
+      <div
+        v-if="loading"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+      >
+        <div
+          v-for="i in 6"
+          :key="i"
+          class="h-64 bg-slate-800/50 rounded-xl animate-pulse"
+        />
       </div>
 
-      <div v-else-if="products.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div
+        v-else-if="products.length > 0"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+      >
         <NuxtLink
           v-for="product in products"
           :key="product.id"
@@ -32,17 +48,26 @@
           class="block bg-slate-800 rounded-xl overflow-hidden hover:ring-2 hover:ring-blue-500/50 transition-all hover:scale-[1.02] group"
         >
           <div class="aspect-video bg-slate-900 relative">
-             <NuxtImg
+            <NuxtImg
               v-if="product.imageUrl"
               :src="product.imageUrl"
               class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
               loading="lazy"
-            /> 
-            <div v-else class="w-full h-full flex items-center justify-center text-slate-600">
-              <Icon name="tabler:photo" class="w-12 h-12" />
+            />
+            <div
+              v-else
+              class="w-full h-full flex items-center justify-center text-slate-600"
+            >
+              <Icon
+                name="tabler:photo"
+                class="w-12 h-12"
+              />
             </div>
             <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent">
-              <span v-if="product.category" class="text-xs font-medium text-blue-400 uppercase tracking-wider">
+              <span
+                v-if="product.category"
+                class="text-xs font-medium text-blue-400 uppercase tracking-wider"
+              >
                 {{ product.category }}
               </span>
             </div>
@@ -59,7 +84,7 @@
                 </span>
               </div>
               <div class="px-3 py-1 bg-slate-700/50 rounded-full text-xs text-slate-300">
-                 Details &rarr;
+                Details &rarr;
               </div>
             </div>
           </div>
@@ -68,8 +93,13 @@
     </div>
 
     <!-- Categories / Features (Default View) -->
-    <div v-else class="max-w-6xl mx-auto mt-20">
-      <h2 class="text-2xl font-bold text-center text-slate-300 mb-10">Popular Categories</h2>
+    <div
+      v-else
+      class="max-w-6xl mx-auto mt-20"
+    >
+      <h2 class="text-2xl font-bold text-center text-slate-300 mb-10">
+        Popular Categories
+      </h2>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <button
           v-for="cat in categories"
@@ -78,9 +108,14 @@
           @click="onCategoryClick(cat.name)"
         >
           <div class="mb-4 inline-flex p-3 rounded-full bg-slate-700/50 group-hover:scale-110 transition-transform text-blue-400">
-            <Icon :name="cat.icon" class="w-8 h-8" />
+            <Icon
+              :name="cat.icon"
+              class="w-8 h-8"
+            />
           </div>
-          <div class="font-medium text-slate-200">{{ cat.name }}</div>
+          <div class="font-medium text-slate-200">
+            {{ cat.name }}
+          </div>
         </button>
       </div>
     </div>
@@ -89,11 +124,12 @@
 
 <script setup lang="ts">
 import { searchProducts } from '~/src/api-client'
+import type { Product } from '~/src/api-client/types.gen'
 
 const router = useRouter()
 const route = useRoute()
 const searchQuery = computed(() => (route.query.q as string) || '')
-const products = ref<any[]>([])
+const products = ref<Product[]>([])
 const loading = ref(false)
 const hasSearched = ref(false)
 
@@ -110,9 +146,11 @@ async function performSearch(query: string) {
   try {
     const response = await searchProducts({ query: { query } })
     products.value = response?.products || []
-  } catch (e) {
+  }
+  catch (e) {
     console.error('Search failed', e)
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
@@ -124,7 +162,8 @@ function onSearch(query: string) {
 watch(() => route.query.q, (newQuery) => {
   if (newQuery) {
     performSearch(newQuery as string)
-  } else {
+  }
+  else {
     products.value = []
     hasSearched.value = false
   }

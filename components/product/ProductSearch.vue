@@ -4,7 +4,10 @@
       <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200" />
       <div class="relative flex items-center bg-slate-800 rounded-lg shadow-xl ring-1 ring-slate-700/50">
         <div class="pl-4 text-slate-400">
-          <Icon name="tabler:search" class="w-6 h-6" />
+          <Icon
+            name="tabler:search"
+            class="w-6 h-6"
+          />
         </div>
         <input
           v-model="query"
@@ -18,7 +21,10 @@
             class="p-2 text-slate-400 hover:text-white transition-colors"
             @click="handleSearch"
           >
-            <Icon name="tabler:arrow-right" class="w-6 h-6" />
+            <Icon
+              name="tabler:arrow-right"
+              class="w-6 h-6"
+            />
           </button>
         </div>
       </div>

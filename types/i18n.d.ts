@@ -8,10 +8,11 @@ declare module '#app' {
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
-    $t: (key: string, ...args: any[]) => string
+    $t: (key: string, ...args: unknown[]) => string
     $i18n: I18n
   }
 }
 declare module '@nuxtjs/i18n' {
-  interface NuxtI18nInstance extends Composer { }
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  interface NuxtI18nInstance extends Composer {}
 }

@@ -5,8 +5,6 @@
 </template>
 
 <script setup lang="ts">
-const localePath = useLocalePath()
-
 const userStore = useUserStore()
 
 definePageMeta({

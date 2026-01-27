@@ -31,6 +31,7 @@ export default defineNuxtConfig({
 
   routeRules: {
     '/': { prerender: true },
+    '/_ipx/**': { prerender: false },
   },
 
   future: {

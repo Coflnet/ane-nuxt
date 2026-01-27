@@ -14,8 +14,6 @@
 </template>
 
 <script setup lang="ts">
-import { useIsWebView } from '~/composable/useIsWebView'
-
 const { t } = useI18n()
 const localePath = useLocalePath()
 

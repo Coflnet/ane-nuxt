@@ -86,8 +86,6 @@ import humanizeDuration from 'humanize-duration'
 import type { FilterMatch } from '~/src/api-client'
 import { useFormat } from '~/composable/useFormat'
 
-const localePath = useLocalePath()
-
 const { width } = useWindowSize()
 const { locale } = useI18n()
 

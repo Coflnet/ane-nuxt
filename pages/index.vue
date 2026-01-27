@@ -1332,7 +1332,7 @@ import { definePageMeta } from '#imports'
 const localePath = useLocalePath()
 
 const vIntersect = {
-  mounted: (el: Element, binding: any) => {
+  mounted: (el: Element, binding: { value: (el: Element) => void }) => {
     const callback = binding.value
     const { stop } = useIntersectionObserver(
       el,

@@ -21,4 +21,3 @@
 <script setup lang="ts">
 defineProps({ isNewFilter: Boolean, saving: Boolean })
 </script>
-

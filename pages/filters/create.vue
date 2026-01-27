@@ -24,7 +24,10 @@
         <FiltersCreateCountrySection :model-value="filter" />
 
         <!-- Dont worry about this, this whole system needs to get reworked by akwav -->
-        <div v-for="(option, _index) in filterStore.getFilterOptions">
+        <div
+          v-for="option in filterStore.getFilterOptions"
+          :key="option.name"
+        >
           <FiltersKleinanzeigenCategoryFilter
             v-if="option.name === 'KleinanzeigenKategorie' && filter.marketplace == 'kleinanzeigen'"
             :filter="filter"
@@ -69,7 +72,6 @@ import { useFirebaseApp } from 'vuefire'
 import type { FilterMatch, ListingListener } from '~/src/api-client'
 import type { Filter } from '~/types/FilterType'
 import { constructOptionsFromString, detectLocationNA, filterFreeMarketplaces, marketplaces, usMarketplaces, valididateAllMarketplace } from '~/constants/CreateFilterConstants'
-import { useIsWebView } from '~/composable/useIsWebView'
 
 const { debounce } = lodash
 
@@ -301,7 +303,7 @@ async function filterToCreate(): Promise<ListingListener | null> {
   return filterToCreate
 }
 
-async function handleFilters(): Promise<{ name: string, value: any }[]> {
+async function handleFilters(): Promise<{ name: string, value: string | number | boolean }[]> {
   const rawFilter = toRaw(filter.value)
   const filters: { name: string, value: string | number | boolean }[] = []
 

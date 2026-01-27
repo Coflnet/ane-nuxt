@@ -97,7 +97,7 @@
 </template>
 
 <script setup lang="ts">
-const { locale, locales } = useI18n()
+const { locale: _locale, locales: _locales } = useI18n()
 const userStore = useUserStore()
 const router = useRouter()
 

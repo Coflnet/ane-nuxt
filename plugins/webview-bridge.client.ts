@@ -3,7 +3,7 @@ declare global {
     greetFromFlutter: () => void
     updateNuxtMessage: (message: string) => void
     getNuxtData: () => string // Return type should match what you JSON.stringify
-    sendToFlutter: (message: any) => void
+    sendToFlutter: (message: unknown) => void
     FlutterChannel?: {
       postMessage: (message: string) => void
     }
@@ -17,26 +17,26 @@ export default defineNuxtPlugin((nuxtApp) => {
     window.updateNuxtMessage = async (message: string) => {
       console.log('Nuxt.js received updateNuxtMessage:', message)
       console.log(typeof message)
-      const dataObject = JSON.parse(message)
+      const dataObject = JSON.parse(message) as { action: string, data: Record<string, unknown> }
       const messageData = dataObject['data']
       switch (dataObject['action']) {
         case 'loginSuccess':
-          connectLoginFirebase(messageData['user'], messageData['token'])
+          connectLoginFirebase(messageData['user'] as FlutterUserData, messageData['token'] as string)
           break
         case 'anonymousLoginSuccess':
-          connectAnonymousLoginFirebase(messageData['token'])
+          connectAnonymousLoginFirebase(messageData['token'] as string)
           break
         case 'upgradeAccountSuccess':
-          upgradeAccountSuccess(messageData['user'])
+          upgradeAccountSuccess(messageData['user'] as FlutterUserData)
           break
         case 'error':
-          errorMessage(messageData['message'])
+          errorMessage(messageData['message'] as string)
           break
         case 'setNotificationToken':
-          setNotificationToken(messageData['token'])
+          setNotificationToken(messageData['token'] as string)
           break
         case 'log':
-          logFunction(messageData['message'])
+          logFunction(messageData['message'] as string)
       }
     }
 
@@ -50,7 +50,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       })
     }
 
-    window.sendToFlutter = (message: any) => {
+    window.sendToFlutter = (message: unknown) => {
       if (window.FlutterChannel && window.FlutterChannel.postMessage) {
         window.FlutterChannel.postMessage(JSON.stringify(message))
       }
@@ -59,6 +59,14 @@ export default defineNuxtPlugin((nuxtApp) => {
       }
     }
   }
+
+  interface FlutterUserData {
+    uid: string
+    displayName?: string
+    email?: string
+    photoURL?: string
+  }
+
   async function connectAnonymousLoginFirebase(token: string) {
     const response = await loginFirebase({
       composable: '$fetch',
@@ -71,7 +79,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     useUserStore().isAnonymous = true
   }
 
-  async function connectLoginFirebase(data: any, token: string) {
+  async function connectLoginFirebase(data: FlutterUserData, token: string) {
     const localePath = useLocalePath()
     useUserStore().user = {
       id: data.uid,
@@ -90,7 +98,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     navigateTo(localePath('/overview'))
   }
 
-  async function upgradeAccountSuccess(data: any) {
+  async function upgradeAccountSuccess(data: FlutterUserData) {
     const localePath = useLocalePath()
     useUserStore().user = {
       id: data.uid,
