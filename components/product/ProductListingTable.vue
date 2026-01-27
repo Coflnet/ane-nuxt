@@ -181,7 +181,8 @@
 
 <script setup lang="ts">
 import { reportProductIssue } from '~/src/api-client'
-import type { IssueType, Platform, ProductMatch } from '~/src/api-client/types.gen'
+import type { IssueType, ProductMatch } from '~/src/api-client/types.gen'
+import { useAvailabilityCheck } from '~/composable/useAvailabilityCheck'
 
 const props = defineProps<{
   listings: ProductMatch[]
@@ -213,6 +214,8 @@ const issueTypes: { value: IssueType, label: string }[] = [
   { value: 'Other', label: 'Other issue' },
 ]
 
+const { getMarketplaceName, checkAvailability: checkAvailabilityUtil } = useAvailabilityCheck()
+
 function formatPrice(amount: number | undefined | null) {
   if (!amount) return 'N/A'
   return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(amount)
@@ -223,62 +226,9 @@ function formatDate(dateStr: string | undefined | null) {
   return new Date(dateStr).toLocaleDateString('de-DE', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
 }
 
-function getMarketplaceName(url?: string | null): string {
-  if (!url) return 'Unknown'
-  try {
-    const hostname = new URL(url).hostname
-    return hostname.replace('www.', '').split('.')[0] ?? 'Unknown'
-  }
-  catch {
-    return 'Web'
-  }
-}
-
-function getPlatformFromUrl(url?: string | null): Platform {
-  if (!url) return 'Unknown'
-  const hostname = getMarketplaceName(url).toLowerCase()
-
-  const platformMap: Record<string, Platform> = {
-    kleinanzeigen: 'Kleinanzeigen',
-    ebay: 'Ebay',
-    marktplaats: 'Marktplaats',
-    willhaben: 'Willhaben',
-    shpock: 'Shpock',
-    markt: 'MarktDe',
-    vinted: 'Vinted',
-    facebook: 'Facebook',
-    poshmark: 'Poshmark',
-    mercari: 'Mercari',
-    depop: 'Depop',
-    mobile: 'Mobile',
-    autoscout24: 'AutoScout24',
-    craigslist: 'Craigslist',
-    offerup: 'OfferUp',
-    olx: 'OLX',
-    quoka: 'Quoka',
-    gumtree: 'Gumtree',
-    wallapop: 'Wallapop',
-  }
-
-  return platformMap[hostname] || 'Unknown'
-}
-
 async function checkAvailability(listing: ProductMatch): Promise<boolean> {
   const listingId = listing.listingId || listing.productId
-  if (!listingId) return true
-
-  const platform = getPlatformFromUrl(listing.listingUrl)
-  if (platform === 'Unknown') return true
-
-  try {
-    const response = await $fetch<{ isAvailable: boolean }>(`https://ane.coflnet.com/api/Product/${platform}/${listingId}/available`)
-    return response.isAvailable
-  }
-  catch (error) {
-    console.error('Failed to check availability:', error)
-    // If check fails, assume available
-    return true
-  }
+  return checkAvailabilityUtil(listingId, listing.listingUrl)
 }
 
 async function handleViewDeal(listing: ProductMatch) {

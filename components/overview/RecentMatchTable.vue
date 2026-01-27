@@ -85,6 +85,7 @@ import { useWindowSize } from '@vueuse/core'
 import humanizeDuration from 'humanize-duration'
 import type { FilterMatch } from '~/src/api-client'
 import { useFormat } from '~/composable/useFormat'
+import { useAvailabilityCheck } from '~/composable/useAvailabilityCheck'
 
 const { width } = useWindowSize()
 const { locale } = useI18n()
@@ -106,7 +107,21 @@ const props = defineProps({
   },
 })
 
+const listingStore = useListingStore()
+const filterStore = useFilterStore()
+const { checkAvailability } = useAvailabilityCheck()
+
 async function tableClicked(auction: FilterMatch) {
+  // Check availability before opening link
+  const listingId = auction.listingData?.id
+  if (listingId) {
+    const isAvailable = await checkAvailability(listingId, auction.listingData?.url)
+    if (!isAvailable) {
+      console.warn('Listing unavailable:', listingId)
+      // Still open the link, but user is warned via console
+    }
+  }
+
   navigateTo(listingStore.constructListingUrl(auction.listingData, locale.value), {
     external: true,
     open: {
@@ -123,7 +138,6 @@ const tableHeader = computed(() => {
 })
 
 const filters = useFilterStore()
-const listingStore = useListingStore()
 
 function timeAgo(auction: FilterMatch): string {
   const past = new Date(auction.matchedAt ?? '')

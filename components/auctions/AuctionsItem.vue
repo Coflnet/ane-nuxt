@@ -3,6 +3,7 @@
     <a
       :href="auctionUrl"
       aria-label="Auction link"
+      @click.prevent="handleAuctionClick"
     >
       <img
         :src="auction.listingData!.imageUrls![0] ?? ''"
@@ -32,7 +33,7 @@
 
   <div class="p-4">
     <div class="flex justify-between">
-      <a :href="auctionUrl">
+    <a :href="auctionUrl">
         <div class="flex items-start justify-between mb-2">
           <h3 class="font-medium text-lg text-white line-clamp-2">
             {{ auction.listingData!.title }}
@@ -74,12 +75,14 @@
 import { Icon, UiHeaderLabel } from '#components'
 import type { FilterMatch } from '#hey-api'
 import { useFormat } from '~/composable/useFormat'
+import { useAvailabilityCheck } from '~/composable/useAvailabilityCheck'
 
 const { locale } = useI18n()
 const localePath = useLocalePath()
 
 const filterStore = useFilterStore()
 const listingStore = useListingStore()
+const { checkAvailability } = useAvailabilityCheck()
 
 const props = defineProps<{
   auction: FilterMatch
@@ -93,4 +96,21 @@ const auctionUrl = computed(() => {
     return ''
   return url
 })
+
+async function handleAuctionClick() {
+  // Check availability before opening link
+  const listingId = props.auction.listingData?.id
+  if (listingId && auctionUrl.value) {
+    const isAvailable = await checkAvailability(listingId, auctionUrl.value)
+    if (!isAvailable) {
+      console.warn('Listing unavailable:', listingId)
+      // Still open the link, but user is warned via console
+    }
+  }
+
+  // Open the link
+  if (auctionUrl.value) {
+    window.open(auctionUrl.value, '_blank')
+  }
+}
 </script>
