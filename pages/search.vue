@@ -43,8 +43,8 @@
       >
         <NuxtLink
           v-for="product in products"
-          :key="product.id"
-          :to="`/product/${product.id}`"
+          :key="product.seoId ?? 'unknown'"
+          :to="`/product/${product.seoId}`"
           class="block bg-slate-800 rounded-xl overflow-hidden hover:ring-2 hover:ring-blue-500/50 transition-all hover:scale-[1.02] group"
         >
           <div class="aspect-video bg-slate-900 relative">
@@ -63,7 +63,9 @@
                 class="w-12 h-12"
               />
             </div>
-            <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent">
+            <div
+              class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent"
+            >
               <span
                 v-if="product.category"
                 class="text-xs font-medium text-blue-400 uppercase tracking-wider"
@@ -107,7 +109,9 @@
           class="p-6 bg-slate-800/30 hover:bg-slate-800 rounded-xl transition-colors text-center group"
           @click="onCategoryClick(cat.name)"
         >
-          <div class="mb-4 inline-flex p-3 rounded-full bg-slate-700/50 group-hover:scale-110 transition-transform text-blue-400">
+          <div
+            class="mb-4 inline-flex p-3 rounded-full bg-slate-700/50 group-hover:scale-110 transition-transform text-blue-400"
+          >
             <Icon
               :name="cat.icon"
               class="w-8 h-8"
@@ -124,12 +128,12 @@
 
 <script setup lang="ts">
 import { searchProducts } from '~/src/api-client'
-import type { Product } from '~/src/api-client/types.gen'
+import type { Product, ProductDocument } from '~/src/api-client/types.gen'
 
 const router = useRouter()
 const route = useRoute()
 const searchQuery = computed(() => (route.query.q as string) || '')
-const products = ref<Product[]>([])
+const products = ref<ProductDocument[]>([])
 const loading = ref(false)
 const hasSearched = ref(false)
 

@@ -11,6 +11,14 @@
     <UiLinkButton
       aria-label="Filters Navigation Button"
       :white="true"
+      :to="localePath('/search')"
+    >
+      {{ $t('appHeaderSearch') }}
+    </UiLinkButton>
+
+    <UiLinkButton
+      aria-label="Filters Navigation Button"
+      :white="true"
       :to="localePath('/filters')"
     >
       {{ $t('appHeaderFilters') }}
@@ -26,9 +34,7 @@
     </UiLinkButton>
 
     <!-- User section -->
-    <AppHeaderProfileDropdown
-      v-if="userStore.isLoggedIn"
-    />
+    <AppHeaderProfileDropdown v-if="userStore.isLoggedIn" />
 
     <div
       v-else
