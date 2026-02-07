@@ -22,7 +22,7 @@
     >
       <div class="flex items-center justify-between mb-6">
         <h2 class="text-2xl font-semibold text-slate-200">
-          {{ loading ? 'Searching...' : products.length > 0 ? 'Search Results' : 'No results found' }}
+          {{ loading ? $t('searching', 'Searching...') : products.length > 0 ? $t('searchResults', 'Search Results') : $t('noResultsFound', 'No results found') }}
         </h2>
       </div>
 
@@ -80,13 +80,13 @@
             </h3>
             <div class="flex items-center justify-between mt-4">
               <div class="text-sm text-slate-400">
-                <span class="block text-xs">Starting from</span>
+                <span class="block text-xs">{{ $t('startingFrom', 'Starting from') }}</span>
                 <span class="text-lg font-bold text-green-400">
-                  {{ product.minPrice ? formatPrice(product.minPrice) : 'Check Price' }}
+                  {{ product.minPrice ? formatPrice(product.minPrice) : $t('checkPrice', 'Check Price') }}
                 </span>
               </div>
               <div class="px-3 py-1 bg-slate-700/50 rounded-full text-xs text-slate-300">
-                Details &rarr;
+                {{ $t('details', 'Details') }} &rarr;
               </div>
             </div>
           </div>
@@ -100,14 +100,14 @@
       class="max-w-6xl mx-auto mt-20"
     >
       <h2 class="text-2xl font-bold text-center text-slate-300 mb-10">
-        Popular Categories
+        {{ $t('popularCategories', 'Popular Categories') }}
       </h2>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <button
           v-for="cat in categories"
-          :key="cat.name"
+          :key="cat.searchValue"
           class="p-6 bg-slate-800/30 hover:bg-slate-800 rounded-xl transition-colors text-center group"
-          @click="onCategoryClick(cat.name)"
+          @click="onCategoryClick(cat.searchValue)"
         >
           <div
             class="mb-4 inline-flex p-3 rounded-full bg-slate-700/50 group-hover:scale-110 transition-transform text-blue-400"
@@ -118,7 +118,7 @@
             />
           </div>
           <div class="font-medium text-slate-200">
-            {{ cat.name }}
+            {{ $t(cat.labelKey) }}
           </div>
         </button>
       </div>
@@ -138,10 +138,10 @@ const loading = ref(false)
 const hasSearched = ref(false)
 
 const categories = [
-  { name: 'Electronics', icon: 'tabler:device-laptop' },
-  { name: 'Smartphones', icon: 'tabler:device-mobile' },
-  { name: 'Photography', icon: 'tabler:camera' },
-  { name: 'Gaming', icon: 'tabler:device-gamepad-2' },
+  { searchValue: 'Electronics', labelKey: 'categories.electronics', icon: 'tabler:device-laptop' },
+  { searchValue: 'Smartphones', labelKey: 'categories.smartphones', icon: 'tabler:device-mobile' },
+  { searchValue: 'Photography', labelKey: 'categories.photography', icon: 'tabler:camera' },
+  { searchValue: 'Gaming', labelKey: 'categories.gaming', icon: 'tabler:device-gamepad-2' },
 ]
 
 async function performSearch(query: string) {
@@ -182,6 +182,6 @@ function formatPrice(amount: number) {
 }
 
 useHead({
-  title: 'Home - Compare Prices',
+  title: $t ? $t('searchPageTitle', 'Search - Compare Prices') : 'Search - Compare Prices',
 })
 </script>
