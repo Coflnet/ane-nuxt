@@ -2,10 +2,10 @@
   <div class="container mx-auto px-4 py-8">
     <!-- Hero Section -->
     <div class="text-center mb-16 pt-12">
-      <h1 class="text-5xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent mb-6">
+      <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent mb-6">
         {{ $t('findBestDeals', 'Find the Best Second-Hand Deals') }}
       </h1>
-      <p class="text-xl text-slate-400 mb-12 max-w-2xl mx-auto">
+      <p class="text-base md:text-lg text-slate-400 mb-12 max-w-2xl mx-auto">
         {{ $t('homeSubtitle', 'Compare prices across multiple marketplaces. Save money and the planet.') }}
       </p>
 
