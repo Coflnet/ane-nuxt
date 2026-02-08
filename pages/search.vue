@@ -128,6 +128,7 @@
 
 <script setup lang="ts">
 import { searchProducts } from '~/src/api-client'
+import { useI18n } from 'vue-i18n'
 import type { Product, ProductDocument } from '~/src/api-client/types.gen'
 
 const router = useRouter()
@@ -143,6 +144,8 @@ const categories = [
   { searchValue: 'Photography', labelKey: 'categories.photography', icon: 'tabler:camera' },
   { searchValue: 'Gaming', labelKey: 'categories.gaming', icon: 'tabler:device-gamepad-2' },
 ]
+
+const { t } = useI18n()
 
 async function performSearch(query: string) {
   loading.value = true
@@ -182,6 +185,6 @@ function formatPrice(amount: number) {
 }
 
 useHead({
-  title: $t ? $t('searchPageTitle', 'Search - Compare Prices') : 'Search - Compare Prices',
+  title: t('searchPageTitle', 'Search - Compare Prices'),
 })
 </script>
