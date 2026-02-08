@@ -9,7 +9,7 @@
     </UiLinkButton>
 
     <UiLinkButton
-      aria-label="Filters Navigation Button"
+      aria-label="Search Navigation Button"
       :white="true"
       :to="localePath('/search')"
     >
