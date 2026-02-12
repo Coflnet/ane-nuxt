@@ -1,7 +1,7 @@
 <template>
   <div class="container mx-auto px-4 py-8">
     <!-- Hero Section -->
-    <div class="text-center mb-10 pt-8">
+    <div class="text-center mb-16 pt-12">
       <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent mb-6 whitespace-normal break-words">
         {{ $t('findBestDeals', 'Find the Best Second-Hand Deals') }}
       </h1>
@@ -22,7 +22,12 @@
     >
       <div class="flex items-center justify-between mb-6">
         <h2 class="text-2xl font-semibold text-slate-200">
-          {{ loading ? $t('searching', 'Searching...') : products.length > 0 ? `${total} ${$t('searchResults', 'Results')}` : $t('noResultsFound', 'No results found') }}
+          <span v-if="loading && products.length === 0">{{ $t('searching', 'Searching...') }}</span>
+          <span v-else-if="products.length > 0">
+            {{ $t('searchResults', 'Search Results') }}
+            <span v-if="totalResults" class="text-slate-400 text-lg ml-2">({{ totalResults }} {{ $t('found', 'found') }})</span>
+          </span>
+          <span v-else>{{ $t('noResultsFound', 'No results found') }}</span>
         </h2>
         <!-- Active filters badges -->
         <div class="flex flex-wrap gap-2">
@@ -30,175 +35,106 @@
             v-if="selectedCategory"
             class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-xs border border-blue-500/30"
           >
-            {{ selectedCategory }}
-            <button
-              class="ml-1 hover:text-white"
-              @click="clearCategory"
-            >
-              &times;
-            </button>
+            {{ localizeCategory(selectedCategory) }}
+            <button class="ml-1 hover:text-white" @click="clearFilter('category')">&times;</button>
           </span>
           <span
             v-if="selectedCondition"
             class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-xs border border-green-500/30"
           >
-            {{ selectedCondition }}
-            <button
-              class="ml-1 hover:text-white"
-              @click="clearCondition"
-            >
-              &times;
-            </button>
+            {{ localizeCondition(selectedCondition) }}
+            <button class="ml-1 hover:text-white" @click="clearFilter('condition')">&times;</button>
           </span>
           <span
             v-for="(value, key) in activeAttributeFilters"
             :key="key"
             class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-purple-500/20 text-purple-400 text-xs border border-purple-500/30"
           >
-            {{ formatAttrKey(key) }}: {{ value }}
-            <button
-              class="ml-1 hover:text-white"
-              @click="removeAttributeFilter(key)"
-            >
-              &times;
-            </button>
+            {{ localizeAttrKey(String(key)) }}: {{ localizeAttrValue(String(key), value) }}
+            <button class="ml-1 hover:text-white" @click="removeAttributeFilter(String(key))">&times;</button>
           </span>
         </div>
       </div>
 
-      <div class="flex gap-6">
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
         <!-- Sidebar Filters -->
-        <aside
-          v-if="!loading && (availableCategories.length > 0 || Object.keys(availableAttributes).length > 0)"
-          class="w-64 flex-shrink-0 hidden lg:block"
-        >
-          <div class="sticky top-4 space-y-6">
-            <!-- Category Filter -->
-            <div
-              v-if="availableCategories.length > 0"
-              class="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50"
-            >
-              <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-3">
-                {{ $t('category', 'Category') }}
-              </h3>
-              <div class="space-y-1 max-h-48 overflow-y-auto">
-                <button
-                  v-for="cat in availableCategories"
-                  :key="cat"
-                  class="block w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors"
-                  :class="selectedCategory === cat ? 'bg-blue-500/20 text-blue-400' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'"
-                  @click="toggleCategory(cat)"
-                >
-                  {{ cat }}
-                </button>
-              </div>
-            </div>
-
-            <!-- Condition Filter -->
-            <div
-              v-if="availableConditions.length > 0"
-              class="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50"
-            >
-              <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-3">
-                {{ $t('condition', 'Condition') }}
-              </h3>
-              <div class="space-y-1">
-                <button
-                  v-for="cond in availableConditions"
-                  :key="cond"
-                  class="block w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors"
-                  :class="selectedCondition === cond ? 'bg-green-500/20 text-green-400' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'"
-                  @click="toggleCondition(cond)"
-                >
-                  {{ formatCondition(cond) }}
-                </button>
-              </div>
-            </div>
-
-            <!-- Attribute Filters -->
-            <div
-              v-for="(values, attrKey) in filteredAttributes"
-              :key="attrKey"
-              class="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50"
-            >
-              <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-3">
-                {{ formatAttrKey(attrKey) }}
-              </h3>
-              <div class="space-y-1 max-h-40 overflow-y-auto">
-                <button
-                  v-for="val in values.slice(0, 10)"
-                  :key="val"
-                  class="block w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors"
-                  :class="activeAttributeFilters[attrKey] === val ? 'bg-purple-500/20 text-purple-400' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'"
-                  @click="toggleAttributeFilter(attrKey, val)"
-                >
-                  {{ val }}
-                </button>
-              </div>
+        <div class="lg:col-span-1 space-y-4">
+          <!-- Category Filter -->
+          <div v-if="categoryBuckets.length > 0" class="bg-slate-800/50 p-5 rounded-xl border border-slate-700/50">
+            <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-3">
+              {{ $t('category', 'Category') }}
+            </h3>
+            <div class="space-y-1 max-h-56 overflow-y-auto">
+              <button
+                v-for="bucket in categoryBuckets"
+                :key="bucket.value"
+                class="flex items-center justify-between w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors"
+                :class="selectedCategory === bucket.value ? 'bg-blue-500/20 text-blue-400 font-medium' : 'text-slate-400 hover:bg-slate-700/50 hover:text-slate-200'"
+                @click="toggleFilter('category', bucket.value!)"
+              >
+                <span>{{ localizeCategory(bucket.value!) }}</span>
+                <span class="text-xs opacity-60 ml-2">({{ bucket.count }})</span>
+              </button>
             </div>
           </div>
-        </aside>
 
-        <!-- Main Content -->
-        <div class="flex-1 min-w-0">
-          <!-- Mobile filter toggle -->
+          <!-- Condition Filter -->
+          <div v-if="displayConditionBuckets.length > 0" class="bg-slate-800/50 p-5 rounded-xl border border-slate-700/50">
+            <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-3">
+              {{ $t('condition', 'Condition') }}
+            </h3>
+            <div class="space-y-1">
+              <button
+                v-for="bucket in displayConditionBuckets"
+                :key="bucket.value"
+                class="flex items-center justify-between w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors"
+                :class="selectedCondition === bucket.value ? 'bg-green-500/20 text-green-400 font-medium' : 'text-slate-400 hover:bg-slate-700/50 hover:text-slate-200'"
+                @click="toggleFilter('condition', bucket.value!)"
+              >
+                <span>{{ localizeCondition(bucket.value!) }}</span>
+                <span class="text-xs opacity-60 ml-2">({{ bucket.count }})</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Attribute Filters -->
+          <div
+            v-for="(buckets, attrKey) in displayAttributeBuckets"
+            :key="attrKey"
+            class="bg-slate-800/50 p-5 rounded-xl border border-slate-700/50"
+          >
+            <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-3">
+              {{ localizeAttrKey(attrKey) }}
+            </h3>
+            <div class="space-y-1 max-h-44 overflow-y-auto">
+              <button
+                v-for="bucket in buckets.slice(0, 15)"
+                :key="bucket.value"
+                class="flex items-center justify-between w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors"
+                :class="activeAttributeFilters[attrKey] === bucket.value ? 'bg-purple-500/20 text-purple-400 font-medium' : 'text-slate-400 hover:bg-slate-700/50 hover:text-slate-200'"
+                @click="toggleAttributeFilter(attrKey, bucket.value!)"
+              >
+                <span class="truncate mr-2">{{ localizeAttrValue(attrKey, bucket.value!) }}</span>
+                <span class="text-xs opacity-60 flex-shrink-0">({{ bucket.count }})</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Clear all filters -->
           <button
-            class="lg:hidden mb-4 flex items-center gap-2 px-4 py-2 bg-slate-800 rounded-lg text-slate-300 text-sm border border-slate-700"
-            @click="showMobileFilters = !showMobileFilters"
+            v-if="hasActiveFilters"
+            class="w-full px-4 py-2 rounded-lg text-sm text-red-400 hover:bg-red-500/10 border border-red-500/20 transition-colors"
+            @click="clearAllFilters"
           >
-            <Icon
-              name="tabler:filter"
-              class="w-4 h-4"
-            />
-            {{ $t('filters', 'Filters') }}
-            <span
-              v-if="activeFilterCount > 0"
-              class="bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
-            >
-              {{ activeFilterCount }}
-            </span>
+            {{ $t('clearAllFilters', 'Clear All Filters') }}
           </button>
+        </div>
 
-          <!-- Mobile Filters Panel -->
+        <!-- Product Grid -->
+        <div class="lg:col-span-3">
           <div
-            v-if="showMobileFilters && !loading"
-            class="lg:hidden mb-6 bg-slate-800/50 rounded-xl p-4 border border-slate-700/50 space-y-4"
-          >
-            <div
-              v-if="availableCategories.length > 0"
-              class="flex flex-wrap gap-2"
-            >
-              <span class="text-xs font-bold text-slate-400 uppercase w-full mb-1">{{ $t('category', 'Category') }}</span>
-              <button
-                v-for="cat in availableCategories"
-                :key="cat"
-                class="px-3 py-1 rounded-full text-xs border transition-colors"
-                :class="selectedCategory === cat ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' : 'text-slate-400 border-slate-600 hover:border-slate-500'"
-                @click="toggleCategory(cat)"
-              >
-                {{ cat }}
-              </button>
-            </div>
-            <div
-              v-if="availableConditions.length > 0"
-              class="flex flex-wrap gap-2"
-            >
-              <span class="text-xs font-bold text-slate-400 uppercase w-full mb-1">{{ $t('condition', 'Condition') }}</span>
-              <button
-                v-for="cond in availableConditions"
-                :key="cond"
-                class="px-3 py-1 rounded-full text-xs border transition-colors"
-                :class="selectedCondition === cond ? 'bg-green-500/20 text-green-400 border-green-500/30' : 'text-slate-400 border-slate-600 hover:border-slate-500'"
-                @click="toggleCondition(cond)"
-              >
-                {{ formatCondition(cond) }}
-              </button>
-            </div>
-          </div>
-
-          <div
-            v-if="loading"
-            class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
+            v-if="loading && products.length === 0"
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
             <div
               v-for="i in 6"
@@ -209,99 +145,73 @@
 
           <div
             v-else-if="products.length > 0"
-            class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
           >
-            <NuxtLink
-              v-for="product in products"
-              :key="product.seoId ?? 'unknown'"
-              :to="`/product/${product.seoId}`"
-              class="block bg-slate-800 rounded-xl overflow-hidden hover:ring-2 hover:ring-blue-500/50 transition-all hover:scale-[1.02] group"
-            >
-              <div class="aspect-video bg-slate-900 relative">
-                <NuxtImg
-                  v-if="product.imageUrl"
-                  :src="product.imageUrl"
-                  class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
-                  loading="lazy"
-                />
-                <div
-                  v-else
-                  class="w-full h-full flex items-center justify-center text-slate-600"
-                >
-                  <Icon
-                    name="tabler:photo"
-                    class="w-12 h-12"
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <NuxtLink
+                v-for="product in products"
+                :key="product.seoId ?? 'unknown'"
+                :to="`/product/${product.seoId}`"
+                class="block bg-slate-800 rounded-xl overflow-hidden hover:ring-2 hover:ring-blue-500/50 transition-all hover:scale-[1.02] group"
+              >
+                <div class="aspect-video bg-slate-900 relative">
+                  <NuxtImg
+                    v-if="product.imageUrl"
+                    :src="product.imageUrl"
+                    class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                    loading="lazy"
                   />
-                </div>
-                <div
-                  class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent"
-                >
-                  <span
-                    v-if="product.categories?.length"
-                    class="text-xs font-medium text-blue-400 uppercase tracking-wider"
+                  <div
+                    v-else
+                    class="w-full h-full flex items-center justify-center text-slate-600"
                   >
-                    {{ product.categories[0] }}
-                  </span>
-                </div>
-              </div>
-              <div class="p-5">
-                <h3 class="text-lg font-semibold text-slate-100 mb-2 line-clamp-2 min-h-[3.5rem]">
-                  {{ product.name }}
-                </h3>
-                <!-- Attribute pills -->
-                <div
-                  v-if="product.attributes?.length"
-                  class="flex flex-wrap gap-1 mb-3"
-                >
-                  <span
-                    v-for="attr in product.attributes.slice(0, 3)"
-                    :key="attr.key"
-                    class="text-[10px] px-2 py-0.5 rounded-full bg-slate-700/60 text-slate-400"
-                  >
-                    {{ attr.value }}
-                  </span>
-                </div>
-                <div class="flex items-center justify-between mt-2">
-                  <div class="text-sm text-slate-400">
-                    <span class="block text-xs">{{ $t('startingFrom', 'Starting from') }}</span>
-                    <span class="text-lg font-bold text-green-400">
-                      {{ product.minPrice ? formatPrice(product.minPrice) : $t('checkPrice', 'Check Price') }}
+                    <Icon name="tabler:photo" class="w-12 h-12" />
+                  </div>
+                  <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent">
+                    <span
+                      v-if="product.categories && product.categories.length > 0"
+                      class="text-xs font-medium text-blue-400 uppercase tracking-wider"
+                    >
+                      {{ localizeCategory(product.categories[0]) }}
                     </span>
                   </div>
-                  <div
-                    v-if="product.condition"
-                    class="px-2 py-0.5 rounded-full text-[10px] font-medium"
-                    :class="conditionClass(product.condition)"
-                  >
-                    {{ formatCondition(product.condition) }}
+                </div>
+                <div class="p-5">
+                  <h3 class="text-lg font-semibold text-slate-100 mb-2 line-clamp-2 min-h-[3.5rem]">
+                    {{ product.name }}
+                  </h3>
+                  <div class="flex items-center justify-between mt-4">
+                    <div class="text-sm text-slate-400">
+                      <span class="block text-xs">{{ $t('startingFrom', 'Starting from') }}</span>
+                      <span class="text-lg font-bold text-green-400">
+                        {{ product.minPrice ? formatPrice(product.minPrice) : $t('checkPrice', 'Check Price') }}
+                      </span>
+                    </div>
+                    <div class="px-3 py-1 bg-slate-700/50 rounded-full text-xs text-slate-300">
+                      {{ $t('details', 'Details') }} &rarr;
+                    </div>
                   </div>
                 </div>
-              </div>
-            </NuxtLink>
-          </div>
+              </NuxtLink>
+            </div>
 
-          <!-- Load more -->
-          <div
-            v-if="products.length > 0 && products.length < total"
-            class="mt-8 text-center"
-          >
-            <button
-              class="px-6 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-sm border border-slate-700 transition-colors"
-              :disabled="loadingMore"
-              @click="loadMore"
-            >
-              {{ loadingMore ? $t('loading', 'Loading...') : $t('loadMore', 'Load More') }}
-            </button>
+            <!-- Load More / Pagination -->
+            <div v-if="canLoadMore" class="flex justify-center mt-8">
+              <button
+                class="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                :disabled="loadingMore"
+                @click="loadMore"
+              >
+                <span v-if="loadingMore">{{ $t('loading', 'Loading...') }}</span>
+                <span v-else>{{ $t('loadMore', 'Load More') }} ({{ allProducts.length }} / {{ totalResults }})</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Categories / Features (Default View) -->
-    <div
-      v-else
-      class="max-w-6xl mx-auto mt-20"
-    >
+    <!-- Popular Categories (Default View) -->
+    <div v-else class="max-w-6xl mx-auto mt-20">
       <h2 class="text-2xl font-bold text-center text-slate-300 mb-10">
         {{ $t('popularCategories', 'Popular Categories') }}
       </h2>
@@ -312,13 +222,8 @@
           class="p-6 bg-slate-800/30 hover:bg-slate-800 rounded-xl transition-colors text-center group"
           @click="onCategoryClick(cat.searchValue)"
         >
-          <div
-            class="mb-4 inline-flex p-3 rounded-full bg-slate-700/50 group-hover:scale-110 transition-transform text-blue-400"
-          >
-            <Icon
-              :name="cat.icon"
-              class="w-8 h-8"
-            />
+          <div class="mb-4 inline-flex p-3 rounded-full bg-slate-700/50 group-hover:scale-110 transition-transform text-blue-400">
+            <Icon :name="cat.icon" class="w-8 h-8" />
           </div>
           <div class="font-medium text-slate-200">
             {{ $t(cat.labelKey) }}
@@ -332,55 +237,87 @@
 <script setup lang="ts">
 import { searchProducts } from '~/src/api-client'
 import { useI18n } from 'vue-i18n'
-import type { ProductDocument, SearchProductsResult } from '~/src/api-client/types.gen'
+import type { ProductDocument, FilterBucket } from '~/src/api-client/types.gen'
 
 const router = useRouter()
 const route = useRoute()
+const { t, locale } = useI18n()
+
+// URL-derived state
 const searchQuery = computed(() => (route.query.q as string) || '')
-const products = ref<ProductDocument[]>([])
+const selectedCategory = computed(() => (route.query.category as string) || '')
+const selectedCondition = computed(() => (route.query.condition as string) || '')
+const activeAttributeFilters = computed(() => {
+  const filters: Record<string, string> = {}
+  for (const [key, value] of Object.entries(route.query)) {
+    if (key.startsWith('attr_') && typeof value === 'string') {
+      filters[key.slice(5)] = value
+    }
+  }
+  return filters
+})
+
+const hasActiveFilters = computed(() => 
+  !!selectedCategory.value || !!selectedCondition.value || Object.keys(activeAttributeFilters.value).length > 0
+)
+
+// Data state
+const allProducts = ref<ProductDocument[]>([])
+const totalResults = ref<number>(0)
+const categoryBuckets = ref<FilterBucket[]>([])
+const conditionBuckets = ref<FilterBucket[]>([])
+const attributeBuckets = ref<Record<string, FilterBucket[]>>({})
+
 const loading = ref(false)
 const loadingMore = ref(false)
 const hasSearched = ref(false)
-const total = ref(0)
-const showMobileFilters = ref(false)
 
-// Filters from API response
-const availableCategories = ref<string[]>([])
-const availableAttributes = ref<Record<string, string[]>>({})
+// Track previous query params to avoid re-fetching when only attribute filters change
+const prevQuery = reactive({ q: '' as string | undefined, category: '' as string | undefined, condition: '' as string | undefined })
 
-// Active filters
-const selectedCategory = ref<string | null>((route.query.category as string) || null)
-const selectedCondition = ref<string | null>((route.query.condition as string) || null)
-const activeAttributeFilters = ref<Record<string, string>>({})
-
-// Derive conditions from attributes
-const availableConditions = computed(() => {
-  const conditions = products.value
-    .map(p => p.condition)
-    .filter((c): c is string => !!c)
-  return [...new Set(conditions)]
+// Filter out empty values, duplicate "condition" key, and sort attribute groups
+const displayAttributeBuckets = computed(() => {
+  const result: Record<string, FilterBucket[]> = {}
+  for (const [key, buckets] of Object.entries(attributeBuckets.value)) {
+    // Skip "condition" as it has its own section
+    if (key.toLowerCase() === 'condition') continue
+    const filtered = buckets.filter(b => b.value && b.value.trim() !== '' && (b.count ?? 0) > 0)
+    if (filtered.length > 0) result[key] = filtered
+  }
+  return result
 })
 
-// Internal attribute keys to exclude from filter UI
-const excludedAttrKeys = new Set(['brand', 'model', 'condition', 'shipping', 'type'])
-
-const filteredAttributes = computed(() => {
-  const filtered: Record<string, string[]> = {}
-  for (const [key, values] of Object.entries(availableAttributes.value)) {
-    if (!excludedAttrKeys.has(key) && values.length > 1) {
-      filtered[key] = values
+// Deduplicate condition buckets by their localized display value
+const displayConditionBuckets = computed(() => {
+  const raw = conditionBuckets.value.filter(b => b.value && b.value !== 'unknown')
+  const merged = new Map<string, FilterBucket>()
+  for (const bucket of raw) {
+    const display = localizeCondition(bucket.value!)
+    const existing = merged.get(display)
+    if (existing) {
+      merged.set(display, { value: existing.value, count: (existing.count ?? 0) + (bucket.count ?? 0) })
+    } else {
+      merged.set(display, { ...bucket })
     }
   }
-  return filtered
+  return Array.from(merged.values())
 })
 
-const activeFilterCount = computed(() => {
-  let count = 0
-  if (selectedCategory.value) count++
-  if (selectedCondition.value) count++
-  count += Object.keys(activeAttributeFilters.value).length
-  return count
+// Client-side attribute filtering — API only supports category & condition
+const products = computed(() => {
+  const filters = activeAttributeFilters.value
+  if (Object.keys(filters).length === 0) return allProducts.value
+  return allProducts.value.filter(p => {
+    if (!p.attributes) return false
+    return Object.entries(filters).every(([key, val]) =>
+      p.attributes!.some(a => a.key === key && a.value === val)
+    )
+  })
 })
+
+const canLoadMore = computed(() => totalResults.value > allProducts.value.length)
+
+const PAGE_SIZE = 20
 
 const defaultCategories = [
   { searchValue: 'Electronics', labelKey: 'categories.electronics', icon: 'tabler:device-laptop' },
@@ -389,49 +326,256 @@ const defaultCategories = [
   { searchValue: 'Gaming', labelKey: 'categories.gaming', icon: 'tabler:device-gamepad-2' },
 ]
 
-const { t } = useI18n()
+// --- Localization helpers ---
 
-function buildSearchParams() {
-  const params: Record<string, any> = {}
+const conditionMap: Record<string, string> = {
+  'new': 'newCondition',
+  'neu': 'newCondition',
+  'nieuw': 'newCondition',
+  'like_new': 'likeNewCondition',
+  'like new': 'likeNewCondition',
+  'used': 'usedCondition',
+  'gebraucht': 'usedCondition',
+  'refurbished': 'refurbishedCondition',
+  'for_parts': 'forPartsCondition',
+  'for parts': 'forPartsCondition',
+  'good': 'goodCondition',
+  'very_good': 'veryGoodCondition',
+  'very good': 'veryGoodCondition',
+  'acceptable': 'acceptableCondition',
+}
+
+// Common category translations
+const categoryTranslationMap: Record<string, string> = {
+  'Electronics': 'cat_electronics',
+  'Smartphones': 'cat_smartphones',
+  'Tablets': 'cat_tablets',
+  'Laptops': 'cat_laptops',
+  'Computers': 'cat_computers',
+  'Gaming': 'cat_gaming',
+  'Photography': 'cat_photography',
+  'Audio': 'cat_audio',
+  'TV & Video': 'cat_tv_video',
+  'Clothing': 'cat_clothing',
+  'Shoes': 'cat_shoes',
+  'Watches': 'cat_watches',
+  'Jewelry': 'cat_jewelry',
+  'Home & Garden': 'cat_home_garden',
+  'Sports': 'cat_sports',
+  'Toys': 'cat_toys',
+  'Books': 'cat_books',
+  'Music': 'cat_music',
+  'Movies': 'cat_movies',
+  'Automotive': 'cat_automotive',
+  'Baby': 'cat_baby',
+  'Health & Beauty': 'cat_health_beauty',
+  'Pet Supplies': 'cat_pet_supplies',
+  'Office': 'cat_office',
+  'Tools': 'cat_tools',
+  'Furniture': 'cat_furniture',
+  'Kitchen': 'cat_kitchen',
+  'Garden': 'cat_garden',
+  'Accessories': 'cat_accessories',
+  'Bags': 'cat_bags',
+  'Collectibles': 'cat_collectibles',
+}
+
+// Common attribute key translations
+const attrKeyTranslationMap: Record<string, string> = {
+  'brand': 'attr_brand',
+  'color': 'attr_color',
+  'size': 'attr_size',
+  'storage': 'attr_storage',
+  'memory': 'attr_memory',
+  'ram': 'attr_ram',
+  'screen_size': 'attr_screen_size',
+  'material': 'attr_material',
+  'style': 'attr_style',
+  'type': 'attr_type',
+  'model': 'attr_model',
+  'connectivity': 'attr_connectivity',
+  'operating_system': 'attr_operating_system',
+  'processor': 'attr_processor',
+  'resolution': 'attr_resolution',
+  'weight': 'attr_weight',
+  'gender': 'attr_gender',
+  'capacity': 'attr_capacity',
+  'battery health': 'attr_battery_health',
+  'battery_health': 'attr_battery_health',
+  'delivery': 'attr_delivery',
+  'service': 'attr_service',
+  'product type': 'attr_product_type',
+  'product_type': 'attr_product_type',
+  'console name': 'attr_console_name',
+  'console_name': 'attr_console_name',
+  'game name': 'attr_game_name',
+  'game_name': 'attr_game_name',
+  'publisher': 'attr_publisher',
+  'controllers': 'attr_controllers',
+  'manufactureaddress': 'attr_manufacturer',
+  'manufacturertradename': 'attr_manufacturer',
+}
+
+// Common attribute value translations (for colors, sizes, etc.)
+const attrValueTranslationMap: Record<string, Record<string, string>> = {
+  color: {
+    'Black': 'color_black',
+    'White': 'color_white',
+    'Red': 'color_red',
+    'Blue': 'color_blue',
+    'Green': 'color_green',
+    'Yellow': 'color_yellow',
+    'Pink': 'color_pink',
+    'Purple': 'color_purple',
+    'Orange': 'color_orange',
+    'Gray': 'color_gray',
+    'Grey': 'color_gray',
+    'Silver': 'color_silver',
+    'Gold': 'color_gold',
+    'Brown': 'color_brown',
+    'Beige': 'color_beige',
+  },
+  gender: {
+    'Male': 'gender_male',
+    'Female': 'gender_female',
+    'Unisex': 'gender_unisex',
+  }
+}
+
+function localizeCategory(cat: string): string {
+  const key = categoryTranslationMap[cat]
+  if (key) {
+    const translated = t(key, cat)
+    return translated !== key ? translated : cat
+  }
+  return cat
+}
+
+function localizeCondition(cond: string): string {
+  const key = conditionMap[cond]
+  if (key) {
+    const translated = t(key, cond)
+    return translated !== key ? translated : formatConditionFallback(cond)
+  }
+  return formatConditionFallback(cond)
+}
+
+function formatConditionFallback(cond: string): string {
+  return cond.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+}
+
+function localizeAttrKey(key: string): string {
+  const tKey = attrKeyTranslationMap[key.toLowerCase()]
+  if (tKey) {
+    const translated = t(tKey, key)
+    return translated !== tKey ? translated : formatAttrKeyFallback(key)
+  }
+  return formatAttrKeyFallback(key)
+}
+
+function formatAttrKeyFallback(key: string): string {
+  return key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+}
+
+function localizeAttrValue(attrKey: string, value: string): string {
+  const valueMap = attrValueTranslationMap[attrKey.toLowerCase()]
+  if (valueMap && valueMap[value]) {
+    const translated = t(valueMap[value], value)
+    return translated !== valueMap[value] ? translated : value
+  }
+  return value
+}
+
+// --- Search & filter logic ---
+
+function buildSearchParams(offset = 0) {
+  const params: Record<string, any> = { offset, limit: PAGE_SIZE }
   if (searchQuery.value) params.query = searchQuery.value
-  if (selectedCategory.value) params.category = selectedCategory.value
-  if (selectedCondition.value) params.condition = selectedCondition.value
-
-  const attrList = Object.entries(activeAttributeFilters.value)
-    .map(([k, v]) => `${k}:${v}`)
-  if (attrList.length > 0) params.attributes = attrList
-
+  // OpenSearch Term queries require lowercase for categories and conditions
+  if (selectedCategory.value) params.category = selectedCategory.value.toLowerCase()
+  if (selectedCondition.value) params.condition = selectedCondition.value.toLowerCase()
+  // Note: attributes are filtered client-side (production API doesn't support them)
   return params
 }
 
 async function performSearch(append = false) {
   if (!append) {
     loading.value = true
-  }
-  else {
+  } else {
     loadingMore.value = true
   }
   hasSearched.value = true
 
   try {
-    const params = buildSearchParams()
-    if (append) params.offset = products.value.length
-    const response = await searchProducts({ query: params }) as unknown as SearchProductsResult
+    const offset = append ? allProducts.value.length : 0
+    const params = buildSearchParams(offset)
+    const response = await searchProducts({ query: params })
 
     if (append) {
-      products.value = [...products.value, ...(response?.products || [])]
+      allProducts.value = [...allProducts.value, ...(response?.products || [])]
+    } else {
+      allProducts.value = response?.products || []
+
+      // Use aggregation buckets if available (new backend), otherwise derive from products
+      if (response?.categoryBuckets && response.categoryBuckets.length > 0) {
+        categoryBuckets.value = response.categoryBuckets
+      } else if (response?.categories) {
+        // Estimate counts from current page of products
+        const catCounts: Record<string, number> = {}
+        for (const p of allProducts.value) {
+          for (const cat of p.categories || []) {
+            catCounts[cat] = (catCounts[cat] || 0) + 1
+          }
+        }
+        categoryBuckets.value = response.categories
+          .map(c => ({ value: c, count: catCounts[c] || 0 }))
+          .sort((a, b) => (b.count || 0) - (a.count || 0))
+      }
+
+      if (response?.conditionBuckets && response.conditionBuckets.length > 0) {
+        conditionBuckets.value = response.conditionBuckets
+      } else {
+        // Derive condition counts from products — normalize to lowercase to avoid duplicates
+        const condCounts: Record<string, number> = {}
+        for (const p of allProducts.value) {
+          if (p.condition) {
+            const normalized = p.condition.toLowerCase()
+            condCounts[normalized] = (condCounts[normalized] || 0) + 1
+          }
+        }
+        conditionBuckets.value = Object.entries(condCounts)
+          .map(([v, c]) => ({ value: v, count: c }))
+          .sort((a, b) => (b.count || 0) - (a.count || 0))
+      }
+
+      if (response?.attributeBuckets && Object.keys(response.attributeBuckets).length > 0) {
+        attributeBuckets.value = response.attributeBuckets
+      } else if (response?.attributesWithValues) {
+        // Derive attribute counts from products 
+        const attrCounts: Record<string, Record<string, number>> = {}
+        for (const p of allProducts.value) {
+          if (p.attributes) {
+            for (const attr of p.attributes) {
+              if (attr.key && attr.value) {
+                if (!attrCounts[attr.key]) attrCounts[attr.key] = {}
+                attrCounts[attr.key][attr.value] = (attrCounts[attr.key][attr.value] || 0) + 1
+              }
+            }
+          }
+        }
+        const result: Record<string, FilterBucket[]> = {}
+        for (const [key, values] of Object.entries(response.attributesWithValues)) {
+          result[key] = values
+            .map(v => ({ value: v, count: attrCounts[key]?.[v] || 0 }))
+            .sort((a, b) => (b.count || 0) - (a.count || 0))
+        }
+        attributeBuckets.value = result
+      }
     }
-    else {
-      products.value = response?.products || []
-      availableCategories.value = response?.categories || []
-      availableAttributes.value = response?.attributesWithValues || {}
-    }
-    total.value = response?.total || 0
-  }
-  catch (e) {
+    totalResults.value = response?.total || 0
+  } catch (e) {
     console.error('Search failed', e)
-  }
-  finally {
+  } finally {
     loading.value = false
     loadingMore.value = false
   }
@@ -452,106 +596,80 @@ function updateUrlAndSearch() {
   router.push({ query })
 }
 
-function toggleCategory(cat: string) {
-  selectedCategory.value = selectedCategory.value === cat ? null : cat
-  updateUrlAndSearch()
+function toggleFilter(type: 'category' | 'condition', value: string) {
+  const query = { ...route.query }
+  if (query[type] === value) {
+    delete query[type]
+  } else {
+    query[type] = value
+  }
+  router.push({ query })
 }
 
-function clearCategory() {
-  selectedCategory.value = null
-  updateUrlAndSearch()
-}
-
-function toggleCondition(cond: string) {
-  selectedCondition.value = selectedCondition.value === cond ? null : cond
-  updateUrlAndSearch()
-}
-
-function clearCondition() {
-  selectedCondition.value = null
-  updateUrlAndSearch()
+function clearFilter(type: string) {
+  const query = { ...route.query }
+  delete query[type]
+  router.push({ query })
 }
 
 function toggleAttributeFilter(key: string, value: string) {
-  if (activeAttributeFilters.value[key] === value) {
-    const { [key]: _, ...rest } = activeAttributeFilters.value
-    activeAttributeFilters.value = rest
+  const query = { ...route.query }
+  const paramKey = `attr_${key}`
+  if (query[paramKey] === value) {
+    delete query[paramKey]
+  } else {
+    query[paramKey] = value
   }
-  else {
-    activeAttributeFilters.value = { ...activeAttributeFilters.value, [key]: value }
-  }
-  updateUrlAndSearch()
+  router.push({ query })
 }
 
 function removeAttributeFilter(key: string) {
-  const { [key]: _, ...rest } = activeAttributeFilters.value
-  activeAttributeFilters.value = rest
-  updateUrlAndSearch()
+  const query = { ...route.query }
+  delete query[`attr_${key}`]
+  router.push({ query })
+}
+
+function clearAllFilters() {
+  const query: Record<string, string> = {}
+  if (searchQuery.value) query.q = searchQuery.value
+  router.push({ query })
 }
 
 function onSearch(query: string) {
-  // Reset filters on new search
-  selectedCategory.value = null
-  selectedCondition.value = null
-  activeAttributeFilters.value = {}
   router.push({ query: { q: query } })
 }
-
-// Restore attribute filters from URL
-function restoreFiltersFromUrl() {
-  for (const [key, value] of Object.entries(route.query)) {
-    if (key.startsWith('attr_') && typeof value === 'string') {
-      activeAttributeFilters.value[key.slice(5)] = value
-    }
-  }
-  if (route.query.category) selectedCategory.value = route.query.category as string
-  if (route.query.condition) selectedCondition.value = route.query.condition as string
-}
-
-watch(() => route.query, () => {
-  restoreFiltersFromUrl()
-  if (route.query.q || selectedCategory.value || selectedCondition.value || Object.keys(activeAttributeFilters.value).length > 0) {
-    performSearch()
-  }
-  else {
-    products.value = []
-    hasSearched.value = false
-  }
-}, { immediate: true })
 
 function onCategoryClick(category: string) {
   onSearch(category)
 }
 
+// Watch route query changes and trigger search
+watch(() => route.query, () => {
+  const hasQuery = route.query.q || route.query.category || route.query.condition || 
+    Object.keys(route.query).some(k => k.startsWith('attr_'))
+  if (hasQuery) {
+    // Only re-fetch from API when server-side filter params change (not attribute filters)
+    const attrChanged = Object.keys(route.query).some(k => k.startsWith('attr_'))
+    const queryChanged = route.query.q !== prevQuery.q || route.query.category !== prevQuery.category || route.query.condition !== prevQuery.condition
+    if (queryChanged || !hasSearched.value) {
+      performSearch()
+    }
+    // Save previous query params for comparison
+    prevQuery.q = route.query.q as string
+    prevQuery.category = route.query.category as string
+    prevQuery.condition = route.query.condition as string
+  } else {
+    allProducts.value = []
+    hasSearched.value = false
+    totalResults.value = 0
+    categoryBuckets.value = []
+    conditionBuckets.value = []
+    attributeBuckets.value = {}
+  }
+}, { immediate: true })
+
 function formatPrice(amount: number) {
-  return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(amount)
-}
-
-function formatAttrKey(key: string) {
-  return key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
-}
-
-function formatCondition(condition: string) {
-  const map: Record<string, string> = {
-    new: 'New',
-    like_new: 'Like New',
-    good: 'Good',
-    acceptable: 'Acceptable',
-    used: 'Used',
-    broken: 'Broken',
-  }
-  return map[condition] || condition
-}
-
-function conditionClass(condition: string) {
-  const classes: Record<string, string> = {
-    new: 'bg-green-500/20 text-green-400 border border-green-500/30',
-    like_new: 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30',
-    good: 'bg-blue-500/20 text-blue-400 border border-blue-500/30',
-    used: 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30',
-    broken: 'bg-red-500/20 text-red-400 border border-red-500/30',
-  }
-  return classes[condition] || 'bg-slate-700/50 text-slate-400'
+  return new Intl.NumberFormat(locale.value === 'de' ? 'de-DE' : 'en-US', { style: 'currency', currency: 'EUR' }).format(amount)
 }
 
 useHead({

@@ -263,11 +263,19 @@ export type ResultReport = {
     contact?: string | null;
 };
 
+export type FilterBucket = {
+    value?: string | null;
+    count?: number;
+};
+
 export type SearchProductsResult = {
     products?: Array<ProductDocument> | null;
     categories?: Array<string> | null;
     total?: number;
     attributesWithValues?: { [key: string]: Array<string> } | null;
+    categoryBuckets?: Array<FilterBucket> | null;
+    conditionBuckets?: Array<FilterBucket> | null;
+    attributeBuckets?: { [key: string]: Array<FilterBucket> } | null;
 };
 
 export type PricePoint = {
