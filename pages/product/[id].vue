@@ -143,22 +143,34 @@
             </div>
           </div>
 
-          <!-- Attributes Table -->
+          <!-- Attributes Section -->
           <div
             v-if="product.attributes && Object.keys(product.attributes).length > 0"
-            class="bg-slate-800/50 rounded-xl border border-slate-700/50 mb-6 overflow-hidden"
+            class="mb-6"
           >
-            <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider px-4 pt-4 pb-2">
-              Attributes
+            <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+              <Icon
+                name="tabler:info-circle"
+                class="w-5 h-5 text-blue-400"
+              />
+              Product Attributes
             </h3>
-            <div class="divide-y divide-slate-700/50">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div
                 v-for="(value, key) in product.attributes"
                 :key="key"
-                class="flex items-center px-4 py-2.5"
+                class="bg-gradient-to-br from-slate-800/60 to-slate-800/30 rounded-lg border border-slate-700/50 p-4 hover:border-blue-500/30 hover:bg-slate-800/50 transition-all duration-200"
               >
-                <span class="text-sm text-slate-400 w-40 flex-shrink-0">{{ formatAttrKey(String(key)) }}</span>
-                <span class="text-sm text-slate-200 font-medium">{{ value }}</span>
+                <div class="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1.5">
+                  {{ formatAttrKey(String(key)) }}
+                </div>
+                <div class="text-sm text-white font-medium flex items-center gap-2">
+                  <Icon
+                    name="tabler:point-filled"
+                    class="w-3 h-3 text-blue-400 flex-shrink-0"
+                  />
+                  {{ value }}
+                </div>
               </div>
             </div>
           </div>
@@ -428,7 +440,8 @@ function priceToY(price: number) {
 function indexToX(index: number) {
   const count = priceHistory.value.length
   if (count <= 1) return chartPadding + chartInnerWidth / 2
-  return chartPadding + (index / (count - 1)) * chartInnerWidth
+  // Reverse the x-position to show past (left) to now (right)
+  return chartPadding + ((count - 1 - index) / (count - 1)) * chartInnerWidth
 }
 
 const medianLinePath = computed(() => {
