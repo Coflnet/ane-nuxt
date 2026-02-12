@@ -14,6 +14,7 @@
           type="text"
           :placeholder="$t('searchProductsPlaceholder', 'Search for products (e.g. iPhone 15, MacBook)...')"
           class="w-full p-4 bg-transparent border-none text-slate-100 placeholder-slate-500 focus:ring-0 text-lg"
+          data-testid="search-input"
           @keyup.enter="handleSearch"
         >
         <div class="pr-2">
