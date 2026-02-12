@@ -260,7 +260,7 @@ async function saveFilter() {
     }
     await filterStore.saveFilter(f)
     push.success('Filter successfully saved')
-    navigateTo(localePath('/overview'))
+    await navigateTo(localePath('/overview'))
   }
   catch (e) {
     savingFilter.value = false

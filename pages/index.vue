@@ -25,6 +25,9 @@
             <p class="text-lg text-gray-300 mb-8 max-w-lg">
               {{ $t('hero.description') }}
             </p>
+            <div class="mb-8 max-w-lg">
+              <ProductSearch @search="handleSearch" />
+            </div>
             <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
               <a
                 :href="localePath(useUserStore().isLoggedIn ? '/filters/create' : '/overview')"
@@ -1358,6 +1361,10 @@ const fadeInUp = (el: Element) => {
   el.classList.add('transition-all', 'duration-1000')
   el.classList.remove('opacity-0', 'translate-y-10')
   el.classList.add('opacity-100', 'translate-y-0')
+}
+
+const handleSearch = (query: string) => {
+  navigateTo(`/search?q=${encodeURIComponent(query)}`)
 }
 
 definePageMeta({
