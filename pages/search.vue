@@ -64,16 +64,16 @@
             <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-3">
               {{ $t('category', 'Category') }}
             </h3>
-            <div class="space-y-1 max-h-56 overflow-y-auto">
+            <div class="flex flex-wrap gap-2 max-h-56 overflow-y-auto">
               <button
                 v-for="bucket in categoryBuckets"
                 :key="bucket.value"
-                class="flex items-center justify-between w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors"
+                class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors max-w-[200px]"
                 :class="selectedCategory === bucket.value ? 'bg-blue-500/20 text-blue-400 font-medium' : 'text-slate-400 hover:bg-slate-700/50 hover:text-slate-200'"
                 @click="toggleFilter('category', bucket.value!)"
               >
-                <span>{{ localizeCategory(bucket.value!) }}</span>
-                <span class="text-xs opacity-60 ml-2">({{ bucket.count }})</span>
+                <span class="truncate">{{ localizeCategory(bucket.value!) }}</span>
+                <span class="text-xs opacity-60 flex-shrink-0">({{ bucket.count }})</span>
               </button>
             </div>
           </div>
@@ -83,16 +83,16 @@
             <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-3">
               {{ $t('condition', 'Condition') }}
             </h3>
-            <div class="space-y-1">
+            <div class="flex flex-wrap gap-2">
               <button
                 v-for="bucket in displayConditionBuckets"
                 :key="bucket.value"
-                class="flex items-center justify-between w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors"
+                class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors max-w-[200px]"
                 :class="selectedCondition === bucket.value ? 'bg-green-500/20 text-green-400 font-medium' : 'text-slate-400 hover:bg-slate-700/50 hover:text-slate-200'"
                 @click="toggleFilter('condition', bucket.value!)"
               >
-                <span>{{ localizeCondition(bucket.value!) }}</span>
-                <span class="text-xs opacity-60 ml-2">({{ bucket.count }})</span>
+                <span class="truncate">{{ localizeCondition(bucket.value!) }}</span>
+                <span class="text-xs opacity-60 flex-shrink-0">({{ bucket.count }})</span>
               </button>
             </div>
           </div>
@@ -106,16 +106,16 @@
             <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-3">
               {{ localizeAttrKey(attrKey) }}
             </h3>
-            <div class="space-y-1 max-h-44 overflow-y-auto">
+            <div class="flex flex-wrap gap-2 max-h-44 overflow-y-auto">
               <button
                 v-for="bucket in buckets.slice(0, 15)"
                 :key="bucket.value"
-                class="flex items-center justify-between w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors"
+                class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors max-w-[200px]"
                 :class="activeAttributeFilters[attrKey] === bucket.value ? 'bg-purple-500/20 text-purple-400 font-medium' : 'text-slate-400 hover:bg-slate-700/50 hover:text-slate-200'"
                 @click="toggleAttributeFilter(attrKey, bucket.value!)"
               >
-                <span class="truncate mr-2">{{ localizeAttrValue(attrKey, bucket.value!) }}</span>
-                <span class="text-xs opacity-60 flex-shrink-0">({{ bucket.count }})</span>
+                <span class="truncate">{{ localizeAttrValue(attrKey, bucket.value!) }}</span>
+                <span class="text-xs opacity-60 ml-1">({{ bucket.count }})</span>
               </button>
             </div>
           </div>
@@ -648,16 +648,21 @@ watch(() => route.query, () => {
   const hasQuery = route.query.q || route.query.category || route.query.condition || 
     Object.keys(route.query).some(k => k.startsWith('attr_'))
   if (hasQuery) {
-    // Only re-fetch from API when server-side filter params change (not attribute filters)
-    const attrChanged = Object.keys(route.query).some(k => k.startsWith('attr_'))
-    const queryChanged = route.query.q !== prevQuery.q || route.query.category !== prevQuery.category || route.query.condition !== prevQuery.condition
+    // Detect if server-side filter params changed (search, category, or condition)
+    const currentQ = route.query.q ? String(route.query.q) : ''
+    const currentCategory = route.query.category ? String(route.query.category) : ''
+    const currentCondition = route.query.condition ? String(route.query.condition) : ''
+    
+    const queryChanged = currentQ !== prevQuery.q || currentCategory !== prevQuery.category || currentCondition !== prevQuery.condition
+    
     if (queryChanged || !hasSearched.value) {
       performSearch()
     }
+    
     // Save previous query params for comparison
-    prevQuery.q = route.query.q as string
-    prevQuery.category = route.query.category as string
-    prevQuery.condition = route.query.condition as string
+    prevQuery.q = currentQ
+    prevQuery.category = currentCategory
+    prevQuery.condition = currentCondition
   } else {
     allProducts.value = []
     hasSearched.value = false
