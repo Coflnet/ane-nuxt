@@ -121,8 +121,6 @@
   "searchRadiusAroundYou": "Suchradius um dich herum, in Kilometern",
   "searchRadiusRequiresEbay": "Die Suchradius Funktion funktioniert leider nicht mit eBay",
   "searchValue": "Suchwert",
-  "findBestDeals": "Finde die besten Second‑Hand‑Schnäppchen",
-  "homeSubtitle": "Vergleiche Preise über mehrere Marktplätze. Spare Geld und schone die Umwelt.",
   "searchPageTitle": "Suche - Preise vergleichen",
   "searching": "Suche läuft...",
   "searchResults": "Suchergebnisse",
@@ -687,5 +685,11 @@
   "mediumFuzzy": "Mittlere Toleranz",
   "fuzzyInfo": "Anzahl der Buchstaben, die sich von deinem Suchwert unterscheiden dürfen: (z.B. Auto -> Auot, entspricht Niedriger Toleranz) \n Vorsicht! Suchwerte mit Toleranz können andere Produkte mit einschließen. Diese Einstellung ist wegen des Rechenaufwands nur für zahlende Nutzer verfügbar.",
   "hasBasicPlanRestriction": "Das kostenlose Abo ist auf eine Suche alle 6 Stunden beschränkt",
-  "appHeaderSearch": "Suchen"
+  "appHeaderSearch": "Suchen",
+  "findBestDeals": "Die besten Secondhand-Deals finden",
+  "homeSubtitle": "Preise auf mehreren Marktplätzen vergleichen. Geld und die Umwelt schonen.",
+  "searchProductsPlaceholder": "Produkte suchen (z.B. iPhone 15, MacBook)...",
+  "category": "Kategorie",
+  "loadMore": "Mehr laden",
+  "loading": "Laden..."
 }

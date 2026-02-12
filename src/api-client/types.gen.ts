@@ -136,28 +136,21 @@ export type ProblemDetails = {
 
 export type Product = {
     id?: string | null;
-    category?: Array<string> | null;
     name?: string | null;
-    normalizedName?: string | null;
+    category?: string | null;
+    categories?: Array<string> | null;
     brand?: string | null;
     model?: string | null;
-    identifierType?: string | null;
-    identifierValue?: string | null;
+    description?: string | null;
     condition?: string | null;
-    averagePrice?: number;
-    medianPrice?: number;
-    minPrice?: number;
-    maxPrice?: number;
-    listingCount?: number;
-    createdAt?: string;
-    lastUpdated?: string;
-    sampleTitles?: Array<string> | null;
     imageUrl?: string | null;
-    attributes?: {
-        [key: string]: string;
-    } | null;
-    canonicalSeoId?: string | null;
-    relatedSeoIds?: Array<string> | null;
+    listingCount?: number;
+    attributes?: { [key: string]: string } | null;
+    minPrice?: number | null;
+    maxPrice?: number | null;
+    avgPrice?: number | null;
+    createdAt?: string;
+    updatedAt?: string;
 };
 
 export type ProductAttribute = {
@@ -272,6 +265,32 @@ export type ResultReport = {
 
 export type SearchProductsResult = {
     products?: Array<ProductDocument> | null;
+    categories?: Array<string> | null;
+    total?: number;
+    attributesWithValues?: { [key: string]: Array<string> } | null;
+};
+
+export type PricePoint = {
+    productSeoId?: string | null;
+    date?: string;
+    averagePrice?: number;
+    medianPrice?: number;
+    minPrice?: number;
+    maxPrice?: number;
+    sampleCount?: number;
+};
+
+export type PriceHistoryStats = {
+    dataPoints?: number;
+    averagePrice?: number;
+    medianPrice?: number;
+    minPrice?: number;
+    maxPrice?: number;
+    currentPrice?: number;
+    daysOfData?: number;
+    oldestDate?: string;
+    newestDate?: string;
+    trendPercent?: number;
 };
 
 export type SearchState = 'None' | 'Disabled' | 'DisabledError';
@@ -1538,6 +1557,14 @@ export type SearchProductsData = {
          * Optional category filter
          */
         category?: string;
+        /**
+         * Optional condition filter
+         */
+        condition?: string;
+        /**
+         * Attribute filters as key:value pairs
+         */
+        attributes?: Array<string>;
         offset?: number;
         /**
          * Maximum results (default 20)
@@ -1546,6 +1573,52 @@ export type SearchProductsData = {
     };
     url: '/api/Product/search';
 };
+
+export type GetPriceHistoryData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: {
+        days?: number;
+    };
+    url: '/api/Product/{id}/price-history';
+};
+
+export type GetPriceHistoryErrors = {
+    404: unknown;
+};
+
+export type GetPriceHistoryError = GetPriceHistoryErrors[keyof GetPriceHistoryErrors];
+
+export type GetPriceHistoryResponses = {
+    200: Array<PricePoint>;
+};
+
+export type GetPriceHistoryResponse = GetPriceHistoryResponses[keyof GetPriceHistoryResponses];
+
+export type GetPriceStatsData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: {
+        days?: number;
+    };
+    url: '/api/Product/{id}/price-stats';
+};
+
+export type GetPriceStatsErrors = {
+    404: unknown;
+};
+
+export type GetPriceStatsError = GetPriceStatsErrors[keyof GetPriceStatsErrors];
+
+export type GetPriceStatsResponses = {
+    200: PriceHistoryStats;
+};
+
+export type GetPriceStatsResponse = GetPriceStatsResponses[keyof GetPriceStatsResponses];
 
 export type SearchProductsErrors = {
     /**

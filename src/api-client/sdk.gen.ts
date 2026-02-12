@@ -2,7 +2,7 @@
 
 import type { Client, Composable, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { AddFilterData, AddFilterError, AddFilterResponse, CancelSubscriptionData, CancelSubscriptionError, CancelSubscriptionResponse, CreateLinkData, CreateLinkError, CreateLinkResponse, DeleteFilterData, DeleteFilterError, DeleteFilterWithTokenData, DeleteFilterWithTokenError, DoRedirectData, DoRedirectError, GetCategoriesData, GetCategoriesError, GetCategoriesResponse, GetCountryData, GetCountryError, GetCountryResponse, GetFilterByTokenData, GetFilterByTokenError, GetFilterByTokenResponse, GetFiltersData, GetFiltersError, GetFiltersResponse, GetFlipsData, GetFlipsError, GetFlipsResponse, GetInfoData, GetInfoError, GetInfoResponse, GetLinkData, GetLinkError, GetLinkResponse, GetLocationData, GetLocationError, GetLocationResponse, GetMatchesData, GetMatchesError, GetMatchesResponse, GetMeData, GetMeError, GetMeResponse, GetOptionsData, GetOptionsError, GetOptionsResponse, GetProductData, GetProductError, GetProductMatchesData, GetProductMatchesError, GetProductMatchesResponse, GetProductResponse, GetStatsData, GetStatsError, GetStatsResponse, GetSubscriptionData, GetSubscriptionError, GetSubscriptionResponse, IsProductAvailableData, IsProductAvailableError, IsProductAvailableResponse, ListLinksData, ListLinksError, ListLinksResponse, LoginFirebaseData, LoginFirebaseError, LoginFirebaseResponse, ReportMatchData, ReportMatchError, ReportMatchResponse, ReportProductIssueData, ReportProductIssueError, SearchProductsData, SearchProductsError, SearchProductsResponse, SubscribeData, SubscribeError, SubscribeResponse, TestFilterData, TestFilterError, TestFilterResponse, UpdateMeData, UpdateMeError, UpdateMeResponse, UseLinkData, UseLinkError } from './types.gen';
+import type { AddFilterData, AddFilterError, AddFilterResponse, CancelSubscriptionData, CancelSubscriptionError, CancelSubscriptionResponse, CreateLinkData, CreateLinkError, CreateLinkResponse, DeleteFilterData, DeleteFilterError, DeleteFilterWithTokenData, DeleteFilterWithTokenError, DoRedirectData, DoRedirectError, GetCategoriesData, GetCategoriesError, GetCategoriesResponse, GetCountryData, GetCountryError, GetCountryResponse, GetFilterByTokenData, GetFilterByTokenError, GetFilterByTokenResponse, GetFiltersData, GetFiltersError, GetFiltersResponse, GetFlipsData, GetFlipsError, GetFlipsResponse, GetInfoData, GetInfoError, GetInfoResponse, GetLinkData, GetLinkError, GetLinkResponse, GetLocationData, GetLocationError, GetLocationResponse, GetMatchesData, GetMatchesError, GetMatchesResponse, GetMeData, GetMeError, GetMeResponse, GetOptionsData, GetOptionsError, GetOptionsResponse, GetProductData, GetProductError, GetProductMatchesData, GetProductMatchesError, GetProductMatchesResponse, GetProductResponse, GetStatsData, GetStatsError, GetStatsResponse, GetSubscriptionData, GetSubscriptionError, GetSubscriptionResponse, IsProductAvailableData, IsProductAvailableError, IsProductAvailableResponse, ListLinksData, ListLinksError, ListLinksResponse, LoginFirebaseData, LoginFirebaseError, LoginFirebaseResponse, ReportMatchData, ReportMatchError, ReportMatchResponse, ReportProductIssueData, ReportProductIssueError, SearchProductsData, SearchProductsError, SearchProductsResponse, SubscribeData, SubscribeError, SubscribeResponse, TestFilterData, TestFilterError, TestFilterResponse, UpdateMeData, UpdateMeError, UpdateMeResponse, UseLinkData, UseLinkError, GetPriceHistoryData, GetPriceHistoryError, GetPriceHistoryResponse, GetPriceStatsData, GetPriceStatsError, GetPriceStatsResponse } from './types.gen';
 
 export type Options<TComposable extends Composable = '$fetch', TData extends TDataShape = TDataShape, ResT = unknown, DefaultT = undefined> = Options2<TComposable, TData, ResT, DefaultT> & {
     /**
@@ -255,4 +255,22 @@ export const updateMe = <TComposable extends Composable = '$fetch', DefaultT ext
         'Content-Type': 'application/json',
         ...options.headers
     }
+});
+
+/**
+ * Get daily price history for a product
+ */
+export const getPriceHistory = <TComposable extends Composable = '$fetch', DefaultT extends GetPriceHistoryResponse = GetPriceHistoryResponse>(options: Options<TComposable, GetPriceHistoryData, GetPriceHistoryResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetPriceHistoryResponse | DefaultT, GetPriceHistoryError, DefaultT>({
+    security: [{ name: 'Authorization', type: 'apiKey' }],
+    url: '/api/Product/{id}/price-history',
+    ...options
+});
+
+/**
+ * Get price statistics aggregated from historical data
+ */
+export const getPriceStats = <TComposable extends Composable = '$fetch', DefaultT extends GetPriceStatsResponse = GetPriceStatsResponse>(options: Options<TComposable, GetPriceStatsData, GetPriceStatsResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetPriceStatsResponse | DefaultT, GetPriceStatsError, DefaultT>({
+    security: [{ name: 'Authorization', type: 'apiKey' }],
+    url: '/api/Product/{id}/price-stats',
+    ...options
 });

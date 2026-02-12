@@ -685,5 +685,11 @@
   "lowFuzzy": "Light Fuzziness",
   "mediumFuzzy": "Medium Fuzziness",
   "fuzzyInfo": "Amount of letters that can be different from your search value: ( Switch -> Swtich ) \n NOTE: changing this value can cause your search to match other products. This setting is restricted to paid tiers",
-  "appHeaderSearch": "Search"
+  "appHeaderSearch": "Search",
+  "findBestDeals": "Find the Best Second-Hand Deals",
+  "homeSubtitle": "Compare prices across multiple marketplaces. Save money and the planet.",
+  "searchProductsPlaceholder": "Search for products (e.g. iPhone 15, MacBook)...",
+  "category": "Category",
+  "loadMore": "Load More",
+  "loading": "Loading..."
 }
