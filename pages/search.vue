@@ -60,13 +60,13 @@
         <!-- Sidebar Filters -->
         <div class="lg:col-span-1 space-y-4">
           <!-- Category Filter -->
-          <div v-if="categoryBuckets.length > 0" class="bg-slate-800/50 p-5 rounded-xl border border-slate-700/50">
+          <div v-if="availableCategoryBuckets.length > 0" class="bg-slate-800/50 p-5 rounded-xl border border-slate-700/50">
             <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-3">
               {{ $t('category', 'Category') }}
             </h3>
             <div class="flex flex-wrap gap-2 max-h-56 overflow-y-auto">
               <button
-                v-for="bucket in categoryBuckets"
+                v-for="bucket in availableCategoryBuckets"
                 :key="bucket.value"
                 class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors max-w-[200px]"
                 :class="selectedCategory === bucket.value ? 'bg-blue-500/20 text-blue-400 font-medium' : 'text-slate-400 hover:bg-slate-700/50 hover:text-slate-200'"
@@ -79,13 +79,13 @@
           </div>
 
           <!-- Condition Filter -->
-          <div v-if="displayConditionBuckets.length > 0" class="bg-slate-800/50 p-5 rounded-xl border border-slate-700/50">
+          <div v-if="availableConditionBuckets.length > 0" class="bg-slate-800/50 p-5 rounded-xl border border-slate-700/50">
             <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-3">
               {{ $t('condition', 'Condition') }}
             </h3>
             <div class="flex flex-wrap gap-2">
               <button
-                v-for="bucket in displayConditionBuckets"
+                v-for="bucket in availableConditionBuckets"
                 :key="bucket.value"
                 class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors max-w-[200px]"
                 :class="selectedCondition === bucket.value ? 'bg-green-500/20 text-green-400 font-medium' : 'text-slate-400 hover:bg-slate-700/50 hover:text-slate-200'"
@@ -99,7 +99,7 @@
 
           <!-- Attribute Filters -->
           <div
-            v-for="(buckets, attrKey) in displayAttributeBuckets"
+            v-for="(buckets, attrKey) in availableAttributeBuckets"
             :key="attrKey"
             class="bg-slate-800/50 p-5 rounded-xl border border-slate-700/50"
           >
@@ -115,7 +115,7 @@
                 @click="toggleAttributeFilter(attrKey, bucket.value!)"
               >
                 <span class="truncate">{{ localizeAttrValue(attrKey, bucket.value!) }}</span>
-                <span class="text-xs opacity-60 ml-1">({{ bucket.count }})</span>
+                <span class="text-xs opacity-60 ml-1 flex-shrink-0">({{ bucket.count }})</span>
               </button>
             </div>
           </div>
@@ -257,8 +257,11 @@ const activeAttributeFilters = computed(() => {
   return filters
 })
 
-const hasActiveFilters = computed(() => 
-  !!selectedCategory.value || !!selectedCondition.value || Object.keys(activeAttributeFilters.value).length > 0
+const hasActiveFilters = computed(
+  () =>
+    !!selectedCategory.value ||
+    !!selectedCondition.value ||
+    Object.keys(activeAttributeFilters.value).length > 0,
 )
 
 // Data state
@@ -275,10 +278,136 @@ const hasSearched = ref(false)
 // Track previous query params to avoid re-fetching when only attribute filters change
 const prevQuery = reactive({ q: '' as string | undefined, category: '' as string | undefined, condition: '' as string | undefined })
 
+// Compute filtered products based on category, condition, and attributes
+const filteredProductsForFacets = computed(() => {
+  let filtered = allProducts.value
+
+  // Filter by selected category
+  if (selectedCategory.value) {
+    filtered = filtered.filter((p) =>
+      p.categories &&
+        p.categories.some(
+          (c) => c.toLowerCase() === selectedCategory.value.toLowerCase(),
+        ),
+    )
+  }
+
+  // Filter by selected condition
+  if (selectedCondition.value) {
+    filtered = filtered.filter((p) =>
+      p.condition &&
+        p.condition.toLowerCase() === selectedCondition.value.toLowerCase(),
+    )
+  }
+
+  // Filter by selected attributes
+  const attrFilters = activeAttributeFilters.value
+  if (Object.keys(attrFilters).length > 0) {
+    filtered = filtered.filter((p) => {
+      if (!p.attributes) {
+        return false
+      }
+      return Object.entries(attrFilters).every(([key, val]) =>
+        p.attributes!.some((a) => a.key === key && a.value === val),
+      )
+    })
+  }
+
+  return filtered
+})
+
+// Compute available category buckets accounting for other selected filters
+const availableCategoryBuckets = computed(() => {
+  if (selectedCategory.value) {
+    // If a category is already selected, show only that one
+    return categoryBuckets.value.filter(b => b.value?.toLowerCase() === selectedCategory.value.toLowerCase())
+  }
+
+  // Count categories in filtered products
+  const counts: Record<string, number> = {}
+  for (const product of filteredProductsForFacets.value) {
+    if (product.categories) {
+      for (const cat of product.categories) {
+        const normalized = cat.toLowerCase()
+        counts[normalized] = (counts[normalized] || 0) + 1
+      }
+    }
+  }
+
+  // Return categories with counts > 0, sorted by count
+  return categoryBuckets.value
+    .filter(b => b.value && (counts[b.value.toLowerCase()] || 0) > 0)
+    .map(b => ({ ...b, count: counts[b.value!.toLowerCase()] || 0 }))
+    .sort((a, b) => (b.count || 0) - (a.count || 0))
+})
+
+// Compute available condition buckets accounting for other selected filters
+const availableConditionBuckets = computed(() => {
+  if (selectedCondition.value) {
+    // If a condition is already selected, show only that one
+    return conditionBuckets.value.filter(b => b.value?.toLowerCase() === selectedCondition.value.toLowerCase())
+  }
+
+  // Count conditions in filtered products
+  const counts: Record<string, number> = {}
+  for (const product of filteredProductsForFacets.value) {
+    if (product.condition) {
+      const normalized = product.condition.toLowerCase()
+      counts[normalized] = (counts[normalized] || 0) + 1
+    }
+  }
+
+  // Return conditions with counts > 0, sorted by count
+  return conditionBuckets.value
+    .filter(b => b.value && (counts[b.value.toLowerCase()] || 0) > 0)
+    .map(b => ({ ...b, count: counts[b.value!.toLowerCase()] || 0 }))
+    .sort((a, b) => (b.count || 0) - (a.count || 0))
+})
+
+// Compute available attribute buckets accounting for other selected filters
+const availableAttributeBuckets = computed(() => {
+  const result: Record<string, FilterBucket[]> = {}
+  
+  const attrFilters = activeAttributeFilters.value
+
+  for (const [key, buckets] of Object.entries(attributeBuckets.value)) {
+    if (key.toLowerCase() === 'condition') continue // Skip condition, it has its own section
+
+    if (attrFilters[key]) {
+      // If this attribute is already selected, show only that value
+      result[key] = buckets.filter(b => b.value === attrFilters[key])
+    } else {
+      // Count this attribute's values in filtered products
+      const counts: Record<string, number> = {}
+      for (const product of filteredProductsForFacets.value) {
+        if (product.attributes) {
+          for (const attr of product.attributes) {
+            if (attr.key === key && attr.value) {
+              counts[attr.value] = (counts[attr.value] || 0) + 1
+            }
+          }
+        }
+      }
+
+      // Return values with counts > 0
+      const available = buckets
+        .filter(b => b.value && (counts[b.value] || 0) > 0)
+        .map(b => ({ ...b, count: counts[b.value!] || 0 }))
+        .sort((a, b) => (b.count || 0) - (a.count || 0))
+
+      if (available.length > 0) {
+        result[key] = available
+      }
+    }
+  }
+
+  return result
+})
+
 // Filter out empty values, duplicate "condition" key, and sort attribute groups
 const displayAttributeBuckets = computed(() => {
   const result: Record<string, FilterBucket[]> = {}
-  for (const [key, buckets] of Object.entries(attributeBuckets.value)) {
+  for (const [key, buckets] of Object.entries(availableAttributeBuckets.value)) {
     // Skip "condition" as it has its own section
     if (key.toLowerCase() === 'condition') continue
     const filtered = buckets.filter(b => b.value && b.value.trim() !== '' && (b.count ?? 0) > 0)
@@ -288,8 +417,8 @@ const displayAttributeBuckets = computed(() => {
 })
 
 // Deduplicate condition buckets by their localized display value
-const displayConditionBuckets = computed(() => {
-  const raw = conditionBuckets.value.filter(b => b.value && b.value !== 'unknown')
+const displayConditionBucketsWithDedup = computed(() => {
+  const raw = availableConditionBuckets.value.filter(b => b.value && b.value !== 'unknown')
   const merged = new Map<string, FilterBucket>()
   for (const bucket of raw) {
     const display = localizeCondition(bucket.value!)
@@ -303,16 +432,12 @@ const displayConditionBuckets = computed(() => {
   return Array.from(merged.values())
 })
 
+// For backward compatibility, keep displayConditionBuckets as an alias
+const displayConditionBuckets = displayConditionBucketsWithDedup
+
 // Client-side attribute filtering — API only supports category & condition
 const products = computed(() => {
-  const filters = activeAttributeFilters.value
-  if (Object.keys(filters).length === 0) return allProducts.value
-  return allProducts.value.filter(p => {
-    if (!p.attributes) return false
-    return Object.entries(filters).every(([key, val]) =>
-      p.attributes!.some(a => a.key === key && a.value === val)
-    )
-  })
+  return filteredProductsForFacets.value
 })
 
 const canLoadMore = computed(() => totalResults.value > allProducts.value.length)

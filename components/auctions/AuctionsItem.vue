@@ -33,7 +33,7 @@
 
   <div class="p-4">
     <div class="flex justify-between">
-    <a :href="auctionUrl">
+      <a :href="auctionUrl">
         <div class="flex items-start justify-between mb-2">
           <h3 class="font-medium text-lg text-white line-clamp-2">
             {{ auction.listingData!.title }}
