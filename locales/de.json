@@ -773,4 +773,12 @@
   "gender_male": "Herren",
   "gender_female": "Damen",
   "gender_unisex": "Unisex"
+,
+  "product": {
+    "attributes": {
+      "title": "Attribute",
+      "unknown_title": "Attribute nicht angegeben",
+      "unknown_description": "Für dieses Produkt sind keine Eigenschaften verfügbar."
+    }
+  }
 }

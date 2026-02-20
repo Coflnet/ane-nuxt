@@ -144,18 +144,20 @@
           </div>
 
           <!-- Attributes Section -->
-          <div
-            v-if="product.attributes && Object.keys(product.attributes).length > 0"
-            class="mb-6"
-          >
+          <div class="mb-6">
             <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
               <Icon
                 name="tabler:info-circle"
                 class="w-5 h-5 text-blue-400"
               />
-              Product Attributes
+              {{ $t('product.attributes.title') }}
             </h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+
+            <!-- When attributes exist and have non-empty values -->
+            <div
+              v-if="hasAttributes"
+              class="grid grid-cols-1 md:grid-cols-2 gap-3"
+            >
               <div
                 v-for="(value, key) in product.attributes"
                 :key="key"
@@ -170,6 +172,20 @@
                     class="w-3 h-3 text-blue-400 flex-shrink-0"
                   />
                   {{ value }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Fallback when attributes missing or empty -->
+            <div
+              v-else
+              class="bg-slate-800/50 rounded-lg border border-slate-700/50 p-4 text-slate-400"
+            >
+              <div class="flex items-center gap-3">
+                <Icon name="tabler:help-circle" class="w-5 h-5 text-slate-400" />
+                <div>
+                  <div class="text-sm font-medium text-white">{{ $t('product.attributes.unknown_title') }}</div>
+                  <div class="text-xs text-slate-400">{{ $t('product.attributes.unknown_description') }}</div>
                 </div>
               </div>
             </div>
@@ -413,6 +429,17 @@ const productIssueTypes: { value: IssueType, label: string }[] = [
 ]
 
 const availableOfferCount = computed(() => matches.value.length - unavailableCount.value)
+
+// Determine if product.attributes contains at least one non-empty value
+const hasAttributes = computed(() => {
+  const attrs = product.value?.attributes as Record<string, any> | undefined
+  if (!attrs) return false
+  return Object.values(attrs).some(v => {
+    if (v === null || v === undefined) return false
+    const s = String(v).trim()
+    return s.length > 0
+  })
+})
 
 // Chart computations
 const chartWidth = 800
