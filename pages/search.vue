@@ -168,7 +168,7 @@
               <NuxtLink
                 v-for="product in products"
                 :key="product.seoId ?? 'unknown'"
-                :to="`/product/${product.seoId}`"
+                :to="localePath(`/product/${product.seoId}`)"
                 class="block bg-slate-800 rounded-xl overflow-hidden hover:ring-2 hover:ring-blue-500/50 transition-all hover:scale-[1.02] group"
               >
                 <div class="aspect-video bg-slate-900 relative">
@@ -271,6 +271,7 @@ import type { ProductDocument, FilterBucket } from '~/src/api-client/types.gen'
 
 const router = useRouter()
 const route = useRoute()
+const localePath = useLocalePath()
 const { t, locale } = useI18n()
 
 // URL-derived state
@@ -511,6 +512,43 @@ const conditionMap: Record<string, string> = {
 
 // Common category translations
 const categoryTranslationMap: Record<string, string> = {
+  'elektronik': 'cat_electronics',
+  'handys': 'cat_smartphones',
+  'tablets': 'cat_tablets',
+  'notebooks': 'cat_laptops',
+  'pcs': 'cat_computers',
+  'konsolen': 'cat_gaming',
+  'videospiele': 'cat_gaming',
+  'foto-kameras': 'cat_photography',
+  'kameras': 'cat_photography',
+  'audio': 'cat_audio',
+  'tv-video': 'cat_tv_video',
+  'mode': 'cat_clothing',
+  'schuhe': 'cat_shoes',
+  'uhren': 'cat_watches',
+  'schmuck': 'cat_jewelry',
+  'haus-garten': 'cat_home_garden',
+  'sport': 'cat_sports',
+  'spielzeug': 'cat_toys',
+  'buecher': 'cat_books',
+  'musik': 'cat_music',
+  'filme': 'cat_movies',
+  'fahrzeuge': 'cat_automotive',
+  'autos': 'cat_automotive',
+  'baby': 'cat_baby',
+  'gesundheit-beauty': 'cat_health_beauty',
+  'haustiere': 'cat_pet_supplies',
+  'buero': 'cat_office',
+  'werkzeug': 'cat_tools',
+  'moebel': 'cat_furniture',
+  'kueche': 'cat_kitchen',
+  'garten': 'cat_garden',
+  'zubehoer': 'cat_accessories',
+  'pc-zubehoer': 'cat_accessories',
+  'taschen': 'cat_bags',
+  'sammlungen': 'cat_collectibles',
+  
+  // Keep English ones for fallback
   'Electronics': 'cat_electronics',
   'Smartphones': 'cat_smartphones',
   'Tablets': 'cat_tablets',

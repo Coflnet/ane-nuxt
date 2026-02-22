@@ -33,7 +33,7 @@
         <span
           v-if="product.categories && product.categories.length > 0 && product.categories[0] !== 'general'"
           class="text-slate-300"
-        >{{ product.categories[0] }}</span>
+        >{{ localizeCategory(product.categories[0]) }}</span>
         <span class="mx-2">/</span>
         <span class="text-slate-200 truncate">{{ product.name }}</span>
       </nav>
@@ -86,7 +86,7 @@
               :key="cat"
               class="px-3 py-1 rounded-full bg-slate-800 text-xs font-medium text-cyan-400 border border-slate-700"
             >
-              {{ cat }}
+              {{ localizeCategory(cat) }}
             </span>
           </div>
 
@@ -164,7 +164,7 @@
                 class="bg-gradient-to-br from-slate-800/60 to-slate-800/30 rounded-lg border border-slate-700/50 p-4 transition-all duration-200 block"
               >
                 <div class="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1.5">
-                  {{ formatAttrKey(String(key)) }}
+                  {{ localizeAttrKey(String(key)) }}
                 </div>
                 <div class="text-sm text-white font-medium flex items-center gap-2">
                   <Icon
@@ -182,10 +182,10 @@
                       :value="opt.productId"
                       :selected="opt.value === String(value)"
                     >
-                      {{ opt.value }}
+                      {{ localizeAttrValue(String(key), opt.value) }}
                     </option>
                   </select>
-                  <span v-else>{{ value }}</span>
+                  <span v-else>{{ localizeAttrValue(String(key), String(value)) }}</span>
                 </div>
               </div>
             </div>
@@ -425,10 +425,13 @@ import { getProduct, getProductMatches, reportProductIssue, getPriceHistory, get
 import { client } from '~/src/api-client/client.gen'
 import type { IssueType, Product, ProductMatch, PricePoint, PriceHistoryStats } from '~/src/api-client/types.gen'
 import ProductListingTable from '~/components/product/ProductListingTable.vue'
+import { useI18n } from 'vue-i18n'
 
 const route = useRoute()
 const productId = route.params.id as string
 const router = useRouter()
+const localePath = useLocalePath()
+const { t } = useI18n()
 
 const product = ref<Product | null>(null)
 const relatedProducts = ref<Product[]>([])
@@ -512,7 +515,7 @@ function handleAttributeChange(event: Event) {
   const target = event.target as HTMLSelectElement
   const newProductId = target.value
   if (newProductId && newProductId !== productId) {
-    router.push(`/product/${newProductId}`)
+    router.push(localePath(`/product/${newProductId}`))
   }
 }
 
@@ -592,6 +595,131 @@ function formatDate(dateStr: string | undefined) {
   if (!dateStr) return ''
   const d = new Date(dateStr)
   return d.toLocaleDateString('de-DE', { month: 'short', day: 'numeric' })
+}
+
+const attrKeyTranslationMap: Record<string, string> = {
+  'color': 'attr_color',
+  'size': 'attr_size',
+  'brand': 'attr_brand',
+  'model': 'attr_model',
+  'material': 'attr_material',
+  'gender': 'attr_gender',
+  'style': 'attr_style',
+  'pattern': 'attr_pattern',
+  'condition': 'attr_condition',
+  'category': 'attr_category',
+  'type': 'attr_type',
+  'year': 'attr_year',
+  'weight': 'attr_weight',
+  'dimensions': 'attr_dimensions',
+  'voltage': 'attr_voltage',
+  'power': 'attr_power',
+  'capacity': 'attr_capacity',
+  'resolution': 'attr_resolution',
+  'storage': 'attr_storage',
+  'ram': 'attr_ram',
+  'processor': 'attr_processor',
+  'os': 'attr_os',
+  'camera': 'attr_camera',
+  'battery': 'attr_battery',
+  'screen_size': 'attr_screen_size',
+  'connectivity': 'attr_connectivity',
+  'features': 'attr_features',
+  'warranty': 'attr_warranty',
+  'origin': 'attr_origin',
+  'manufacturer': 'attr_manufacturer',
+  'manufactureaddress': 'attr_manufacturer',
+  'manufacturertradename': 'attr_manufacturer',
+}
+
+const attrValueTranslationMap: Record<string, Record<string, string>> = {
+  color: {
+    Black: 'color_black',
+    White: 'color_white',
+    Red: 'color_red',
+    Blue: 'color_blue',
+    Green: 'color_green',
+    Yellow: 'color_yellow',
+    Pink: 'color_pink',
+    Purple: 'color_purple',
+    Orange: 'color_orange',
+    Gray: 'color_gray',
+    Grey: 'color_gray',
+    Silver: 'color_silver',
+    Gold: 'color_gold',
+    Brown: 'color_brown',
+    Beige: 'color_beige',
+  },
+  gender: {
+    Male: 'gender_male',
+    Female: 'gender_female',
+    Unisex: 'gender_unisex',
+  },
+}
+
+const categoryTranslationMap: Record<string, string> = {
+  'elektronik': 'cat_electronics',
+  'handys': 'cat_smartphones',
+  'tablets': 'cat_tablets',
+  'notebooks': 'cat_laptops',
+  'pcs': 'cat_computers',
+  'konsolen': 'cat_gaming',
+  'videospiele': 'cat_gaming',
+  'foto-kameras': 'cat_photography',
+  'kameras': 'cat_photography',
+  'audio': 'cat_audio',
+  'tv-video': 'cat_tv_video',
+  'mode': 'cat_clothing',
+  'schuhe': 'cat_shoes',
+  'uhren': 'cat_watches',
+  'schmuck': 'cat_jewelry',
+  'haus-garten': 'cat_home_garden',
+  'sport': 'cat_sports',
+  'spielzeug': 'cat_toys',
+  'buecher': 'cat_books',
+  'musik': 'cat_music',
+  'filme': 'cat_movies',
+  'fahrzeuge': 'cat_automotive',
+  'autos': 'cat_automotive',
+  'baby': 'cat_baby',
+  'gesundheit-beauty': 'cat_health_beauty',
+  'haustiere': 'cat_pet_supplies',
+  'buero': 'cat_office',
+  'werkzeug': 'cat_tools',
+  'moebel': 'cat_furniture',
+  'kueche': 'cat_kitchen',
+  'garten': 'cat_garden',
+  'zubehoer': 'cat_accessories',
+  'pc-zubehoer': 'cat_accessories',
+  'taschen': 'cat_bags',
+  'sammlungen': 'cat_collectibles',
+}
+
+function localizeCategory(cat: string): string {
+  const key = categoryTranslationMap[cat]
+  if (key) {
+    const translated = t(key, cat)
+    return translated !== key ? translated : cat
+  }
+  return cat
+}
+
+function localizeAttrKey(key: string): string {
+  const tKey = attrKeyTranslationMap[key.toLowerCase()]
+  if (tKey) {
+    const translated = t(tKey, key)
+    return translated !== tKey ? translated : formatAttrKey(key)
+  }
+  return formatAttrKey(key)
+}
+
+function localizeAttrValue(attrKey: string, value: string): string {
+  const valueMap = attrValueTranslationMap[attrKey.toLowerCase()]
+  if (valueMap && valueMap[value]) {
+    const translated = t(valueMap[value], value)
+    return translated !== valueMap[value] ? translated : value
+  }
+  return value
 }
 
 function formatAttrKey(key: string) {
