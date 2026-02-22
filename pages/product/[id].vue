@@ -27,13 +27,13 @@
           Search
         </NuxtLink>
         <span
-          v-if="product.category"
+          v-if="product.categories && product.categories.length > 0 && product.categories[0] !== 'general'"
           class="mx-2"
         >/</span>
         <span
-          v-if="product.category"
+          v-if="product.categories && product.categories.length > 0 && product.categories[0] !== 'general'"
           class="text-slate-300"
-        >{{ product.category }}</span>
+        >{{ product.categories[0] }}</span>
         <span class="mx-2">/</span>
         <span class="text-slate-200 truncate">{{ product.name }}</span>
       </nav>
@@ -82,7 +82,7 @@
               {{ formatCondition(product.condition) }}
             </span>
             <span
-              v-for="cat in (product.categories || [])"
+              v-for="cat in (product.categories || []).filter(c => c !== 'general')"
               :key="cat"
               class="px-3 py-1 rounded-full bg-slate-800 text-xs font-medium text-cyan-400 border border-slate-700"
             >
@@ -161,7 +161,7 @@
               <div
                 v-for="(value, key) in product.attributes"
                 :key="key"
-                class="bg-gradient-to-br from-slate-800/60 to-slate-800/30 rounded-lg border border-slate-700/50 p-4 hover:border-blue-500/30 hover:bg-slate-800/50 transition-all duration-200"
+                class="bg-gradient-to-br from-slate-800/60 to-slate-800/30 rounded-lg border border-slate-700/50 p-4 transition-all duration-200 block"
               >
                 <div class="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1.5">
                   {{ formatAttrKey(String(key)) }}
@@ -171,7 +171,21 @@
                     name="tabler:point-filled"
                     class="w-3 h-3 text-blue-400 flex-shrink-0"
                   />
-                  {{ value }}
+                  <select
+                    v-if="attributeOptions[key] && attributeOptions[key].length > 1"
+                    class="bg-slate-900 border border-slate-600 rounded px-2 py-1 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full"
+                    @change="handleAttributeChange"
+                  >
+                    <option
+                      v-for="opt in attributeOptions[key]"
+                      :key="opt.productId"
+                      :value="opt.productId"
+                      :selected="opt.value === String(value)"
+                    >
+                      {{ opt.value }}
+                    </option>
+                  </select>
+                  <span v-else>{{ value }}</span>
                 </div>
               </div>
             </div>
@@ -182,10 +196,17 @@
               class="bg-slate-800/50 rounded-lg border border-slate-700/50 p-4 text-slate-400"
             >
               <div class="flex items-center gap-3">
-                <Icon name="tabler:help-circle" class="w-5 h-5 text-slate-400" />
+                <Icon
+                  name="tabler:help-circle"
+                  class="w-5 h-5 text-slate-400"
+                />
                 <div>
-                  <div class="text-sm font-medium text-white">{{ $t('product.attributes.unknown_title') }}</div>
-                  <div class="text-xs text-slate-400">{{ $t('product.attributes.unknown_description') }}</div>
+                  <div class="text-sm font-medium text-white">
+                    {{ $t('product.attributes.unknown_title') }}
+                  </div>
+                  <div class="text-xs text-slate-400">
+                    {{ $t('product.attributes.unknown_description') }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -401,13 +422,16 @@
 
 <script setup lang="ts">
 import { getProduct, getProductMatches, reportProductIssue, getPriceHistory, getPriceStats } from '~/src/api-client'
+import { client } from '~/src/api-client/client.gen'
 import type { IssueType, Product, ProductMatch, PricePoint, PriceHistoryStats } from '~/src/api-client/types.gen'
 import ProductListingTable from '~/components/product/ProductListingTable.vue'
 
 const route = useRoute()
 const productId = route.params.id as string
+const router = useRouter()
 
 const product = ref<Product | null>(null)
+const relatedProducts = ref<Product[]>([])
 const matches = ref<ProductMatch[]>([])
 const priceHistory = ref<PricePoint[]>([])
 const priceStats = ref<PriceHistoryStats | null>(null)
@@ -434,12 +458,63 @@ const availableOfferCount = computed(() => matches.value.length - unavailableCou
 const hasAttributes = computed(() => {
   const attrs = product.value?.attributes as Record<string, any> | undefined
   if (!attrs) return false
-  return Object.values(attrs).some(v => {
+  return Object.values(attrs).some((v) => {
     if (v === null || v === undefined) return false
     const s = String(v).trim()
     return s.length > 0
   })
 })
+
+const attributeOptions = computed(() => {
+  if (!product.value?.attributes) return {}
+
+  const options: Record<string, { value: string, productId: string }[]> = {}
+
+  // Add current product's attributes
+  for (const [key, value] of Object.entries(product.value.attributes)) {
+    if (value) {
+      options[key] = [{ value: String(value), productId: product.value.id! }]
+    }
+  }
+
+  // Add related products' attributes
+  for (const related of relatedProducts.value) {
+    if (!related.attributes) continue
+
+    for (const [key, value] of Object.entries(related.attributes)) {
+      if (value && options[key]) {
+        // Check if this value is already in the options for this key
+        const existing = options[key].find(o => o.value === String(value))
+        if (!existing) {
+          options[key].push({ value: String(value), productId: related.id! })
+        }
+      }
+    }
+  }
+
+  // Sort options by value
+  for (const key in options) {
+    options[key].sort((a, b) => {
+      // Try numeric sort first
+      const numA = Number.parseFloat(a.value)
+      const numB = Number.parseFloat(b.value)
+      if (!isNaN(numA) && !isNaN(numB)) {
+        return numA - numB
+      }
+      return a.value.localeCompare(b.value)
+    })
+  }
+
+  return options
+})
+
+function handleAttributeChange(event: Event) {
+  const target = event.target as HTMLSelectElement
+  const newProductId = target.value
+  if (newProductId && newProductId !== productId) {
+    router.push(`/product/${newProductId}`)
+  }
+}
 
 // Chart computations
 const chartWidth = 800
@@ -575,17 +650,19 @@ async function submitProductReport() {
 onMounted(async () => {
   try {
     // Parallel fetch all data
-    const [pRes, mRes, histRes, statsRes] = await Promise.all([
+    const [pRes, mRes, histRes, statsRes, relatedRes] = await Promise.all([
       getProduct({ path: { id: productId } }),
       getProductMatches({ path: { id: productId } }),
       getPriceHistory({ path: { id: productId }, query: { days: 90 } }).catch(() => []),
       getPriceStats({ path: { id: productId }, query: { days: 90 } }).catch(() => null),
+      client.get<Product[]>({ url: `/api/Product/${productId}/related` }).catch(() => ({ data: [] })),
     ])
 
     product.value = pRes as Product
     matches.value = (mRes as ProductMatch[]) || []
     priceHistory.value = (histRes as PricePoint[]) || []
     priceStats.value = statsRes as PriceHistoryStats | null
+    relatedProducts.value = (relatedRes as any)?.data || relatedRes || []
   }
   catch (e) {
     console.error('Failed to load product', e)

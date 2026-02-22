@@ -25,3 +25,6 @@ logs
 !.env.example
 
 service-account.json
+
+### Generated API client (hey-api)
+src/api-client

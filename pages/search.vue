@@ -25,7 +25,10 @@
           <span v-if="loading && products.length === 0">{{ $t('searching', 'Searching...') }}</span>
           <span v-else-if="products.length > 0">
             {{ $t('searchResults', 'Search Results') }}
-            <span v-if="totalResults" class="text-slate-400 text-lg ml-2">({{ totalResults }} {{ $t('found', 'found') }})</span>
+            <span
+              v-if="totalResults"
+              class="text-slate-400 text-lg ml-2"
+            >({{ totalResults }} {{ $t('found', 'found') }})</span>
           </span>
           <span v-else>{{ $t('noResultsFound', 'No results found') }}</span>
         </h2>
@@ -36,14 +39,20 @@
             class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-xs border border-blue-500/30"
           >
             {{ localizeCategory(selectedCategory) }}
-            <button class="ml-1 hover:text-white" @click="clearFilter('category')">&times;</button>
+            <button
+              class="ml-1 hover:text-white"
+              @click="clearFilter('category')"
+            >&times;</button>
           </span>
           <span
             v-if="selectedCondition"
             class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-xs border border-green-500/30"
           >
             {{ localizeCondition(selectedCondition) }}
-            <button class="ml-1 hover:text-white" @click="clearFilter('condition')">&times;</button>
+            <button
+              class="ml-1 hover:text-white"
+              @click="clearFilter('condition')"
+            >&times;</button>
           </span>
           <span
             v-for="(value, key) in activeAttributeFilters"
@@ -51,7 +60,10 @@
             class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-purple-500/20 text-purple-400 text-xs border border-purple-500/30"
           >
             {{ localizeAttrKey(String(key)) }}: {{ localizeAttrValue(String(key), value) }}
-            <button class="ml-1 hover:text-white" @click="removeAttributeFilter(String(key))">&times;</button>
+            <button
+              class="ml-1 hover:text-white"
+              @click="removeAttributeFilter(String(key))"
+            >&times;</button>
           </span>
         </div>
       </div>
@@ -60,7 +72,10 @@
         <!-- Sidebar Filters -->
         <div class="lg:col-span-1 space-y-4">
           <!-- Category Filter -->
-          <div v-if="availableCategoryBuckets.length > 0" class="bg-slate-800/50 p-5 rounded-xl border border-slate-700/50">
+          <div
+            v-if="availableCategoryBuckets.length > 0"
+            class="bg-slate-800/50 p-5 rounded-xl border border-slate-700/50"
+          >
             <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-3">
               {{ $t('category', 'Category') }}
             </h3>
@@ -79,7 +94,10 @@
           </div>
 
           <!-- Condition Filter -->
-          <div v-if="availableConditionBuckets.length > 0" class="bg-slate-800/50 p-5 rounded-xl border border-slate-700/50">
+          <div
+            v-if="availableConditionBuckets.length > 0"
+            class="bg-slate-800/50 p-5 rounded-xl border border-slate-700/50"
+          >
             <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-3">
               {{ $t('condition', 'Condition') }}
             </h3>
@@ -164,11 +182,14 @@
                     v-else
                     class="w-full h-full flex items-center justify-center text-slate-600"
                   >
-                    <Icon name="tabler:photo" class="w-12 h-12" />
+                    <Icon
+                      name="tabler:photo"
+                      class="w-12 h-12"
+                    />
                   </div>
                   <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent">
                     <span
-                      v-if="product.categories && product.categories.length > 0"
+                      v-if="product.categories && product.categories.length > 0 && product.categories[0] !== 'general'"
                       class="text-xs font-medium text-blue-400 uppercase tracking-wider"
                     >
                       {{ localizeCategory(product.categories[0]) }}
@@ -195,7 +216,10 @@
             </div>
 
             <!-- Load More / Pagination -->
-            <div v-if="canLoadMore" class="flex justify-center mt-8">
+            <div
+              v-if="canLoadMore"
+              class="flex justify-center mt-8"
+            >
               <button
                 class="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 :disabled="loadingMore"
@@ -211,7 +235,10 @@
     </div>
 
     <!-- Popular Categories (Default View) -->
-    <div v-else class="max-w-6xl mx-auto mt-20">
+    <div
+      v-else
+      class="max-w-6xl mx-auto mt-20"
+    >
       <h2 class="text-2xl font-bold text-center text-slate-300 mb-10">
         {{ $t('popularCategories', 'Popular Categories') }}
       </h2>
@@ -223,7 +250,10 @@
           @click="onCategoryClick(cat.searchValue)"
         >
           <div class="mb-4 inline-flex p-3 rounded-full bg-slate-700/50 group-hover:scale-110 transition-transform text-blue-400">
-            <Icon :name="cat.icon" class="w-8 h-8" />
+            <Icon
+              :name="cat.icon"
+              class="w-8 h-8"
+            />
           </div>
           <div class="font-medium text-slate-200">
             {{ $t(cat.labelKey) }}
@@ -235,8 +265,8 @@
 </template>
 
 <script setup lang="ts">
-import { searchProducts } from '~/src/api-client'
 import { useI18n } from 'vue-i18n'
+import { searchProducts } from '~/src/api-client'
 import type { ProductDocument, FilterBucket } from '~/src/api-client/types.gen'
 
 const router = useRouter()
@@ -259,9 +289,9 @@ const activeAttributeFilters = computed(() => {
 
 const hasActiveFilters = computed(
   () =>
-    !!selectedCategory.value ||
-    !!selectedCondition.value ||
-    Object.keys(activeAttributeFilters.value).length > 0,
+    !!selectedCategory.value
+    || !!selectedCondition.value
+    || Object.keys(activeAttributeFilters.value).length > 0,
 )
 
 // Data state
@@ -284,19 +314,19 @@ const filteredProductsForFacets = computed(() => {
 
   // Filter by selected category
   if (selectedCategory.value) {
-    filtered = filtered.filter((p) =>
-      p.categories &&
-        p.categories.some(
-          (c) => c.toLowerCase() === selectedCategory.value.toLowerCase(),
-        ),
+    filtered = filtered.filter(p =>
+      p.categories
+      && p.categories.some(
+        c => c.toLowerCase() === selectedCategory.value.toLowerCase(),
+      ),
     )
   }
 
   // Filter by selected condition
   if (selectedCondition.value) {
-    filtered = filtered.filter((p) =>
-      p.condition &&
-        p.condition.toLowerCase() === selectedCondition.value.toLowerCase(),
+    filtered = filtered.filter(p =>
+      p.condition
+      && p.condition.toLowerCase() === selectedCondition.value.toLowerCase(),
     )
   }
 
@@ -308,7 +338,7 @@ const filteredProductsForFacets = computed(() => {
         return false
       }
       return Object.entries(attrFilters).every(([key, val]) =>
-        p.attributes!.some((a) => a.key === key && a.value === val),
+        p.attributes!.some(a => a.key === key && a.value === val),
       )
     })
   }
@@ -336,7 +366,7 @@ const availableCategoryBuckets = computed(() => {
 
   // Return categories with counts > 0, sorted by count
   return categoryBuckets.value
-    .filter(b => b.value && (counts[b.value.toLowerCase()] || 0) > 0)
+    .filter(b => b.value && b.value.toLowerCase() !== 'general' && (counts[b.value.toLowerCase()] || 0) > 0)
     .map(b => ({ ...b, count: counts[b.value!.toLowerCase()] || 0 }))
     .sort((a, b) => (b.count || 0) - (a.count || 0))
 })
@@ -367,7 +397,7 @@ const availableConditionBuckets = computed(() => {
 // Compute available attribute buckets accounting for other selected filters
 const availableAttributeBuckets = computed(() => {
   const result: Record<string, FilterBucket[]> = {}
-  
+
   const attrFilters = activeAttributeFilters.value
 
   for (const [key, buckets] of Object.entries(attributeBuckets.value)) {
@@ -376,7 +406,8 @@ const availableAttributeBuckets = computed(() => {
     if (attrFilters[key]) {
       // If this attribute is already selected, show only that value
       result[key] = buckets.filter(b => b.value === attrFilters[key])
-    } else {
+    }
+    else {
       // Count this attribute's values in filtered products
       const counts: Record<string, number> = {}
       for (const product of filteredProductsForFacets.value) {
@@ -425,8 +456,15 @@ const displayConditionBucketsWithDedup = computed(() => {
     const existing = merged.get(display)
     if (existing) {
       merged.set(display, { value: existing.value, count: (existing.count ?? 0) + (bucket.count ?? 0) })
-    } else {
-      merged.set(display, { ...bucket })
+    }
+    else {
+      // Map the value to the standard condition if it exists in the map
+      let standardValue = bucket.value
+      if (conditionMap[bucket.value!]) {
+        standardValue = conditionMap[bucket.value!].replace('Condition', '').toLowerCase()
+        if (standardValue === 'forparts') standardValue = 'broken'
+      }
+      merged.set(display, { value: standardValue, count: bucket.count })
     }
   }
   return Array.from(merged.values())
@@ -457,17 +495,18 @@ const conditionMap: Record<string, string> = {
   'new': 'newCondition',
   'neu': 'newCondition',
   'nieuw': 'newCondition',
-  'like_new': 'likeNewCondition',
-  'like new': 'likeNewCondition',
+  'like_new': 'usedCondition',
+  'like new': 'usedCondition',
   'used': 'usedCondition',
   'gebraucht': 'usedCondition',
   'refurbished': 'refurbishedCondition',
   'for_parts': 'forPartsCondition',
   'for parts': 'forPartsCondition',
-  'good': 'goodCondition',
-  'very_good': 'veryGoodCondition',
-  'very good': 'veryGoodCondition',
-  'acceptable': 'acceptableCondition',
+  'broken': 'forPartsCondition',
+  'good': 'usedCondition',
+  'very_good': 'usedCondition',
+  'very good': 'usedCondition',
+  'acceptable': 'usedCondition',
 }
 
 // Common category translations
@@ -544,27 +583,27 @@ const attrKeyTranslationMap: Record<string, string> = {
 // Common attribute value translations (for colors, sizes, etc.)
 const attrValueTranslationMap: Record<string, Record<string, string>> = {
   color: {
-    'Black': 'color_black',
-    'White': 'color_white',
-    'Red': 'color_red',
-    'Blue': 'color_blue',
-    'Green': 'color_green',
-    'Yellow': 'color_yellow',
-    'Pink': 'color_pink',
-    'Purple': 'color_purple',
-    'Orange': 'color_orange',
-    'Gray': 'color_gray',
-    'Grey': 'color_gray',
-    'Silver': 'color_silver',
-    'Gold': 'color_gold',
-    'Brown': 'color_brown',
-    'Beige': 'color_beige',
+    Black: 'color_black',
+    White: 'color_white',
+    Red: 'color_red',
+    Blue: 'color_blue',
+    Green: 'color_green',
+    Yellow: 'color_yellow',
+    Pink: 'color_pink',
+    Purple: 'color_purple',
+    Orange: 'color_orange',
+    Gray: 'color_gray',
+    Grey: 'color_gray',
+    Silver: 'color_silver',
+    Gold: 'color_gold',
+    Brown: 'color_brown',
+    Beige: 'color_beige',
   },
   gender: {
-    'Male': 'gender_male',
-    'Female': 'gender_female',
-    'Unisex': 'gender_unisex',
-  }
+    Male: 'gender_male',
+    Female: 'gender_female',
+    Unisex: 'gender_unisex',
+  },
 }
 
 function localizeCategory(cat: string): string {
@@ -626,7 +665,8 @@ function buildSearchParams(offset = 0) {
 async function performSearch(append = false) {
   if (!append) {
     loading.value = true
-  } else {
+  }
+  else {
     loadingMore.value = true
   }
   hasSearched.value = true
@@ -638,13 +678,15 @@ async function performSearch(append = false) {
 
     if (append) {
       allProducts.value = [...allProducts.value, ...(response?.products || [])]
-    } else {
+    }
+    else {
       allProducts.value = response?.products || []
 
       // Use aggregation buckets if available (new backend), otherwise derive from products
       if (response?.categoryBuckets && response.categoryBuckets.length > 0) {
-        categoryBuckets.value = response.categoryBuckets
-      } else if (response?.categories) {
+        categoryBuckets.value = response.categoryBuckets.filter(b => b.value?.toLowerCase() !== 'general')
+      }
+      else if (response?.categories) {
         // Estimate counts from current page of products
         const catCounts: Record<string, number> = {}
         for (const p of allProducts.value) {
@@ -653,13 +695,15 @@ async function performSearch(append = false) {
           }
         }
         categoryBuckets.value = response.categories
+          .filter(c => c.toLowerCase() !== 'general')
           .map(c => ({ value: c, count: catCounts[c] || 0 }))
           .sort((a, b) => (b.count || 0) - (a.count || 0))
       }
 
       if (response?.conditionBuckets && response.conditionBuckets.length > 0) {
         conditionBuckets.value = response.conditionBuckets
-      } else {
+      }
+      else {
         // Derive condition counts from products — normalize to lowercase to avoid duplicates
         const condCounts: Record<string, number> = {}
         for (const p of allProducts.value) {
@@ -675,8 +719,9 @@ async function performSearch(append = false) {
 
       if (response?.attributeBuckets && Object.keys(response.attributeBuckets).length > 0) {
         attributeBuckets.value = response.attributeBuckets
-      } else if (response?.attributesWithValues) {
-        // Derive attribute counts from products 
+      }
+      else if (response?.attributesWithValues) {
+        // Derive attribute counts from products
         const attrCounts: Record<string, Record<string, number>> = {}
         for (const p of allProducts.value) {
           if (p.attributes) {
@@ -698,9 +743,11 @@ async function performSearch(append = false) {
       }
     }
     totalResults.value = response?.total || 0
-  } catch (e) {
+  }
+  catch (e) {
     console.error('Search failed', e)
-  } finally {
+  }
+  finally {
     loading.value = false
     loadingMore.value = false
   }
@@ -725,7 +772,8 @@ function toggleFilter(type: 'category' | 'condition', value: string) {
   const query = { ...route.query }
   if (query[type] === value) {
     delete query[type]
-  } else {
+  }
+  else {
     query[type] = value
   }
   router.push({ query })
@@ -742,7 +790,8 @@ function toggleAttributeFilter(key: string, value: string) {
   const paramKey = `attr_${key}`
   if (query[paramKey] === value) {
     delete query[paramKey]
-  } else {
+  }
+  else {
     query[paramKey] = value
   }
   router.push({ query })
@@ -770,25 +819,26 @@ function onCategoryClick(category: string) {
 
 // Watch route query changes and trigger search
 watch(() => route.query, () => {
-  const hasQuery = route.query.q || route.query.category || route.query.condition || 
-    Object.keys(route.query).some(k => k.startsWith('attr_'))
+  const hasQuery = route.query.q || route.query.category || route.query.condition
+    || Object.keys(route.query).some(k => k.startsWith('attr_'))
   if (hasQuery) {
     // Detect if server-side filter params changed (search, category, or condition)
     const currentQ = route.query.q ? String(route.query.q) : ''
     const currentCategory = route.query.category ? String(route.query.category) : ''
     const currentCondition = route.query.condition ? String(route.query.condition) : ''
-    
+
     const queryChanged = currentQ !== prevQuery.q || currentCategory !== prevQuery.category || currentCondition !== prevQuery.condition
-    
+
     if (queryChanged || !hasSearched.value) {
       performSearch()
     }
-    
+
     // Save previous query params for comparison
     prevQuery.q = currentQ
     prevQuery.category = currentCategory
     prevQuery.condition = currentCondition
-  } else {
+  }
+  else {
     allProducts.value = []
     hasSearched.value = false
     totalResults.value = 0

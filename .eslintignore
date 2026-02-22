@@ -1,0 +1,2 @@
+# Ignore generated API client from @hey-api/nuxt codegen
+src/api-client

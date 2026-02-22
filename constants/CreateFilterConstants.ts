@@ -30,9 +30,8 @@ export const frequency = [
 
 export const condidtion = [
   { value: 'all', label: 'allCondition' },
-  { value: 'New', label: 'newCondition' },
+  { value: 'new', label: 'newCondition' },
   { value: 'used', label: 'usedCondition' },
-  { value: 'refurbished', label: 'refurbishedCondition' },
   { value: 'broken', label: 'forPartsCondition' }]
 
 export const deliveryKind = [
