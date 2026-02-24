@@ -80,7 +80,7 @@
 
       <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
         <!-- Sidebar Filters -->
-        <div class="lg:col-span-1 space-y-4">
+        <div class="lg:col-span-1 space-y-4 min-w-0 overflow-hidden">
           <!-- Category Filter -->
           <div
             v-if="availableCategoryBuckets.length > 0"
@@ -127,15 +127,18 @@
 
           <!-- Price Range Filter -->
           <div
-            v-if="priceRangeMax > 0"
+            v-if="hasSearched"
             class="bg-slate-800/50 p-5 rounded-xl border border-slate-700/50"
           >
             <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-3">
               {{ $t('price', 'Price') }}
             </h3>
-            <div class="space-y-3">
+            <div
+              v-if="priceRangeMax > 0"
+              class="space-y-3"
+            >
               <div class="flex items-center gap-2">
-                <div class="relative flex-1">
+                <div class="relative flex-1 min-w-0">
                   <span class="absolute left-2 top-1/2 -translate-y-1/2 text-slate-500 text-xs">€</span>
                   <input
                     v-model.number="priceFilterMin"
@@ -143,12 +146,12 @@
                     :min="0"
                     :max="priceFilterMax"
                     :placeholder="Math.floor(priceRangeMin).toString()"
-                    class="w-full pl-6 pr-2 py-1.5 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-slate-200 focus:border-blue-500/50 focus:outline-none"
+                    class="w-full pl-6 pr-1 py-1.5 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-slate-200 focus:border-blue-500/50 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     @change="applyPriceFilter"
                   >
                 </div>
-                <span class="text-slate-500 text-xs">–</span>
-                <div class="relative flex-1">
+                <span class="text-slate-500 text-xs flex-shrink-0">–</span>
+                <div class="relative flex-1 min-w-0">
                   <span class="absolute left-2 top-1/2 -translate-y-1/2 text-slate-500 text-xs">€</span>
                   <input
                     v-model.number="priceFilterMax"
@@ -156,7 +159,7 @@
                     :min="priceFilterMin"
                     :max="priceRangeMax"
                     :placeholder="Math.ceil(priceRangeMax).toString()"
-                    class="w-full pl-6 pr-2 py-1.5 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-slate-200 focus:border-blue-500/50 focus:outline-none"
+                    class="w-full pl-6 pr-1 py-1.5 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-slate-200 focus:border-blue-500/50 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     @change="applyPriceFilter"
                   >
                 </div>
@@ -196,6 +199,17 @@
                 <span>{{ formatPrice(priceRangeMin) }}</span>
                 <span>{{ formatPrice(priceRangeMax) }}</span>
               </div>
+            </div>
+            <div
+              v-else
+              class="space-y-3 animate-pulse"
+            >
+              <div class="flex items-center gap-2">
+                <div class="flex-1 h-8 bg-slate-700/50 rounded-lg" />
+                <span class="text-slate-500 text-xs">–</span>
+                <div class="flex-1 h-8 bg-slate-700/50 rounded-lg" />
+              </div>
+              <div class="h-6 bg-slate-700/30 rounded-full" />
             </div>
           </div>
 
@@ -888,18 +902,13 @@ async function performSearch(append = false) {
     totalResults.value = response?.total || 0
 
     // Update price range from aggregation
+    // Backend always returns the global price range (not narrowed by price filter)
     if (response?.priceMin != null && response?.priceMax != null) {
       priceRangeMin.value = Math.floor(response.priceMin)
       priceRangeMax.value = Math.ceil(response.priceMax)
-      // Only reset slider values if no price filter is active
-      if (selectedMinPrice.value === undefined && selectedMaxPrice.value === undefined) {
-        priceFilterMin.value = priceRangeMin.value
-        priceFilterMax.value = priceRangeMax.value
-      }
-      else {
-        priceFilterMin.value = selectedMinPrice.value ?? priceRangeMin.value
-        priceFilterMax.value = selectedMaxPrice.value ?? priceRangeMax.value
-      }
+      // Sync slider to URL values or full range
+      priceFilterMin.value = selectedMinPrice.value ?? priceRangeMin.value
+      priceFilterMax.value = selectedMaxPrice.value ?? priceRangeMax.value
     }
   }
   catch (e) {
@@ -968,26 +977,29 @@ function clearAllFilters() {
 }
 
 function applyPriceFilter() {
-  const query = { ...route.query } as Record<string, string>
-  if (priceFilterMin.value > priceRangeMin.value) {
-    query.price_min = String(priceFilterMin.value)
+  const query: Record<string, string> = {}
+  // Preserve all existing query params except price
+  for (const [k, v] of Object.entries(route.query)) {
+    if (k !== 'price_min' && k !== 'price_max' && typeof v === 'string') {
+      query[k] = v
+    }
   }
-  else {
-    delete query.price_min
+  if (priceFilterMin.value > priceRangeMin.value) {
+    query.price_min = String(Math.round(priceFilterMin.value))
   }
   if (priceFilterMax.value < priceRangeMax.value) {
-    query.price_max = String(priceFilterMax.value)
-  }
-  else {
-    delete query.price_max
+    query.price_max = String(Math.round(priceFilterMax.value))
   }
   router.push({ query })
 }
 
 function clearPriceFilter() {
-  const query = { ...route.query } as Record<string, string>
-  delete query.price_min
-  delete query.price_max
+  const query: Record<string, string> = {}
+  for (const [k, v] of Object.entries(route.query)) {
+    if (k !== 'price_min' && k !== 'price_max' && typeof v === 'string') {
+      query[k] = v
+    }
+  }
   priceFilterMin.value = priceRangeMin.value
   priceFilterMax.value = priceRangeMax.value
   router.push({ query })
