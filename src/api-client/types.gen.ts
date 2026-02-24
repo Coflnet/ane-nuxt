@@ -276,6 +276,8 @@ export type SearchProductsResult = {
     categoryBuckets?: Array<FilterBucket> | null;
     conditionBuckets?: Array<FilterBucket> | null;
     attributeBuckets?: { [key: string]: Array<FilterBucket> } | null;
+    priceMin?: number | null;
+    priceMax?: number | null;
 };
 
 export type PricePoint = {
@@ -1573,6 +1575,14 @@ export type SearchProductsData = {
          * Attribute filters as key:value pairs
          */
         attributes?: Array<string>;
+        /**
+         * Optional minimum price filter
+         */
+        minPrice?: number;
+        /**
+         * Optional maximum price filter
+         */
+        maxPrice?: number;
         offset?: number;
         /**
          * Maximum results (default 20)

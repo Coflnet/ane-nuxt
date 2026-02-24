@@ -55,6 +55,16 @@
             >&times;</button>
           </span>
           <span
+            v-if="selectedMinPrice || selectedMaxPrice"
+            class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-400 text-xs border border-yellow-500/30"
+          >
+            {{ $t('price', 'Price') }}: {{ selectedMinPrice ? formatPrice(selectedMinPrice) : '€0' }} – {{ selectedMaxPrice ? formatPrice(selectedMaxPrice) : '∞' }}
+            <button
+              class="ml-1 hover:text-white"
+              @click="clearPriceFilter"
+            >&times;</button>
+          </span>
+          <span
             v-for="(value, key) in activeAttributeFilters"
             :key="key"
             class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-purple-500/20 text-purple-400 text-xs border border-purple-500/30"
@@ -112,6 +122,80 @@
                 <span class="truncate">{{ localizeCondition(bucket.value!) }}</span>
                 <span class="text-xs opacity-60 flex-shrink-0">({{ bucket.count }})</span>
               </button>
+            </div>
+          </div>
+
+          <!-- Price Range Filter -->
+          <div
+            v-if="priceRangeMax > 0"
+            class="bg-slate-800/50 p-5 rounded-xl border border-slate-700/50"
+          >
+            <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-3">
+              {{ $t('price', 'Price') }}
+            </h3>
+            <div class="space-y-3">
+              <div class="flex items-center gap-2">
+                <div class="relative flex-1">
+                  <span class="absolute left-2 top-1/2 -translate-y-1/2 text-slate-500 text-xs">€</span>
+                  <input
+                    v-model.number="priceFilterMin"
+                    type="number"
+                    :min="0"
+                    :max="priceFilterMax"
+                    :placeholder="Math.floor(priceRangeMin).toString()"
+                    class="w-full pl-6 pr-2 py-1.5 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-slate-200 focus:border-blue-500/50 focus:outline-none"
+                    @change="applyPriceFilter"
+                  >
+                </div>
+                <span class="text-slate-500 text-xs">–</span>
+                <div class="relative flex-1">
+                  <span class="absolute left-2 top-1/2 -translate-y-1/2 text-slate-500 text-xs">€</span>
+                  <input
+                    v-model.number="priceFilterMax"
+                    type="number"
+                    :min="priceFilterMin"
+                    :max="priceRangeMax"
+                    :placeholder="Math.ceil(priceRangeMax).toString()"
+                    class="w-full pl-6 pr-2 py-1.5 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-slate-200 focus:border-blue-500/50 focus:outline-none"
+                    @change="applyPriceFilter"
+                  >
+                </div>
+              </div>
+              <!-- Dual range slider -->
+              <div class="relative h-6 flex items-center">
+                <div class="absolute inset-x-0 h-1 bg-slate-700 rounded-full" />
+                <div
+                  class="absolute h-1 bg-blue-500 rounded-full"
+                  :style="{
+                    left: `${(priceFilterMin - priceRangeMin) / (priceRangeMax - priceRangeMin) * 100}%`,
+                    right: `${100 - (priceFilterMax - priceRangeMin) / (priceRangeMax - priceRangeMin) * 100}%`,
+                  }"
+                />
+                <input
+                  :value="priceFilterMin"
+                  type="range"
+                  :min="Math.floor(priceRangeMin)"
+                  :max="Math.ceil(priceRangeMax)"
+                  :step="priceSliderStep"
+                  class="absolute inset-x-0 w-full appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-blue-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-slate-900 [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-blue-500 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-slate-900"
+                  @input="(e: Event) => { priceFilterMin = Math.min(Number((e.target as HTMLInputElement).value), priceFilterMax - priceSliderStep) }"
+                  @change="applyPriceFilter"
+                >
+                <input
+                  :value="priceFilterMax"
+                  type="range"
+                  :min="Math.floor(priceRangeMin)"
+                  :max="Math.ceil(priceRangeMax)"
+                  :step="priceSliderStep"
+                  class="absolute inset-x-0 w-full appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-blue-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-slate-900 [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-blue-500 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-slate-900"
+                  @input="(e: Event) => { priceFilterMax = Math.max(Number((e.target as HTMLInputElement).value), priceFilterMin + priceSliderStep) }"
+                  @change="applyPriceFilter"
+                >
+              </div>
+              <div class="flex justify-between text-xs text-slate-500">
+                <span>{{ formatPrice(priceRangeMin) }}</span>
+                <span>{{ formatPrice(priceRangeMax) }}</span>
+              </div>
             </div>
           </div>
 
@@ -278,6 +362,8 @@ const { t, locale } = useI18n()
 const searchQuery = computed(() => (route.query.q as string) || '')
 const selectedCategory = computed(() => (route.query.category as string) || '')
 const selectedCondition = computed(() => (route.query.condition as string) || '')
+const selectedMinPrice = computed(() => route.query.price_min ? Number(route.query.price_min) : undefined)
+const selectedMaxPrice = computed(() => route.query.price_max ? Number(route.query.price_max) : undefined)
 const activeAttributeFilters = computed(() => {
   const filters: Record<string, string> = {}
   for (const [key, value] of Object.entries(route.query)) {
@@ -292,6 +378,8 @@ const hasActiveFilters = computed(
   () =>
     !!selectedCategory.value
     || !!selectedCondition.value
+    || selectedMinPrice.value !== undefined
+    || selectedMaxPrice.value !== undefined
     || Object.keys(activeAttributeFilters.value).length > 0,
 )
 
@@ -302,12 +390,25 @@ const categoryBuckets = ref<FilterBucket[]>([])
 const conditionBuckets = ref<FilterBucket[]>([])
 const attributeBuckets = ref<Record<string, FilterBucket[]>>({})
 
+// Price range state
+const priceRangeMin = ref<number>(0)
+const priceRangeMax = ref<number>(1000)
+const priceFilterMin = ref<number>(0)
+const priceFilterMax = ref<number>(1000)
+const priceSliderStep = computed(() => {
+  const range = priceRangeMax.value - priceRangeMin.value
+  if (range <= 100) return 1
+  if (range <= 1000) return 5
+  if (range <= 5000) return 10
+  return 50
+})
+
 const loading = ref(false)
 const loadingMore = ref(false)
 const hasSearched = ref(false)
 
 // Track previous query params to avoid re-fetching when only attribute filters change
-const prevQuery = reactive({ q: '' as string | undefined, category: '' as string | undefined, condition: '' as string | undefined })
+const prevQuery = reactive({ q: '' as string | undefined, category: '' as string | undefined, condition: '' as string | undefined, price_min: '' as string | undefined, price_max: '' as string | undefined })
 
 // Compute filtered products based on category, condition, and attributes
 const filteredProductsForFacets = computed(() => {
@@ -588,7 +689,9 @@ const attrKeyTranslationMap: Record<string, string> = {
   'color': 'attr_color',
   'size': 'attr_size',
   'storage': 'attr_storage',
+  'storage_size': 'attr_storage',
   'memory': 'attr_memory',
+  'ram_size': 'attr_ram',
   'ram': 'attr_ram',
   'screen_size': 'attr_screen_size',
   'material': 'attr_material',
@@ -696,6 +799,8 @@ function buildSearchParams(offset = 0) {
   // OpenSearch Term queries require lowercase for categories and conditions
   if (selectedCategory.value) params.category = selectedCategory.value.toLowerCase()
   if (selectedCondition.value) params.condition = selectedCondition.value.toLowerCase()
+  if (selectedMinPrice.value !== undefined) params.minPrice = selectedMinPrice.value
+  if (selectedMaxPrice.value !== undefined) params.maxPrice = selectedMaxPrice.value
   // Note: attributes are filtered client-side (production API doesn't support them)
   return params
 }
@@ -781,6 +886,21 @@ async function performSearch(append = false) {
       }
     }
     totalResults.value = response?.total || 0
+
+    // Update price range from aggregation
+    if (response?.priceMin != null && response?.priceMax != null) {
+      priceRangeMin.value = Math.floor(response.priceMin)
+      priceRangeMax.value = Math.ceil(response.priceMax)
+      // Only reset slider values if no price filter is active
+      if (selectedMinPrice.value === undefined && selectedMaxPrice.value === undefined) {
+        priceFilterMin.value = priceRangeMin.value
+        priceFilterMax.value = priceRangeMax.value
+      }
+      else {
+        priceFilterMin.value = selectedMinPrice.value ?? priceRangeMin.value
+        priceFilterMax.value = selectedMaxPrice.value ?? priceRangeMax.value
+      }
+    }
   }
   catch (e) {
     console.error('Search failed', e)
@@ -847,6 +967,32 @@ function clearAllFilters() {
   router.push({ query })
 }
 
+function applyPriceFilter() {
+  const query = { ...route.query } as Record<string, string>
+  if (priceFilterMin.value > priceRangeMin.value) {
+    query.price_min = String(priceFilterMin.value)
+  }
+  else {
+    delete query.price_min
+  }
+  if (priceFilterMax.value < priceRangeMax.value) {
+    query.price_max = String(priceFilterMax.value)
+  }
+  else {
+    delete query.price_max
+  }
+  router.push({ query })
+}
+
+function clearPriceFilter() {
+  const query = { ...route.query } as Record<string, string>
+  delete query.price_min
+  delete query.price_max
+  priceFilterMin.value = priceRangeMin.value
+  priceFilterMax.value = priceRangeMax.value
+  router.push({ query })
+}
+
 function onSearch(query: string) {
   router.push({ query: { q: query } })
 }
@@ -858,6 +1004,7 @@ function onCategoryClick(category: string) {
 // Watch route query changes and trigger search
 watch(() => route.query, () => {
   const hasQuery = route.query.q || route.query.category || route.query.condition
+    || route.query.price_min || route.query.price_max
     || Object.keys(route.query).some(k => k.startsWith('attr_'))
   if (hasQuery) {
     // Detect if server-side filter params changed (search, category, or condition)
@@ -865,11 +1012,17 @@ watch(() => route.query, () => {
     const currentCategory = route.query.category ? String(route.query.category) : ''
     const currentCondition = route.query.condition ? String(route.query.condition) : ''
 
-    const queryChanged = currentQ !== prevQuery.q || currentCategory !== prevQuery.category || currentCondition !== prevQuery.condition
+    const currentPriceMin = route.query.price_min ? String(route.query.price_min) : ''
+    const currentPriceMax = route.query.price_max ? String(route.query.price_max) : ''
+
+    const queryChanged = currentQ !== prevQuery.q || currentCategory !== prevQuery.category || currentCondition !== prevQuery.condition || currentPriceMin !== prevQuery.price_min || currentPriceMax !== prevQuery.price_max
 
     if (queryChanged || !hasSearched.value) {
       performSearch()
     }
+
+    prevQuery.price_min = currentPriceMin
+    prevQuery.price_max = currentPriceMax
 
     // Save previous query params for comparison
     prevQuery.q = currentQ
