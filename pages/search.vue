@@ -12,6 +12,7 @@
       <ProductSearch
         :initial-query="searchQuery"
         @search="onSearch"
+        @select-category="onSearchCategorySelect"
       />
     </div>
 
@@ -332,30 +333,93 @@
       </div>
     </div>
 
-    <!-- Popular Categories (Default View) -->
+    <!-- Category Browser (Default View) -->
     <div
       v-else
       class="max-w-6xl mx-auto mt-20"
     >
-      <h2 class="text-2xl font-bold text-center text-slate-300 mb-10">
-        {{ $t('popularCategories', 'Popular Categories') }}
-      </h2>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <!-- Breadcrumb for category navigation -->
+      <div
+        v-if="browsePath.length > 0"
+        class="flex items-center gap-2 mb-6 text-sm text-slate-400"
+      >
         <button
-          v-for="cat in defaultCategories"
-          :key="cat.searchValue"
-          class="p-6 bg-slate-800/30 hover:bg-slate-800 rounded-xl transition-colors text-center group"
-          @click="onCategoryClick(cat.searchValue)"
+          class="hover:text-white transition-colors"
+          @click="browsePath = []; browseSubCats = []"
         >
-          <div class="mb-4 inline-flex p-3 rounded-full bg-slate-700/50 group-hover:scale-110 transition-transform text-blue-400">
+          {{ $t('allCategories', 'All Categories') }}
+        </button>
+        <template
+          v-for="(seg, idx) in browsePath"
+          :key="seg.slug"
+        >
+          <Icon
+            name="tabler:chevron-right"
+            class="w-4 h-4"
+          />
+          <button
+            class="hover:text-white transition-colors"
+            :class="{ 'text-blue-400 font-medium': idx === browsePath.length - 1 }"
+            @click="navigateToBreadcrumb(idx)"
+          >
+            {{ seg.label }}
+          </button>
+        </template>
+      </div>
+
+      <h2 class="text-2xl font-bold text-center text-slate-300 mb-10">
+        {{ browsePath.length > 0 ? browsePath[browsePath.length - 1].label : $t('browseCategories', 'Browse Categories') }}
+      </h2>
+
+      <!-- Category grid from unified categories API -->
+      <div
+        v-if="loadingCategories"
+        class="grid grid-cols-2 md:grid-cols-4 gap-4"
+      >
+        <div
+          v-for="i in 8"
+          :key="i"
+          class="h-24 bg-slate-800/50 rounded-xl animate-pulse"
+        />
+      </div>
+      <div
+        v-else
+        class="grid grid-cols-2 md:grid-cols-4 gap-4"
+      >
+        <button
+          v-for="cat in displayCategories"
+          :key="cat.slug"
+          class="p-6 bg-slate-800/30 hover:bg-slate-800 rounded-xl transition-colors text-center group relative"
+          @click="onUnifiedCategoryClick(cat)"
+        >
+          <div class="mb-2 inline-flex p-3 rounded-full bg-slate-700/50 group-hover:scale-110 transition-transform text-blue-400">
             <Icon
-              :name="cat.icon"
+              :name="getCategoryIcon(cat.slug, cat.label)"
               class="w-8 h-8"
             />
           </div>
           <div class="font-medium text-slate-200">
-            {{ $t(cat.labelKey) }}
+            {{ cat.label }}
           </div>
+          <div
+            v-if="cat.subCategories && cat.subCategories.length > 0"
+            class="text-xs text-slate-500 mt-1"
+          >
+            {{ cat.subCategories.length }} {{ $t('subcategories', 'subcategories') }}
+          </div>
+        </button>
+      </div>
+
+      <!-- Browse products in selected category -->
+      <div
+        v-if="browsePath.length > 0"
+        class="mt-8 text-center"
+      >
+        <button
+          class="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition-colors font-medium"
+          @click="searchInCurrentCategory"
+        >
+          {{ $t('showProducts', 'Show Products') }} — {{ browsePath[browsePath.length - 1].label }}
         </button>
       </div>
     </div>
@@ -366,6 +430,7 @@
 import { useI18n } from 'vue-i18n'
 import { searchProducts } from '~/src/api-client'
 import type { ProductDocument, FilterBucket } from '~/src/api-client/types.gen'
+import { useCategories } from '~/composable/useCategories'
 
 const router = useRouter()
 const route = useRoute()
@@ -421,92 +486,32 @@ const loading = ref(false)
 const loadingMore = ref(false)
 const hasSearched = ref(false)
 
-// Track previous query params to avoid re-fetching when only attribute filters change
-const prevQuery = reactive({ q: '' as string | undefined, category: '' as string | undefined, condition: '' as string | undefined, price_min: '' as string | undefined, price_max: '' as string | undefined })
+// Track previous query params to detect server-side filter changes that need a re-fetch
+const prevQuery = reactive({ q: '' as string | undefined, category: '' as string | undefined, condition: '' as string | undefined, price_min: '' as string | undefined, price_max: '' as string | undefined, attrs: '' as string | undefined })
 
-// Compute filtered products based on category, condition, and attributes
-const filteredProductsForFacets = computed(() => {
-  let filtered = allProducts.value
-
-  // Filter by selected category
-  if (selectedCategory.value) {
-    filtered = filtered.filter(p =>
-      p.categories
-      && p.categories.some(
-        c => c.toLowerCase() === selectedCategory.value.toLowerCase(),
-      ),
-    )
-  }
-
-  // Filter by selected condition
-  if (selectedCondition.value) {
-    filtered = filtered.filter(p =>
-      p.condition
-      && p.condition.toLowerCase() === selectedCondition.value.toLowerCase(),
-    )
-  }
-
-  // Filter by selected attributes
-  const attrFilters = activeAttributeFilters.value
-  if (Object.keys(attrFilters).length > 0) {
-    filtered = filtered.filter((p) => {
-      if (!p.attributes) {
-        return false
-      }
-      return Object.entries(attrFilters).every(([key, val]) =>
-        p.attributes!.some(a => a.key === key && a.value === val),
-      )
-    })
-  }
-
-  return filtered
-})
-
-// Compute available category buckets accounting for other selected filters
+// Compute available category buckets — use server-provided aggregation counts directly
 const availableCategoryBuckets = computed(() => {
   if (selectedCategory.value) {
     // If a category is already selected, show only that one
     return categoryBuckets.value.filter(b => b.value?.toLowerCase() === selectedCategory.value.toLowerCase())
   }
 
-  // Count categories in filtered products
-  const counts: Record<string, number> = {}
-  for (const product of filteredProductsForFacets.value) {
-    if (product.categories) {
-      for (const cat of product.categories) {
-        const normalized = cat.toLowerCase()
-        counts[normalized] = (counts[normalized] || 0) + 1
-      }
-    }
-  }
-
-  // Return categories with counts > 0, sorted by count
+  // Use server-side aggregation counts (already computed across ALL matching docs)
   return categoryBuckets.value
-    .filter(b => b.value && b.value.toLowerCase() !== 'general' && (counts[b.value.toLowerCase()] || 0) > 0)
-    .map(b => ({ ...b, count: counts[b.value!.toLowerCase()] || 0 }))
+    .filter(b => b.value && b.value.toLowerCase() !== 'general' && (b.count ?? 0) > 0)
     .sort((a, b) => (b.count || 0) - (a.count || 0))
 })
 
-// Compute available condition buckets accounting for other selected filters
+// Compute available condition buckets — use server-provided aggregation counts directly
 const availableConditionBuckets = computed(() => {
   if (selectedCondition.value) {
     // If a condition is already selected, show only that one
     return conditionBuckets.value.filter(b => b.value?.toLowerCase() === selectedCondition.value.toLowerCase())
   }
 
-  // Count conditions in filtered products
-  const counts: Record<string, number> = {}
-  for (const product of filteredProductsForFacets.value) {
-    if (product.condition) {
-      const normalized = product.condition.toLowerCase()
-      counts[normalized] = (counts[normalized] || 0) + 1
-    }
-  }
-
-  // Return conditions with counts > 0, sorted by count
+  // Use server-side aggregation counts
   return conditionBuckets.value
-    .filter(b => b.value && (counts[b.value.toLowerCase()] || 0) > 0)
-    .map(b => ({ ...b, count: counts[b.value!.toLowerCase()] || 0 }))
+    .filter(b => b.value && (b.count ?? 0) > 0)
     .sort((a, b) => (b.count || 0) - (a.count || 0))
 })
 
@@ -524,22 +529,9 @@ const availableAttributeBuckets = computed(() => {
       result[key] = buckets.filter(b => b.value === attrFilters[key])
     }
     else {
-      // Count this attribute's values in filtered products
-      const counts: Record<string, number> = {}
-      for (const product of filteredProductsForFacets.value) {
-        if (product.attributes) {
-          for (const attr of product.attributes) {
-            if (attr.key === key && attr.value) {
-              counts[attr.value] = (counts[attr.value] || 0) + 1
-            }
-          }
-        }
-      }
-
-      // Return values with counts > 0
+      // Use server-side aggregation counts directly (covers all matching docs, not just page)
       const available = buckets
-        .filter(b => b.value && (counts[b.value] || 0) > 0)
-        .map(b => ({ ...b, count: counts[b.value!] || 0 }))
+        .filter(b => b.value && (b.count ?? 0) > 0)
         .sort((a, b) => (b.count || 0) - (a.count || 0))
 
       if (available.length > 0) {
@@ -551,59 +543,104 @@ const availableAttributeBuckets = computed(() => {
   return result
 })
 
-// Filter out empty values, duplicate "condition" key, and sort attribute groups
-const displayAttributeBuckets = computed(() => {
-  const result: Record<string, FilterBucket[]> = {}
-  for (const [key, buckets] of Object.entries(availableAttributeBuckets.value)) {
-    // Skip "condition" as it has its own section
-    if (key.toLowerCase() === 'condition') continue
-    const filtered = buckets.filter(b => b.value && b.value.trim() !== '' && (b.count ?? 0) > 0)
-    if (filtered.length > 0) result[key] = filtered
-  }
-  return result
-})
-
-// Deduplicate condition buckets by their localized display value
-const displayConditionBucketsWithDedup = computed(() => {
-  const raw = availableConditionBuckets.value.filter(b => b.value && b.value !== 'unknown')
-  const merged = new Map<string, FilterBucket>()
-  for (const bucket of raw) {
-    const display = localizeCondition(bucket.value!)
-    const existing = merged.get(display)
-    if (existing) {
-      merged.set(display, { value: existing.value, count: (existing.count ?? 0) + (bucket.count ?? 0) })
-    }
-    else {
-      // Map the value to the standard condition if it exists in the map
-      let standardValue = bucket.value
-      if (conditionMap[bucket.value!]) {
-        standardValue = conditionMap[bucket.value!].replace('Condition', '').toLowerCase()
-        if (standardValue === 'forparts') standardValue = 'broken'
-      }
-      merged.set(display, { value: standardValue, count: bucket.count })
-    }
-  }
-  return Array.from(merged.values())
-})
-
-// For backward compatibility, keep displayConditionBuckets as an alias
-const displayConditionBuckets = displayConditionBucketsWithDedup
-
-// Client-side attribute filtering — API only supports category & condition
-const products = computed(() => {
-  return filteredProductsForFacets.value
-})
+// Products are now server-side filtered (category, condition, attributes all sent to API)
+const products = computed(() => allProducts.value)
 
 const canLoadMore = computed(() => totalResults.value > allProducts.value.length)
 
 const PAGE_SIZE = 20
 
-const defaultCategories = [
-  { searchValue: 'Electronics', labelKey: 'categories.electronics', icon: 'tabler:device-laptop' },
-  { searchValue: 'Smartphones', labelKey: 'categories.smartphones', icon: 'tabler:device-mobile' },
-  { searchValue: 'Photography', labelKey: 'categories.photography', icon: 'tabler:camera' },
-  { searchValue: 'Gaming', labelKey: 'categories.gaming', icon: 'tabler:device-gamepad-2' },
-]
+// --- Category browsing ---
+const { topLevelCategories, loadingCategories, fetchTopLevelCategories, fetchSubCategories } = useCategories()
+
+interface BrowseSegment { slug: string; label: string }
+const browsePath = ref<BrowseSegment[]>([])
+const browseSubCats = ref<Array<{ slug: string; label: string; subCategories?: any[] | null }>>([])
+
+// Categories to display in the browser
+const displayCategories = computed(() => {
+  if (browseSubCats.value.length > 0) return browseSubCats.value
+  return topLevelCategories.value
+})
+
+// Icon map for common top-level categories
+const categoryIconMap: Record<string, string> = {
+  'Baby & Kleinkind': 'tabler:baby-carriage',
+  'Sportartikel': 'tabler:run',
+  'Elektronik': 'tabler:device-laptop',
+  'Bekleidung & Accessoires': 'tabler:shirt',
+  'Haus & Garten': 'tabler:home',
+  'Fahrzeuge & Teile': 'tabler:car',
+  'Gesundheit & Schönheit': 'tabler:heart',
+  'Bürobedarf': 'tabler:briefcase',
+  'Möbel': 'tabler:armchair',
+  'Spielzeug & Spiele': 'tabler:puzzle',
+  'Medien': 'tabler:book',
+  'Lebensmittel': 'tabler:shopping-cart',
+  'Tiere & Tierbedarf': 'tabler:paw',
+  'Kunst & Unterhaltung': 'tabler:palette',
+  'Kameras & Optik': 'tabler:camera',
+  'Software': 'tabler:code',
+  'Hardware': 'tabler:cpu',
+  'Werkzeuge & Eisenwaren': 'tabler:tool',
+  'Gepäck & Taschen': 'tabler:backpack',
+  'Radsport': 'tabler:bike',
+  'Fahrräder': 'tabler:bike',
+}
+
+function getCategoryIcon(slug: string, label: string): string {
+  return categoryIconMap[label] || 'tabler:category'
+}
+
+async function onUnifiedCategoryClick(cat: { slug: string; label: string; subCategories?: any[] | null }) {
+  if (cat.subCategories && cat.subCategories.length > 0) {
+    // Navigate deeper into the tree
+    browsePath.value = [...browsePath.value, { slug: cat.slug, label: cat.label }]
+    browseSubCats.value = cat.subCategories
+  }
+  else {
+    // Try to fetch subcategories from API
+    const subs = await fetchSubCategories(cat.slug)
+    if (subs && subs.length > 0) {
+      browsePath.value = [...browsePath.value, { slug: cat.slug, label: cat.label }]
+      browseSubCats.value = subs
+    }
+    else {
+      // Leaf category — search for products with this category
+      router.push({ query: { category: cat.slug } })
+    }
+  }
+}
+
+function navigateToBreadcrumb(idx: number) {
+  if (idx === 0 && browsePath.value.length === 1) {
+    // Going back to top level
+    browsePath.value = []
+    browseSubCats.value = []
+    return
+  }
+  // Navigate to this breadcrumb level
+  const targetCat = browsePath.value[idx]
+  browsePath.value = browsePath.value.slice(0, idx + 1)
+  // Re-fetch subcategories for this level
+  if (targetCat) {
+    fetchSubCategories(targetCat.slug).then((subs: unknown[]) => {
+      browseSubCats.value = (subs || []) as Array<{ slug: string; label: string; subCategories?: unknown[] | null }>
+    })
+  }
+}
+
+function searchInCurrentCategory() {
+  const leaf = browsePath.value.at(-1)
+  if (leaf) {
+    router.push({ query: { category: leaf.slug } })
+  }
+}
+
+// Load top-level categories on mount
+onMounted(() => {
+  fetchTopLevelCategories()
+})
 
 // --- Localization helpers ---
 
@@ -733,6 +770,8 @@ const attrKeyTranslationMap: Record<string, string> = {
   'controllers': 'attr_controllers',
   'manufactureaddress': 'attr_manufacturer',
   'manufacturertradename': 'attr_manufacturer',
+  'bike_type': 'attr_bike_type',
+  'sub_type': 'attr_sub_type',
 }
 
 // Common attribute value translations (for colors, sizes, etc.)
@@ -815,7 +854,11 @@ function buildSearchParams(offset = 0) {
   if (selectedCondition.value) params.condition = selectedCondition.value.toLowerCase()
   if (selectedMinPrice.value !== undefined) params.minPrice = selectedMinPrice.value
   if (selectedMaxPrice.value !== undefined) params.maxPrice = selectedMaxPrice.value
-  // Note: attributes are filtered client-side (production API doesn't support them)
+  // Send attribute filters to the API as key:value pairs
+  const attrFilters = activeAttributeFilters.value
+  if (Object.keys(attrFilters).length > 0) {
+    params.attributes = Object.entries(attrFilters).map(([k, v]) => `${k}:${v}`)
+  }
   return params
 }
 
@@ -924,17 +967,6 @@ function loadMore() {
   performSearch(true)
 }
 
-function updateUrlAndSearch() {
-  const query: Record<string, string> = {}
-  if (searchQuery.value) query.q = searchQuery.value
-  if (selectedCategory.value) query.category = selectedCategory.value
-  if (selectedCondition.value) query.condition = selectedCondition.value
-  for (const [k, v] of Object.entries(activeAttributeFilters.value)) {
-    query[`attr_${k}`] = v
-  }
-  router.push({ query })
-}
-
 function toggleFilter(type: 'category' | 'condition', value: string) {
   const query = { ...route.query }
   if (query[type] === value) {
@@ -1009,8 +1041,8 @@ function onSearch(query: string) {
   router.push({ query: { q: query } })
 }
 
-function onCategoryClick(category: string) {
-  onSearch(category)
+function onSearchCategorySelect(slug: string) {
+  router.push({ query: { category: slug } })
 }
 
 // Watch route query changes and trigger search
@@ -1019,7 +1051,7 @@ watch(() => route.query, () => {
     || route.query.price_min || route.query.price_max
     || Object.keys(route.query).some(k => k.startsWith('attr_'))
   if (hasQuery) {
-    // Detect if server-side filter params changed (search, category, or condition)
+    // Detect if server-side filter params changed (search, category, condition, price, or attributes)
     const currentQ = route.query.q ? String(route.query.q) : ''
     const currentCategory = route.query.category ? String(route.query.category) : ''
     const currentCondition = route.query.condition ? String(route.query.condition) : ''
@@ -1027,7 +1059,14 @@ watch(() => route.query, () => {
     const currentPriceMin = route.query.price_min ? String(route.query.price_min) : ''
     const currentPriceMax = route.query.price_max ? String(route.query.price_max) : ''
 
-    const queryChanged = currentQ !== prevQuery.q || currentCategory !== prevQuery.category || currentCondition !== prevQuery.condition || currentPriceMin !== prevQuery.price_min || currentPriceMax !== prevQuery.price_max
+    // Serialize attribute filters for comparison
+    const currentAttrs = Object.entries(route.query)
+      .filter(([k]) => k.startsWith('attr_'))
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([k, v]) => `${k}=${v}`)
+      .join('&')
+
+    const queryChanged = currentQ !== prevQuery.q || currentCategory !== prevQuery.category || currentCondition !== prevQuery.condition || currentPriceMin !== prevQuery.price_min || currentPriceMax !== prevQuery.price_max || currentAttrs !== prevQuery.attrs
 
     if (queryChanged || !hasSearched.value) {
       performSearch()
@@ -1035,6 +1074,7 @@ watch(() => route.query, () => {
 
     prevQuery.price_min = currentPriceMin
     prevQuery.price_max = currentPriceMax
+    prevQuery.attrs = currentAttrs
 
     // Save previous query params for comparison
     prevQuery.q = currentQ
