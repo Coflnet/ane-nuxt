@@ -568,25 +568,6 @@
           v-intersect="fadeIn"
           class="grid grid-cols-2 md:grid-cols-3 gap-8 opacity-0"
         >
-          <a :href="localePath('/marketplaces/ebay')">
-            <div
-              class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"
-            >
-              <div class="text-xl font-semibold text-gray-200">
-                {{ $t('marketplaces.platforms.ebay') }}
-              </div>
-            </div>
-          </a>
-          <a :href="localePath('/marketplaces/facebook')">
-            <div
-              class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"
-            >
-              <div class="text-xl font-semibold text-gray-200">
-                {{ $t('marketplaces.platforms.facebook') }}
-              </div>
-            </div>
-          </a>
-
           <a :href="localePath('/marketplaces/craigslist')">
             <div
               class="flex items-center justify-center p-8 bg-gray-800 rounded-2xl shadow-sm border border-gray-700 transition-all hover:shadow-md hover:-translate-y-1"

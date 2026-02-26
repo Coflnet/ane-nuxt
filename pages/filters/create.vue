@@ -341,7 +341,7 @@ async function handleFilters(): Promise<{ name: string, value: string | number |
   if (rawFilter.commercialSeller)
     filters.push({ name: 'CommercialSeller', value: true })
 
-  if (rawFilter.zipcode != '' && rawFilter.marketplace != 'ebay') {
+  if (rawFilter.zipcode != '') {
     const location = await handleSearchRadius()
     filters.push({ name: 'Radius', value: `${location[0]};${location[1]};${rawFilter.searchRadius};${rawFilter.zipcode}` })
   }

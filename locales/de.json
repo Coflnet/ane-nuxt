@@ -41,7 +41,7 @@
   "connectedToXChannels": "Verbunden mit {n} Kanälen",
   "continueWithGoogle": "Weiter mit Google",
   "createAccount": "Account erstellen",
-  "createCustomAlerts": "Erstelle eigene Filter und erhalte Benachrichtigungen für eBay und andere Marktplätze. Kaufe Artikel unter dem Marktwert.",
+  "createCustomAlerts": "Erstelle eigene Filter und erhalte Benachrichtigungen für Kleinanzeigen und andere Marktplätze. Kaufe Artikel unter dem Marktwert.",
   "createFilter": "Filter erstellen",
   "createYourFilter": "Erstelle deine Filter",
   "currentPlan": "Aktueller Plan",
@@ -119,7 +119,7 @@
   "searchKeywords": "Suchwörter",
   "searchRadius": "Suchradius",
   "searchRadiusAroundYou": "Suchradius um dich herum, in Kilometern",
-  "searchRadiusRequiresEbay": "Die Suchradius Funktion funktioniert leider nicht mit eBay",
+
   "searchValue": "Suchwert",
   "searchPageTitle": "Suche - Preise vergleichen",
   "searching": "Suche läuft...",
@@ -338,10 +338,8 @@
     "title": "Supported Marketplaces",
     "description": "Our platform integrates with many major online and local marketplaces to give you comprehensive coverage and ensure you never miss a deal.",
     "platforms": {
-      "ebay": "eBay",
       "kleinanzeigen": "Kleinanzeigen",
       "autoscout24": "Autoscout24",
-      "facebook": "Facebook",
       "craigslist": "Craigslist",
       "more": "+ Viele mehr"
     }
@@ -435,7 +433,7 @@
     "items": {
       "first": {
         "question": "Welche Plattformen werden unterstützt?",
-        "answer": "Unser Service unterstützt eine breite Palette beliebter Online-Marktplätze, darunter Autoscout24, Kleinanzeigen und eBay. Wir erweitern kontinuierlich unsere Plattformintegrationen, um mehr Optionen anzubieten. Schreibe uns, wenn du eine bestimmte Plattform im Sinn hast!"
+        "answer": "Unser Service unterstützt eine breite Palette beliebter Online-Marktplätze, darunter Autoscout24, Kleinanzeigen und Craigslist. Wir erweitern kontinuierlich unsere Plattformintegrationen, um mehr Optionen anzubieten. Schreibe uns, wenn du eine bestimmte Plattform im Sinn hast!"
       },
       "second": {
         "question": "Gibt es eine kostenlose Testversion?",
@@ -479,38 +477,7 @@
   "thisAuctionDoesntMatch": "Diese Auktion passt nicht zu meinem Filter",
   "tellUsWhatsWrongs": "Sag uns, was schief gelaufen ist oder nicht gepasst hat",
   "reportSuccessfull": "Dein Meldung war erfolgreich \n Das ist deine Melde-Nummer: {id}",
-  "facebook": {
-    "name": "Facebook Marketplace",
-    "title": "Facebook Marketplace Filter & Benachrichtigungen",
-    "subtitle": "Verpasse keine tollen Angebote auf dem Facebook Marketplace mehr – mit intelligenten Filtern und Sofortbenachrichtigungen",
-    "introduction": {
-      "title": "Verändere dein Facebook Marketplace-Erlebnis",
-      "bodyText": "Der Facebook Marketplace ist einer der größten Online-Marktplätze, auf dem täglich Millionen von Menschen Artikel kaufen und verkaufen. Mit unserem fortschrittlichen Filtersystem kannst du den Lärm durchdringen und genau das finden, wonach du suchst, ohne stundenlang durch irrelevante Angebote scrollen zu müssen."
-    },
-    "benefits": {
-      "title": "Warum Facebook Marketplace Filter verwenden?",
-      "bodyText": "Spare Zeit und verpasse keine tollen Angebote mehr mit unserem intelligenten Überwachungssystem, das speziell für Facebook Marketplace-Nutzer entwickelt wurde.",
-      "benefit1": "Spare Stunden manueller Suche in Facebook Marketplace-Angeboten",
-      "benefit2": "Erfahre als Erster von neuen Artikeln, die deinen Interessen entsprechen",
-      "benefit3": "Finde bessere Angebote schneller durch automatische Preis- und Zustandsüberwachung"
-    }
-  },
-  "ebay": {
-    "name": "eBay",
-    "title": "eBay Filter & Benachrichtigungen",
-    "subtitle": "Erhalte die besten Angebote auf eBay mit benutzerdefinierten Filtern und Echtzeit-Benachrichtigungen",
-    "introduction": {
-      "title": "Maximiere dein eBay-Einkaufserlebnis",
-      "bodyText": "eBay ist ein riesiger Marktplatz mit Millionen von Angeboten. Unsere Plattform hilft dir, dich in diesem Meer von Optionen zurechtzufinden, indem du personalisierte Filter einrichten kannst, die deinen spezifischen Bedürfnissen entsprechen und sicherstellen, dass du kein tolles Angebot verpasst."
-    },
-    "benefits": {
-      "title": "Warum eBay Filter verwenden?",
-      "bodyText": "Mit unseren eBay-Filtern kannst du dein Einkaufserlebnis optimieren und dich auf die Artikel konzentrieren, die dir am wichtigsten sind.",
-      "benefit1": "Finde schnell Artikel, die genau deinen Kriterien entsprechen",
-      "benefit2": "Erhalte zeitnahe Benachrichtigungen, wenn neue Angebote veröffentlicht werden",
-      "benefit3": "Spare Zeit und Mühe durch automatische Überwachung"
-    }
-  },
+
   "craigslist": {
     "name": "Craigslist",
     "title": "Craigslist Filter & Benachrichtigungen: Optimierte Suche",
@@ -625,7 +592,6 @@
   "XincludedPremiumSearches": "Premium-Suchen inklusive: {amount}",
   "appHeaderBeta": "Beta",
   "noAvailableFilters": "Deine verfügbaren Filter sind aufgebraucht. Aktualisiere dein Abo, um mehr Filter zu erstellen.",
-  "ebayMarketplace": "eBay",
   "kleinanzeigenMarketplace": "Kleinanzeigen",
   "weRanIntoAnError": "Es ist ein Fehler aufgetreten. Sollte dies weiterhin der Fall sein, wenden Sie sich bitte an den Support.",
   "issueGettingLocationData": "Es gab ein Problem beim Abrufen Ihrer Standortdaten anhand Ihrer Postleitzahl. Sollte das Problem weiterhin bestehen, wenden Sie sich bitte an den Support.",

@@ -6,7 +6,7 @@
       <UiHeaderLabel :label="filter.name" />
       <UiFooterLabel
         class="truncate w-48"
-        :label="filter.marketplace || 'Ebay'"
+        :label="filter.marketplace || 'Kleinanzeigen'"
         :xs="true"
       />
     </a>

@@ -297,7 +297,7 @@
                 </div>
                 <div class="p-5">
                   <h3 class="text-lg font-semibold text-slate-100 mb-2 line-clamp-2 min-h-[3.5rem]">
-                    {{ product.name }}
+                    {{ productDisplayName(product) }}
                   </h3>
                   <div class="flex items-center justify-between mt-4">
                     <div class="text-sm text-slate-400">
@@ -1093,6 +1093,28 @@ watch(() => route.query, () => {
 
 function formatPrice(amount: number) {
   return new Intl.NumberFormat(locale.value === 'de' ? 'de-DE' : 'en-US', { style: 'currency', currency: 'EUR' }).format(amount)
+}
+
+/** Build a better display name when product.name is just the brand or too generic */
+function productDisplayName(product: any): string {
+  const name = product.name?.trim()
+  const brand = product.brand?.trim()
+  const model = product.model?.trim()
+  if (!name) return brand || model || 'Unknown'
+
+  // Clean leading dash artifacts
+  const cleanName = name.replace(/^[-\s]+/, '').trim()
+
+  // If name is a single word and model exists, the name is likely just a brand/chip marker
+  // e.g. name="NVIDIA", brand="Asus", model="GeForce RTX 3070 8GB" -> "Asus GeForce RTX 3070 8GB"
+  if (model && cleanName.split(/\s+/).length <= 1) {
+    return brand ? (model.toLowerCase().startsWith(brand.toLowerCase()) ? model : `${brand} ${model}`) : model
+  }
+  // If name equals brand and model exists, show brand + model
+  if (brand && model && cleanName.toLowerCase() === brand.toLowerCase()) {
+    return model.toLowerCase().startsWith(brand.toLowerCase()) ? model : `${brand} ${model}`
+  }
+  return cleanName || name
 }
 
 useHead({

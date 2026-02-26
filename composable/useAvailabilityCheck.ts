@@ -3,13 +3,11 @@ import type { Platform } from '~/src/api-client'
 export const useAvailabilityCheck = () => {
   const platformMap: Record<string, Platform> = {
     kleinanzeigen: 'Kleinanzeigen',
-    ebay: 'Ebay',
     marktplaats: 'Marktplaats',
     willhaben: 'Willhaben',
     shpock: 'Shpock',
     markt: 'MarktDe',
     vinted: 'Vinted',
-    facebook: 'Facebook',
     poshmark: 'Poshmark',
     mercari: 'Mercari',
     depop: 'Depop',

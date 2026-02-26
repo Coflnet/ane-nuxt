@@ -96,15 +96,8 @@ export const useListingStore = defineStore('listing', () => {
       'es-ES': 'es',
     }
     const localDomain = localeDomainMap[lang] ?? 'com'
-    if (listing === 'Ebay') {
-      return `https://www.ebay.${localDomain}/itm/` + id
-    }
-
     if (listing === 'Craigslist') {
       return `https://${id}`
-    }
-    if (listing === 'Facebook') {
-      return `https://www.facebook.com/marketplace/item/${id}`
     }
     if (listing === 'Willhaben') {
       return `https://www.willhaben.at/iad/${id.replace(/^\//, '')}`

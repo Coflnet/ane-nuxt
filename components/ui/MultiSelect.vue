@@ -100,7 +100,7 @@ watch(() => model, () => {
   selectedItems.value = model.value!
 }, { deep: true })
 
-// create the string that is displayed on the button eq. Ebay, AutoScout24
+// create the string that is displayed on the button eq. Kleinanzeigen, AutoScout24
 const selectedLabels = computed(() => {
   if (selectedItems.value.length === 0) return ''
   const rawSelectedItems = selectedItems.value.map(item => toRaw(item)) // Convert Proxies to raw objects

@@ -107,7 +107,7 @@
   "searchKeywords": "Search Keywords",
   "searchRadius": "Search Radius",
   "searchRadiusAroundYou": "Search radius around you in KM (requires zip code)",
-  "searchRadiusRequiresEbay": "Search radius does not work with Ebay",
+
   "searchValue": "Search Value",
   "searchPageTitle": "Search - Compare Prices",
   "searching": "Searching...",
@@ -286,10 +286,8 @@
     "title": "Supported Marketplaces",
     "description": "Our platform integrates with many major online and local marketplaces to give you comprehensive coverage and ensure you never miss a deal.",
     "platforms": {
-      "ebay": "eBay",
       "kleinanzeigen": "Kleinanzeigen",
       "autoscout24": "Autoscout24",
-      "facebook": "Facebook",
       "craigslist": "Craigslist",
       "more": "+ Many More"
     }
@@ -380,7 +378,7 @@
     "items": {
       "first": {
         "question": "What platforms are supported?",
-        "answer": "Our service supports a wide range of popular online marketplaces, including Facebook Marketplace, Autoscout24, Kleineanzeigen, and eBay, among others. We are continuously expanding our platform integrations to provide more options."
+        "answer": "Our service supports a wide range of popular online marketplaces, including Autoscout24, Kleinanzeigen, and Craigslist, among others. We are continuously expanding our platform integrations to provide more options."
       },
       "second": {
         "question": "Is there a free trial?",
@@ -479,7 +477,6 @@
   "frequency6Hour": "Every 6 Hours",
   "frequency1PerDay": "Once per day",
   "noReset": "Upgrade your plan to get more Premium Searches",
-  "ebayMarketplace": "eBay",
   "kleinanzeigenMarketplace": "Kleinanzeigen",
   "invalidDiscordWebhook": "Please enter a valid webhook url",
   "invalidEmail": "Please enter a valid email address",
@@ -488,43 +485,11 @@
   "setRadius": "Set Radius",
   "hasBasicPlanRestriction": "Basic plan is restricted to one search every 6 hours",
   "searchRadiusTooltip": "A zip code is required for search radius to function",
-  "facebookMarketplace": "Facebook Marketplace",
   "craigslistMarketplace": "Craigslist",
   "thisAuctionDoesntMatch": "This auction doesn't match my filter",
   "tellUsWhatsWrongs": "Tell us what went wrong or didn't match",
   "reportSuccessfull": "Your report was successful \n This is your report ID: {id}",
-  "facebook": {
-    "name": "Facebook Marketplace",
-    "title": "Facebook Marketplace Filters & Notifications",
-    "subtitle": "Never miss great deals on Facebook Marketplace with smart filters and instant notifications",
-    "introduction": {
-      "title": "Transform Your Facebook Marketplace Experience",
-      "bodyText": "Facebook Marketplace is one of the largest online marketplaces where millions of people buy and sell items daily. With our advanced filtering system, you can cut through the noise and find exactly what you're looking for without spending hours scrolling through irrelevant listings."
-    },
-    "benefits": {
-      "title": "Why Use Facebook Marketplace Filters?",
-      "bodyText": "Save time and never miss great deals with our intelligent monitoring system designed specifically for Facebook Marketplace users.",
-      "benefit1": "Save hours of manual searching through Facebook Marketplace listings",
-      "benefit2": "Be the first to know about new items that match your interests",
-      "benefit3": "Find better deals faster with automated price and condition monitoring"
-    }
-  },
-  "ebay": {
-    "name": "eBay",
-    "title": "eBay Filters & Notifications",
-    "subtitle": "Get the best deals on eBay with custom filters and real-time alerts",
-    "introduction": {
-      "title": "Maximize Your eBay Shopping Experience",
-      "bodyText": "eBay is a vast marketplace with millions of listings. Our platform helps you navigate this sea of options by allowing you to set up personalized filters that match your specific needs, ensuring you never miss a great deal."
-    },
-    "benefits": {
-      "title": "Why Use eBay Filters?",
-      "bodyText": "With our eBay filters, you can streamline your shopping experience and focus on the items that matter most to you.",
-      "benefit1": "Quickly find items that match your exact criteria",
-      "benefit2": "Receive instant notifications when new listings are posted",
-      "benefit3": "Save time and effort with automated monitoring"
-    }
-  },
+
   "craigslist": {
     "name": "Craigslist",
     "title": "Craigslist Filters & Notifications",

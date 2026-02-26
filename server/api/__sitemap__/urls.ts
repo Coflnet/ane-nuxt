@@ -5,14 +5,6 @@ import type { SitemapUrlInput } from '#sitemap/types'
 export default defineSitemapEventHandler(() => {
   return [
     {
-      loc: '/marketplaces/ebay',
-      _i18nTransform: true,
-    },
-    {
-      loc: '/marketplaces/facebook',
-      _i18nTransform: true,
-    },
-    {
       loc: '/marketplaces/craigslist',
       _i18nTransform: true,
     },
