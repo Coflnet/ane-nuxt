@@ -69,13 +69,13 @@
               {{ product.brand }}
             </span>
             <span
-              v-if="product.model"
+              v-if="product.model && product.model !== 'unknown' && product.model.toLowerCase() !== 'nicht angegeben' && product.model.toLowerCase() !== 'nichtangegeben'"
               class="px-3 py-1 rounded-full bg-slate-800 text-xs font-medium text-slate-400 border border-slate-700"
             >
               {{ product.model }}
             </span>
             <span
-              v-if="product.condition"
+              v-if="product.condition && product.condition !== 'unknown'"
               class="px-3 py-1 rounded-full text-xs font-medium"
               :class="conditionClass(product.condition)"
             >
