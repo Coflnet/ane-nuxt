@@ -886,7 +886,7 @@ async function performSearch(append = false) {
       if (response?.categoryBuckets && response.categoryBuckets.length > 0) {
         categoryBuckets.value = response.categoryBuckets.filter(b => b.value?.toLowerCase() !== 'general')
       }
-      else if (response?.categories) {
+      else if (response?.categories && response.categories.length > 0) {
         // Estimate counts from current page of products
         const catCounts: Record<string, number> = {}
         for (const p of allProducts.value) {
@@ -899,6 +899,20 @@ async function performSearch(append = false) {
           .map(c => ({ value: c, count: catCounts[c] || 0 }))
           .sort((a, b) => (b.count || 0) - (a.count || 0))
       }
+      else {
+        // Last resort: derive categories directly from product hits
+        const catCounts: Record<string, number> = {}
+        for (const p of allProducts.value) {
+          for (const cat of p.categories || []) {
+            if (cat.toLowerCase() !== 'general') {
+              catCounts[cat] = (catCounts[cat] || 0) + 1
+            }
+          }
+        }
+        categoryBuckets.value = Object.entries(catCounts)
+          .map(([v, c]) => ({ value: v, count: c }))
+          .sort((a, b) => (b.count || 0) - (a.count || 0))
+      }
 
       if (response?.conditionBuckets && response.conditionBuckets.length > 0) {
         conditionBuckets.value = response.conditionBuckets
@@ -907,7 +921,7 @@ async function performSearch(append = false) {
         // Derive condition counts from products — normalize to lowercase to avoid duplicates
         const condCounts: Record<string, number> = {}
         for (const p of allProducts.value) {
-          if (p.condition) {
+          if (p.condition && p.condition.toLowerCase() !== 'unknown') {
             const normalized = p.condition.toLowerCase()
             condCounts[normalized] = (condCounts[normalized] || 0) + 1
           }
@@ -920,8 +934,8 @@ async function performSearch(append = false) {
       if (response?.attributeBuckets && Object.keys(response.attributeBuckets).length > 0) {
         attributeBuckets.value = response.attributeBuckets
       }
-      else if (response?.attributesWithValues) {
-        // Derive attribute counts from products
+      else {
+        // Derive attribute counts from products (either from attributesWithValues or directly)
         const attrCounts: Record<string, Record<string, number>> = {}
         for (const p of allProducts.value) {
           if (p.attributes) {
@@ -933,13 +947,25 @@ async function performSearch(append = false) {
             }
           }
         }
-        const result: Record<string, FilterBucket[]> = {}
-        for (const [key, values] of Object.entries(response.attributesWithValues)) {
-          result[key] = values
-            .map(v => ({ value: v, count: attrCounts[key]?.[v] || 0 }))
-            .sort((a, b) => (b.count || 0) - (a.count || 0))
+        if (response?.attributesWithValues) {
+          const result: Record<string, FilterBucket[]> = {}
+          for (const [key, values] of Object.entries(response.attributesWithValues)) {
+            result[key] = values
+              .map(v => ({ value: v, count: attrCounts[key]?.[v] || 0 }))
+              .sort((a, b) => (b.count || 0) - (a.count || 0))
+          }
+          attributeBuckets.value = result
         }
-        attributeBuckets.value = result
+        else {
+          // Derive directly from product attributes
+          const result: Record<string, FilterBucket[]> = {}
+          for (const [key, valueCounts] of Object.entries(attrCounts)) {
+            result[key] = Object.entries(valueCounts)
+              .map(([v, c]) => ({ value: v, count: c }))
+              .sort((a, b) => (b.count || 0) - (a.count || 0))
+          }
+          attributeBuckets.value = result
+        }
       }
     }
     totalResults.value = response?.total || 0
@@ -952,6 +978,18 @@ async function performSearch(append = false) {
       // Sync slider to URL values or full range
       priceFilterMin.value = selectedMinPrice.value ?? priceRangeMin.value
       priceFilterMax.value = selectedMaxPrice.value ?? priceRangeMax.value
+    }
+    else if (allProducts.value.length > 0) {
+      // Derive price range from product hits when aggregation is unavailable
+      const prices = allProducts.value
+        .map(p => p.minPrice)
+        .filter((p): p is number => p != null && p > 0)
+      if (prices.length > 0) {
+        priceRangeMin.value = Math.floor(Math.min(...prices))
+        priceRangeMax.value = Math.ceil(Math.max(...prices))
+        priceFilterMin.value = selectedMinPrice.value ?? priceRangeMin.value
+        priceFilterMax.value = selectedMaxPrice.value ?? priceRangeMax.value
+      }
     }
   }
   catch (e) {
