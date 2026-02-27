@@ -30,10 +30,11 @@
           v-if="product.categories && product.categories.length > 0 && product.categories[0] !== 'general'"
           class="mx-2"
         >/</span>
-        <span
+        <NuxtLink
           v-if="product.categories && product.categories.length > 0 && product.categories[0] !== 'general'"
-          class="text-slate-300"
-        >{{ localizeCategory(product.categories[0]) }}</span>
+          :to="localePath(`/search?category=${encodeURIComponent(product.categories[0])}`)"
+          class="hover:text-blue-400"
+        >{{ localizeCategory(product.categories[0]) }}</NuxtLink>
         <span class="mx-2">/</span>
         <span class="text-slate-200 truncate">{{ product.name }}</span>
       </nav>
