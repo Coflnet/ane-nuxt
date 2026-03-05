@@ -299,6 +299,19 @@
                   <h3 class="text-lg font-semibold text-slate-100 mb-2 line-clamp-2 min-h-[3.5rem]">
                     {{ productDisplayName(product) }}
                   </h3>
+
+                  <!-- Top Attributes -->
+                  <div v-if="getTopAttributes(product).length > 0" class="flex flex-wrap gap-1.5 mt-2 mb-2 min-h-[24px]">
+                    <span 
+                      v-for="attr in getTopAttributes(product)" 
+                      :key="attr.key"
+                      class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-slate-700/50 text-slate-300 border border-slate-600/50 truncate max-w-full"
+                    >
+                      <span class="opacity-70 mr-1 shrink-0">{{ localizeAttrKey(attr.key) }}:</span>
+                      <span class="truncate">{{ localizeAttrValue(attr.key, attr.value) }}</span>
+                    </span>
+                  </div>
+
                   <div class="flex items-center justify-between mt-4">
                     <div class="text-sm text-slate-400">
                       <span class="block text-xs">{{ $t('startingFrom', 'Starting from') }}</span>
@@ -1153,6 +1166,13 @@ function productDisplayName(product: any): string {
     return model.toLowerCase().startsWith(brand.toLowerCase()) ? model : `${brand} ${model}`
   }
   return cleanName || name
+}
+
+function getTopAttributes(product: any, limit = 4) {
+  if (!product.attributes || !Array.isArray(product.attributes)) return []
+  return product.attributes
+    .filter((a: any) => a.key && a.value && a.key.toLowerCase() !== 'condition')
+    .slice(0, limit)
 }
 
 useHead({
