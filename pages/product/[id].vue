@@ -435,6 +435,8 @@ const localePath = useLocalePath()
 const { t } = useI18n()
 
 const zipCode = computed(() => (route.query.zip as string) || '')
+const lat = computed(() => route.query.lat ? Number(route.query.lat) : undefined)
+const lon = computed(() => route.query.lon ? Number(route.query.lon) : undefined)
 const maxDistance = computed(() => route.query.max_distance ? Number(route.query.max_distance) : undefined)
 
 const product = ref<Product | null>(null)
@@ -753,6 +755,19 @@ function buildRelatedProductsUrl(id: string): string {
   let url = `/api/Product/${id}/related`
   const params = new URLSearchParams()
   if (zipCode.value) params.append('zip', zipCode.value)
+  if (lat.value) params.append('lat', lat.value.toString())
+  if (lon.value) params.append('lon', lon.value.toString())
+  if (maxDistance.value) params.append('maxDistance', maxDistance.value.toString())
+  const queryString = params.toString()
+  return queryString ? `${url}?${queryString}` : url
+}
+
+function buildMatchesUrl(id: string): string {
+  let url = `/api/Product/${id}/matches`
+  const params = new URLSearchParams()
+  if (zipCode.value) params.append('zip', zipCode.value)
+  if (lat.value) params.append('lat', lat.value.toString())
+  if (lon.value) params.append('lon', lon.value.toString())
   if (maxDistance.value) params.append('maxDistance', maxDistance.value.toString())
   const queryString = params.toString()
   return queryString ? `${url}?${queryString}` : url
@@ -793,14 +808,14 @@ onMounted(async () => {
     // Parallel fetch all data
     const [pRes, mRes, histRes, statsRes, relatedRes] = await Promise.all([
       getProduct({ path: { id: productId } }),
-      getProductMatches({ path: { id: productId } }),
+      client.get<ProductMatch[]>({ url: buildMatchesUrl(productId) }).catch(() => ({ data: [] })),
       getPriceHistory({ path: { id: productId }, query: { days: 90 } }).catch(() => []),
       getPriceStats({ path: { id: productId }, query: { days: 90 } }).catch(() => null),
       client.get<Product[]>({ url: buildRelatedProductsUrl(productId) }).catch(() => ({ data: [] })),
     ])
 
     product.value = pRes as Product
-    matches.value = (mRes as ProductMatch[]) || []
+    matches.value = (mRes as any)?.data || mRes || []
     priceHistory.value = (histRes as PricePoint[]) || []
     priceStats.value = statsRes as PriceHistoryStats | null
     relatedProducts.value = (relatedRes as any)?.data || relatedRes || []

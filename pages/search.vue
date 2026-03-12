@@ -1405,7 +1405,17 @@ function getDisplayCategory(product: any): string | null {
 function buildProductLink(product: any): string {
   const params = new URLSearchParams()
   if (route.query.zip) params.append('zip', route.query.zip as string)
+  if (route.query.lat) params.append('lat', route.query.lat as string)
+  if (route.query.lon) params.append('lon', route.query.lon as string)
   if (route.query.max_distance) params.append('max_distance', route.query.max_distance as string)
+  // Fallback to userLocation if query doesn't have it but we have it in state
+  if (!route.query.lat && userLocation.value) {
+    params.append('lat', userLocation.value.lat.toString())
+    params.append('lon', userLocation.value.lon.toString())
+    if (distanceFilterKm.value && !route.query.max_distance) {
+      params.append('max_distance', distanceFilterKm.value.toString())
+    }
+  }
   const queryString = params.toString()
   return queryString ? `?${queryString}` : ''
 }
