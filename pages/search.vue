@@ -272,12 +272,39 @@
               {{ $t('distance', 'Distance') }}
             </h3>
             <div class="space-y-3">
+              <!-- ZIP code input -->
+              <div class="flex items-center gap-2">
+                <input
+                  v-model="zipCodeInput"
+                  type="text"
+                  inputmode="numeric"
+                  :placeholder="$t('enterZip', 'PLZ / ZIP code')"
+                  class="flex-1 px-3 py-2 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-slate-200 focus:border-blue-500/50 focus:outline-none placeholder-slate-500"
+                  @keydown.enter="lookupZipCode"
+                >
+                <button
+                  class="px-3 py-2 rounded-lg text-sm bg-cyan-600/30 text-cyan-400 hover:bg-cyan-600/50 border border-cyan-500/30 transition-colors flex-shrink-0"
+                  :disabled="!zipCodeInput || zipLoading"
+                  @click="lookupZipCode"
+                >
+                  <span v-if="zipLoading">...</span>
+                  <span v-else>📍</span>
+                </button>
+              </div>
+              <!-- Location status -->
+              <div v-if="locationName" class="text-xs text-green-400">
+                📍 {{ locationName }}
+              </div>
+              <div v-else-if="zipError" class="text-xs text-red-400">
+                {{ zipError }}
+              </div>
+              <!-- Or use browser geolocation -->
               <button
                 class="w-full px-3 py-2 rounded-lg text-sm transition-colors"
-                :class="userLocation ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-slate-200 border border-slate-600/50'"
+                :class="userLocation && !locationName ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-slate-200 border border-slate-600/50'"
                 @click="requestLocation"
               >
-                <span v-if="userLocation">📍 {{ $t('locationSet', 'Location set') }}</span>
+                <span v-if="userLocation && !locationName">📍 {{ $t('locationSet', 'Location set') }}</span>
                 <span v-else>📍 {{ $t('useMyLocation', 'Use my location') }}</span>
               </button>
               <div v-if="userLocation" class="space-y-2">
@@ -552,6 +579,10 @@ const hasActiveFilters = computed(
 // Geolocation state
 const userLocation = ref<{ lat: number; lon: number } | null>(null)
 const distanceFilterKm = ref<number>(50)
+const zipCodeInput = ref<string>((route.query.zip as string) || '')
+const locationName = ref<string>('')
+const zipLoading = ref(false)
+const zipError = ref<string>('')
 
 // Data state
 const allProducts = ref<ProductDocument[]>([])
@@ -729,8 +760,14 @@ function searchInCurrentCategory() {
 }
 
 // Load top-level categories on mount
-onMounted(() => {
+onMounted(async () => {
   fetchTopLevelCategories()
+  // Auto-resolve ZIP code from URL on page load
+  const urlZip = route.query.zip as string
+  if (urlZip) {
+    zipCodeInput.value = urlZip
+    await lookupZipCode()
+  }
 })
 
 // --- Localization helpers ---
@@ -1160,6 +1197,13 @@ function requestLocation() {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         userLocation.value = { lat: pos.coords.latitude, lon: pos.coords.longitude }
+        locationName.value = ''
+        zipCodeInput.value = ''
+        zipError.value = ''
+        // Remove zip from URL since we're using browser location
+        const query = { ...route.query } as Record<string, string>
+        delete query.zip
+        router.push({ query })
         // If distance filter already set, re-trigger search
         if (selectedMaxDistance.value) {
           performSearch()
@@ -1167,10 +1211,47 @@ function requestLocation() {
       },
       (err) => {
         console.error('Geolocation error:', err)
-        alert('Could not get your location. Please allow location access and try again.')
+        alert('Could not get your location. Please allow location access or enter a ZIP code.')
       },
       { enableHighAccuracy: false, timeout: 10000 }
     )
+  }
+}
+
+async function lookupZipCode() {
+  const zip = zipCodeInput.value?.trim()
+  if (!zip) return
+
+  zipLoading.value = true
+  zipError.value = ''
+  locationName.value = ''
+
+  try {
+    const locationData = await getLocation({
+      path: { zip },
+      composable: '$fetch',
+    })
+
+    if (!locationData || (locationData.lat === 0 && locationData.lon === 0)) {
+      zipError.value = 'ZIP code not found'
+      return
+    }
+
+    userLocation.value = { lat: locationData.lat ?? 0, lon: locationData.lon ?? 0 }
+    locationName.value = locationData.name ? `${locationData.name} (${zip})` : zip
+
+    // Persist zip in URL
+    const query = { ...route.query } as Record<string, string>
+    query.zip = zip
+    if (!query.max_distance) {
+      query.max_distance = String(distanceFilterKm.value)
+    }
+    router.push({ query })
+  } catch (err) {
+    console.error('ZIP lookup error:', err)
+    zipError.value = 'Could not resolve ZIP code'
+  } finally {
+    zipLoading.value = false
   }
 }
 
@@ -1187,6 +1268,11 @@ function applyDistanceFilter() {
 function clearDistanceFilter() {
   const query = { ...route.query } as Record<string, string>
   delete query.max_distance
+  delete query.zip
+  userLocation.value = null
+  locationName.value = ''
+  zipCodeInput.value = ''
+  zipError.value = ''
   router.push({ query })
 }
 
@@ -1231,6 +1317,7 @@ function onSearchCategorySelect(slug: string) {
 watch(() => route.query, () => {
   const hasQuery = route.query.q || route.query.category || route.query.condition
     || route.query.price_min || route.query.price_max || route.query.sort || route.query.max_distance
+    || route.query.zip
     || Object.keys(route.query).some(k => k.startsWith('attr_'))
   if (hasQuery) {
     // Detect if server-side filter params changed (search, category, condition, price, sort, distance, or attributes)
