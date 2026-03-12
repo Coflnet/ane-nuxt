@@ -434,6 +434,9 @@ const router = useRouter()
 const localePath = useLocalePath()
 const { t } = useI18n()
 
+const zipCode = computed(() => (route.query.zip as string) || '')
+const maxDistance = computed(() => route.query.max_distance ? Number(route.query.max_distance) : undefined)
+
 const product = ref<Product | null>(null)
 const relatedProducts = ref<Product[]>([])
 const matches = ref<ProductMatch[]>([])
@@ -746,6 +749,15 @@ function conditionClass(condition: string) {
   return classes[condition] || 'bg-slate-700/50 text-slate-400'
 }
 
+function buildRelatedProductsUrl(id: string): string {
+  let url = `/api/Product/${id}/related`
+  const params = new URLSearchParams()
+  if (zipCode.value) params.append('zip', zipCode.value)
+  if (maxDistance.value) params.append('maxDistance', maxDistance.value.toString())
+  const queryString = params.toString()
+  return queryString ? `${url}?${queryString}` : url
+}
+
 function handleListingUnavailable(_listingId: number | string) {
   unavailableCount.value++
 }
@@ -784,7 +796,7 @@ onMounted(async () => {
       getProductMatches({ path: { id: productId } }),
       getPriceHistory({ path: { id: productId }, query: { days: 90 } }).catch(() => []),
       getPriceStats({ path: { id: productId }, query: { days: 90 } }).catch(() => null),
-      client.get<Product[]>({ url: `/api/Product/${productId}/related` }).catch(() => ({ data: [] })),
+      client.get<Product[]>({ url: buildRelatedProductsUrl(productId) }).catch(() => ({ data: [] })),
     ])
 
     product.value = pRes as Product

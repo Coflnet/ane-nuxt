@@ -365,7 +365,7 @@
               <NuxtLink
                 v-for="product in products"
                 :key="product.seoId ?? 'unknown'"
-                :to="localePath(`/product/${product.seoId}`)"
+                :to="localePath(`/product/${product.seoId}${buildProductLink(product)}`)"
                 class="block bg-slate-800 rounded-xl overflow-hidden hover:ring-2 hover:ring-blue-500/50 transition-all hover:scale-[1.02] group"
               >
                 <div class="aspect-video bg-slate-900 relative">
@@ -1400,6 +1400,14 @@ function getDisplayCategory(product: any): string | null {
   return product.categories.find((c: string) =>
     c && c !== 'general' && !/^\d+(,\s*\d+)*$/.test(c)
   ) ?? null
+}
+
+function buildProductLink(product: any): string {
+  const params = new URLSearchParams()
+  if (route.query.zip) params.append('zip', route.query.zip as string)
+  if (route.query.max_distance) params.append('max_distance', route.query.max_distance as string)
+  const queryString = params.toString()
+  return queryString ? `?${queryString}` : ''
 }
 
 function getTopAttributes(product: any, limit = 4) {
