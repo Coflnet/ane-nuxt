@@ -1583,6 +1583,22 @@ export type SearchProductsData = {
          * Optional maximum price filter
          */
         maxPrice?: number;
+        /**
+         * Sort order: relevance, price_asc, price_desc, newest, oldest, distance
+         */
+        sortBy?: string;
+        /**
+         * User latitude for distance filtering/sorting
+         */
+        lat?: number;
+        /**
+         * User longitude for distance filtering/sorting
+         */
+        lon?: number;
+        /**
+         * Maximum distance in km (requires lat/lon)
+         */
+        maxDistanceKm?: number;
         offset?: number;
         /**
          * Maximum results (default 20)

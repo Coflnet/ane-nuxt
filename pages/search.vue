@@ -33,8 +33,35 @@
           </span>
           <span v-else>{{ $t('noResultsFound', 'No results found') }}</span>
         </h2>
-        <!-- Active filters badges -->
-        <div class="flex flex-wrap gap-2">
+        <!-- Sort dropdown -->
+        <div class="flex items-center gap-3">
+          <select
+            :value="selectedSort"
+            class="bg-slate-800 border border-slate-600/50 rounded-lg px-3 py-1.5 text-sm text-slate-200 focus:border-blue-500/50 focus:outline-none"
+            @change="onSortChange($event)"
+          >
+            <option value="">{{ $t('sortDefault', 'Sort: Default') }}</option>
+            <option value="price_asc">{{ $t('sortPriceAsc', 'Price: Low → High') }}</option>
+            <option value="price_desc">{{ $t('sortPriceDesc', 'Price: High → Low') }}</option>
+            <option value="newest">{{ $t('sortNewest', 'Newest First') }}</option>
+            <option value="oldest">{{ $t('sortOldest', 'Oldest First') }}</option>
+            <option value="distance">{{ $t('sortDistance', 'Nearest First') }}</option>
+          </select>
+        </div>
+      </div>
+      <!-- Active filters badges -->
+      <div class="flex flex-wrap gap-2 mb-4">
+        <!-- Distance filter badge -->
+        <span
+          v-if="selectedMaxDistance"
+          class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-400 text-xs border border-cyan-500/30"
+        >
+          ≤ {{ selectedMaxDistance }} km
+          <button
+            class="ml-1 hover:text-white"
+            @click="clearDistanceFilter"
+          >&times;</button>
+        </span>
           <span
             v-if="selectedCategory"
             class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-xs border border-blue-500/30"
@@ -76,7 +103,6 @@
               @click="removeAttributeFilter(String(key))"
             >&times;</button>
           </span>
-        </div>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -234,6 +260,51 @@
                 <span class="truncate">{{ localizeAttrValue(attrKey, bucket.value!) }}</span>
                 <span class="text-xs opacity-60 ml-1 flex-shrink-0">({{ bucket.count }})</span>
               </button>
+            </div>
+          </div>
+
+          <!-- Distance Filter -->
+          <div
+            v-if="hasSearched"
+            class="bg-slate-800/50 p-5 rounded-xl border border-slate-700/50"
+          >
+            <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-3">
+              {{ $t('distance', 'Distance') }}
+            </h3>
+            <div class="space-y-3">
+              <button
+                class="w-full px-3 py-2 rounded-lg text-sm transition-colors"
+                :class="userLocation ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-slate-200 border border-slate-600/50'"
+                @click="requestLocation"
+              >
+                <span v-if="userLocation">📍 {{ $t('locationSet', 'Location set') }}</span>
+                <span v-else>📍 {{ $t('useMyLocation', 'Use my location') }}</span>
+              </button>
+              <div v-if="userLocation" class="space-y-2">
+                <label class="text-xs text-slate-400">{{ $t('maxDistance', 'Max distance (km)') }}</label>
+                <div class="flex items-center gap-2">
+                  <input
+                    v-model.number="distanceFilterKm"
+                    type="number"
+                    :min="1"
+                    :max="500"
+                    placeholder="50"
+                    class="w-full px-3 py-1.5 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-slate-200 focus:border-blue-500/50 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    @change="applyDistanceFilter"
+                  >
+                  <span class="text-xs text-slate-500 flex-shrink-0">km</span>
+                </div>
+                <input
+                  :value="distanceFilterKm"
+                  type="range"
+                  :min="5"
+                  :max="500"
+                  :step="5"
+                  class="w-full appearance-none bg-transparent [&::-webkit-slider-runnable-track]:bg-slate-700 [&::-webkit-slider-runnable-track]:rounded-full [&::-webkit-slider-runnable-track]:h-1 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-cyan-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-slate-900 [&::-webkit-slider-thumb]:-mt-1.5 [&::-moz-range-track]:bg-slate-700 [&::-moz-range-track]:rounded-full [&::-moz-range-track]:h-1 [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-cyan-500 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-slate-900"
+                  @input="(e: Event) => { distanceFilterKm = Number((e.target as HTMLInputElement).value) }"
+                  @change="applyDistanceFilter"
+                >
+              </div>
             </div>
           </div>
 
@@ -456,6 +527,8 @@ const selectedCategory = computed(() => (route.query.category as string) || '')
 const selectedCondition = computed(() => (route.query.condition as string) || '')
 const selectedMinPrice = computed(() => route.query.price_min ? Number(route.query.price_min) : undefined)
 const selectedMaxPrice = computed(() => route.query.price_max ? Number(route.query.price_max) : undefined)
+const selectedSort = computed(() => (route.query.sort as string) || '')
+const selectedMaxDistance = computed(() => route.query.max_distance ? Number(route.query.max_distance) : undefined)
 const activeAttributeFilters = computed(() => {
   const filters: Record<string, string> = {}
   for (const [key, value] of Object.entries(route.query)) {
@@ -472,8 +545,13 @@ const hasActiveFilters = computed(
     || !!selectedCondition.value
     || selectedMinPrice.value !== undefined
     || selectedMaxPrice.value !== undefined
+    || !!selectedMaxDistance.value
     || Object.keys(activeAttributeFilters.value).length > 0,
 )
+
+// Geolocation state
+const userLocation = ref<{ lat: number; lon: number } | null>(null)
+const distanceFilterKm = ref<number>(50)
 
 // Data state
 const allProducts = ref<ProductDocument[]>([])
@@ -500,7 +578,7 @@ const loadingMore = ref(false)
 const hasSearched = ref(false)
 
 // Track previous query params to detect server-side filter changes that need a re-fetch
-const prevQuery = reactive({ q: '' as string | undefined, category: '' as string | undefined, condition: '' as string | undefined, price_min: '' as string | undefined, price_max: '' as string | undefined, attrs: '' as string | undefined })
+const prevQuery = reactive({ q: '' as string | undefined, category: '' as string | undefined, condition: '' as string | undefined, price_min: '' as string | undefined, price_max: '' as string | undefined, attrs: '' as string | undefined, sort: '' as string | undefined, max_distance: '' as string | undefined })
 
 // Compute available category buckets — use server-provided aggregation counts directly
 const availableCategoryBuckets = computed(() => {
@@ -867,6 +945,13 @@ function buildSearchParams(offset = 0) {
   if (selectedCondition.value) params.condition = selectedCondition.value.toLowerCase()
   if (selectedMinPrice.value !== undefined) params.minPrice = selectedMinPrice.value
   if (selectedMaxPrice.value !== undefined) params.maxPrice = selectedMaxPrice.value
+  if (selectedSort.value) params.sortBy = selectedSort.value
+  // Distance params
+  if (userLocation.value) {
+    params.lat = userLocation.value.lat
+    params.lon = userLocation.value.lon
+    if (selectedMaxDistance.value) params.maxDistanceKm = selectedMaxDistance.value
+  }
   // Send attribute filters to the API as key:value pairs
   const attrFilters = activeAttributeFilters.value
   if (Object.keys(attrFilters).length > 0) {
@@ -1059,6 +1144,52 @@ function clearAllFilters() {
   router.push({ query })
 }
 
+function onSortChange(event: Event) {
+  const value = (event.target as HTMLSelectElement).value
+  const query = { ...route.query } as Record<string, string>
+  if (value) {
+    query.sort = value
+  } else {
+    delete query.sort
+  }
+  router.push({ query })
+}
+
+function requestLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        userLocation.value = { lat: pos.coords.latitude, lon: pos.coords.longitude }
+        // If distance filter already set, re-trigger search
+        if (selectedMaxDistance.value) {
+          performSearch()
+        }
+      },
+      (err) => {
+        console.error('Geolocation error:', err)
+        alert('Could not get your location. Please allow location access and try again.')
+      },
+      { enableHighAccuracy: false, timeout: 10000 }
+    )
+  }
+}
+
+function applyDistanceFilter() {
+  const query = { ...route.query } as Record<string, string>
+  if (distanceFilterKm.value > 0 && userLocation.value) {
+    query.max_distance = String(distanceFilterKm.value)
+  } else {
+    delete query.max_distance
+  }
+  router.push({ query })
+}
+
+function clearDistanceFilter() {
+  const query = { ...route.query } as Record<string, string>
+  delete query.max_distance
+  router.push({ query })
+}
+
 function applyPriceFilter() {
   const query: Record<string, string> = {}
   // Preserve all existing query params except price
@@ -1099,16 +1230,18 @@ function onSearchCategorySelect(slug: string) {
 // Watch route query changes and trigger search
 watch(() => route.query, () => {
   const hasQuery = route.query.q || route.query.category || route.query.condition
-    || route.query.price_min || route.query.price_max
+    || route.query.price_min || route.query.price_max || route.query.sort || route.query.max_distance
     || Object.keys(route.query).some(k => k.startsWith('attr_'))
   if (hasQuery) {
-    // Detect if server-side filter params changed (search, category, condition, price, or attributes)
+    // Detect if server-side filter params changed (search, category, condition, price, sort, distance, or attributes)
     const currentQ = route.query.q ? String(route.query.q) : ''
     const currentCategory = route.query.category ? String(route.query.category) : ''
     const currentCondition = route.query.condition ? String(route.query.condition) : ''
 
     const currentPriceMin = route.query.price_min ? String(route.query.price_min) : ''
     const currentPriceMax = route.query.price_max ? String(route.query.price_max) : ''
+    const currentSort = route.query.sort ? String(route.query.sort) : ''
+    const currentMaxDistance = route.query.max_distance ? String(route.query.max_distance) : ''
 
     // Serialize attribute filters for comparison
     const currentAttrs = Object.entries(route.query)
@@ -1117,7 +1250,7 @@ watch(() => route.query, () => {
       .map(([k, v]) => `${k}=${v}`)
       .join('&')
 
-    const queryChanged = currentQ !== prevQuery.q || currentCategory !== prevQuery.category || currentCondition !== prevQuery.condition || currentPriceMin !== prevQuery.price_min || currentPriceMax !== prevQuery.price_max || currentAttrs !== prevQuery.attrs
+    const queryChanged = currentQ !== prevQuery.q || currentCategory !== prevQuery.category || currentCondition !== prevQuery.condition || currentPriceMin !== prevQuery.price_min || currentPriceMax !== prevQuery.price_max || currentAttrs !== prevQuery.attrs || currentSort !== prevQuery.sort || currentMaxDistance !== prevQuery.max_distance
 
     if (queryChanged || !hasSearched.value) {
       performSearch()
@@ -1126,6 +1259,13 @@ watch(() => route.query, () => {
     prevQuery.price_min = currentPriceMin
     prevQuery.price_max = currentPriceMax
     prevQuery.attrs = currentAttrs
+    prevQuery.sort = currentSort
+    prevQuery.max_distance = currentMaxDistance
+
+    // Sync distance slider
+    if (currentMaxDistance) {
+      distanceFilterKm.value = Number(currentMaxDistance)
+    }
 
     // Save previous query params for comparison
     prevQuery.q = currentQ
