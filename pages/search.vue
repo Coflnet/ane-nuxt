@@ -386,10 +386,10 @@
                   </div>
                   <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent">
                     <span
-                      v-if="product.categories && product.categories.length > 0 && product.categories[0] !== 'general'"
+                      v-if="getDisplayCategory(product)"
                       class="text-xs font-medium text-blue-400 uppercase tracking-wider"
                     >
-                      {{ localizeCategory(product.categories[0]) }}
+                      {{ localizeCategory(getDisplayCategory(product)!) }}
                     </span>
                   </div>
                 </div>
@@ -1395,10 +1395,34 @@ function productDisplayName(product: any): string {
   return cleanName || name
 }
 
+function getDisplayCategory(product: any): string | null {
+  if (!product.categories || !Array.isArray(product.categories)) return null
+  return product.categories.find((c: string) =>
+    c && c !== 'general' && !/^\d+(,\s*\d+)*$/.test(c)
+  ) ?? null
+}
+
 function getTopAttributes(product: any, limit = 4) {
   if (!product.attributes || !Array.isArray(product.attributes)) return []
+  const excludedKeys = new Set([
+    'condition', 'title', 'price', 'description', 'name', 'image', 'url', 'id', 'seo_id',
+    'ad_uuid', 'adid', 'adtype_id', 'all_image_urls', 'categorytreeattributeids',
+    'categorytreeids', 'changed', 'changed_string', 'country', 'district',
+    'enddate', 'enddate_string', 'heading', 'mmo', 'org_uuid', 'orgid',
+    'p2penabled', 'postcode', 'price_for_display', 'price/amount', 'product_id',
+    'published_string', 'segment', 'state', 'shipping', 'delivery', 'service', 'type',
+    'manufactureaddress', 'manufacturertradename',
+    'orgname', 'orgmainlogo', 'contact/name', 'address',
+    'result_list_style2', 'price_reduction_set_date', 'price_reduction_set_date_string',
+    'old_price', 'original_price', 'currency',
+    'location_id', 'seller_id', 'shop_id', 'user_id', 'item_id',
+    'does_not_come_from_search_engine__teaser_attribute', 'teaser_attribute',
+  ])
   return product.attributes
-    .filter((a: any) => a.key && a.value && a.key.toLowerCase() !== 'condition')
+    .filter((a: any) => a.key && a.value
+      && !excludedKeys.has(a.key.toLowerCase())
+      && a.value !== '0' && a.value !== 'null' && a.value !== 'unknown'
+      && !a.value.startsWith('http') && a.value.length <= 80)
     .slice(0, limit)
 }
 
