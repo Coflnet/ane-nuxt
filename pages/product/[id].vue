@@ -27,11 +27,11 @@
           Search
         </NuxtLink>
         <span
-          v-if="product.categories && product.categories.length > 0 && product.categories[0] !== 'general'"
+          v-if="product.categories && product.categories.length > 0 && product.categories[0] !== 'general' && !/^[\d,\s]+$/.test(product.categories[0])"
           class="mx-2"
         >/</span>
         <NuxtLink
-          v-if="product.categories && product.categories.length > 0 && product.categories[0] !== 'general'"
+          v-if="product.categories && product.categories.length > 0 && product.categories[0] !== 'general' && !/^[\d,\s]+$/.test(product.categories[0])"
           :to="localePath(`/search?category=${encodeURIComponent(product.categories[0])}`)"
           class="hover:text-blue-400"
         >{{ localizeCategory(product.categories[0]) }}</NuxtLink>
@@ -83,7 +83,7 @@
               {{ formatCondition(product.condition) }}
             </span>
             <span
-              v-for="cat in (product.categories || []).filter(c => c !== 'general')"
+              v-for="cat in (product.categories || []).filter(c => c !== 'general' && !/^[\d,\s]+$/.test(c))"
               :key="cat"
               class="px-3 py-1 rounded-full bg-slate-800 text-xs font-medium text-cyan-400 border border-slate-700"
             >
