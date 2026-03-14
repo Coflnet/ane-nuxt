@@ -103,6 +103,17 @@
               @click="removeAttributeFilter(String(key))"
             >&times;</button>
           </span>
+          <!-- Battery range badge -->
+          <span
+            v-if="selectedBatteryMin || selectedBatteryMax"
+            class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-purple-500/20 text-purple-400 text-xs border border-purple-500/30"
+          >
+            {{ localizeAttrKey('battery') }}: {{ selectedBatteryMin ?? batteryRangeMin }}% – {{ selectedBatteryMax ?? batteryRangeMax }}%
+            <button
+              class="ml-1 hover:text-white"
+              @click="() => { batteryFilterMin = batteryRangeMin; batteryFilterMax = batteryRangeMax; const q = { ...route.query } as Record<string, string>; delete q.attr_battery_min; delete q.attr_battery_max; router.push({ query: q }) }"
+            >&times;</button>
+          </span>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -260,6 +271,80 @@
                 <span class="truncate">{{ localizeAttrValue(attrKey, bucket.value!) }}</span>
                 <span class="text-xs opacity-60 ml-1 flex-shrink-0">({{ bucket.count }})</span>
               </button>
+            </div>
+          </div>
+
+          <!-- Battery Range Filter -->
+          <div
+            v-if="hasBatteryBuckets"
+            class="bg-slate-800/50 p-5 rounded-xl border border-slate-700/50"
+          >
+            <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-3">
+              {{ localizeAttrKey('battery') }}
+            </h3>
+            <div class="space-y-3">
+              <div class="flex items-center gap-2">
+                <div class="relative flex-1 min-w-0">
+                  <span class="absolute left-2 top-1/2 -translate-y-1/2 text-slate-500 text-xs">%</span>
+                  <input
+                    v-model.number="batteryFilterMin"
+                    type="number"
+                    :min="0"
+                    :max="batteryFilterMax"
+                    placeholder="0"
+                    class="w-full pl-6 pr-1 py-1.5 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-slate-200 focus:border-blue-500/50 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    @change="applyBatteryFilter"
+                  >
+                </div>
+                <span class="text-slate-500 text-xs flex-shrink-0">–</span>
+                <div class="relative flex-1 min-w-0">
+                  <span class="absolute left-2 top-1/2 -translate-y-1/2 text-slate-500 text-xs">%</span>
+                  <input
+                    v-model.number="batteryFilterMax"
+                    type="number"
+                    :min="batteryFilterMin"
+                    :max="100"
+                    placeholder="100"
+                    class="w-full pl-6 pr-1 py-1.5 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-slate-200 focus:border-blue-500/50 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    @change="applyBatteryFilter"
+                  >
+                </div>
+              </div>
+              <!-- Dual range slider -->
+              <div class="relative h-6 flex items-center">
+                <div class="absolute inset-x-0 h-1 bg-slate-700 rounded-full" />
+                <div
+                  class="absolute h-1 bg-purple-500 rounded-full"
+                  :style="{
+                    left: `${(batteryFilterMin - batteryRangeMin) / (batteryRangeMax - batteryRangeMin) * 100}%`,
+                    right: `${100 - (batteryFilterMax - batteryRangeMin) / (batteryRangeMax - batteryRangeMin) * 100}%`,
+                  }"
+                />
+                <input
+                  :value="batteryFilterMin"
+                  type="range"
+                  :min="batteryRangeMin"
+                  :max="batteryRangeMax"
+                  step="1"
+                  class="absolute inset-x-0 w-full appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-purple-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-slate-900 [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-purple-500 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-slate-900"
+                  @input="(e: Event) => { batteryFilterMin = Math.min(Number((e.target as HTMLInputElement).value), batteryFilterMax - 1) }"
+                  @change="applyBatteryFilter"
+                >
+                <input
+                  :value="batteryFilterMax"
+                  type="range"
+                  :min="batteryRangeMin"
+                  :max="batteryRangeMax"
+                  step="1"
+                  class="absolute inset-x-0 w-full appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-purple-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-slate-900 [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-purple-500 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-slate-900"
+                  @input="(e: Event) => { batteryFilterMax = Math.max(Number((e.target as HTMLInputElement).value), batteryFilterMin + 1) }"
+                  @change="applyBatteryFilter"
+                >
+              </div>
+              <div class="flex justify-between text-xs text-slate-500">
+                <span>{{ batteryRangeMin }}%</span>
+                <span>{{ batteryRangeMax }}%</span>
+              </div>
             </div>
           </div>
 
@@ -573,6 +658,8 @@ const hasActiveFilters = computed(
     || selectedMinPrice.value !== undefined
     || selectedMaxPrice.value !== undefined
     || !!selectedMaxDistance.value
+    || selectedBatteryMin.value !== undefined
+    || selectedBatteryMax.value !== undefined
     || Object.keys(activeAttributeFilters.value).length > 0,
 )
 
@@ -583,6 +670,8 @@ const zipCodeInput = ref<string>((route.query.zip as string) || '')
 const locationName = ref<string>('')
 const zipLoading = ref(false)
 const zipError = ref<string>('')
+// Flag: true while we're resolving a ZIP from URL on page load (blocks initial search until geo ready)
+const zipResolving = ref(!!route.query.zip)
 
 // Data state
 const allProducts = ref<ProductDocument[]>([])
@@ -603,6 +692,15 @@ const priceSliderStep = computed(() => {
   if (range <= 5000) return 10
   return 50
 })
+
+// Battery range filter state
+const rangeFilterAttrs = new Set(['battery']) // attribute keys that should render as range filters
+const batteryRangeMin = ref<number>(0)
+const batteryRangeMax = ref<number>(100)
+const batteryFilterMin = ref<number>(0)
+const batteryFilterMax = ref<number>(100)
+const selectedBatteryMin = computed(() => route.query.attr_battery_min ? Number(route.query.attr_battery_min) : undefined)
+const selectedBatteryMax = computed(() => route.query.attr_battery_max ? Number(route.query.attr_battery_max) : undefined)
 
 const loading = ref(false)
 const loadingMore = ref(false)
@@ -645,6 +743,7 @@ const availableAttributeBuckets = computed(() => {
 
   for (const [key, buckets] of Object.entries(attributeBuckets.value)) {
     if (key.toLowerCase() === 'condition') continue // Skip condition, it has its own section
+    if (rangeFilterAttrs.has(key.toLowerCase())) continue // Skip range attributes, they get their own UI
 
     if (attrFilters[key]) {
       // If this attribute is already selected, show only that value
@@ -663,6 +762,12 @@ const availableAttributeBuckets = computed(() => {
   }
 
   return result
+})
+
+// Battery range: extract min/max from battery buckets
+const hasBatteryBuckets = computed(() => {
+  const buckets = attributeBuckets.value['battery']
+  return buckets && buckets.length > 0
 })
 
 // Products are now server-side filtered (category, condition, attributes all sent to API)
@@ -991,8 +1096,15 @@ function buildSearchParams(offset = 0) {
   }
   // Send attribute filters to the API as key:value pairs
   const attrFilters = activeAttributeFilters.value
-  if (Object.keys(attrFilters).length > 0) {
-    params.attributes = Object.entries(attrFilters).map(([k, v]) => `${k}:${v}`)
+  const attrArray: string[] = []
+  for (const [k, v] of Object.entries(attrFilters)) {
+    attrArray.push(`${k}:${v}`)
+  }
+  // Battery range filter
+  if (selectedBatteryMin.value !== undefined) attrArray.push(`battery_min:${selectedBatteryMin.value}`)
+  if (selectedBatteryMax.value !== undefined) attrArray.push(`battery_max:${selectedBatteryMax.value}`)
+  if (attrArray.length > 0) {
+    params.attributes = attrArray
   }
   return params
 }
@@ -1105,6 +1217,20 @@ async function performSearch(append = false) {
     }
     totalResults.value = response?.total || 0
 
+    // Update battery range from attribute buckets
+    const batteryBuckets = attributeBuckets.value['battery']
+    if (batteryBuckets && batteryBuckets.length > 0) {
+      const numericValues = batteryBuckets
+        .map(b => parseInt(String(b.value).replace('%', ''), 10))
+        .filter(n => !isNaN(n))
+      if (numericValues.length > 0) {
+        batteryRangeMin.value = Math.min(...numericValues)
+        batteryRangeMax.value = Math.max(...numericValues)
+        batteryFilterMin.value = selectedBatteryMin.value ?? batteryRangeMin.value
+        batteryFilterMax.value = selectedBatteryMax.value ?? batteryRangeMax.value
+      }
+    }
+
     // Update price range from aggregation
     // Backend always returns the global price range (not narrowed by price filter)
     if (response?.priceMin != null && response?.priceMax != null) {
@@ -1181,6 +1307,22 @@ function clearAllFilters() {
   router.push({ query })
 }
 
+function applyBatteryFilter() {
+  const query: Record<string, string> = {}
+  for (const [k, v] of Object.entries(route.query)) {
+    if (k !== 'attr_battery_min' && k !== 'attr_battery_max' && typeof v === 'string') {
+      query[k] = v
+    }
+  }
+  if (batteryFilterMin.value > batteryRangeMin.value) {
+    query.attr_battery_min = String(Math.round(batteryFilterMin.value))
+  }
+  if (batteryFilterMax.value < batteryRangeMax.value) {
+    query.attr_battery_max = String(Math.round(batteryFilterMax.value))
+  }
+  router.push({ query })
+}
+
 function onSortChange(event: Event) {
   const value = (event.target as HTMLSelectElement).value
   const query = { ...route.query } as Record<string, string>
@@ -1234,11 +1376,17 @@ async function lookupZipCode() {
 
     if (!locationData || (locationData.lat === 0 && locationData.lon === 0)) {
       zipError.value = 'ZIP code not found'
+      zipResolving.value = false
+      performSearch() // Still search, just without distance filter
       return
     }
 
     userLocation.value = { lat: locationData.lat ?? 0, lon: locationData.lon ?? 0 }
     locationName.value = locationData.name ? `${locationData.name} (${zip})` : zip
+
+    // Clear the zipResolving flag now that we have coordinates
+    const wasResolving = zipResolving.value
+    zipResolving.value = false
 
     // Persist zip in URL
     const query = { ...route.query } as Record<string, string>
@@ -1247,9 +1395,17 @@ async function lookupZipCode() {
       query.max_distance = String(distanceFilterKm.value)
     }
     router.push({ query })
+
+    // If this was the initial ZIP resolution from URL, trigger search now that geo is available
+    if (wasResolving) {
+      await nextTick()
+      performSearch()
+    }
   } catch (err) {
     console.error('ZIP lookup error:', err)
     zipError.value = 'Could not resolve ZIP code'
+    zipResolving.value = false
+    performSearch() // Still search, just without distance filter
   } finally {
     zipLoading.value = false
   }
@@ -1320,6 +1476,8 @@ watch(() => route.query, () => {
     || route.query.zip
     || Object.keys(route.query).some(k => k.startsWith('attr_'))
   if (hasQuery) {
+    // Skip search while ZIP is being resolved from URL — distance filter won't work without coordinates
+    if (zipResolving.value) return
     // Detect if server-side filter params changed (search, category, condition, price, sort, distance, or attributes)
     const currentQ = route.query.q ? String(route.query.q) : ''
     const currentCategory = route.query.category ? String(route.query.category) : ''
