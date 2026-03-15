@@ -41,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import type { Flip } from '~/src/api-client/types.gen'
 import { getFlips } from '~/src/api-client'
 
@@ -53,8 +53,10 @@ const route = useRoute()
 const userStore = useUserStore()
 
 const FEED_LIMIT = 24
+const MAX_FEED_ITEMS = 100
 
 let removeWheelHandler: (() => void) | null = null
+let refreshInterval: ReturnType<typeof setInterval> | null = null
 
 function getAuthHeaders() {
   if (!userStore.token) {
@@ -64,8 +66,8 @@ function getAuthHeaders() {
   return { Authorization: `Bearer ${userStore.token}` }
 }
 
-async function loadFlips() {
-  loading.value = true
+async function loadFlips(isRefresh = false) {
+  if (!isRefresh) loading.value = true
   try {
     await userStore.checkAuth(useFirebaseAuth()!)
 
@@ -80,17 +82,38 @@ async function loadFlips() {
     })
 
     if (response) {
-       items.value = Array.isArray(response) ? response : Array.from(response)
-    } else {
+      const newItems = Array.isArray(response) ? response : Array.from(response)
+      
+      const el = scrollContainer.value
+      // Check if user is scrolled to the very right (since it's RTL, scrollLeft is ~0)
+      const isAtRight = !el || Math.abs(el.scrollLeft) <= 10
+
+      const existingIds = new Set(items.value.map(i => i.listing?.id))
+      const added = newItems.filter(i => !existingIds.has(i.listing?.id))
+      
+      if (added.length > 0) {
+        items.value = [...added, ...items.value].slice(0, MAX_FEED_ITEMS)
+        
+        if (isAtRight) {
+          nextTick(() => {
+            if (scrollContainer.value) {
+              scrollContainer.value.scrollLeft = 0
+            }
+          })
+        }
+      } else if (items.value.length === 0) {
+        items.value = newItems
+      }
+    } else if (!isRefresh) {
        items.value = []
     }
   }
   catch (e) {
     console.error('Failed to load flips:', e)
-    items.value = []
+    if (!isRefresh) items.value = []
   }
   finally {
-    loading.value = false
+    if (!isRefresh) loading.value = false
   }
 }
 
@@ -105,22 +128,29 @@ const filteredItems = computed(() => {
 
 onMounted(() => {
   loadFlips()
+  refreshInterval = setInterval(() => loadFlips(true), 60000)
+
   if (scrollContainer.value) {
     const wheelHandler = (e: WheelEvent) => {
       e.preventDefault()
-      scrollContainer.value!.scrollLeft += e.deltaY
+      const el = scrollContainer.value!
+      el.scrollLeft += e.deltaY
     }
 
-    scrollContainer.value.addEventListener('wheel', wheelHandler)
+    scrollContainer.value.addEventListener('wheel', wheelHandler, { passive: false })
     removeWheelHandler = () => scrollContainer.value?.removeEventListener('wheel', wheelHandler)
   }
 })
 
 onBeforeUnmount(() => {
   removeWheelHandler?.()
+  if (refreshInterval) {
+    clearInterval(refreshInterval)
+  }
 })
 
 watch(() => route.query.category, () => {
+  items.value = []
   loadFlips()
 })
 

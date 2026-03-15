@@ -29,9 +29,27 @@
 
     <!-- Content -->
     <div class="p-4 flex flex-col flex-1">
-      <h3 class="text-white font-medium text-sm line-clamp-2 mb-3 min-h-[2.5rem]">
-        {{ item.listing?.title }}
-      </h3>
+      <div class="flex justify-between items-start mb-3 gap-2">
+        <h3 class="text-white font-medium text-sm line-clamp-2 min-h-[2.5rem] flex-1">
+          {{ item.listing?.title }}
+        </h3>
+        <div class="flex flex-col gap-1 shrink-0">
+          <button
+            @click="reportFlip"
+            class="w-7 h-7 rounded-md bg-gray-700/50 hover:bg-red-500/20 text-gray-400 hover:text-red-400 flex items-center justify-center transition-colors"
+            title="Report Flip"
+          >
+            <Icon name="mdi:flag-outline" size="14" />
+          </button>
+          <button
+            @click="showReferences = !showReferences"
+            class="w-7 h-7 rounded-md bg-gray-700/50 hover:bg-blue-500/20 text-gray-400 hover:text-blue-400 flex items-center justify-center transition-colors"
+            title="Show References"
+          >
+            <Icon name="mdi:format-list-bulleted" size="14" />
+          </button>
+        </div>
+      </div>
 
       <div class="space-y-2 mb-4">
         <div class="flex justify-between items-center">
@@ -45,12 +63,12 @@
       </div>
 
       <!-- Category & Location -->
-      <div class="flex items-center gap-2 mb-4 text-xs text-gray-400">
+      <div class="flex items-center gap-2 mb-4 text-xs text-gray-400 flex-wrap">
         <span
-          v-if="item.category"
+          v-if="item.foundAt"
           class="bg-gray-700/50 px-2 py-1 rounded"
         >
-          {{ item.category }}
+          {{ formatDistanceToNow(new Date(item.foundAt), { addSuffix: true }) }}
         </span>
         <span
           v-if="listingLocation"
@@ -58,6 +76,26 @@
         >
           📍 {{ listingLocation }}
         </span>
+      </div>
+
+      <!-- References List -->
+      <div v-if="showReferences && item.recentSells?.length" class="mb-4 bg-gray-900/50 rounded p-2 max-h-40 overflow-y-auto">
+        <div class="text-xs font-semibold text-gray-400 mb-2 border-b border-gray-700 pb-1">Found References ({{ item.recentSells.length }})</div>
+        <div class="flex flex-col gap-2">
+          <a
+            v-for="(sell, idx) in item.recentSells"
+            :key="idx"
+            :href="getSellUrl(sell)"
+            target="_blank"
+            class="flex justify-between items-center text-xs hover:bg-gray-700/50 p-1 rounded"
+          >
+            <span class="text-blue-400 truncate max-w-[120px]" :title="sell.title">{{ sell.title }}</span>
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="text-green-400">{{ formatPrice(sell.price) }}</span>
+              <span class="text-gray-500" v-if="sell.endTime">{{ formatDistanceToNow(new Date(sell.endTime), { addSuffix: true }) }}</span>
+            </div>
+          </a>
+        </div>
       </div>
 
       <div class="mt-auto">
@@ -75,8 +113,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import type { Flip } from '~/src/api-client/types.gen'
+import { formatDistanceToNow } from 'date-fns'
 
 const props = defineProps<{
   item: Flip
@@ -84,6 +123,28 @@ const props = defineProps<{
 
 const profit = computed(() => props.item.potentialProfit ?? 0)
 const primaryImageUrl = computed(() => props.item.listing?.imageUrls?.[0] ?? '')
+
+const showReferences = ref(false)
+
+const reportFlip = () => {
+  const reportId = Math.random().toString(36).substring(2, 10).toUpperCase()
+  console.log(`[REPORT ${reportId}] Flip Data:`, JSON.stringify(props.item, null, 2))
+  navigator.clipboard.writeText(reportId)
+  alert(`Report generated and ID (${reportId}) copied to clipboard.\nCheck the console for JSON data.`)
+}
+
+const formatPrice = (price: number | undefined) => {
+  return new Intl.NumberFormat('de-DE', {
+    style: 'currency',
+    currency: 'EUR',
+  }).format(price ?? 0)
+}
+
+const getSellUrl = (sell: any) => {
+  if (!sell?.id) return '#'
+  // Assuming platform is mainly eBay right now
+  return `https://ebay.de/itm/${sell.id}`
+}
 
 const listingLocation = computed(() => {
   const listing = props.item.listing

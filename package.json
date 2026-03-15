@@ -30,6 +30,7 @@
     "@pinia/nuxt": "^0.9.0",
     "@types/humanize-duration": "^3.27.4",
     "@vueuse/core": "^13.0.0",
+    "date-fns": "^4.1.0",
     "element-plus": "^2.9.10",
     "firebase": "^11.5.0",
     "firebase-admin": "^13.2.0",
