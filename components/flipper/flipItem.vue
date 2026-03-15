@@ -3,8 +3,8 @@
     <!-- Image -->
     <div class="relative h-[200px] bg-gray-900/50">
       <img
-        v-if="item.listing?.imageUrl"
-        :src="item.listing.imageUrl"
+        v-if="primaryImageUrl"
+        :src="primaryImageUrl"
         :alt="item.listing?.title ?? 'Flip'"
         class="w-full h-full object-contain"
       >
@@ -53,16 +53,16 @@
           {{ item.category }}
         </span>
         <span
-          v-if="item.listing?.location"
+          v-if="listingLocation"
           class="bg-gray-700/50 px-2 py-1 rounded"
         >
-          📍 {{ item.listing.location }}
+          📍 {{ listingLocation }}
         </span>
       </div>
 
       <div class="mt-auto">
         <a
-          :href="item.listing?.url ?? '#'"
+          :href="listingUrl"
           target="_blank"
           rel="noopener noreferrer"
           class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition-colors duration-200 text-sm"
@@ -83,6 +83,40 @@ const props = defineProps<{
 }>()
 
 const profit = computed(() => props.item.potentialProfit ?? 0)
+const primaryImageUrl = computed(() => props.item.listing?.imageUrls?.[0] ?? '')
+
+const listingLocation = computed(() => {
+  const listing = props.item.listing
+  return [listing?.locality, listing?.region, listing?.street]
+    .filter((value): value is string => Boolean(value))
+    .join(', ')
+})
+
+const listingUrl = computed(() => {
+  const listing = props.item.listing
+  if (!listing?.id) {
+    return '#'
+  }
+
+  switch (listing.platform) {
+    case 'Kleinanzeigen':
+      return `https://www.kleinanzeigen.de/s-anzeige/copy/${listing.id}-1-1`
+    case 'Ebay':
+      return `https://ebay.de/itm/${listing.id}`
+    case 'Facebook':
+      return `https://www.facebook.com/marketplace/item/${listing.id}`
+    case 'Willhaben':
+      return `https://www.willhaben.at/iad/${listing.id.replace(/^\//, '')}`
+    case 'Shpock':
+      return `https://www.shpock.com/de-de/i/${listing.id}`
+    case 'Marktplaats':
+      return listing.id.includes('/')
+        ? `https://www.marktplaats.nl${listing.id}`
+        : `https://www.marktplaats.nl/v/redirect/redirect/${listing.id}-test`
+    default:
+      return `https://ane.deals/auctions?platform=${String(listing.platform ?? 'unknown').toLowerCase()}&id=${encodeURIComponent(listing.id)}`
+  }
+})
 
 const formattedProfit = computed(() => {
   return new Intl.NumberFormat('de-DE', {
