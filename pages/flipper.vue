@@ -44,7 +44,6 @@
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import type { Flip } from '~/src/api-client/types.gen'
 import { getFlips } from '~/src/api-client'
-import { useCategories } from '~/composable/useCategories'
 
 const selectedMarketplace = ref('all')
 const items = ref<Flip[]>([])
@@ -52,10 +51,8 @@ const loading = ref(true)
 const scrollContainer = ref<HTMLElement | null>(null)
 const route = useRoute()
 const userStore = useUserStore()
-const { fetchTopLevelCategories } = useCategories()
 
 const FEED_LIMIT = 24
-const PER_CATEGORY_LIMIT = 3
 
 let removeWheelHandler: (() => void) | null = null
 
@@ -67,78 +64,26 @@ function getAuthHeaders() {
   return { Authorization: `Bearer ${userStore.token}` }
 }
 
-function getFeedCategories(categoryLabels: string[]) {
-  const requestedCategory = typeof route.query.category === 'string'
-    ? route.query.category.trim()
-    : ''
-
-  if (requestedCategory) {
-    return [requestedCategory]
-  }
-
-  return categoryLabels
-}
-
-function mergeFlips(flipsByCategory: Flip[][]) {
-  const seenListingIds = new Set<string>()
-
-  return flipsByCategory
-    .flat()
-    .filter((flip) => {
-      const listingId = flip.listing?.id
-      if (!listingId || seenListingIds.has(listingId)) {
-        return false
-      }
-
-      seenListingIds.add(listingId)
-      return true
-    })
-    .sort((left, right) => {
-      const rightFoundAt = Date.parse(right.foundAt ?? '')
-      const leftFoundAt = Date.parse(left.foundAt ?? '')
-
-      if (!Number.isNaN(rightFoundAt) && !Number.isNaN(leftFoundAt) && rightFoundAt !== leftFoundAt) {
-        return rightFoundAt - leftFoundAt
-      }
-
-      return (right.potentialProfit ?? 0) - (left.potentialProfit ?? 0)
-    })
-    .slice(0, FEED_LIMIT)
-}
-
 async function loadFlips() {
   loading.value = true
   try {
     await userStore.checkAuth(useFirebaseAuth()!)
 
-    const topLevelCategories = await fetchTopLevelCategories()
-    const categoryLabels = topLevelCategories
-      .map(category => category.label?.trim())
-      .filter((category): category is string => Boolean(category))
-    const feedCategories = getFeedCategories(categoryLabels)
     const headers = getAuthHeaders()
 
-    if (feedCategories.length === 0) {
-      items.value = []
-      return
+    // 1 is the partition key for combined flips
+    const response = await getFlips({
+      composable: '$fetch',
+      path: { category: '1' },
+      query: { limit: FEED_LIMIT },
+      ...(headers ? { headers } : {}),
+    })
+
+    if (response) {
+       items.value = Array.isArray(response) ? response : Array.from(response)
+    } else {
+       items.value = []
     }
-
-    const flipResponses = await Promise.allSettled(
-      feedCategories.map(category =>
-        getFlips({
-          composable: '$fetch',
-          path: { category },
-          query: { limit: PER_CATEGORY_LIMIT },
-          ...(headers ? { headers } : {}),
-        }),
-      ),
-    )
-
-    const successfulResponses = flipResponses
-      .filter((result): result is PromiseFulfilledResult<Flip[]> => result.status === 'fulfilled' && Array.isArray(result.value))
-      .map(result => result.value)
-
-    items.value = mergeFlips(successfulResponses)
   }
   catch (e) {
     console.error('Failed to load flips:', e)
