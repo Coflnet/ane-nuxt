@@ -658,6 +658,8 @@
   "category": "Kategorie",
   "loadMore": "Mehr laden",
   "loading": "Laden...",
+  "newFlips": "Neue Flips",
+  "noFlipsFound": "Keine Flips gefunden",
   "clearAllFilters": "Alle Filter zurücksetzen",
   "found": "gefunden",
   "likeNewCondition": "Wie neu",
@@ -740,7 +742,38 @@
   "gender_female": "Damen",
   "gender_unisex": "Unisex"
 ,
+  "nav": {
+    "home": "Startseite",
+    "search": "Suche"
+  },
+  "condition": {
+    "new": "Neu",
+    "like_new": "Wie Neu",
+    "good": "Gut",
+    "acceptable": "Akzeptabel",
+    "used": "Gebraucht",
+    "broken": "Defekt",
+    "refurbished": "Generalüberholt",
+    "unknown": "Unbekannt"
+  },
   "product": {
+    "averagePrice": "Durchschnittspreis",
+    "priceRange": "Preisspanne",
+    "available": "Verfügbar",
+    "trend": "Trend",
+    "availableOffers": "Verfügbare Angebote",
+    "loadMore": "Mehr laden...",
+    "viewDeal": "Zum Angebot",
+    "reportIssue": "Produkt melden",
+    "reportListing": "Anzeige melden",
+    "marketplace": "Marktplatz",
+    "title": "Titel",
+    "price": "Preis",
+    "date": "Datum",
+    "action": "Aktion",
+    "offersCount": "{count} Angebote",
+    "listedPrice": "Listenpreis",
+    "marketValue": "Marktwert",
     "attributes": {
       "title": "Attribute",
       "unknown_title": "Attribute nicht angegeben",

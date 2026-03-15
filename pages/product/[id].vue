@@ -17,14 +17,14 @@
           to="/home"
           class="hover:text-blue-400"
         >
-          Home
+          {{ $t('nav.home') }}
         </NuxtLink>
         <span class="mx-2">/</span>
         <NuxtLink
           to="/search"
           class="hover:text-blue-400"
         >
-          Search
+          {{ $t('nav.search') }}
         </NuxtLink>
         <span
           v-if="product.categories && product.categories.length > 0 && product.categories[0] !== 'general' && !/^[\d,\s]+$/.test(product.categories[0])"
@@ -106,7 +106,7 @@
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50">
               <div class="text-slate-500 text-xs uppercase font-bold mb-1">
-                Average Price
+                {{ $t('product.averagePrice') }}
               </div>
               <div class="text-xl font-bold text-white">
                 ~{{ formatPrice(product.avgPrice) }}
@@ -114,7 +114,7 @@
             </div>
             <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50">
               <div class="text-slate-500 text-xs uppercase font-bold mb-1">
-                Price Range
+                {{ $t('product.priceRange') }}
               </div>
               <div class="text-sm font-bold text-white">
                 {{ formatPrice(product.minPrice) }} - {{ formatPrice(product.maxPrice) }}
@@ -122,10 +122,10 @@
             </div>
             <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50">
               <div class="text-slate-500 text-xs uppercase font-bold mb-1">
-                Available
+                {{ $t('product.available') }}
               </div>
               <div class="text-xl font-bold text-green-400">
-                {{ availableOfferCount }} Offers
+                {{ $t('product.offersCount', { count: availableOfferCount }) }}
               </div>
             </div>
             <div
@@ -133,7 +133,7 @@
               class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50"
             >
               <div class="text-slate-500 text-xs uppercase font-bold mb-1">
-                Trend ({{ priceStats.daysOfData }}d)
+                {{ $t('product.trend') }} ({{ priceStats.daysOfData }}d)
               </div>
               <div
                 class="text-xl font-bold"
@@ -160,7 +160,7 @@
               class="grid grid-cols-1 md:grid-cols-2 gap-3"
             >
               <div
-                v-for="(value, key) in product.attributes"
+                v-for="(value, key) in filteredAttributes"
                 :key="key"
                 class="bg-gradient-to-br from-slate-800/60 to-slate-800/30 rounded-lg border border-slate-700/50 p-4 transition-all duration-200 block"
               >
@@ -222,7 +222,7 @@
               name="tabler:flag"
               class="w-4 h-4"
             />
-            Report product issue
+            {{ $t('product.reportIssue') }}
           </button>
         </div>
       </div>
@@ -322,7 +322,7 @@
       <div class="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-xl">
         <div class="p-6 border-b border-slate-800 flex justify-between items-center">
           <h2 class="text-2xl font-bold text-white">
-            Available Offers
+            {{ $t('product.availableOffers') }}
           </h2>
         </div>
 
@@ -334,7 +334,7 @@
 
         <div class="p-4 bg-slate-800/30 text-center">
           <button class="text-blue-400 hover:text-blue-300 text-sm font-medium">
-            Load more...
+            {{ $t('product.loadMore') }}
           </button>
         </div>
       </div>
@@ -463,10 +463,21 @@ const productIssueTypes: { value: IssueType, label: string }[] = [
 
 const availableOfferCount = computed(() => matches.value.length - unavailableCount.value)
 
+// Filter out 'condition' key from attributes (shown as top-level field)
+const filteredAttributes = computed(() => {
+  const attrs = product.value?.attributes as Record<string, any> | undefined
+  if (!attrs) return {}
+  const result: Record<string, any> = {}
+  for (const [key, value] of Object.entries(attrs)) {
+    if (key.toLowerCase() === 'condition') continue
+    result[key] = value
+  }
+  return result
+})
+
 // Determine if product.attributes contains at least one non-empty value
 const hasAttributes = computed(() => {
-  const attrs = product.value?.attributes as Record<string, any> | undefined
-  if (!attrs) return false
+  const attrs = filteredAttributes.value
   return Object.values(attrs).some((v) => {
     if (v === null || v === undefined) return false
     const s = String(v).trim()
@@ -733,11 +744,9 @@ function formatAttrKey(key: string) {
 }
 
 function formatCondition(condition: string) {
-  const map: Record<string, string> = {
-    new: 'New', like_new: 'Like New', good: 'Good',
-    acceptable: 'Acceptable', used: 'Used', broken: 'Broken',
-  }
-  return map[condition] || condition
+  const key = `condition.${condition}`
+  const translated = t(key)
+  return translated !== key ? translated : condition
 }
 
 function conditionClass(condition: string) {

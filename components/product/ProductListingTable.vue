@@ -4,16 +4,16 @@
       <thead class="text-xs uppercase bg-slate-800/50 text-slate-300">
         <tr>
           <th class="px-6 py-4 rounded-tl-lg">
-            Marketplace
+            {{ $t('product.marketplace') }}
           </th>
           <th class="px-6 py-4">
-            Title
+            {{ $t('product.title') }}
           </th>
           <th
             class="px-6 py-4 cursor-pointer hover:text-white"
             @click="$emit('sort', 'price')"
           >
-            Price
+            {{ $t('product.price') }}
             <Icon
               name="tabler:arrows-sort"
               class="inline w-4 h-4"
@@ -23,14 +23,14 @@
             class="px-6 py-4 cursor-pointer hover:text-white"
             @click="$emit('sort', 'date')"
           >
-            Date
+            {{ $t('product.date') }}
             <Icon
               name="tabler:arrows-sort"
               class="inline w-4 h-4"
             />
           </th>
           <th class="px-6 py-4 rounded-tr-lg">
-            Action
+            {{ $t('product.action') }}
           </th>
         </tr>
       </thead>
@@ -83,7 +83,7 @@
                   class="w-3 h-3 animate-spin"
                 />
                 <template v-else>
-                  View Deal
+                  {{ $t('product.viewDeal') }}
                   <Icon
                     name="tabler:external-link"
                     class="w-3 h-3"
@@ -92,7 +92,7 @@
               </button>
               <button
                 class="p-2 text-slate-400 hover:text-red-400 transition-colors"
-                title="Report this listing"
+                :title="$t('product.reportListing')"
                 @click="openReportDialog(listing)"
               >
                 <Icon

@@ -1082,8 +1082,8 @@ function localizeAttrValue(attrKey: string, value: string): string {
 function buildSearchParams(offset = 0) {
   const params: Record<string, any> = { offset, limit: PAGE_SIZE }
   if (searchQuery.value) params.query = searchQuery.value
-  // OpenSearch Term queries require lowercase for categories and conditions
-  if (selectedCategory.value) params.category = selectedCategory.value.toLowerCase()
+  // Category values come from aggregation buckets with correct case; condition is normalized to lowercase during indexing
+  if (selectedCategory.value) params.category = selectedCategory.value
   if (selectedCondition.value) params.condition = selectedCondition.value.toLowerCase()
   if (selectedMinPrice.value !== undefined) params.minPrice = selectedMinPrice.value
   if (selectedMaxPrice.value !== undefined) params.maxPrice = selectedMaxPrice.value

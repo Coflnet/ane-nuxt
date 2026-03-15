@@ -657,6 +657,8 @@
   "category": "Category",
   "loadMore": "Load More",
   "loading": "Loading...",
+  "newFlips": "New Flips",
+  "noFlipsFound": "No flips found",
   "clearAllFilters": "Clear All Filters",
   "found": "found",
   "likeNewCondition": "Like New",
@@ -739,7 +741,38 @@
   "gender_female": "Female",
   "gender_unisex": "Unisex"
 ,
+  "nav": {
+    "home": "Home",
+    "search": "Search"
+  },
+  "condition": {
+    "new": "New",
+    "like_new": "Like New",
+    "good": "Good",
+    "acceptable": "Acceptable",
+    "used": "Used",
+    "broken": "Broken",
+    "refurbished": "Refurbished",
+    "unknown": "Unknown"
+  },
   "product": {
+    "averagePrice": "Average Price",
+    "priceRange": "Price Range",
+    "available": "Available",
+    "trend": "Trend",
+    "availableOffers": "Available Offers",
+    "loadMore": "Load more...",
+    "viewDeal": "View Deal",
+    "reportIssue": "Report product issue",
+    "reportListing": "Report this listing",
+    "marketplace": "Marketplace",
+    "title": "Title",
+    "price": "Price",
+    "date": "Date",
+    "action": "Action",
+    "offersCount": "{count} Offers",
+    "listedPrice": "Listed Price",
+    "marketValue": "Market Value",
     "attributes": {
       "title": "Product Attributes",
       "unknown_title": "Attributes not specified",
