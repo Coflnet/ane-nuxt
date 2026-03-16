@@ -37,9 +37,10 @@
           <button
             @click="reportFlip"
             class="w-7 h-7 rounded-md bg-gray-700/50 hover:bg-red-500/20 text-gray-400 hover:text-red-400 flex items-center justify-center transition-colors"
+            :disabled="reportSubmitting"
             title="Report Flip"
           >
-            <Icon name="mdi:flag-outline" size="14" />
+            <Icon :name="reportSubmitting ? 'mdi:loading' : 'mdi:flag-outline'" size="14" :class="{ 'animate-spin': reportSubmitting }" />
           </button>
           <button
             @click="showReferences = !showReferences"
@@ -89,10 +90,10 @@
             target="_blank"
             class="flex justify-between items-center text-xs hover:bg-gray-700/50 p-1 rounded"
           >
-            <span class="text-blue-400 truncate max-w-[120px]" :title="sell.title">{{ sell.title }}</span>
+            <span class="text-blue-400 truncate max-w-[120px]" :title="sell.key ?? undefined">{{ sell.key }}</span>
             <div class="flex items-center gap-2 shrink-0">
               <span class="text-green-400">{{ formatPrice(sell.price) }}</span>
-              <span class="text-gray-500" v-if="sell.endTime">{{ formatDistanceToNow(new Date(sell.endTime), { addSuffix: true }) }}</span>
+              <span class="text-gray-500" v-if="sell.date">{{ formatDistanceToNow(new Date(sell.date), { addSuffix: true }) }}</span>
             </div>
           </a>
         </div>
@@ -109,12 +110,49 @@
         </a>
       </div>
     </div>
+
+    <!-- Report Dialog -->
+    <Teleport to="body">
+      <div
+        v-if="showReportDialog"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50"
+        @click.self="showReportDialog = false"
+      >
+        <div class="bg-gray-800 rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl border border-gray-700">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
+              <Icon name="mdi:check" size="24" class="text-green-400" />
+            </div>
+            <h3 class="text-lg font-bold text-white">Report Submitted</h3>
+          </div>
+          <p class="text-gray-400 text-sm mb-4">
+            Your report has been logged. Use the ID below for reference.
+          </p>
+          <div class="bg-gray-900/80 rounded-lg p-3 flex items-center justify-between mb-4">
+            <code class="text-blue-400 font-mono text-lg tracking-wider">{{ reportId }}</code>
+            <button
+              @click="copyReportId"
+              class="text-gray-400 hover:text-white transition-colors px-2"
+              title="Copy ID"
+            >
+              <Icon :name="copied ? 'mdi:check' : 'mdi:content-copy'" size="18" />
+            </button>
+          </div>
+          <button
+            @click="showReportDialog = false"
+            class="w-full py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors text-sm"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import type { Flip } from '~/src/api-client/types.gen'
+import type { Flip, SoldFor, Platform } from '~/src/api-client/types.gen'
 import { formatDistanceToNow } from 'date-fns'
 
 const props = defineProps<{
@@ -125,25 +163,70 @@ const profit = computed(() => props.item.potentialProfit ?? 0)
 const primaryImageUrl = computed(() => props.item.listing?.imageUrls?.[0] ?? '')
 
 const showReferences = ref(false)
+const showReportDialog = ref(false)
+const reportId = ref('')
+const reportSubmitting = ref(false)
+const copied = ref(false)
 
-const reportFlip = () => {
-  const reportId = Math.random().toString(36).substring(2, 10).toUpperCase()
-  console.log(`[REPORT ${reportId}] Flip Data:`, JSON.stringify(props.item, null, 2))
-  navigator.clipboard.writeText(reportId)
-  alert(`Report generated and ID (${reportId}) copied to clipboard.\nCheck the console for JSON data.`)
+const reportFlip = async () => {
+  reportSubmitting.value = true
+  try {
+    const { data } = await useFetch('/api/report-flip', {
+      method: 'POST',
+      body: {
+        listing: props.item.listing,
+        profit: props.item.potentialProfit,
+        medianPrice: props.item.medianPrice,
+        recentSells: props.item.recentSells,
+      },
+    })
+    reportId.value = data.value?.reportId ?? 'ERROR'
+    showReportDialog.value = true
+  } catch {
+    reportId.value = 'ERROR'
+    showReportDialog.value = true
+  } finally {
+    reportSubmitting.value = false
+  }
 }
 
-const formatPrice = (price: number | undefined) => {
+const copyReportId = async () => {
+  await navigator.clipboard.writeText(reportId.value)
+  copied.value = true
+  setTimeout(() => { copied.value = false }, 2000)
+}
+
+const formatPrice = (price: number | null | undefined) => {
   return new Intl.NumberFormat('de-DE', {
     style: 'currency',
     currency: 'EUR',
   }).format(price ?? 0)
 }
 
-const getSellUrl = (sell: any) => {
+function getPlatformUrl(platform: Platform | undefined, id: string): string {
+  switch (platform) {
+    case 'Kleinanzeigen':
+      return `https://www.kleinanzeigen.de/s-anzeige/copy/${id}-1-1`
+    case 'Ebay':
+      return `https://ebay.de/itm/${id}`
+    case 'Facebook':
+      return `https://www.facebook.com/marketplace/item/${id}`
+    case 'Willhaben':
+      return `https://www.willhaben.at/iad/${id.replace(/^\//, '')}`
+    case 'Shpock':
+      return `https://www.shpock.com/de-de/i/${id}`
+    case 'Marktplaats':
+      return id.includes('/')
+        ? `https://www.marktplaats.nl${id}`
+        : `https://www.marktplaats.nl/v/redirect/redirect/${id}-test`
+    default:
+      return `https://ane.deals/auctions?platform=${String(platform ?? 'unknown').toLowerCase()}&id=${encodeURIComponent(id)}`
+  }
+}
+
+const getSellUrl = (sell: SoldFor) => {
   if (!sell?.id) return '#'
-  // Assuming platform is mainly eBay right now
-  return `https://ebay.de/itm/${sell.id}`
+  return getPlatformUrl(sell.platform, sell.id)
 }
 
 const listingLocation = computed(() => {
@@ -155,28 +238,8 @@ const listingLocation = computed(() => {
 
 const listingUrl = computed(() => {
   const listing = props.item.listing
-  if (!listing?.id) {
-    return '#'
-  }
-
-  switch (listing.platform) {
-    case 'Kleinanzeigen':
-      return `https://www.kleinanzeigen.de/s-anzeige/copy/${listing.id}-1-1`
-    case 'Ebay':
-      return `https://ebay.de/itm/${listing.id}`
-    case 'Facebook':
-      return `https://www.facebook.com/marketplace/item/${listing.id}`
-    case 'Willhaben':
-      return `https://www.willhaben.at/iad/${listing.id.replace(/^\//, '')}`
-    case 'Shpock':
-      return `https://www.shpock.com/de-de/i/${listing.id}`
-    case 'Marktplaats':
-      return listing.id.includes('/')
-        ? `https://www.marktplaats.nl${listing.id}`
-        : `https://www.marktplaats.nl/v/redirect/redirect/${listing.id}-test`
-    default:
-      return `https://ane.deals/auctions?platform=${String(listing.platform ?? 'unknown').toLowerCase()}&id=${encodeURIComponent(listing.id)}`
-  }
+  if (!listing?.id) return '#'
+  return getPlatformUrl(listing.platform, listing.id)
 })
 
 const formattedProfit = computed(() => {
