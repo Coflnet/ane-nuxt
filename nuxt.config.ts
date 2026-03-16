@@ -76,6 +76,9 @@ export default defineNuxtConfig({
       cookieKey: 'i18n_redirected',
       redirectOn: 'root', // recommended
     },
+    bundle: {
+      optimizeTranslationDirective: false,
+    },
   }),
 
   icon: {

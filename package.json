@@ -55,5 +55,14 @@
     "eslint": "^9.26.0",
     "eslint-plugin-nuxt": "^4.0.0",
     "shadcn-nuxt": "^2.1.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "@parcel/watcher",
+      "sharp",
+      "protobufjs",
+      "unrs-resolver"
+    ]
   }
 }
