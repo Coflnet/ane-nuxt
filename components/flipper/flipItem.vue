@@ -35,6 +35,22 @@
         </h3>
         <div class="flex flex-col gap-1 shrink-0">
           <button
+            @click="emit('bookmark')"
+            class="w-7 h-7 rounded-md bg-gray-700/50 hover:bg-yellow-500/20 flex items-center justify-center transition-colors"
+            :class="props.isBookmarked ? 'text-yellow-400' : 'text-gray-400 hover:text-yellow-400'"
+            :title="props.isBookmarked ? 'Remove Bookmark' : 'Bookmark'"
+          >
+            <Icon :name="props.isBookmarked ? 'mdi:bookmark' : 'mdi:bookmark-outline'" size="14" />
+          </button>
+          <button
+            v-if="props.showDelete"
+            @click="emit('delete')"
+            class="w-7 h-7 rounded-md bg-gray-700/50 hover:bg-red-500/20 text-gray-400 hover:text-red-400 flex items-center justify-center transition-colors"
+            title="Delete Bookmark"
+          >
+            <Icon name="mdi:delete-outline" size="14" />
+          </button>
+          <button
             @click="reportFlip"
             class="w-7 h-7 rounded-md bg-gray-700/50 hover:bg-red-500/20 text-gray-400 hover:text-red-400 flex items-center justify-center transition-colors"
             :disabled="reportSubmitting"
@@ -105,6 +121,7 @@
           target="_blank"
           rel="noopener noreferrer"
           class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition-colors duration-200 text-sm"
+          @click="emit('click')"
         >
           {{ $t('product.viewDeal') }}
         </a>
@@ -157,6 +174,14 @@ import { formatDistanceToNow } from 'date-fns'
 
 const props = defineProps<{
   item: Flip
+  isBookmarked?: boolean
+  showDelete?: boolean
+}>()
+
+const emit = defineEmits<{
+  bookmark: []
+  delete: []
+  click: []
 }>()
 
 const profit = computed(() => props.item.potentialProfit ?? 0)

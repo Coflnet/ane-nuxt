@@ -54,7 +54,8 @@
     "@types/lodash": "^4.17.16",
     "eslint": "^9.26.0",
     "eslint-plugin-nuxt": "^4.0.0",
-    "shadcn-nuxt": "^2.1.0"
+    "shadcn-nuxt": "^2.1.0",
+    "vue-tsc": "3.2.6"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
