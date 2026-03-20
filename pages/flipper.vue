@@ -79,17 +79,21 @@
           class="flex gap-6 w-max "
           style="direction: ltr;"
         >
-          <div
-            v-for="item in filteredItems"
-            :key="item.listing!.id ?? ''"
-          >
-            <FlipperFlipItem
-              :item="item"
-              :is-bookmarked="isBookmarked(item)"
-              @bookmark="toggleBookmark(item)"
-              @click="handleFlipClick(item)"
-            />
-          </div>
+          <TransitionGroup name="flip-slide">
+            <div
+              v-for="item in filteredItems"
+              :key="item.listing!.id ?? ''"
+              :class="{ 'flip-hidden': hiddenIds.has(item.listing!.id ?? '') }"
+              class="flip-item"
+            >
+              <FlipperFlipItem
+                :item="item"
+                :is-bookmarked="isBookmarked(item)"
+                @bookmark="toggleBookmark(item)"
+                @click="handleFlipClick(item)"
+              />
+            </div>
+          </TransitionGroup>
         </div>
       </div>
       <div
@@ -177,6 +181,8 @@ const scrollContainer = ref<HTMLElement | null>(null)
 const route = useRoute()
 const userStore = useUserStore()
 const deleteTarget = ref<Flip | null>(null)
+const hiddenIds = ref<Set<string>>(new Set())
+const isFirstLoad = ref(true)
 
 const FEED_LIMIT = 24
 const MAX_FEED_ITEMS = 100
@@ -286,7 +292,36 @@ async function loadFlips(isRefresh = false) {
       const added = newItems.filter(i => !existingIds.has(i.listing?.id))
       
       if (added.length > 0) {
-        items.value = [...added, ...items.value].slice(0, MAX_FEED_ITEMS)
+        if (isFirstLoad.value) {
+          // First load: show all items but hide first two, then reveal with 5s stagger
+          items.value = [...added, ...items.value].slice(0, MAX_FEED_ITEMS)
+          isFirstLoad.value = false
+
+          const revealIds = added.slice(0, 2).map(i => i.listing?.id ?? '')
+          hiddenIds.value = new Set(revealIds)
+
+          // Reveal first item after 5s, second after 10s
+          for (let i = 0; i < revealIds.length; i++) {
+            const id = revealIds[i]
+            if (id) {
+              setTimeout(() => {
+                hiddenIds.value = new Set([...hiddenIds.value].filter(x => x !== id))
+              }, (i + 1) * 5000)
+            }
+          }
+        } else {
+          // Subsequent loads: hide new items, add them, then reveal with stagger
+          const addedIds = added.map(i => i.listing?.id ?? '').filter(Boolean)
+          hiddenIds.value = new Set([...hiddenIds.value, ...addedIds])
+          items.value = [...added, ...items.value].slice(0, MAX_FEED_ITEMS)
+          
+          // Stagger reveal each new item 300ms apart
+          addedIds.forEach((id, i) => {
+            setTimeout(() => {
+              hiddenIds.value = new Set([...hiddenIds.value].filter(x => x !== id))
+            }, (i + 1) * 300)
+          })
+        }
         
         if (isAtRight) {
           nextTick(() => {
@@ -297,6 +332,7 @@ async function loadFlips(isRefresh = false) {
         }
       } else if (items.value.length === 0) {
         items.value = newItems
+        isFirstLoad.value = false
       }
     } else if (!isRefresh) {
        items.value = []
@@ -378,3 +414,33 @@ useHead({
   ],
 })
 </script>
+
+<style scoped>
+/* Smooth scroll-in for new flip items */
+.flip-item {
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.flip-hidden {
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+}
+
+/* TransitionGroup animations for items entering/leaving */
+.flip-slide-enter-active {
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.flip-slide-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.flip-slide-enter-from {
+  opacity: 0;
+  transform: translateX(-40px) scale(0.9);
+}
+.flip-slide-leave-to {
+  opacity: 0;
+  transform: translateX(40px) scale(0.9);
+}
+.flip-slide-move {
+  transition: transform 0.5s ease;
+}
+</style>
