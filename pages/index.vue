@@ -921,7 +921,7 @@
               </ul>
             </div>
             <a
-              :href="localePath('/register?redirectTo=/subscriptions')"
+              :href="localePath('/subscriptions?discount=EARLY')"
               class="block w-full px-4 py-3 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition-all text-center font-medium shadow-lg shadow-indigo-900/20"
             >
               {{ $t('pricing.plans.collector.cta') }}
@@ -933,11 +933,6 @@
             v-intersect="fadeInUp"
             class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700 relative transition-all hover:shadow-2xl hover:-translate-y-1 opacity-0"
           >
-            <div
-              class="absolute top-0 right-0 bg-gray-600 text-white px-4 py-1 rounded-bl-lg rounded-tr-lg text-sm font-medium"
-            >
-              {{ $t('pricing.comingSoon') }}
-            </div>
             <div class="text-center mb-6">
               <h3 class="text-2xl font-bold text-white mb-2">
                 {{ $t('pricing.plans.flipper.name') }}
@@ -991,12 +986,12 @@
                 </li>
               </ul>
             </div>
-            <button
-              disabled
-              class="block w-full px-4 py-3 rounded-full bg-gray-700 text-gray-500 cursor-not-allowed text-center font-medium"
+            <a
+              :href="localePath('/subscriptions?discount=EARLY')"
+              class="block w-full px-4 py-3 rounded-full border border-indigo-600 text-indigo-400 hover:bg-indigo-900/30 transition-all text-center font-medium"
             >
               {{ $t('pricing.plans.flipper.cta') }}
-            </button>
+            </a>
           </div>
         </div>
 

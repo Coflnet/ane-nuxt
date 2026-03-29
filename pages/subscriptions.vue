@@ -9,9 +9,33 @@
       </p>
     </div>
 
+    <!-- Discount Code Input -->
+    <div class="max-w-md mx-auto mb-8">
+      <div class="flex gap-2">
+        <input
+          v-model="discountCode"
+          type="text"
+          :placeholder="$t('enterDiscountCode')"
+          class="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-indigo-500 focus:outline-none"
+        >
+        <button
+          class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors text-sm font-medium"
+          @click="applyDiscount"
+        >
+          {{ $t('apply') }}
+        </button>
+      </div>
+      <p
+        v-if="discountApplied"
+        class="mt-2 text-sm text-green-400"
+      >
+        {{ $t('discountApplied', { percent: discountPercent }) }}
+      </p>
+    </div>
+
     <div class="grid gap-8 lg:grid-cols-3 sm:grid-cols-2 sm:gap-6">
       <SubscriptionsPlanCard
-        v-for="plan in plans"
+        v-for="plan in displayPlans"
         :key="plan.id"
         :plan="plan"
         :current-plan="currentPlan"
@@ -35,7 +59,7 @@
 </template>
 
 <script setup lang="ts">
-import { plans, type PlanId } from '~/constants/SubscriptionConstants'
+import { plans, type PlanId, type Plan } from '~/constants/SubscriptionConstants'
 
 const { t } = useI18n()
 const userStore = useUserStore()
@@ -45,6 +69,32 @@ const selectedPlan = ref<PlanId | null>(null)
 const confirmCancelation = ref(false)
 const endDate = ref<Date | null>(null)
 const subscriptionCanceled = computed(() => Number.isNaN(endDate.value?.getTime()))
+const discountCode = ref('')
+const discountApplied = ref(false)
+const discountPercent = ref(0)
+
+const displayPlans = computed<Plan[]>(() => {
+  if (!discountApplied.value) return plans
+  return plans.map(p => {
+    if (p.id === 'basic') return p
+    return { ...p, price: Math.round(p.price * (1 - discountPercent.value / 100) * 100) / 100 }
+  })
+})
+
+async function applyDiscount() {
+  if (!discountCode.value.trim()) return
+  try {
+    const res = await $fetch<{ code: string, discountPercent: number }>(`/api/payment/discount/${encodeURIComponent(discountCode.value.trim())}`, {
+      headers: { Authorization: `Bearer ${userStore.token}` },
+    })
+    discountPercent.value = res.discountPercent
+    discountApplied.value = true
+  }
+  catch {
+    discountApplied.value = false
+    push.error(t('invalidDiscountCode'))
+  }
+}
 
 const apiToken = `Bearer ${useUserStore().token}`
 
@@ -56,7 +106,12 @@ async function changePlan(plan: string) {
 
   const url = await subscribe({
     composable: '$fetch',
-    body: { planSlug: 'collector', redirectSuccess: 'https://ane.deals/overview', redirectCancel: 'https://ane.deals/overview' },
+    body: {
+      planSlug: plan as PlanId,
+      redirectSuccess: 'https://ane.deals/overview',
+      redirectCancel: 'https://ane.deals/overview',
+      discountCode: discountApplied.value ? discountCode.value.trim() : undefined,
+    },
     headers: { Authorization: apiToken },
   })
 
@@ -118,5 +173,15 @@ async function resetSubscription() {
   endDate.value = null
 }
 
-onMounted(() => getCurrentSubscription())
+const route = useRoute()
+
+onMounted(async () => {
+  getCurrentSubscription()
+  // Auto-apply discount code from URL parameter (e.g. ?discount=EARLY)
+  const urlDiscount = route.query.discount as string | undefined
+  if (urlDiscount) {
+    discountCode.value = urlDiscount
+    await applyDiscount()
+  }
+})
 </script>

@@ -7,6 +7,29 @@
       />
     </h1>
 
+    <!-- Flipper Tier Banner -->
+    <UiDefaultContainer
+      v-if="!isFlipperTier"
+      class="mb-4 p-4 border border-indigo-500/30 bg-indigo-900/20"
+    >
+      <div class="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <p class="text-white font-medium">
+            {{ $t('flipperTierPromo') }}
+          </p>
+          <p class="text-sm text-gray-400 mt-1">
+            {{ $t('flipperTierPromoDetail') }}
+          </p>
+        </div>
+        <UiLinkButton
+          :primary="true"
+          :to="localePath('/subscriptions')"
+        >
+          {{ $t('upgrade') }}
+        </UiLinkButton>
+      </div>
+    </UiDefaultContainer>
+
     <!-- Filters -->
     <UiDefaultContainer class="mb-4 p-4">
       <div class="flex flex-wrap gap-3 items-end">
@@ -62,6 +85,18 @@
         >
           {{ $t('clearFilters') }}
         </button>
+        <!-- Save Filter & Notify Button -->
+        <button
+          v-if="hasActiveFilters"
+          class="flex items-center gap-1.5 text-xs text-white px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 transition-colors font-medium"
+          @click="showSaveFilterDialog = true"
+        >
+          <Icon
+            name="tabler:bell-plus"
+            class="w-4 h-4"
+          />
+          {{ $t('saveFilterNotify') }}
+        </button>
         <div class="ml-auto text-xs text-gray-500">
           {{ filteredItems.length }}/{{ items.length }} {{ $t('flips') }}
         </div>
@@ -72,7 +107,7 @@
     <UiDefaultContainer class="mb-6 p-6 relative">
       <div
         ref="scrollContainer"
-        class="overflow-x-auto py-4"
+        class="overflow-x-auto py-4 scroll-smooth"
         style="direction: rtl;"
       >
         <div
@@ -83,7 +118,6 @@
             <div
               v-for="item in filteredItems"
               :key="item.listing!.id ?? ''"
-              :class="{ 'flip-hidden': hiddenIds.has(item.listing!.id ?? '') }"
               class="flip-item"
             >
               <FlipperFlipItem
@@ -135,6 +169,84 @@
       </UiDefaultContainer>
     </div>
 
+    <!-- Save Filter & Notify Dialog -->
+    <Teleport to="body">
+      <div
+        v-if="showSaveFilterDialog"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50"
+        @click.self="showSaveFilterDialog = false"
+      >
+        <div class="bg-gray-800 rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl border border-gray-700">
+          <h3 class="text-lg font-bold text-white mb-4">
+            {{ $t('saveFlipFilter') }}
+          </h3>
+          <div class="space-y-3">
+            <div>
+              <label class="text-xs text-gray-400">{{ $t('filterName') }}</label>
+              <input
+                v-model="filterName"
+                type="text"
+                :placeholder="$t('nameEg')"
+                class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white mt-1 focus:border-indigo-500 focus:outline-none"
+              >
+            </div>
+            <div>
+              <label class="text-xs text-gray-400">{{ $t('notificationsChannels') }}</label>
+              <select
+                v-model="filterNotifyType"
+                class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white mt-1 focus:border-indigo-500 focus:outline-none"
+              >
+                <option value="firebase">
+                  {{ $t('webPush') }}
+                </option>
+                <option value="discord">
+                  {{ $t('sendDiscordNotifications') }}
+                </option>
+                <option value="email">
+                  {{ $t('sendEmail') }}
+                </option>
+                <option value="none">
+                  {{ $t('dontSendNotifications') }}
+                </option>
+              </select>
+            </div>
+            <div v-if="filterNotifyType === 'discord'">
+              <label class="text-xs text-gray-400">{{ $t('discordWebHookUrl') }}</label>
+              <input
+                v-model="filterNotifyTarget"
+                type="text"
+                placeholder="https://discord.com/api/webhooks/..."
+                class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white mt-1 focus:border-indigo-500 focus:outline-none"
+              >
+            </div>
+            <div v-if="filterNotifyType === 'email'">
+              <label class="text-xs text-gray-400">{{ $t('email') }}</label>
+              <input
+                v-model="filterNotifyTarget"
+                type="email"
+                placeholder="you@example.com"
+                class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white mt-1 focus:border-indigo-500 focus:outline-none"
+              >
+            </div>
+          </div>
+          <div class="flex gap-3 mt-5">
+            <button
+              class="flex-1 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors text-sm"
+              @click="showSaveFilterDialog = false"
+            >
+              {{ $t('cancel') }}
+            </button>
+            <button
+              class="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors text-sm font-medium"
+              @click="saveFlipFilter"
+            >
+              {{ $t('saveFilterNotify') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
     <!-- Delete Confirmation Dialog -->
     <Teleport to="body">
       <div
@@ -181,8 +293,65 @@ const scrollContainer = ref<HTMLElement | null>(null)
 const route = useRoute()
 const userStore = useUserStore()
 const deleteTarget = ref<Flip | null>(null)
-const hiddenIds = ref<Set<string>>(new Set())
 const isFirstLoad = ref(true)
+const localePath = useLocalePath()
+
+// --- Flipper tier check ---
+const isFlipperTier = computed(() => {
+  const plan = userStore.currentPlan?.product
+  return plan === 'flipper'
+})
+
+// --- Save filter dialog ---
+const showSaveFilterDialog = ref(false)
+const filterName = ref('')
+const filterNotifyType = ref<'firebase' | 'discord' | 'email' | 'none'>('firebase')
+const filterNotifyTarget = ref('')
+
+async function saveFlipFilter() {
+  if (!filterName.value.trim()) return
+
+  const filterData: Array<{ name: string, value: string }> = []
+  // Mark this as a flip notification (not a regular listing filter)
+  filterData.push({ name: 'IsFlipNotification', value: 'true' })
+  if (filters.search) filterData.push({ name: 'SearchTerm', value: filters.search })
+  if (filters.minProfit > 0) filterData.push({ name: 'MinProfit', value: String(filters.minProfit) })
+  if (filters.minRefs > 0) filterData.push({ name: 'MinReferences', value: String(filters.minRefs) })
+  if (filters.category) filterData.push({ name: 'ContainsKeyWord', value: JSON.stringify([filters.category]) })
+
+  const targetTypeMap: Record<string, string> = {
+    firebase: 'FireBase',
+    discord: 'DiscordWebhook',
+    email: 'Email',
+    none: 'Unknown',
+  }
+
+  let target = ''
+  if (filterNotifyType.value === 'firebase') target = userStore.notificationToken || ''
+  else if (filterNotifyType.value !== 'none') target = filterNotifyTarget.value
+
+  try {
+    await $fetch('/api/filters', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${userStore.token}` },
+      body: {
+        userId: userStore.user?.id ?? '',
+        name: filterName.value.trim(),
+        filters: filterData,
+        target,
+        targetType: targetTypeMap[filterNotifyType.value],
+      },
+    })
+    showSaveFilterDialog.value = false
+    filterName.value = ''
+    filterNotifyTarget.value = ''
+    push.success(useI18n().t('filterSaved'))
+  }
+  catch (e) {
+    console.error('Failed to save filter:', e)
+    push.error(useI18n().t('errorSavingFilter'))
+  }
+}
 
 const FEED_LIMIT = 24
 const MAX_FEED_ITEMS = 100
@@ -284,51 +453,60 @@ async function loadFlips(isRefresh = false) {
 
     if (response) {
       const newItems = (Array.isArray(response) ? response : Array.from(response)) as Flip[]
-      
-      const el = scrollContainer.value
-      const isAtRight = !el || Math.abs(el.scrollLeft) <= 10
 
       const existingIds = new Set(items.value.map(i => i.listing?.id))
       const added = newItems.filter(i => !existingIds.has(i.listing?.id))
       
-      if (added.length > 0) {
+if (added.length > 0) {
+        let toAddImmediately = added
+        let toAddLater: typeof added = []
+
+        if (isFirstLoad.value && added.length >= 3) {
+          toAddLater = added.slice(0, 2)
+          toAddImmediately = added.slice(2)
+        }
+        // Prepend new items (newest first)
+        items.value = [...toAddImmediately, ...items.value].slice(0, MAX_FEED_ITEMS)
+
         if (isFirstLoad.value) {
-          // First load: show all items but hide first two, then reveal with 5s stagger
-          items.value = [...added, ...items.value].slice(0, MAX_FEED_ITEMS)
           isFirstLoad.value = false
+          // First load: start scrolled to the end (oldest items visible), then smooth-scroll right to newest
+          await nextTick()
+          const el = scrollContainer.value
+          if (el) {
+            // In RTL, scrollLeft 0 = rightmost. We start at leftmost (max negative), then scroll to 0.
+            el.scrollLeft = el.scrollWidth
+            setTimeout(() => {
+              el.scrollTo({ left: 0, behavior: 'smooth' })
+            }, 300)
+            
+            // Simulate incoming flips
+            if (toAddLater.length > 0) {
+              const addNewItem = async (item: Flip) => {
+                const existing = new Set(items.value.map(i => i.listing?.id))
+                if (existing.has(item.listing?.id)) return
+                items.value = [item, ...items.value].slice(0, MAX_FEED_ITEMS)
+                await nextTick()
+                if (scrollContainer.value) {
+                  scrollContainer.value.scrollTo({ left: 0, behavior: 'smooth' })
+                }
+              }
 
-          const revealIds = added.slice(0, 2).map(i => i.listing?.id ?? '')
-          hiddenIds.value = new Set(revealIds)
-
-          // Reveal first item after 5s, second after 10s
-          for (let i = 0; i < revealIds.length; i++) {
-            const id = revealIds[i]
-            if (id) {
-              setTimeout(() => {
-                hiddenIds.value = new Set([...hiddenIds.value].filter(x => x !== id))
-              }, (i + 1) * 5000)
+              if (toAddLater[1]) {
+                setTimeout(() => addNewItem(toAddLater[1]!), 5000)
+              }
+              if (toAddLater[0]) {
+                setTimeout(() => addNewItem(toAddLater[0]!), 10000)
+              }
             }
           }
         } else {
-          // Subsequent loads: hide new items, add them, then reveal with stagger
-          const addedIds = added.map(i => i.listing?.id ?? '').filter(Boolean)
-          hiddenIds.value = new Set([...hiddenIds.value, ...addedIds])
-          items.value = [...added, ...items.value].slice(0, MAX_FEED_ITEMS)
-          
-          // Stagger reveal each new item 300ms apart
-          addedIds.forEach((id, i) => {
-            setTimeout(() => {
-              hiddenIds.value = new Set([...hiddenIds.value].filter(x => x !== id))
-            }, (i + 1) * 300)
-          })
-        }
-        
-        if (isAtRight) {
-          nextTick(() => {
-            if (scrollContainer.value) {
-              scrollContainer.value.scrollLeft = 0
-            }
-          })
+          // Subsequent loads: smooth-scroll toward the newly added items (rightmost in RTL = scrollLeft 0)
+          await nextTick()
+          const el = scrollContainer.value
+          if (el) {
+            el.scrollTo({ left: 0, behavior: 'smooth' })
+          }
         }
       } else if (items.value.length === 0) {
         items.value = newItems
@@ -381,7 +559,9 @@ const filteredItems = computed(() => {
 
 onMounted(() => {
   loadFlips()
-  refreshInterval = setInterval(() => loadFlips(true), 60000)
+  // Flipper tier gets faster refresh (15s vs 60s)
+  const interval = isFlipperTier.value ? 15000 : 60000
+  refreshInterval = setInterval(() => loadFlips(true), interval)
 
   if (scrollContainer.value) {
     const wheelHandler = (e: WheelEvent) => {
@@ -416,16 +596,12 @@ useHead({
 </script>
 
 <style scoped>
-/* Smooth scroll-in for new flip items */
+/* Smooth scroll-in for new flip items from the right */
 .flip-item {
-  transition: opacity 0.6s ease, transform 0.6s ease;
-}
-.flip-hidden {
-  opacity: 0;
-  transform: translateY(20px) scale(0.95);
+  transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
-/* TransitionGroup animations for items entering/leaving */
+/* TransitionGroup animations - new items slide in from the right */
 .flip-slide-enter-active {
   transition: opacity 0.5s ease, transform 0.5s ease;
 }
@@ -434,11 +610,11 @@ useHead({
 }
 .flip-slide-enter-from {
   opacity: 0;
-  transform: translateX(-40px) scale(0.9);
+  transform: translateX(80px) scale(0.9);
 }
 .flip-slide-leave-to {
   opacity: 0;
-  transform: translateX(40px) scale(0.9);
+  transform: translateX(-40px) scale(0.9);
 }
 .flip-slide-move {
   transition: transform 0.5s ease;

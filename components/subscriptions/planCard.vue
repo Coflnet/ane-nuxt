@@ -1,7 +1,7 @@
 <template>
   <div
     :class="[
-      'rounded-lg overflow-hidden shadow-lg transition-all duration-200 max-h-[470px]',
+      'rounded-lg overflow-hidden shadow-lg transition-all duration-200',
       selectedPlan === plan.id ? 'transform scale-105' : 'hover:scale-105',
       currentPlan === plan.id ? 'border-2 border-indigo-400' : 'border border-gray-700',
     ]"

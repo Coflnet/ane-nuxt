@@ -1,6 +1,12 @@
 <template>
   <div>
     <FiltersFilterViewItemHeader :filter="filter" />
+    <span
+      v-if="filter.isFlipNotification"
+      class="inline-block text-xs font-medium px-2 py-0.5 rounded bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 mb-2"
+    >
+      {{ $t('flipNotification') }}
+    </span>
     <a
       aria-label="Edit Filter"
       :href="localePath(`/filters/create?id=${useFilterStore().getSimplifiedFilters[filter.id ?? '']![1]}`)"

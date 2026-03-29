@@ -14,12 +14,12 @@ export interface Plan {
   features: Feature[]
 }
 
-export type PlanId = 'basic' | 'collector' | 'enterprise'
+export type PlanId = 'basic' | 'collector' | 'flipper'
 
 export const planPrices: { [key: string]: number } = {
   basic: 0,
   collector: 9.99,
-  enterprise: 69.69,
+  flipper: 69.69,
 }
 
 export const plans: Plan[] = [
@@ -54,19 +54,19 @@ export const plans: Plan[] = [
     ],
   },
   {
-    id: 'enterprise',
+    id: 'flipper',
     name: 'flipper',
-    price: planPrices.enterprise ?? 0,
+    price: planPrices.flipper ?? 0,
     description: 'forBestOfBestFlippers',
     popular: false,
-    available: false,
+    available: true,
     features: [
       { text: 'XActiveFilters', amount: 500, included: true },
       { text: 'pushNotifications', included: true },
-      { text: 'XMinuteDelay', amount: 1, included: true },
+      { text: 'noExtraDelay', included: true },
       { text: 'XincludedPremiumSearches', amount: 25000, included: true },
+      { text: 'instantFlipperAccess', included: true },
       { text: 'priceCalculation', included: true },
     ],
-
   },
 ]

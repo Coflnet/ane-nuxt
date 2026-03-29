@@ -33,6 +33,14 @@
       {{ $t('appHeaderAuctions') }}
     </UiLinkButton>
 
+    <UiLinkButton
+      aria-label="Flipper Navigation Button"
+      :white="true"
+      :to="localePath('/flipper')"
+    >
+      {{ $t('appHeaderFlipper') }}
+    </UiLinkButton>
+
     <!-- User section -->
     <AppHeaderProfileDropdown v-if="userStore.isLoggedIn" />
 

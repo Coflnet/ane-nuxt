@@ -16,6 +16,7 @@ export interface FilterFace {
   location: string
   active: boolean
   matchCount: number
+  isFlipNotification?: boolean
 }
 
 export interface Filter {

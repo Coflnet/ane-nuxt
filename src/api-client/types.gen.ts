@@ -353,6 +353,7 @@ export type SubscriptionRequest = {
     planSlug?: string | null;
     redirectSuccess?: string | null;
     redirectCancel?: string | null;
+    discountCode?: string | null;
 };
 
 export type TargetType = 'Unknown' | 'FireBase' | 'DiscordWebhook' | 'Email' | 'WhatsApp';

@@ -87,6 +87,7 @@ const filters = computed(() => {
       active: true,
       priceRange: filtersHolder.priceRange,
       location: filtersHolder.radius,
+      isFlipNotification: i.filters?.some(f => f.name === 'IsFlipNotification') ?? false,
     }
   })
 

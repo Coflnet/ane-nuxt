@@ -86,6 +86,17 @@
             />
             {{ $t('appHeaderAuctions') }}
           </UiButton>
+
+          <UiTextButton
+            class="justify-start"
+            @on-click="navigateAndClose('/flipper')"
+          >
+            <Icon
+              name="lucide:zap"
+              class="w-5 h-5 mr-2"
+            />
+            {{ $t('appHeaderFlipper') }}
+          </UiTextButton>
         </div>
       </div>
 

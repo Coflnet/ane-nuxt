@@ -1,6 +1,7 @@
 {
   "XActiveFilters": "{amount} Custom Searches",
   "XMinuteDelay": "{amount} minute delay",
+  "noExtraDelay": "No extra delay",
   "actions": "Actions",
   "active": "Active",
   "activeFilters": "Custom Searches",
@@ -24,6 +25,7 @@
   "auctionMatchedToFilters": "Auctions that mached your filters",
   "auctionsPerHour": "Auctions per hour",
   "backToFilters": "Back to filters",
+  "beTheFirst": "Be the first to buy underpriced items",
   "blackKeywords": "Blacklist Keywords",
   "browserNotifications": "Browser notifications push notifications",
   "buyAndSave": "Buy & Save",
@@ -39,11 +41,14 @@
   "confirmCancel": "Confirm Cancel",
   "confirmCancelSub": "Are you sure you want to cancel your subscription?",
   "confirmDeletion": "Confirm Deletion",
+  "complexFilters": "Create complex filters with multiple conditions",
   "connectedToXChannels": "Connected to {n} channels",
   "continueWithGoogle": "Continue with Google",
   "createAccount": "Create your account",
+  "createCustomAlerts": "Create custom filters and get notifications for Kleinanzeigen and other marketplaces. Buy items below market value.",
   "createFilter": "Create Filter",
   "createYourFilter": "Create Your Filters",
+  "customFilter": "Create custom filters for the items you're looking for. Specify price ranges, keywords, and conditions.",
   "current": "Current",
   "currentPlan": "Current Plan",
   "dashboard": "Dashboard",
@@ -64,13 +69,32 @@
   "filterName": "Filter Name",
   "filters": "Filters",
   "flipper": "Flipper",
+  "flippers": "Flippers",
   "forBestOfBestFlippers": "For the best of the best flippers",
+  "appHeaderFlipper": "Flipper",
+  "instantFlipperAccess": "Instant access to Flipper feed",
+  "flipperTierPromo": "Upgrade to Flipper for real-time flips and faster notifications",
+  "flipperTierPromoDetail": "Flipper tier members see flips faster and can set up notifications. Use code EARLY for 69% off!",
+  "flipNotification": "Flip Notification",
+  "saveFilterNotify": "Save & Notify",
+  "saveFlipFilter": "Save Flip Filter & Get Notified",
+  "filterSaved": "Filter saved! You will be notified of matching flips.",
+  "errorSavingFilter": "Error saving filter",
+  "enterDiscountCode": "Discount code",
+  "apply": "Apply",
+  "discountApplied": "{percent}% discount applied!",
+  "invalidDiscountCode": "Invalid discount code",
   "forgotPassword": "Forgot Password?",
   "free": "Free",
   "getNotified": "Get Notified",
   "getStarted": "Get Started",
   "greatTryingAne": "Great for trying out ANE",
   "how": "How",
+  "instantNotifications": "Get instant notifications",
+  "joinFreeToday": "No payment required. Sign up for free today.",
+  "joinThousandsSmartShoppers": "Thousands of bargain hunters use ANE to find the best deals.",
+  "justNow": "Just now",
+  "keywords": "Keywords",
   "listedXMinutesAgo": "Listed {n} minutes ago",
   "loadMoreAuctions": "Loading more auctions",
   "login": "Login",
@@ -79,12 +103,22 @@
   "matchedAuctions": "Matched Auctions",
   "matches": "Matches",
   "matchFilter": "Matched Filter:",
+  "marketAnalyist": "Market Analysis",
   "mechanicalKeyboard": "Mechanical Keyboard",
   "monitorAuctionAndFilters": "Monitor your auction filters and notifications",
   "month": "/ month",
   "mostPopular": "Most Popular",
   "nameEg": "e.g., Photography Equipment",
   "neverMissADealAgain": "Never Miss a Deal Again",
+  "marketingTextNeverMissADeal": {
+    "text": "Never miss a {deal} again",
+    "deal": "Deal"
+  },
+  "marketingTextPowerTools": {
+    "text": "Powerful tools for {dealHunter}",
+    "dealHunter": "Deal Hunters"
+  },
+  "newAlert": "New Alert",
   "noAuctions": "No Auctions found",
   "noImageForAuction": "This Auction has no image",
   "none": "None",
@@ -98,6 +132,8 @@
   "privacy": "Privacy",
   "privacyPolicy": "Privacy Policy",
   "radiusEq": "e.g., {n}",
+  "realTimeAlerts": "Real-time Alerts",
+  "receiveInstantAlerts": "Receive instant alerts when matching items are listed. Choose from email, discord, or push notifications.",
   "register": "Register",
   "reseller": "Verkäufer",
   "resellerDescription": "I saved {amount} in only {months} months. ANE helped me find the best deals and maximize my profit margin.",
@@ -161,6 +197,7 @@
   "thatEmailInUse": "This email is already in use try signin or using a different email",
   "faqHeader": "FAQ",
   "smartWayToFindDeals": "The smart way to find deals and make profits on online marketplaces.",
+  "startFindingDeals": "Start finding deals",
   "hero": {
     "badge": "#1 Marketplace Monitoring Tool",
     "marketingTextNeverMissADeal": {
@@ -324,10 +361,11 @@
       "free": {
         "name": "Free",
         "subtitle": "Perfect for casual browsing",
-        "price": "$0",
+        "price": "€0",
         "billing": "Forever free",
         "features": {
           "notifiers": "Up to 3 custom searches",
+          "filters": "Access to multiple marketplaces",
           "premiumSearches": "100 Premium Searches On Signup",
           "email": "All notifications channels",
           "updates": "Notifications within 1 hour",
@@ -338,10 +376,11 @@
       "collector": {
         "name": "Collector",
         "subtitle": "For serious collectors",
-        "price": "$9.99",
+        "price": "€9.99",
         "billing": "per month",
         "features": {
           "notifiers": "Up to 20 custom searches",
+          "filters": "Access to all marketplaces",
           "premiumSearches": "3500 Premium Searches",
           "notifications": "All notifications channels",
           "updates": "Notifications within 10 minutes",
@@ -352,16 +391,17 @@
       "flipper": {
         "name": "Flipper",
         "subtitle": "For professional resellers",
-        "price": "??,99€",
+        "price": "€69.69",
         "billing": "per month",
         "features": {
-          "notifiers": "More custom searches",
-          "premiumSearches": "More Premium Searches",
+          "notifiers": "Up to 500 custom searches",
+          "premiumSearches": "25,000 Premium Searches",
           "notifications": "All notification channels",
           "updates": "Notifications within the minute",
+          "flipperAccess": "Instant Flipper feed access",
           "analytics": "Price calculation"
         },
-        "cta": "Coming Soon"
+        "cta": "Subscribe Now"
       }
     },
     "allPlansInclude": {
@@ -394,11 +434,11 @@
       },
       "fifth": {
         "question": "How many marketplaces can I monitor at once?",
-        "answer": "Notification speed depends on your chosen tier. Free tier users receive notifications within 1 hour. Collector tier within 10 minutes. Our upcoming Flipper tier will offer near real-time notifications"
+        "answer": "Notification speed depends on your chosen tier. Free tier users receive notifications within 1 hour. Collector tier within 10 minutes. The Flipper tier offers near real-time notifications."
       },
       "sixth": {
         "question": "When will the Flipper plan be available?",
-        "answer": "The Flipper plan is currently in development and will be available soon. You can join our waitlist to be notified when it launches and get early access."
+        "answer": "The Flipper plan is now available! Get real-time flip notifications, instant access to the Flipper feed, and 500 custom searches. Use code EARLY for 69% off your first month."
       }
     },
     "moreQuestions": "Still have questions?",
