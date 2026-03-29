@@ -97,8 +97,16 @@
           />
           {{ $t('saveFilterNotify') }}
         </button>
-        <div class="ml-auto text-xs text-gray-500">
-          {{ filteredItems.length }}/{{ items.length }} {{ $t('flips') }}
+        <div class="ml-auto flex items-center gap-3">
+          <label class="flex items-center gap-1.5 text-xs text-gray-400 cursor-pointer select-none">
+            <input
+              v-model="autoScroll"
+              type="checkbox"
+              class="w-3.5 h-3.5 rounded accent-indigo-500 cursor-pointer"
+            >
+            {{ $t('autoScroll') }}
+          </label>
+          <span class="text-xs text-gray-500">{{ filteredItems.length }}/{{ items.length }} {{ $t('flips') }}</span>
         </div>
       </div>
     </UiDefaultContainer>
@@ -108,11 +116,9 @@
       <div
         ref="scrollContainer"
         class="overflow-x-auto py-4 scroll-smooth"
-        style="direction: rtl;"
       >
         <div
-          class="flex gap-6 w-max "
-          style="direction: ltr;"
+          class="flex gap-6 w-max"
         >
           <TransitionGroup name="flip-slide">
             <div
@@ -150,8 +156,8 @@
         <UiHeaderLabel :label="$t('bookmarkedFlips')" />
       </h2>
       <UiDefaultContainer class="mb-6 p-6 relative">
-        <div class="overflow-x-auto py-4" style="direction: rtl;">
-          <div class="flex gap-6 w-max" style="direction: ltr;">
+        <div class="overflow-x-auto py-4">
+          <div class="flex gap-6 w-max">
             <div
               v-for="item in bookmarkedFlips"
               :key="'bm-' + (item.listing?.id ?? '')"
@@ -286,10 +292,24 @@ import { getFlips } from '~/src/api-client'
 
 const STORAGE_KEY_FILTERS = 'flipper-filters'
 const STORAGE_KEY_BOOKMARKS = 'flipper-bookmarks'
+const STORAGE_KEY_AUTOSCROLL = 'flipper-autoscroll'
 
 const items = ref<Flip[]>([])
 const loading = ref(true)
 const scrollContainer = ref<HTMLElement | null>(null)
+
+function loadAutoScroll(): boolean {
+  if (import.meta.server) return true
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY_AUTOSCROLL)
+    return saved === null ? true : saved === 'true'
+  } catch { return true }
+}
+const autoScroll = ref(loadAutoScroll())
+watch(autoScroll, (val) => {
+  if (import.meta.server) return
+  localStorage.setItem(STORAGE_KEY_AUTOSCROLL, String(val))
+})
 const route = useRoute()
 const userStore = useUserStore()
 const deleteTarget = ref<Flip | null>(null)
@@ -462,50 +482,49 @@ if (added.length > 0) {
         let toAddLater: typeof added = []
 
         if (isFirstLoad.value && added.length >= 3) {
-          toAddLater = added.slice(0, 2)
-          toAddImmediately = added.slice(2)
+          // Hold back 2 newest to animate in at 5s and 10s
+          toAddLater = added.slice(-2)
+          toAddImmediately = added.slice(0, -2)
         }
-        // Prepend new items (newest first)
-        items.value = [...toAddImmediately, ...items.value].slice(0, MAX_FEED_ITEMS)
+
+        // Append new items to the right end (newest = rightmost)
+        items.value = [...items.value, ...toAddImmediately].slice(-MAX_FEED_ITEMS)
 
         if (isFirstLoad.value) {
           isFirstLoad.value = false
-          // First load: start scrolled to the end (oldest items visible), then smooth-scroll right to newest
+          // First load: start at left (oldest), smooth-scroll right to newest
           await nextTick()
           const el = scrollContainer.value
           if (el) {
-            // In RTL, scrollLeft 0 = rightmost. We start at leftmost (max negative), then scroll to 0.
-            el.scrollLeft = el.scrollWidth
+            el.scrollLeft = 0
             setTimeout(() => {
-              el.scrollTo({ left: 0, behavior: 'smooth' })
+              el.scrollTo({ left: el.scrollWidth, behavior: 'smooth' })
             }, 300)
-            
-            // Simulate incoming flips
+
+            // Simulate 2 more flips arriving
             if (toAddLater.length > 0) {
               const addNewItem = async (item: Flip) => {
                 const existing = new Set(items.value.map(i => i.listing?.id))
                 if (existing.has(item.listing?.id)) return
-                items.value = [item, ...items.value].slice(0, MAX_FEED_ITEMS)
+                items.value = [...items.value, item].slice(-MAX_FEED_ITEMS)
                 await nextTick()
-                if (scrollContainer.value) {
-                  scrollContainer.value.scrollTo({ left: 0, behavior: 'smooth' })
+                if (autoScroll.value && scrollContainer.value) {
+                  scrollContainer.value.scrollTo({ left: scrollContainer.value.scrollWidth, behavior: 'smooth' })
                 }
               }
 
-              if (toAddLater[1]) {
-                setTimeout(() => addNewItem(toAddLater[1]!), 5000)
-              }
-              if (toAddLater[0]) {
-                setTimeout(() => addNewItem(toAddLater[0]!), 10000)
-              }
+              if (toAddLater[0]) setTimeout(() => addNewItem(toAddLater[0]!), 5000)
+              if (toAddLater[1]) setTimeout(() => addNewItem(toAddLater[1]!), 10000)
             }
           }
         } else {
-          // Subsequent loads: smooth-scroll toward the newly added items (rightmost in RTL = scrollLeft 0)
-          await nextTick()
-          const el = scrollContainer.value
-          if (el) {
-            el.scrollTo({ left: 0, behavior: 'smooth' })
+          // Subsequent refresh: scroll right to reveal new items if autoScroll is on
+          if (autoScroll.value) {
+            await nextTick()
+            const el = scrollContainer.value
+            if (el) {
+              el.scrollTo({ left: el.scrollWidth, behavior: 'smooth' })
+            }
           }
         }
       } else if (items.value.length === 0) {
