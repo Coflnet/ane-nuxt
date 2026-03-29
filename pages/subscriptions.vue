@@ -72,51 +72,88 @@ const subscriptionCanceled = computed(() => Number.isNaN(endDate.value?.getTime(
 const discountCode = ref('')
 const discountApplied = ref(false)
 const discountPercent = ref(0)
+const localePath = useLocalePath()
 
 const displayPlans = computed<Plan[]>(() => {
   if (!discountApplied.value) return plans
   return plans.map(p => {
     if (p.id === 'basic') return p
-    return { ...p, price: Math.round(p.price * (1 - discountPercent.value / 100) * 100) / 100 }
+    return {
+      ...p,
+      originalPrice: p.price,
+      price: Math.round(p.price * (1 - discountPercent.value / 100) * 100) / 100,
+    }
   })
 })
 
+function getApiToken() {
+  return `Bearer ${userStore.token}`
+}
+
+async function ensureAuth() {
+  if (!userStore.token) {
+    navigateTo(localePath(`/login?redirectTo=${encodeURIComponent('/subscriptions')}`))
+    return false
+  }
+  return true
+}
+
+function handleAuthError(error: unknown) {
+  const status = (error as any)?.response?.status ?? (error as any)?.statusCode ?? 0
+  if (status === 401 || status === 403) {
+    userStore.token = null
+    const redirect = discountCode.value
+      ? `/subscriptions?discount=${encodeURIComponent(discountCode.value)}`
+      : '/subscriptions'
+    navigateTo(localePath(`/login?redirectTo=${encodeURIComponent(redirect)}`))
+    return true
+  }
+  return false
+}
+
 async function applyDiscount() {
   if (!discountCode.value.trim()) return
+  if (!(await ensureAuth())) return
   try {
     const res = await $fetch<{ code: string, discountPercent: number }>(`/api/payment/discount/${encodeURIComponent(discountCode.value.trim())}`, {
-      headers: { Authorization: `Bearer ${userStore.token}` },
+      headers: { Authorization: getApiToken() },
     })
     discountPercent.value = res.discountPercent
     discountApplied.value = true
   }
-  catch {
+  catch (error) {
+    if (handleAuthError(error)) return
     discountApplied.value = false
     push.error(t('invalidDiscountCode'))
   }
 }
 
-const apiToken = `Bearer ${useUserStore().token}`
-
 async function changePlan(plan: string) {
   if (plan === currentPlan.value || plan == 'basic') {
     confirmCancelation.value = true
     return
-  };
+  }
+  if (!(await ensureAuth())) return
 
-  const url = await subscribe({
-    composable: '$fetch',
-    body: {
-      planSlug: plan as PlanId,
-      redirectSuccess: 'https://ane.deals/overview',
-      redirectCancel: 'https://ane.deals/overview',
-      discountCode: discountApplied.value ? discountCode.value.trim() : undefined,
-    },
-    headers: { Authorization: apiToken },
-  })
+  try {
+    const url = await subscribe({
+      composable: '$fetch',
+      body: {
+        planSlug: plan as PlanId,
+        redirectSuccess: 'https://ane.deals/overview',
+        redirectCancel: 'https://ane.deals/overview',
+        discountCode: discountApplied.value ? discountCode.value.trim() : undefined,
+      },
+      headers: { Authorization: getApiToken() },
+    })
 
-  useUserStore().noPremium = false
-  await navigateTo(url, { external: true })
+    userStore.noPremium = false
+    await navigateTo(url, { external: true })
+  }
+  catch (error) {
+    if (handleAuthError(error)) return
+    push.error(`${t('errorCreatingSubscription')} ${error}`)
+  }
 }
 
 async function confirmCancelSubscription() {
@@ -124,16 +161,23 @@ async function confirmCancelSubscription() {
     confirmCancelation.value = false
     return
   }
-  const result = await getSubscription({ composable: '$fetch', headers: { Authorization: apiToken } })
-  await cancelSubscription({
-    composable: '$fetch',
-    path: { id: result[0]?.id ?? '' },
-    headers: { Authorization: apiToken },
-  })
+  if (!(await ensureAuth())) return
+  try {
+    const result = await getSubscription({ composable: '$fetch', headers: { Authorization: getApiToken() } })
+    await cancelSubscription({
+      composable: '$fetch',
+      path: { id: result[0]?.id ?? '' },
+      headers: { Authorization: getApiToken() },
+    })
 
-  push.success(t('cancelSubscriptionSuccess'))
-  confirmCancelation.value = false
-  getCurrentSubscription()
+    push.success(t('cancelSubscriptionSuccess'))
+    confirmCancelation.value = false
+    getCurrentSubscription()
+  }
+  catch (error) {
+    if (handleAuthError(error)) return
+    push.error(`${t('errorCreatingSubscription')} ${error}`)
+  }
 }
 
 async function getCurrentSubscription() {
@@ -141,8 +185,9 @@ async function getCurrentSubscription() {
   currentPlan.value = userStore.currentPlan?.product as PlanId ?? 'basic'
   endDate.value = userStore.currentPlan?.endsAt != null ? new Date(userStore.currentPlan?.endsAt) : null
 
+  if (!userStore.token) return
   try {
-    const result = await getSubscription({ composable: '$fetch', headers: { Authorization: apiToken } })
+    const result = await getSubscription({ composable: '$fetch', headers: { Authorization: getApiToken() } })
     if (result.length == 0) {
       if (currentPlan.value !== 'basic')
         resetSubscription()
@@ -162,6 +207,7 @@ async function getCurrentSubscription() {
       endDate.value = new Date(result[0]?.endsAt ?? '')
   }
   catch (error) {
+    if (handleAuthError(error)) return
     push.error(`${t('errorCreatingSubscription')} ${error}`)
     console.error(error)
   }

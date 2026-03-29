@@ -28,6 +28,10 @@
       </div>
       <div class="mt-4">
         <span class="text-4xl font-extrabold text-white">€{{ plan.price }}</span>
+        <span
+          v-if="plan.originalPrice && plan.originalPrice !== plan.price"
+          class="ml-2 text-lg text-gray-500 line-through"
+        >€{{ plan.originalPrice }}</span>
         <span class="text-gray-400 ml-1">{{ $t('month') }}</span>
       </div>
       <p class="mt-4 text-gray-400">

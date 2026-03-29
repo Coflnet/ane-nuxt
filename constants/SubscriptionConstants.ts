@@ -8,6 +8,7 @@ export interface Plan {
   id: PlanId
   name: string
   price: number
+  originalPrice?: number
   description: string
   popular: boolean
   available?: boolean
@@ -33,7 +34,7 @@ export const plans: Plan[] = [
     features: [
       { text: 'XActiveFilters', amount: 3, included: true },
       { text: 'pushNotifications', included: true },
-      { text: 'XMinuteDelay', amount: 30, included: true },
+      { text: 'XMinuteDelay', amount: 60, included: true },
       { text: 'XPremiumSearchesOnSignUp', amount: 100, included: true },
       { text: 'priceCalculation', included: false },
     ],
