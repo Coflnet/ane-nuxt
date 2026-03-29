@@ -78,7 +78,7 @@ async function login() {
     }
   }
 
-  navigateTo(localePath(redirectTo ?? props.isLogin ? '/overview' : '/filters/create'))
+  navigateTo(localePath(redirectTo ?? (props.isLogin ? '/overview' : '/filters/create')))
 }
 
 async function loginEmailPasswordWebView() {

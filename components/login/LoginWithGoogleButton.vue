@@ -46,7 +46,7 @@ async function loginWithGoogle() {
       }
     }
 
-    navigateTo(localePath(redirectTo ?? googleSignInRequest.newUser ? '/filters/create' : '/overview'))
+    navigateTo(localePath(redirectTo ?? (googleSignInRequest.newUser ? '/filters/create' : '/overview')))
     return
   }
   push.error(t(googleSignInRequest.error ?? 'Something is very wrong'))
