@@ -1,11 +1,15 @@
 import { randomUUID } from 'crypto'
+import { appendFile, mkdir } from 'fs/promises'
+import { join } from 'path'
+
+const DATA_DIR = join(process.cwd(), 'data', 'reports')
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
 
   const reportId = randomUUID().split('-')[0].toUpperCase()
 
-  console.log(`[FLIP-REPORT ${reportId}]`, JSON.stringify({
+  const report = {
     reportId,
     timestamp: new Date().toISOString(),
     listing: body?.listing,
@@ -13,7 +17,22 @@ export default defineEventHandler(async (event) => {
     medianPrice: body?.medianPrice,
     recentSells: body?.recentSells,
     reason: body?.reason,
-  }))
+    suggestedSlug: body?.suggestedSlug,
+  }
+
+  console.log(`[FLIP-REPORT ${reportId}]`, JSON.stringify(report))
+
+  // Persist report to file
+  try {
+    await mkdir(DATA_DIR, { recursive: true })
+    await appendFile(
+      join(DATA_DIR, 'flip-reports.jsonl'),
+      JSON.stringify(report) + '\n',
+    )
+  }
+  catch (err) {
+    console.error('[FLIP-REPORT] Failed to persist report:', err)
+  }
 
   return { reportId }
 })

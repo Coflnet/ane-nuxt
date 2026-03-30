@@ -135,32 +135,89 @@
         class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50"
         @click.self="showReportDialog = false"
       >
-        <div class="bg-gray-800 rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl border border-gray-700">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
-              <Icon name="mdi:check" size="24" class="text-green-400" />
+        <div class="bg-gray-800 rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl border border-gray-700">
+          <!-- Pre-submit: report form -->
+          <template v-if="!reportId">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center">
+                <Icon name="mdi:flag-outline" size="24" class="text-red-400" />
+              </div>
+              <h3 class="text-lg font-bold text-white">Report Flip</h3>
             </div>
-            <h3 class="text-lg font-bold text-white">Report Submitted</h3>
-          </div>
-          <p class="text-gray-400 text-sm mb-4">
-            Your report has been logged. Use the ID below for reference.
-          </p>
-          <div class="bg-gray-900/80 rounded-lg p-3 flex items-center justify-between mb-4">
-            <code class="text-blue-400 font-mono text-lg tracking-wider">{{ reportId }}</code>
+
+            <!-- Current grouping -->
+            <div v-if="currentSlug" class="mb-3">
+              <label class="text-xs text-gray-400 block mb-1">Current grouping</label>
+              <div class="bg-gray-900/80 rounded-lg px-3 py-2 text-sm text-gray-300 font-mono">{{ currentSlug }}</div>
+            </div>
+
+            <!-- Suggested slug input -->
+            <div class="mb-3">
+              <label class="text-xs text-gray-400 block mb-1">Suggest correct grouping slug</label>
+              <input
+                v-model="suggestedSlug"
+                type="text"
+                placeholder="e.g. nintendo-wii-lego-star-wars-used"
+                class="w-full bg-gray-900/80 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none"
+              >
+            </div>
+
+            <!-- Reason -->
+            <div class="mb-4">
+              <label class="text-xs text-gray-400 block mb-1">Reason (optional)</label>
+              <textarea
+                v-model="reportReason"
+                rows="2"
+                placeholder="e.g. Wrong product grouping, game title missing..."
+                class="w-full bg-gray-900/80 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none resize-none"
+              />
+            </div>
+
+            <div class="flex gap-2">
+              <button
+                @click="showReportDialog = false"
+                class="flex-1 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                @click="submitReport"
+                :disabled="reportSubmitting"
+                class="flex-1 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm disabled:opacity-50"
+              >
+                {{ reportSubmitting ? 'Submitting...' : 'Submit Report' }}
+              </button>
+            </div>
+          </template>
+
+          <!-- Post-submit: confirmation -->
+          <template v-else>
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
+                <Icon name="mdi:check" size="24" class="text-green-400" />
+              </div>
+              <h3 class="text-lg font-bold text-white">Report Submitted</h3>
+            </div>
+            <p class="text-gray-400 text-sm mb-4">
+              Your report has been logged. Use the ID below for reference.
+            </p>
+            <div class="bg-gray-900/80 rounded-lg p-3 flex items-center justify-between mb-4">
+              <code class="text-blue-400 font-mono text-lg tracking-wider">{{ reportId }}</code>
+              <button
+                @click="copyReportId"
+                class="text-gray-400 hover:text-white transition-colors px-2"
+                title="Copy ID"
+              >
+                <Icon :name="copied ? 'mdi:check' : 'mdi:content-copy'" size="18" />
+              </button>
+            </div>
             <button
-              @click="copyReportId"
-              class="text-gray-400 hover:text-white transition-colors px-2"
-              title="Copy ID"
+              @click="closeReportDialog"
+              class="w-full py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors text-sm"
             >
-              <Icon :name="copied ? 'mdi:check' : 'mdi:content-copy'" size="18" />
+              Close
             </button>
-          </div>
-          <button
-            @click="showReportDialog = false"
-            class="w-full py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors text-sm"
-          >
-            Close
-          </button>
+          </template>
         </div>
       </div>
     </Teleport>
@@ -171,6 +228,9 @@
 import { computed, ref } from 'vue'
 import type { Flip, SoldFor, Platform } from '~/src/api-client/types.gen'
 import { formatDistanceToNow } from 'date-fns'
+
+const API_BASE = 'https://ane.coflnet.com'
+const userStore = useUserStore()
 
 const props = defineProps<{
   item: Flip
@@ -192,27 +252,52 @@ const showReportDialog = ref(false)
 const reportId = ref('')
 const reportSubmitting = ref(false)
 const copied = ref(false)
+const suggestedSlug = ref('')
+const reportReason = ref('')
 
-const reportFlip = async () => {
+const currentSlug = computed(() => {
+  const sells = props.item.recentSells
+  return sells?.[0]?.key ?? ''
+})
+
+const reportFlip = () => {
+  reportId.value = ''
+  suggestedSlug.value = ''
+  reportReason.value = ''
+  showReportDialog.value = true
+}
+
+const submitReport = async () => {
+  if (!userStore.token) {
+    reportId.value = 'ERROR'
+    return
+  }
   reportSubmitting.value = true
   try {
-    const { data } = await useFetch('/api/report-flip', {
+    const result = await $fetch<{ reportId: string }>(`${API_BASE}/api/flips/report`, {
       method: 'POST',
+      headers: { Authorization: `Bearer ${userStore.token}` },
       body: {
         listing: props.item.listing,
         profit: props.item.potentialProfit,
         medianPrice: props.item.medianPrice,
         recentSells: props.item.recentSells,
+        reason: reportReason.value || undefined,
+        currentSlug: currentSlug.value || undefined,
+        suggestedSlug: suggestedSlug.value || undefined,
       },
     })
-    reportId.value = data.value?.reportId ?? 'ERROR'
-    showReportDialog.value = true
+    reportId.value = result?.reportId ?? 'ERROR'
   } catch {
     reportId.value = 'ERROR'
-    showReportDialog.value = true
   } finally {
     reportSubmitting.value = false
   }
+}
+
+const closeReportDialog = () => {
+  showReportDialog.value = false
+  reportId.value = ''
 }
 
 const copyReportId = async () => {
