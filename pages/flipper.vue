@@ -513,8 +513,8 @@ if (added.length > 0) {
                 }
               }
 
-              if (toAddLater[0]) setTimeout(() => addNewItem(toAddLater[0]!), 5000)
-              if (toAddLater[1]) setTimeout(() => addNewItem(toAddLater[1]!), 10000)
+              if (toAddLater[0]) setTimeout(() => addNewItem(toAddLater[0]!), 8000)
+              if (toAddLater[1]) setTimeout(() => addNewItem(toAddLater[1]!), 15000)
             }
           }
         } else {
