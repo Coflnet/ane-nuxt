@@ -23,7 +23,7 @@
         </div>
         <UiLinkButton
           :primary="true"
-          :to="localePath('/subscriptions')"
+          :to="localePath('/subscriptions') + '?discount=EARLY'"
         >
           {{ $t('upgrade') }}
         </UiLinkButton>

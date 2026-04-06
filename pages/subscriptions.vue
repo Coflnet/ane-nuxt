@@ -113,16 +113,15 @@ function handleAuthError(error: unknown) {
 
 async function applyDiscount() {
   if (!discountCode.value.trim()) return
-  if (!(await ensureAuth())) return
   try {
-    const res = await $fetch<{ code: string, discountPercent: number }>(`/api/payment/discount/${encodeURIComponent(discountCode.value.trim())}`, {
-      headers: { Authorization: getApiToken() },
+    const res = await getDiscount({
+      composable: '$fetch',
+      path: { code: discountCode.value.trim() },
     })
-    discountPercent.value = res.discountPercent
+    discountPercent.value = res.discountPercent ?? 0
     discountApplied.value = true
   }
   catch (error) {
-    if (handleAuthError(error)) return
     discountApplied.value = false
     push.error(t('invalidDiscountCode'))
   }
