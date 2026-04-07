@@ -32,10 +32,6 @@ export default defineNuxtConfig({
   routeRules: {
     '/': { prerender: true },
     '/_ipx/**': { prerender: false },
-    '/api/sitemap-products.xml': { proxy: 'https://ane.coflnet.com/api/sitemap-products.xml' },
-    '/api/sitemap-products-**.xml': { proxy: 'https://ane.coflnet.com/api/sitemap-products-**.xml' },
-    '/api/sitemap-de-products.xml': { proxy: 'https://ane.coflnet.com/api/sitemap-de-products.xml' },
-    '/api/sitemap-de-products-**.xml': { proxy: 'https://ane.coflnet.com/api/sitemap-de-products-**.xml' },
   },
 
   future: {
@@ -98,6 +94,14 @@ export default defineNuxtConfig({
   sitemap: {
     sources: [
       '/api/__sitemap__/urls',
+    ],
+  },
+
+  robots: {
+    sitemap: [
+      '/sitemap_index.xml',
+      'https://ane.coflnet.com/api/sitemap-products.xml',
+      'https://ane.coflnet.com/api/sitemap-de-products.xml',
     ],
   },
 
