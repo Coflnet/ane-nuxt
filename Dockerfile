@@ -12,9 +12,6 @@ RUN npm install
 # Copy the rest of the application code
 COPY . .
 
-# Create minimal .nuxt/tsconfig.json so @hey-api/openapi-ts can resolve tsconfig
-RUN mkdir -p .nuxt && echo '{"compilerOptions":{}}' > .nuxt/tsconfig.json
-
 # Build the Nuxt app
 RUN npm run build
 
