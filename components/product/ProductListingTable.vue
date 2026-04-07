@@ -72,10 +72,13 @@
           </td>
           <td class="px-6 py-4">
             <div class="flex items-center gap-2">
-              <button
+              <a
+                :href="listing.listingUrl"
+                target="_blank"
+                rel="noopener"
                 class="inline-flex items-center gap-1 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-full transition-all hover:scale-105 shadow-lg shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-                :disabled="checkingAvailability.has(listing.listingId || listing.id)"
-                @click="handleViewDeal(listing)"
+                :class="{ 'pointer-events-none opacity-50': checkingAvailability.has(listing.listingId || listing.id) }"
+                @click.prevent="handleViewDeal(listing)"
               >
                 <Icon
                   v-if="checkingAvailability.has(listing.listingId || listing.id)"
@@ -89,7 +92,7 @@
                     class="w-3 h-3"
                   />
                 </template>
-              </button>
+              </a>
               <button
                 class="p-2 text-slate-400 hover:text-red-400 transition-colors"
                 :title="$t('product.reportListing')"
