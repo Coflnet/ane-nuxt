@@ -111,6 +111,72 @@
       </div>
     </UiDefaultContainer>
 
+    <!-- Distance Sort & Location (Flipper tier feature) -->
+    <UiDefaultContainer class="mb-4 p-4" :class="{ 'opacity-60 pointer-events-none select-none': !isFlipperTier }">
+      <div class="flex flex-wrap gap-3 items-end">
+        <div class="flex flex-col gap-1">
+          <label class="text-xs text-gray-400">{{ $t('sortBy') }}</label>
+          <select
+            v-model="sortMode"
+            :disabled="!isFlipperTier"
+            class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-40 focus:border-blue-500 focus:outline-none disabled:cursor-not-allowed"
+          >
+            <option value="newest">{{ $t('sortNewest') }}</option>
+            <option value="profit">{{ $t('sortProfit') }}</option>
+            <option value="distance">{{ $t('sortDistance') }}</option>
+          </select>
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-xs text-gray-400">{{ $t('location') }}</label>
+          <div class="flex gap-2">
+            <input
+              v-model="locationZip"
+              type="text"
+              :disabled="!isFlipperTier"
+              :placeholder="$t('zipCodePlaceholder')"
+              class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-32 focus:border-blue-500 focus:outline-none disabled:cursor-not-allowed"
+              @keydown.enter="geocodeZip"
+            >
+            <button
+              :disabled="!isFlipperTier"
+              class="flex items-center gap-1 text-xs text-white px-3 py-1.5 rounded-lg bg-gray-700 hover:bg-gray-600 border border-gray-600 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+              @click="useDeviceLocation"
+            >
+              <Icon name="tabler:current-location" class="w-4 h-4" />
+              {{ $t('useGPS') }}
+            </button>
+          </div>
+        </div>
+        <div v-if="userLocation" class="flex items-center gap-2 text-xs text-green-400">
+          <Icon name="tabler:map-pin" class="w-4 h-4" />
+          {{ locationLabel }}
+        </div>
+        <div v-if="locationError" class="text-xs text-red-400">
+          {{ locationError }}
+        </div>
+        <div v-if="sortMode === 'distance' && filters.maxDistance > 0" class="flex flex-col gap-1">
+          <label class="text-xs text-gray-400">{{ $t('maxDistance') }}</label>
+          <div class="flex items-center gap-2">
+            <input
+              v-model.number="filters.maxDistance"
+              type="number"
+              :disabled="!isFlipperTier"
+              placeholder="∞"
+              class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-24 focus:border-blue-500 focus:outline-none disabled:cursor-not-allowed"
+            >
+            <span class="text-xs text-gray-400">km</span>
+          </div>
+        </div>
+      </div>
+      <div v-if="!isFlipperTier" class="mt-2 flex items-center gap-2">
+        <Icon name="tabler:lock" class="w-4 h-4 text-indigo-400" />
+        <span class="text-xs text-indigo-400">
+          {{ $t('distanceSortFlipperOnly') }}
+          <NuxtLink :to="localePath('/subscriptions') + '?discount=EARLY'" class="underline hover:text-indigo-300">{{ $t('upgrade') }}</NuxtLink>
+        </span>
+      </div>
+    </UiDefaultContainer>
+
     <!-- Feed -->
     <UiDefaultContainer class="mb-6 p-6 relative">
       <div
@@ -380,8 +446,71 @@ let removeWheelHandler: (() => void) | null = null
 let refreshInterval: ReturnType<typeof setInterval> | null = null
 
 // --- Filters (persisted to localStorage) ---
-const defaultFilters = { search: '', minProfit: 0, minMarginPct: 0, minRefs: 0, category: '' }
+const defaultFilters = { search: '', minProfit: 0, minMarginPct: 0, minRefs: 0, category: '', maxDistance: 0 }
 const filters = reactive(loadFilters())
+
+// --- Sort & Location ---
+const sortMode = ref<'newest' | 'profit' | 'distance'>('newest')
+const userLocation = ref<{ lat: number, lng: number } | null>(null)
+const locationZip = ref('')
+const locationLabel = ref('')
+const locationError = ref('')
+
+function haversineDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371 // km
+  const dLat = (lat2 - lat1) * Math.PI / 180
+  const dLng = (lng2 - lng1) * Math.PI / 180
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) ** 2
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+}
+
+function getFlipDistance(flip: Flip): number | null {
+  if (!userLocation.value) return null
+  const lat = flip.listing?.latitude
+  const lng = flip.listing?.longitude
+  if (lat == null || lng == null) return null
+  return haversineDistance(userLocation.value.lat, userLocation.value.lng, lat, lng)
+}
+
+function useDeviceLocation() {
+  locationError.value = ''
+  if (!navigator.geolocation) {
+    locationError.value = useI18n().t('geolocationNotSupported')
+    return
+  }
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      userLocation.value = { lat: pos.coords.latitude, lng: pos.coords.longitude }
+      locationLabel.value = `${pos.coords.latitude.toFixed(2)}, ${pos.coords.longitude.toFixed(2)}`
+      locationError.value = ''
+      if (sortMode.value !== 'distance') sortMode.value = 'distance'
+    },
+    () => {
+      locationError.value = useI18n().t('geolocationDenied')
+    },
+  )
+}
+
+async function geocodeZip() {
+  if (!locationZip.value.trim()) return
+  locationError.value = ''
+  try {
+    const query = encodeURIComponent(locationZip.value.trim())
+    const res = await $fetch<Array<{ lat: string, lon: string, display_name: string }>>(`https://nominatim.openstreetmap.org/search?postalcode=${query}&format=json&limit=1`, {
+      headers: { 'User-Agent': 'ane.deals' },
+    })
+    if (res.length === 0) {
+      locationError.value = useI18n().t('zipNotFound')
+      return
+    }
+    userLocation.value = { lat: parseFloat(res[0].lat), lng: parseFloat(res[0].lon) }
+    locationLabel.value = res[0].display_name.split(',').slice(0, 2).join(', ')
+    if (sortMode.value !== 'distance') sortMode.value = 'distance'
+  }
+  catch {
+    locationError.value = useI18n().t('zipNotFound')
+  }
+}
 
 function loadFilters() {
   if (import.meta.server) return { ...defaultFilters }
@@ -397,7 +526,7 @@ function saveFilters() {
 }
 
 const hasActiveFilters = computed(() =>
-  filters.search !== '' || filters.minProfit > 0 || filters.minMarginPct > 0 || filters.minRefs > 0 || filters.category !== '',
+  filters.search !== '' || filters.minProfit > 0 || filters.minMarginPct > 0 || filters.minRefs > 0 || filters.category !== '' || filters.maxDistance > 0,
 )
 
 function clearFilters() {
@@ -546,7 +675,7 @@ if (added.length > 0) {
 
 // --- Filtering ---
 const filteredItems = computed(() => {
-  return items.value.filter((item) => {
+  let result = items.value.filter((item) => {
     const listing = item.listing
     const profit = item.potentialProfit ?? 0
     const price = listing?.price ?? 0
@@ -572,8 +701,32 @@ const filteredItems = computed(() => {
       if (!listingCat.includes(cat) && !sellKeys.some(k => k.includes(cat))) return false
     }
 
+    // Max distance filter
+    if (filters.maxDistance > 0 && userLocation.value) {
+      const dist = getFlipDistance(item)
+      if (dist != null && dist > filters.maxDistance) return false
+    }
+
     return true
   })
+
+  // Sort
+  if (sortMode.value === 'profit') {
+    result = [...result].sort((a, b) => (b.potentialProfit ?? 0) - (a.potentialProfit ?? 0))
+  }
+  else if (sortMode.value === 'distance' && userLocation.value) {
+    result = [...result].sort((a, b) => {
+      const da = getFlipDistance(a)
+      const db = getFlipDistance(b)
+      // Items without coordinates go to the end
+      if (da == null && db == null) return 0
+      if (da == null) return 1
+      if (db == null) return -1
+      return da - db
+    })
+  }
+
+  return result
 })
 
 onMounted(() => {

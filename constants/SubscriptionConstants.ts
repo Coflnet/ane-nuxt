@@ -67,6 +67,7 @@ export const plans: Plan[] = [
       { text: 'noExtraDelay', included: true },
       { text: 'XincludedPremiumSearches', amount: 25000, included: true },
       { text: 'instantFlipperAccess', included: true },
+      { text: 'flipsDistanceSorting', included: true },
       { text: 'priceCalculation', included: true },
     ],
   },

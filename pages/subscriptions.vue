@@ -29,7 +29,7 @@
         v-if="discountApplied"
         class="mt-2 text-sm text-green-400"
       >
-        {{ $t('discountApplied', { percent: discountPercent }) }}
+        {{ discountName ? `${discountName}: ` : '' }}{{ $t('discountApplied', { percent: discountPercent }) }}
       </p>
     </div>
 
@@ -72,6 +72,7 @@ const subscriptionCanceled = computed(() => Number.isNaN(endDate.value?.getTime(
 const discountCode = ref('')
 const discountApplied = ref(false)
 const discountPercent = ref(0)
+const discountName = ref('')
 const localePath = useLocalePath()
 
 const displayPlans = computed<Plan[]>(() => {
@@ -120,6 +121,7 @@ async function applyDiscount() {
     })
     discountPercent.value = res.discountPercent ?? 0
     discountApplied.value = true
+    discountName.value = (res as any).name ?? ''
   }
   catch (error) {
     discountApplied.value = false
