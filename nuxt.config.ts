@@ -95,6 +95,19 @@ export default defineNuxtConfig({
     sources: [
       '/api/__sitemap__/urls',
     ],
+    sitemaps: {
+      pages: {
+        sources: ['/api/__sitemap__/urls'],
+      },
+      'sitemap-products': {
+        sources: ['https://ane.coflnet.com/api/sitemap-products.xml'],
+        sitemapName: 'sitemap-products',
+      },
+      'sitemap-de-products': {
+        sources: ['https://ane.coflnet.com/api/sitemap-de-products.xml'],
+        sitemapName: 'sitemap-de-products',
+      },
+    },
   },
 
   tailwindcss: { exposeConfig: true },

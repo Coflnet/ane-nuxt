@@ -339,6 +339,53 @@
         </div>
       </div>
 
+      <!-- Related Products -->
+      <div
+        v-if="relatedProducts.length > 0"
+        class="mt-8"
+      >
+        <h2 class="text-2xl font-bold text-white mb-4">
+          {{ $t('product.relatedProducts', 'Related Products') }}
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+          <NuxtLink
+            v-for="rp in relatedProducts.slice(0, 5)"
+            :key="rp.id"
+            :to="localePath(`/product/${rp.id}`)"
+            class="bg-slate-900 rounded-xl border border-slate-800 p-4 hover:border-blue-500/50 transition-colors group"
+          >
+            <div class="aspect-square bg-slate-800 rounded-lg overflow-hidden mb-3">
+              <NuxtImg
+                v-if="rp.imageUrl"
+                :src="rp.imageUrl"
+                class="w-full h-full object-contain"
+              />
+              <div
+                v-else
+                class="w-full h-full flex items-center justify-center text-slate-600"
+              >
+                <Icon
+                  name="tabler:photo"
+                  class="w-10 h-10"
+                />
+              </div>
+            </div>
+            <h3 class="text-sm font-medium text-white truncate group-hover:text-blue-400 transition-colors">
+              {{ rp.name }}
+            </h3>
+            <p
+              v-if="rp.avgPrice"
+              class="text-sm text-emerald-400 mt-1"
+            >
+              {{ formatPrice(rp.avgPrice) }}
+            </p>
+            <p class="text-xs text-slate-500 mt-1">
+              {{ rp.listingCount }} {{ $t('product.listings', 'listings') }}
+            </p>
+          </NuxtLink>
+        </div>
+      </div>
+
       <!-- Product Report Dialog -->
       <Teleport to="body">
         <div
