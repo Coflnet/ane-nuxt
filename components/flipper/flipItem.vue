@@ -151,26 +151,29 @@
               <div class="bg-gray-900/80 rounded-lg px-3 py-2 text-sm text-gray-300 font-mono">{{ currentSlug }}</div>
             </div>
 
-            <!-- Suggested slug input -->
+            <!-- Reason (required) -->
             <div class="mb-3">
-              <label class="text-xs text-gray-400 block mb-1">Suggest correct grouping slug</label>
+              <label class="text-xs text-gray-400 block mb-1">Reason <span class="text-red-400">*</span></label>
+              <textarea
+                v-model="reportReason"
+                rows="2"
+                placeholder="e.g. Wrong product grouping, price is incorrect..."
+                class="w-full bg-gray-900/80 border rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none resize-none"
+                :class="reasonInvalid ? 'border-red-500' : 'border-gray-600'"
+                @input="reasonInvalid = false"
+              />
+              <p v-if="reasonInvalid" class="text-xs text-red-400 mt-1">Reason must be at least 5 characters</p>
+            </div>
+
+            <!-- Suggested slug input (optional) -->
+            <div class="mb-4">
+              <label class="text-xs text-gray-400 block mb-1">Suggest correct grouping slug (optional)</label>
               <input
                 v-model="suggestedSlug"
                 type="text"
                 placeholder="e.g. nintendo-wii-lego-star-wars-used"
                 class="w-full bg-gray-900/80 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none"
               >
-            </div>
-
-            <!-- Reason -->
-            <div class="mb-4">
-              <label class="text-xs text-gray-400 block mb-1">Reason (optional)</label>
-              <textarea
-                v-model="reportReason"
-                rows="2"
-                placeholder="e.g. Wrong product grouping, game title missing..."
-                class="w-full bg-gray-900/80 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none resize-none"
-              />
             </div>
 
             <div class="flex gap-2">
@@ -254,6 +257,7 @@ const reportSubmitting = ref(false)
 const copied = ref(false)
 const suggestedSlug = ref('')
 const reportReason = ref('')
+const reasonInvalid = ref(false)
 
 const currentSlug = computed(() => {
   const sells = props.item.recentSells
@@ -264,10 +268,15 @@ const reportFlip = () => {
   reportId.value = ''
   suggestedSlug.value = ''
   reportReason.value = ''
+  reasonInvalid.value = false
   showReportDialog.value = true
 }
 
 const submitReport = async () => {
+  if (reportReason.value.trim().length < 5) {
+    reasonInvalid.value = true
+    return
+  }
   if (!userStore.token) {
     reportId.value = 'ERROR'
     return

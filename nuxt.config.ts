@@ -100,8 +100,8 @@ export default defineNuxtConfig({
   robots: {
     sitemap: [
       '/sitemap_index.xml',
-      'https://ane.coflnet.com/api/sitemap-products.xml',
-      'https://ane.coflnet.com/api/sitemap-de-products.xml',
+      '/product-sitemap.xml',
+      '/product-sitemap-de.xml',
     ],
   },
 

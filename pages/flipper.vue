@@ -7,12 +7,10 @@
       />
     </h1>
 
-    <!-- Flipper Tier Banner -->
-    <UiDefaultContainer
-      v-if="!isFlipperTier"
-      class="mb-4 p-4 border border-indigo-500/30 bg-indigo-900/20"
-    >
-      <div class="flex items-center justify-between flex-wrap gap-3">
+    <!-- Flipper Tier Banner + Distance Sort & Location -->
+    <UiDefaultContainer class="mb-4 p-4" :class="!isFlipperTier ? 'border border-indigo-500/30 bg-indigo-900/20' : ''">
+      <!-- Promo banner for non-flipper users -->
+      <div v-if="!isFlipperTier" class="flex items-center justify-between flex-wrap gap-3 mb-4 pb-4 border-b border-indigo-500/20">
         <div>
           <p class="text-white font-medium">
             {{ $t('flipperTierPromo') }}
@@ -27,6 +25,71 @@
         >
           {{ $t('upgrade') }}
         </UiLinkButton>
+      </div>
+
+      <!-- Sort & Location controls -->
+      <div :class="{ 'opacity-60 pointer-events-none select-none': !isFlipperTier }">
+        <div class="flex flex-wrap gap-3 items-end">
+          <div class="flex flex-col gap-1">
+            <label class="text-xs text-gray-400">{{ $t('sortBy') }}</label>
+            <select
+              v-model="sortMode"
+              :disabled="!isFlipperTier"
+              class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-40 focus:border-blue-500 focus:outline-none disabled:cursor-not-allowed"
+            >
+              <option value="newest">{{ $t('sortNewest') }}</option>
+              <option value="profit">{{ $t('sortProfit') }}</option>
+              <option value="distance">{{ $t('sortDistance') }}</option>
+            </select>
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-xs text-gray-400">{{ $t('location') }}</label>
+            <div class="flex gap-2">
+              <input
+                v-model="locationZip"
+                type="text"
+                :disabled="!isFlipperTier"
+                :placeholder="$t('zipCodePlaceholder')"
+                class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-32 focus:border-blue-500 focus:outline-none disabled:cursor-not-allowed"
+                @keydown.enter="geocodeZip"
+              >
+              <button
+                :disabled="!isFlipperTier"
+                class="flex items-center gap-1 text-xs text-white px-3 py-1.5 rounded-lg bg-gray-700 hover:bg-gray-600 border border-gray-600 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                @click="useDeviceLocation"
+              >
+                <Icon name="tabler:current-location" class="w-4 h-4" />
+                {{ $t('useGPS') }}
+              </button>
+            </div>
+          </div>
+          <div v-if="userLocation" class="flex items-center gap-2 text-xs text-green-400">
+            <Icon name="tabler:map-pin" class="w-4 h-4" />
+            {{ locationLabel }}
+          </div>
+          <div v-if="locationError" class="text-xs text-red-400">
+            {{ locationError }}
+          </div>
+          <div v-if="sortMode === 'distance' && filters.maxDistance > 0" class="flex flex-col gap-1">
+            <label class="text-xs text-gray-400">{{ $t('maxDistance') }}</label>
+            <div class="flex items-center gap-2">
+              <input
+                v-model.number="filters.maxDistance"
+                type="number"
+                :disabled="!isFlipperTier"
+                placeholder="∞"
+                class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-24 focus:border-blue-500 focus:outline-none disabled:cursor-not-allowed"
+              >
+              <span class="text-xs text-gray-400">km</span>
+            </div>
+          </div>
+        </div>
+        <div v-if="!isFlipperTier" class="mt-2 flex items-center gap-2">
+          <Icon name="tabler:lock" class="w-4 h-4 text-indigo-400" />
+          <span class="text-xs text-indigo-400">
+            {{ $t('distanceSortFlipperOnly') }}
+          </span>
+        </div>
       </div>
     </UiDefaultContainer>
 
@@ -85,7 +148,6 @@
         >
           {{ $t('clearFilters') }}
         </button>
-        <!-- Save Filter & Notify Button -->
         <button
           v-if="hasActiveFilters"
           class="flex items-center gap-1.5 text-xs text-white px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 transition-colors font-medium"
@@ -108,72 +170,6 @@
           </label>
           <span class="text-xs text-gray-500">{{ filteredItems.length }}/{{ items.length }} {{ $t('flips') }}</span>
         </div>
-      </div>
-    </UiDefaultContainer>
-
-    <!-- Distance Sort & Location (Flipper tier feature) -->
-    <UiDefaultContainer class="mb-4 p-4" :class="{ 'opacity-60 pointer-events-none select-none': !isFlipperTier }">
-      <div class="flex flex-wrap gap-3 items-end">
-        <div class="flex flex-col gap-1">
-          <label class="text-xs text-gray-400">{{ $t('sortBy') }}</label>
-          <select
-            v-model="sortMode"
-            :disabled="!isFlipperTier"
-            class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-40 focus:border-blue-500 focus:outline-none disabled:cursor-not-allowed"
-          >
-            <option value="newest">{{ $t('sortNewest') }}</option>
-            <option value="profit">{{ $t('sortProfit') }}</option>
-            <option value="distance">{{ $t('sortDistance') }}</option>
-          </select>
-        </div>
-        <div class="flex flex-col gap-1">
-          <label class="text-xs text-gray-400">{{ $t('location') }}</label>
-          <div class="flex gap-2">
-            <input
-              v-model="locationZip"
-              type="text"
-              :disabled="!isFlipperTier"
-              :placeholder="$t('zipCodePlaceholder')"
-              class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-32 focus:border-blue-500 focus:outline-none disabled:cursor-not-allowed"
-              @keydown.enter="geocodeZip"
-            >
-            <button
-              :disabled="!isFlipperTier"
-              class="flex items-center gap-1 text-xs text-white px-3 py-1.5 rounded-lg bg-gray-700 hover:bg-gray-600 border border-gray-600 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-              @click="useDeviceLocation"
-            >
-              <Icon name="tabler:current-location" class="w-4 h-4" />
-              {{ $t('useGPS') }}
-            </button>
-          </div>
-        </div>
-        <div v-if="userLocation" class="flex items-center gap-2 text-xs text-green-400">
-          <Icon name="tabler:map-pin" class="w-4 h-4" />
-          {{ locationLabel }}
-        </div>
-        <div v-if="locationError" class="text-xs text-red-400">
-          {{ locationError }}
-        </div>
-        <div v-if="sortMode === 'distance' && filters.maxDistance > 0" class="flex flex-col gap-1">
-          <label class="text-xs text-gray-400">{{ $t('maxDistance') }}</label>
-          <div class="flex items-center gap-2">
-            <input
-              v-model.number="filters.maxDistance"
-              type="number"
-              :disabled="!isFlipperTier"
-              placeholder="∞"
-              class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-24 focus:border-blue-500 focus:outline-none disabled:cursor-not-allowed"
-            >
-            <span class="text-xs text-gray-400">km</span>
-          </div>
-        </div>
-      </div>
-      <div v-if="!isFlipperTier" class="mt-2 flex items-center gap-2">
-        <Icon name="tabler:lock" class="w-4 h-4 text-indigo-400" />
-        <span class="text-xs text-indigo-400">
-          {{ $t('distanceSortFlipperOnly') }}
-          <NuxtLink :to="localePath('/subscriptions') + '?discount=EARLY'" class="underline hover:text-indigo-300">{{ $t('upgrade') }}</NuxtLink>
-        </span>
       </div>
     </UiDefaultContainer>
 
