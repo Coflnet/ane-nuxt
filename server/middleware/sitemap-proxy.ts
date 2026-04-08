@@ -1,13 +1,9 @@
 const API_BASE = 'https://ane.coflnet.com'
 
 export default defineEventHandler(async (event) => {
-  const name = getRouterParam(event, 'name') ?? ''
-  // name is e.g. "product-sitemap" or "product-sitemap-de" or "product-sitemap-0" or "product-sitemap-de-0"
-  const match = name.match(/^product-sitemap(?:-(de))?(?:-(\d+))?$/)
-  if (!match) {
-    setResponseStatus(event, 404)
-    return 'Not found'
-  }
+  const path = getRequestURL(event).pathname
+  const match = path.match(/^\/product-sitemap(?:-(de))?(?:-(\d+))?\.xml$/)
+  if (!match) return
 
   const [, locale, index] = match
   let backendPath: string
