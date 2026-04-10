@@ -819,6 +819,7 @@
     "acceptable": "Akzeptabel",
     "used": "Gebraucht",
     "broken": "Defekt",
+    "damaged": "Beschädigt",
     "refurbished": "Generalüberholt",
     "unknown": "Unbekannt"
   },
@@ -844,6 +845,48 @@
       "title": "Attribute",
       "unknown_title": "Attribute nicht angegeben",
       "unknown_description": "Für dieses Produkt sind keine Eigenschaften verfügbar."
-    }
-  }
+    },
+    "report": {
+      "title": "Produkt melden",
+      "prompt": "Was stimmt mit diesem Produkt nicht?",
+      "detailsLabel": "Zusätzliche Details (optional)",
+      "detailsPlaceholder": "Beschreibe das Problem genauer...",
+      "submit": "Meldung absenden",
+      "submitting": "Wird gesendet...",
+      "issue": {
+        "WrongCategory": "Falsche Kategorie",
+        "Duplicate": "Duplikat",
+        "IncorrectInformation": "Falsche Informationen",
+        "Spam": "Spam oder Fake",
+        "Other": "Sonstiges"
+      }
+    },
+    "relatedProducts": "Ähnliche Produkte",
+    "listings": "Angebote",
+    "seo": {
+      "description": "{name} — vergleiche {count} Angebote von mehreren Marktplätzen. ANE ist eine Meta-Suchmaschine, die Angebote von Kleinanzeigen, eBay und anderen Plattformen zusammenfasst. Attribute und Preise werden KI-gestützt ermittelt und können Fehler enthalten – falls etwas nicht stimmt, melde es bitte."
+    },
+    "priceHistoryTitle": "Preisverlauf",
+    "priceHistoryDays": "{days} Tage Preisdaten"
+  },
+  "attr_mileage": "Kilometerstand",
+  "attr_year": "Baujahr",
+  "attr_fuel": "Kraftstoff",
+  "attr_transmission": "Getriebe",
+  "attr_horsepower": "PS",
+  "attr_displacement": "Hubraum",
+  "attr_doors": "Türen",
+  "attr_seats": "Sitze",
+  "attr_drive_type": "Antrieb",
+  "attr_body_type": "Karosserie",
+  "attr_registration_year": "Erstzulassung",
+  "fuel_petrol": "Benzin",
+  "fuel_diesel": "Diesel",
+  "fuel_electric": "Elektro",
+  "fuel_hybrid": "Hybrid",
+  "fuel_plugin_hybrid": "Plug-in Hybrid",
+  "fuel_gas": "Gas (LPG/CNG)",
+  "fuel_hydrogen": "Wasserstoff",
+  "transmission_manual": "Schaltgetriebe",
+  "transmission_automatic": "Automatik"
 }

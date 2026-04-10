@@ -44,9 +44,10 @@
         <div class="lg:col-span-1">
           <div class="aspect-square bg-slate-800 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/5 p-4">
             <NuxtImg
-              v-if="product.imageUrl"
-              :src="product.imageUrl"
+              v-if="productImageUrl"
+              :src="productImageUrl"
               class="w-full h-full object-contain"
+              @error="onProductImageError"
             />
             <div
               v-else
@@ -234,10 +235,10 @@
       >
         <div class="p-6 border-b border-slate-800">
           <h2 class="text-2xl font-bold text-white">
-            Price History
+            {{ $t('product.priceHistoryTitle') }}
           </h2>
           <p class="text-sm text-slate-400 mt-1">
-            {{ priceHistory.length }} days of price data
+            {{ $t('product.priceHistoryDays', { days: priceHistory.length }) }}
           </p>
         </div>
         <div class="p-6">
@@ -386,6 +387,13 @@
         </div>
       </div>
 
+      <!-- SEO Description -->
+      <div class="mt-8 bg-slate-900/50 rounded-xl border border-slate-800 p-6">
+        <p class="text-sm text-slate-400 leading-relaxed">
+          {{ $t('product.seo.description', { name: product.name, count: matches.length }) }}
+        </p>
+      </div>
+
       <!-- Product Report Dialog -->
       <Teleport to="body">
         <div
@@ -395,10 +403,10 @@
         >
           <div class="bg-slate-800 rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl border border-slate-700">
             <h3 class="text-lg font-bold text-white mb-4">
-              Report Product Issue
+              {{ $t('product.report.title') }}
             </h3>
             <p class="text-slate-400 text-sm mb-4">
-              What's wrong with this product?
+              {{ $t('product.report.prompt') }}
             </p>
 
             <div class="space-y-2 mb-4">
@@ -414,19 +422,19 @@
                   :value="issue.value"
                   class="text-blue-500 focus:ring-blue-500"
                 >
-                <span class="text-slate-200">{{ issue.label }}</span>
+                <span class="text-slate-200">{{ $t(`product.report.issue.${issue.value}`) }}</span>
               </label>
             </div>
 
             <div class="mb-4">
               <label class="block text-slate-400 text-sm mb-2">
-                Additional details (optional)
+                {{ $t('product.report.detailsLabel') }}
               </label>
               <textarea
                 v-model="productReportDescription"
                 class="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white placeholder-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 rows="3"
-                placeholder="Provide more details about the issue..."
+                :placeholder="$t('product.report.detailsPlaceholder')"
               />
             </div>
 
@@ -435,15 +443,15 @@
                 class="px-4 py-2 text-slate-400 hover:text-white transition-colors"
                 @click="showProductReportDialog = false"
               >
-                Cancel
+                {{ $t('cancel') }}
               </button>
               <button
                 class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
                 :disabled="!selectedProductIssueType || submittingProductReport"
                 @click="submitProductReport"
               >
-                <span v-if="submittingProductReport">Submitting...</span>
-                <span v-else>Submit Report</span>
+                <span v-if="submittingProductReport">{{ $t('product.report.submitting') }}</span>
+                <span v-else>{{ $t('product.report.submit') }}</span>
               </button>
             </div>
           </div>
@@ -474,12 +482,14 @@ import { client } from '~/src/api-client/client.gen'
 import type { IssueType, Product, ProductMatch, PricePoint, PriceHistoryStats } from '~/src/api-client/types.gen'
 import ProductListingTable from '~/components/product/ProductListingTable.vue'
 import { useI18n } from 'vue-i18n'
+import { useUserStore } from '~/stores/user'
 
 const route = useRoute()
 const productId = route.params.id as string
 const router = useRouter()
 const localePath = useLocalePath()
 const { t } = useI18n()
+const userStore = useUserStore()
 
 const zipCode = computed(() => (route.query.zip as string) || '')
 const lat = computed(() => route.query.lat ? Number(route.query.lat) : undefined)
@@ -493,6 +503,24 @@ const priceHistory = ref<PricePoint[]>([])
 const priceStats = ref<PriceHistoryStats | null>(null)
 const loading = ref(true)
 const unavailableCount = ref(0)
+const imageErrorCount = ref(0)
+
+// Product image with fallback: try product.imageUrl first, then listing images
+const productImageUrl = computed(() => {
+  if (imageErrorCount.value === 0 && product.value?.imageUrl) {
+    return product.value.imageUrl
+  }
+  // Try listing images as fallback
+  const listingImages = matches.value
+    .map(m => m.imageUrl)
+    .filter((url): url is string => !!url && url !== product.value?.imageUrl)
+  const fallbackIdx = imageErrorCount.value - 1
+  return listingImages[fallbackIdx] || null
+})
+
+function onProductImageError() {
+  imageErrorCount.value++
+}
 
 // Product report dialog state
 const showProductReportDialog = ref(false)
@@ -500,12 +528,12 @@ const selectedProductIssueType = ref<IssueType | null>(null)
 const productReportDescription = ref('')
 const submittingProductReport = ref(false)
 
-const productIssueTypes: { value: IssueType, label: string }[] = [
-  { value: 'WrongCategory', label: 'Wrong category' },
-  { value: 'Duplicate', label: 'Duplicate product' },
-  { value: 'IncorrectInformation', label: 'Incorrect information' },
-  { value: 'Spam', label: 'Spam or fake' },
-  { value: 'Other', label: 'Other issue' },
+const productIssueTypes: { value: IssueType }[] = [
+  { value: 'WrongCategory' },
+  { value: 'Duplicate' },
+  { value: 'IncorrectInformation' },
+  { value: 'Spam' },
+  { value: 'Other' },
 ]
 
 const availableOfferCount = computed(() => matches.value.length - unavailableCount.value)
@@ -694,6 +722,16 @@ const attrKeyTranslationMap: Record<string, string> = {
   'manufacturer': 'attr_manufacturer',
   'manufactureaddress': 'attr_manufacturer',
   'manufacturertradename': 'attr_manufacturer',
+  'mileage': 'attr_mileage',
+  'fuel': 'attr_fuel',
+  'transmission': 'attr_transmission',
+  'horsepower': 'attr_horsepower',
+  'displacement': 'attr_displacement',
+  'doors': 'attr_doors',
+  'seats': 'attr_seats',
+  'drive_type': 'attr_drive_type',
+  'body_type': 'attr_body_type',
+  'registration_year': 'attr_registration_year',
 }
 
 const attrValueTranslationMap: Record<string, Record<string, string>> = {
@@ -718,6 +756,19 @@ const attrValueTranslationMap: Record<string, Record<string, string>> = {
     Male: 'gender_male',
     Female: 'gender_female',
     Unisex: 'gender_unisex',
+  },
+  fuel: {
+    petrol: 'fuel_petrol',
+    diesel: 'fuel_diesel',
+    electric: 'fuel_electric',
+    hybrid: 'fuel_hybrid',
+    'plug-in-hybrid': 'fuel_plugin_hybrid',
+    gas: 'fuel_gas',
+    hydrogen: 'fuel_hydrogen',
+  },
+  transmission: {
+    manual: 'transmission_manual',
+    automatic: 'transmission_automatic',
   },
 }
 
@@ -778,10 +829,29 @@ function localizeAttrKey(key: string): string {
 }
 
 function localizeAttrValue(attrKey: string, value: string): string {
+  // Mileage ranges: format numbers with locale and add "km"
+  if (attrKey.toLowerCase() === 'mileage') {
+    return formatMileageRange(value)
+  }
   const valueMap = attrValueTranslationMap[attrKey.toLowerCase()]
   if (valueMap && valueMap[value]) {
     const translated = t(valueMap[value], value)
     return translated !== valueMap[value] ? translated : value
+  }
+  return value
+}
+
+function formatMileageRange(value: string): string {
+  const locale = t('nav.home') === 'Startseite' ? 'de-DE' : 'en-US'
+  if (value.endsWith('+')) {
+    const num = parseInt(value.replace('+', ''))
+    if (!isNaN(num)) return `${num.toLocaleString(locale)}+ km`
+  }
+  const parts = value.split('-')
+  if (parts.length === 2) {
+    const a = parseInt(parts[0])
+    const b = parseInt(parts[1])
+    if (!isNaN(a) && !isNaN(b)) return `${a.toLocaleString(locale)} - ${b.toLocaleString(locale)} km`
   }
   return value
 }
@@ -802,6 +872,7 @@ function conditionClass(condition: string) {
     like_new: 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30',
     good: 'bg-blue-500/20 text-blue-400 border border-blue-500/30',
     used: 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30',
+    damaged: 'bg-orange-500/20 text-orange-400 border border-orange-500/30',
     broken: 'bg-red-500/20 text-red-400 border border-red-500/30',
   }
   return classes[condition] || 'bg-slate-700/50 text-slate-400'
@@ -835,15 +906,23 @@ function handleListingUnavailable(_listingId: number | string) {
 
 async function submitProductReport() {
   if (!selectedProductIssueType.value) return
+  if (!userStore.token) {
+    router.push(localePath('/login'))
+    return
+  }
 
   submittingProductReport.value = true
 
   try {
+    const description = [selectedProductIssueType.value, productReportDescription.value].filter(Boolean).join(': ')
     await reportProductIssue({
       path: { id: productId },
       body: {
         type: selectedProductIssueType.value,
-        description: productReportDescription.value || undefined,
+        description,
+      },
+      headers: {
+        Authorization: `Bearer ${userStore.token}`,
       },
     })
 
@@ -886,5 +965,8 @@ onMounted(async () => {
 
 useHead({
   title: computed(() => product.value?.name || 'Product'),
+  meta: [
+    { name: 'description', content: computed(() => product.value ? t('product.seo.description', { name: product.value.name, count: matches.value.length }) : '') },
+  ],
 })
 </script>

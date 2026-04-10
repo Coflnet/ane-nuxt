@@ -819,6 +819,7 @@
     "acceptable": "Acceptable",
     "used": "Used",
     "broken": "Broken",
+    "damaged": "Damaged",
     "refurbished": "Refurbished",
     "unknown": "Unknown"
   },
@@ -844,6 +845,48 @@
       "title": "Product Attributes",
       "unknown_title": "Attributes not specified",
       "unknown_description": "No attribute data is available for this product."
-    }
-  }
+    },
+    "report": {
+      "title": "Report Product Issue",
+      "prompt": "What's wrong with this product?",
+      "detailsLabel": "Additional details (optional)",
+      "detailsPlaceholder": "Provide more details about the issue...",
+      "submit": "Submit Report",
+      "submitting": "Submitting...",
+      "issue": {
+        "WrongCategory": "Wrong category",
+        "Duplicate": "Duplicate product",
+        "IncorrectInformation": "Incorrect information",
+        "Spam": "Spam or fake",
+        "Other": "Other issue"
+      }
+    },
+    "relatedProducts": "Related Products",
+    "listings": "listings",
+    "seo": {
+      "description": "{name} — compare {count} offers from multiple marketplaces. ANE is a meta search engine that aggregates listings across Kleinanzeigen, eBay and other platforms. Attributes and prices are AI-assisted and may contain errors — if something looks wrong, please report it."
+    },
+    "priceHistoryTitle": "Price History",
+    "priceHistoryDays": "{days} days of price data"
+  },
+  "attr_mileage": "Mileage",
+  "attr_year": "Year",
+  "attr_fuel": "Fuel",
+  "attr_transmission": "Transmission",
+  "attr_horsepower": "Horsepower",
+  "attr_displacement": "Displacement",
+  "attr_doors": "Doors",
+  "attr_seats": "Seats",
+  "attr_drive_type": "Drive Type",
+  "attr_body_type": "Body Type",
+  "attr_registration_year": "First Registration",
+  "fuel_petrol": "Petrol",
+  "fuel_diesel": "Diesel",
+  "fuel_electric": "Electric",
+  "fuel_hybrid": "Hybrid",
+  "fuel_plugin_hybrid": "Plug-in Hybrid",
+  "fuel_gas": "Gas (LPG/CNG)",
+  "fuel_hydrogen": "Hydrogen",
+  "transmission_manual": "Manual",
+  "transmission_automatic": "Automatic"
 }
