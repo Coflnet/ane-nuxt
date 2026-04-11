@@ -862,14 +862,19 @@ async function fetchGlobalCategoryCounts() {
   } catch { /* ignore — show all categories as fallback */ }
 }
 
+function countForCategory(cat: { slug: string; label?: string }): number {
+  const counts = globalCategoryCounts.value
+  return (counts[cat.slug?.toLowerCase()] ?? 0) + (counts[(cat as any).label?.toLowerCase()] ?? 0)
+}
+
 // Categories to display in the browser (filtered to those with listings)
 const displayCategories = computed(() => {
   const cats = browseSubCats.value.length > 0 ? browseSubCats.value : topLevelCategories.value
   if (Object.keys(globalCategoryCounts.value).length === 0) return cats
   return cats.filter(cat => {
-    // Show a category if it or any of its subcategories has listings
-    if (globalCategoryCounts.value[cat.slug.toLowerCase()] > 0) return true
-    if (cat.subCategories?.some((sub: any) => (globalCategoryCounts.value[sub.slug?.toLowerCase()] ?? 0) > 0)) return true
+    // Show a category if it or any of its subcategories has listings (match by slug or label)
+    if (countForCategory(cat) > 0) return true
+    if (cat.subCategories?.some((sub: any) => countForCategory(sub) > 0)) return true
     return false
   })
 })
@@ -903,15 +908,14 @@ function getCategoryIcon(slug: string, label: string): string {
   return categoryIconMap[label] || 'tabler:category'
 }
 
-function getCategoryProductCount(cat: { slug: string; subCategories?: any[] | null }): number {
-  const counts = globalCategoryCounts.value
-  let total = counts[cat.slug.toLowerCase()] ?? 0
+function getCategoryProductCount(cat: { slug: string; label?: string; subCategories?: any[] | null }): number {
+  let total = countForCategory(cat)
   if (cat.subCategories) {
     for (const sub of cat.subCategories) {
-      total += counts[sub.slug?.toLowerCase()] ?? 0
+      total += countForCategory(sub)
       if (sub.subCategories) {
         for (const sub2 of sub.subCategories) {
-          total += counts[sub2.slug?.toLowerCase()] ?? 0
+          total += countForCategory(sub2)
         }
       }
     }
