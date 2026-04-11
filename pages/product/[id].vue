@@ -388,9 +388,18 @@
       </div>
 
       <!-- SEO Description -->
-      <div class="mt-8 bg-slate-900/50 rounded-xl border border-slate-800 p-6">
+      <div class="mt-8 bg-slate-900/50 rounded-xl border border-slate-800 p-6 space-y-4">
         <p class="text-sm text-slate-400 leading-relaxed">
           {{ $t('product.seo.description', { name: product.name, count: matches.length }) }}
+        </p>
+        <p class="text-sm text-slate-400 leading-relaxed">
+          {{ $t('product.seo.howItWorks') }}
+        </p>
+        <p class="text-sm text-slate-400 leading-relaxed">
+          {{ $t('product.seo.priceComparison', { name: product.name }) }}
+        </p>
+        <p class="text-sm text-slate-400 leading-relaxed">
+          {{ $t('product.seo.disclaimer') }}
         </p>
       </div>
 

@@ -132,8 +132,8 @@
                 v-for="bucket in availableCategoryBuckets"
                 :key="bucket.value"
                 class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors max-w-[200px]"
-                :class="selectedCategory === bucket.value ? 'bg-blue-500/20 text-blue-400 font-medium' : 'text-slate-400 hover:bg-slate-700/50 hover:text-slate-200'"
-                @click="toggleFilter('category', bucket.value!)"
+                :class="isCategorySelected(bucket.value!) ? 'bg-blue-500/20 text-blue-400 font-medium' : 'text-slate-400 hover:bg-slate-700/50 hover:text-slate-200'"
+                @click="toggleFilter('category', toUrlSlug(bucket.value!) || bucket.value!)"
               >
                 <span class="truncate">{{ localizeCategory(bucket.value!) }}</span>
                 <span class="text-xs opacity-60 flex-shrink-0">({{ bucket.count }})</span>
@@ -357,6 +357,23 @@
               {{ $t('distance', 'Distance') }}
             </h3>
             <div class="space-y-3">
+              <!-- Country shortcut -->
+              <div>
+                <label class="text-xs text-slate-400 mb-1 block">{{ $t('country', 'Country') }}</label>
+                <select
+                  :value="selectedCountryCode"
+                  class="w-full px-3 py-2 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-slate-200 focus:border-blue-500/50 focus:outline-none"
+                  @change="onCountrySelect($event)"
+                >
+                  <option value="">{{ $t('anyCountry', 'Any country') }}</option>
+                  <option value="DE">{{ $t('countryDE', 'Germany') }}</option>
+                  <option value="AT">{{ $t('countryAT', 'Austria') }}</option>
+                  <option value="CH">{{ $t('countryCH', 'Switzerland') }}</option>
+                  <option value="NL">{{ $t('countryNL', 'Netherlands') }}</option>
+                  <option value="BE">{{ $t('countryBE', 'Belgium') }}</option>
+                  <option value="FR">{{ $t('countryFR', 'France') }}</option>
+                </select>
+              </div>
               <!-- ZIP code input -->
               <div class="flex items-center gap-2">
                 <input
@@ -512,7 +529,7 @@
 
             <!-- Load More / Pagination -->
             <div
-              v-if="canLoadMore"
+              v-if="canLoadMore && allProducts.length >= AUTO_LOAD_MAX"
               class="flex justify-center mt-8"
             >
               <button
@@ -523,6 +540,17 @@
                 <span v-if="loadingMore">{{ $t('loading', 'Loading...') }}</span>
                 <span v-else>{{ $t('loadMore', 'Load More') }} ({{ allProducts.length }} / {{ totalResults }})</span>
               </button>
+            </div>
+            <!-- Infinite scroll sentinel (auto-loads until AUTO_LOAD_MAX) -->
+            <div
+              v-if="canLoadMore && allProducts.length < AUTO_LOAD_MAX"
+              ref="scrollSentinel"
+              class="flex justify-center mt-8 py-4"
+            >
+              <div
+                v-if="loadingMore"
+                class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"
+              />
             </div>
           </div>
         </div>
@@ -598,7 +626,13 @@
             {{ cat.label }}
           </div>
           <div
-            v-if="cat.subCategories && cat.subCategories.length > 0"
+            v-if="getCategoryProductCount(cat) > 0"
+            class="text-xs text-blue-400/70 mt-1"
+          >
+            {{ formatCount(getCategoryProductCount(cat)) }} {{ $t('products', 'products') }}
+          </div>
+          <div
+            v-else-if="cat.subCategories && cat.subCategories.length > 0"
             class="text-xs text-slate-500 mt-1"
           >
             {{ cat.subCategories.length }} {{ $t('subcategories', 'subcategories') }}
@@ -672,6 +706,7 @@ const zipLoading = ref(false)
 const zipError = ref<string>('')
 // Flag: true while we're resolving a ZIP from URL on page load (blocks initial search until geo ready)
 const zipResolving = ref(!!route.query.zip)
+const selectedCountryCode = ref<string>((route.query.country as string) || '')
 
 // Data state
 const allProducts = ref<ProductDocument[]>([])
@@ -711,9 +746,10 @@ const prevQuery = reactive({ q: '' as string | undefined, category: '' as string
 
 // Compute available category buckets — use server-provided aggregation counts directly
 const availableCategoryBuckets = computed(() => {
+  const apiSlug = toApiSlug(selectedCategory.value).toLowerCase()
   if (selectedCategory.value) {
-    // If a category is already selected, show only that one
-    return categoryBuckets.value.filter(b => b.value?.toLowerCase() === selectedCategory.value.toLowerCase())
+    // If a category is already selected, show only that one (compare with resolved API slug)
+    return categoryBuckets.value.filter(b => b.value?.toLowerCase() === apiSlug || b.value?.toLowerCase() === selectedCategory.value.toLowerCase())
   }
 
   // Use server-side aggregation counts (already computed across ALL matching docs)
@@ -776,18 +812,66 @@ const products = computed(() => allProducts.value)
 const canLoadMore = computed(() => totalResults.value > allProducts.value.length)
 
 const PAGE_SIZE = 20
+const AUTO_LOAD_MAX = 100
+
+// Infinite scroll
+const scrollSentinel = ref<HTMLElement | null>(null)
+let scrollObserver: IntersectionObserver | null = null
+
+function setupScrollObserver() {
+  if (scrollObserver) scrollObserver.disconnect()
+  scrollObserver = new IntersectionObserver((entries) => {
+    if (entries[0]?.isIntersecting && canLoadMore.value && !loadingMore.value && allProducts.value.length < AUTO_LOAD_MAX) {
+      loadMore()
+    }
+  }, { rootMargin: '200px' })
+}
+
+watch(scrollSentinel, (el) => {
+  if (scrollObserver) scrollObserver.disconnect()
+  if (el) {
+    if (!scrollObserver) setupScrollObserver()
+    scrollObserver!.observe(el)
+  }
+})
+
+onBeforeUnmount(() => {
+  scrollObserver?.disconnect()
+})
 
 // --- Category browsing ---
-const { topLevelCategories, loadingCategories, fetchTopLevelCategories, fetchSubCategories } = useCategories()
+const { topLevelCategories, loadingCategories, fetchTopLevelCategories, fetchSubCategories, toUrlSlug, toApiSlug, slugToLabel } = useCategories()
 
 interface BrowseSegment { slug: string; label: string }
 const browsePath = ref<BrowseSegment[]>([])
 const browseSubCats = ref<Array<{ slug: string; label: string; subCategories?: any[] | null }>>([])
 
-// Categories to display in the browser
+// Global category counts (from aggregation) to hide empty categories and show product counts
+const globalCategoryCounts = ref<Record<string, number>>({})
+
+async function fetchGlobalCategoryCounts() {
+  try {
+    const counts = await $fetch<Record<string, number>>('https://ane.coflnet.com/api/Categories/with-counts')
+    if (counts && Object.keys(counts).length > 0) {
+      const normalized: Record<string, number> = {}
+      for (const [slug, count] of Object.entries(counts)) {
+        normalized[slug.toLowerCase()] = count
+      }
+      globalCategoryCounts.value = normalized
+    }
+  } catch { /* ignore — show all categories as fallback */ }
+}
+
+// Categories to display in the browser (filtered to those with listings)
 const displayCategories = computed(() => {
-  if (browseSubCats.value.length > 0) return browseSubCats.value
-  return topLevelCategories.value
+  const cats = browseSubCats.value.length > 0 ? browseSubCats.value : topLevelCategories.value
+  if (Object.keys(globalCategoryCounts.value).length === 0) return cats
+  return cats.filter(cat => {
+    // Show a category if it or any of its subcategories has listings
+    if (globalCategoryCounts.value[cat.slug.toLowerCase()] > 0) return true
+    if (cat.subCategories?.some((sub: any) => (globalCategoryCounts.value[sub.slug?.toLowerCase()] ?? 0) > 0)) return true
+    return false
+  })
 })
 
 // Icon map for common top-level categories
@@ -819,6 +903,27 @@ function getCategoryIcon(slug: string, label: string): string {
   return categoryIconMap[label] || 'tabler:category'
 }
 
+function getCategoryProductCount(cat: { slug: string; subCategories?: any[] | null }): number {
+  const counts = globalCategoryCounts.value
+  let total = counts[cat.slug.toLowerCase()] ?? 0
+  if (cat.subCategories) {
+    for (const sub of cat.subCategories) {
+      total += counts[sub.slug?.toLowerCase()] ?? 0
+      if (sub.subCategories) {
+        for (const sub2 of sub.subCategories) {
+          total += counts[sub2.slug?.toLowerCase()] ?? 0
+        }
+      }
+    }
+  }
+  return total
+}
+
+function formatCount(n: number): string {
+  if (n >= 1000) return `${(n / 1000).toFixed(1).replace(/\.0$/, '')}k`
+  return n.toString()
+}
+
 async function onUnifiedCategoryClick(cat: { slug: string; label: string; subCategories?: any[] | null }) {
   if (cat.subCategories && cat.subCategories.length > 0) {
     // Navigate deeper into the tree
@@ -834,7 +939,7 @@ async function onUnifiedCategoryClick(cat: { slug: string; label: string; subCat
     }
     else {
       // Leaf category — search for products with this category
-      router.push({ query: { category: cat.slug } })
+      router.push({ query: { category: toUrlSlug(cat.slug) } })
     }
   }
 }
@@ -860,13 +965,20 @@ function navigateToBreadcrumb(idx: number) {
 function searchInCurrentCategory() {
   const leaf = browsePath.value.at(-1)
   if (leaf) {
-    router.push({ query: { category: leaf.slug } })
+    router.push({ query: { category: toUrlSlug(leaf.slug) } })
   }
 }
 
 // Load top-level categories on mount
 onMounted(async () => {
   fetchTopLevelCategories()
+  fetchGlobalCategoryCounts()
+  setupScrollObserver()
+  // Restore country from URL
+  const urlCountry = route.query.country as string
+  if (urlCountry) {
+    selectedCountryCode.value = urlCountry
+  }
   // Auto-resolve ZIP code from URL on page load
   const urlZip = route.query.zip as string
   if (urlZip) {
@@ -1034,12 +1146,23 @@ const attrValueTranslationMap: Record<string, Record<string, string>> = {
 }
 
 function localizeCategory(cat: string): string {
+  // If it's a numeric slug, try to show the label
+  const label = slugToLabel.value[cat]
+  if (label) return label
+
   const key = categoryTranslationMap[cat]
   if (key) {
     const translated = t(key, cat)
     return translated !== key ? translated : cat
   }
   return cat
+}
+
+function isCategorySelected(bucketValue: string): boolean {
+  if (!selectedCategory.value) return false
+  const urlLower = selectedCategory.value.toLowerCase()
+  const apiSlug = toApiSlug(selectedCategory.value)
+  return bucketValue.toLowerCase() === urlLower || bucketValue.toLowerCase() === apiSlug.toLowerCase()
 }
 
 function localizeCondition(cond: string): string {
@@ -1082,8 +1205,8 @@ function localizeAttrValue(attrKey: string, value: string): string {
 function buildSearchParams(offset = 0) {
   const params: Record<string, any> = { offset, limit: PAGE_SIZE }
   if (searchQuery.value) params.query = searchQuery.value
-  // Category values come from aggregation buckets with correct case; condition is normalized to lowercase during indexing
-  if (selectedCategory.value) params.category = selectedCategory.value
+  // Category values: URL uses readable slugs, API expects the original slug
+  if (selectedCategory.value) params.category = toApiSlug(selectedCategory.value)
   if (selectedCondition.value) params.condition = selectedCondition.value.toLowerCase()
   if (selectedMinPrice.value !== undefined) params.minPrice = selectedMinPrice.value
   if (selectedMaxPrice.value !== undefined) params.maxPrice = selectedMaxPrice.value
@@ -1094,6 +1217,8 @@ function buildSearchParams(offset = 0) {
     params.lon = userLocation.value.lon
     if (selectedMaxDistance.value) params.maxDistanceKm = selectedMaxDistance.value
   }
+  // Country filter
+  if (selectedCountryCode.value) params.country = selectedCountryCode.value
   // Send attribute filters to the API as key:value pairs
   const attrFilters = activeAttributeFilters.value
   const attrArray: string[] = []
@@ -1335,6 +1460,7 @@ function onSortChange(event: Event) {
 }
 
 function requestLocation() {
+  selectedCountryCode.value = ''
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
@@ -1425,10 +1551,24 @@ function clearDistanceFilter() {
   const query = { ...route.query } as Record<string, string>
   delete query.max_distance
   delete query.zip
+  delete query.country
   userLocation.value = null
   locationName.value = ''
   zipCodeInput.value = ''
   zipError.value = ''
+  selectedCountryCode.value = ''
+  router.push({ query })
+}
+
+function onCountrySelect(event: Event) {
+  const code = (event.target as HTMLSelectElement).value
+  selectedCountryCode.value = code
+  const query = { ...route.query } as Record<string, string>
+  if (!code) {
+    delete query.country
+  } else {
+    query.country = code
+  }
   router.push({ query })
 }
 
@@ -1466,14 +1606,14 @@ function onSearch(query: string) {
 }
 
 function onSearchCategorySelect(slug: string) {
-  router.push({ query: { category: slug } })
+  router.push({ query: { category: toUrlSlug(slug) || slug } })
 }
 
 // Watch route query changes and trigger search
 watch(() => route.query, () => {
   const hasQuery = route.query.q || route.query.category || route.query.condition
     || route.query.price_min || route.query.price_max || route.query.sort || route.query.max_distance
-    || route.query.zip
+    || route.query.zip || route.query.country
     || Object.keys(route.query).some(k => k.startsWith('attr_'))
   if (hasQuery) {
     // Skip search while ZIP is being resolved from URL — distance filter won't work without coordinates

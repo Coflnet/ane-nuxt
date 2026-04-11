@@ -864,7 +864,10 @@
     "relatedProducts": "Ähnliche Produkte",
     "listings": "Angebote",
     "seo": {
-      "description": "{name} — vergleiche {count} Angebote von mehreren Marktplätzen. ANE ist eine Meta-Suchmaschine, die Angebote von Kleinanzeigen, eBay und anderen Plattformen zusammenfasst. Attribute und Preise werden KI-gestützt ermittelt und können Fehler enthalten – falls etwas nicht stimmt, melde es bitte."
+      "description": "{name} — vergleiche {count} Angebote von mehreren Marktplätzen. ANE ist eine Meta-Suchmaschine, die Angebote von Kleinanzeigen, eBay und anderen Plattformen zusammenfasst. Attribute und Preise werden KI-gestützt ermittelt und können Fehler enthalten – falls etwas nicht stimmt, melde es bitte.",
+      "howItWorks": "ANE durchsucht kontinuierlich große Second-Hand-Marktplätze wie Kleinanzeigen, eBay, Vinted, Shpock und weitere. Angebote werden mithilfe KI-gestützter Zuordnung nach Produkt gruppiert, sodass du Preise verschiedener Verkäufer an einem Ort vergleichen kannst. Jede Produktseite zeigt verfügbare Angebote, den Preisverlauf und wichtige Attribute, die automatisch aus den Anzeigenbeschreibungen extrahiert werden.",
+      "priceComparison": "Durch den Vergleich aller aktuellen Angebote für {name} nebeneinander findest du schnell das beste Angebot. Das Preisverlauf-Diagramm zeigt, ob die Preise steigen oder fallen, und hilft dir, den richtigen Kaufzeitpunkt zu wählen. Filtere nach Zustand (neu, gebraucht, generalüberholt) und sortiere nach Preis, um genau das zu finden, was du brauchst.",
+      "disclaimer": "Alle Daten auf dieser Seite werden automatisch aggregiert. Preise, Produkteigenschaften und Zustandsbewertungen werden mittels maschinellem Lernen extrahiert und können gelegentlich ungenau sein. Überprüfe die Details immer im Originalangebot des Verkäufers, bevor du kaufst. Falls du falsche Informationen bemerkst, nutze bitte die Melden-Funktion, um uns zu helfen."
     },
     "priceHistoryTitle": "Preisverlauf",
     "priceHistoryDays": "{days} Tage Preisdaten"
@@ -888,5 +891,30 @@
   "fuel_gas": "Gas (LPG/CNG)",
   "fuel_hydrogen": "Wasserstoff",
   "transmission_manual": "Schaltgetriebe",
-  "transmission_automatic": "Automatik"
+  "transmission_automatic": "Automatik",
+  "sortDefault": "Sortierung: Standard",
+  "sortPriceAsc": "Preis: Niedrig → Hoch",
+  "sortPriceDesc": "Preis: Hoch → Niedrig",
+  "sortOldest": "Älteste zuerst",
+  "distance": "Entfernung",
+  "enterZip": "PLZ eingeben",
+  "locationSet": "Standort gesetzt",
+  "useMyLocation": "Meinen Standort verwenden",
+  "browseCategories": "Kategorien durchsuchen",
+  "subcategories": "Unterkategorien",
+  "showProducts": "Produkte anzeigen",
+  "country": "Land",
+  "anyCountry": "Beliebiges Land",
+  "countryDE": "Deutschland",
+  "countryAT": "Österreich",
+  "countryNL": "Niederlande",
+  "countryCH": "Schweiz",
+  "countryBE": "Belgien",
+  "countryFR": "Frankreich",
+  "flipper.seo.title": "Flipper – Finde profitable Angebote zum Weiterverkaufen",
+  "flipper.seo.intro": "Flipping ist die Kunst, unterbewertete Artikel zu kaufen und mit Gewinn weiterzuverkaufen. Das ANE Flipper-Tool durchsucht automatisch Tausende neuer Angebote auf Kleinanzeigen, eBay, Vinted, Shpock und anderen Marktplätzen, um Artikel zu finden, die deutlich unter ihrem Marktwert angeboten werden. Jeder Flip zeigt den Angebotspreis, den geschätzten Marktwert basierend auf aktuellen Verkäufen und deine potenzielle Gewinnmarge.",
+  "flipper.seo.howItWorks": "Wie funktioniert es? ANE überwacht Marktplatz-Angebote kontinuierlich in Echtzeit. Wenn ein neues Angebot erscheint, vergleicht unsere KI den Preis mit kürzlich verkauften Artikeln desselben Produkts. Liegt der Angebotspreis deutlich unter dem mittleren Verkaufspreis, erscheint es als potenzielle Flip-Chance in deinem Flipper-Feed. Je mehr Referenzverkäufe wir finden, desto zuverlässiger ist die Gewinnschätzung.",
+  "flipper.seo.tips": "Tipps für erfolgreiches Flipping: Konzentriere dich auf Produktkategorien, die du gut kennst – Elektronik, Spielkonsolen, Smartphones und Markenkleidung haben meist die konstantesten Wiederverkaufswerte. Prüfe den Zustand sorgfältig, indem du die vollständige Anzeigenbeschreibung liest. Berücksichtige Versandkosten und Marktplatzgebühren bei der Berechnung deines tatsächlichen Gewinns. Handle schnell – die besten Deals sind innerhalb von Minuten vergriffen.",
+  "flipper.seo.examples": "Beliebte Flipping-Kategorien sind Smartphones (besonders iPhones und Samsung Galaxy), Spielkonsolen (PS5, Nintendo Switch), Designermode, LEGO-Sets, Vintage-Uhren und Elektrowerkzeuge. Viele erfolgreiche Flipper spezialisieren sich auf eine Nische und bauen Expertenwissen auf, das ihnen hilft, echte Schnäppchen schneller zu erkennen als die Konkurrenz.",
+  "flipper.seo.cta": "Melde dich kostenlos an und finde noch heute profitable Flips. Upgrade auf den Flipper-Tarif für Echtzeit-Benachrichtigungen, entfernungsbasierte Sortierung und bevorzugten Zugang zu den neuesten Deals."
 }

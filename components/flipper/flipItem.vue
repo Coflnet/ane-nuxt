@@ -85,7 +85,7 @@
           v-if="item.foundAt"
           class="bg-gray-700/50 px-2 py-1 rounded"
         >
-          {{ formatDistanceToNow(new Date(item.foundAt), { addSuffix: true }) }}
+          {{ formatDistanceToNow(new Date(item.foundAt), { addSuffix: true, ...dateFnsLocale }) }}
         </span>
         <span
           v-if="listingLocation"
@@ -109,7 +109,7 @@
             <span class="text-blue-400 truncate max-w-[120px]" :title="sell.key ?? undefined">{{ sell.key }}</span>
             <div class="flex items-center gap-2 shrink-0">
               <span class="text-green-400">{{ formatPrice(sell.price) }}</span>
-              <span class="text-gray-500" v-if="sell.date">{{ formatDistanceToNow(new Date(sell.date), { addSuffix: true }) }}</span>
+              <span class="text-gray-500" v-if="sell.date">{{ formatDistanceToNow(new Date(sell.date), { addSuffix: true, ...dateFnsLocale }) }}</span>
             </div>
           </a>
         </div>
@@ -231,6 +231,11 @@
 import { computed, ref } from 'vue'
 import type { Flip, SoldFor, Platform } from '~/src/api-client/types.gen'
 import { formatDistanceToNow } from 'date-fns'
+import { de } from 'date-fns/locale'
+import { useI18n } from 'vue-i18n'
+
+const { locale } = useI18n()
+const dateFnsLocale = computed(() => locale.value === 'de' ? { locale: de } : {})
 
 const API_BASE = 'https://ane.coflnet.com'
 const userStore = useUserStore()

@@ -74,7 +74,7 @@ export default defineNuxtConfig({
       useCookie: true,
       alwaysRedirect: true,
       cookieKey: 'i18n_redirected',
-      redirectOn: 'root', // recommended
+      redirectOn: 'all',
     },
     bundle: {
       optimizeTranslationDirective: false,

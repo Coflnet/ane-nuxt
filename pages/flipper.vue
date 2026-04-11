@@ -344,6 +344,28 @@
         </div>
       </div>
     </Teleport>
+
+    <!-- SEO Content -->
+    <div class="mt-12 bg-slate-900/50 rounded-xl border border-slate-800 p-8 space-y-6">
+      <h2 class="text-xl font-bold text-slate-200">
+        {{ $t('flipper.seo.title') }}
+      </h2>
+      <p class="text-sm text-slate-400 leading-relaxed">
+        {{ $t('flipper.seo.intro') }}
+      </p>
+      <p class="text-sm text-slate-400 leading-relaxed">
+        {{ $t('flipper.seo.howItWorks') }}
+      </p>
+      <p class="text-sm text-slate-400 leading-relaxed">
+        {{ $t('flipper.seo.tips') }}
+      </p>
+      <p class="text-sm text-slate-400 leading-relaxed">
+        {{ $t('flipper.seo.examples') }}
+      </p>
+      <p class="text-sm text-slate-400 leading-relaxed">
+        {{ $t('flipper.seo.cta') }}
+      </p>
+    </div>
   </div>
 </template>
 
@@ -351,6 +373,8 @@
 import { ref, reactive, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import type { Flip } from '~/src/api-client/types.gen'
 import { getFlips } from '~/src/api-client'
+
+const { t } = useI18n()
 
 const STORAGE_KEY_FILTERS = 'flipper-filters'
 const STORAGE_KEY_BOOKMARKS = 'flipper-bookmarks'
@@ -756,9 +780,9 @@ watch(() => route.query.category, () => {
 })
 
 useHead({
-  title: 'Flipper Dashboard',
+  title: computed(() => t('flipper.seo.title')),
   meta: [
-    { name: 'description', content: 'Real-time marketplace flipping opportunities' },
+    { name: 'description', content: computed(() => t('flipper.seo.intro')) },
   ],
 })
 </script>

@@ -864,7 +864,10 @@
     "relatedProducts": "Related Products",
     "listings": "listings",
     "seo": {
-      "description": "{name} — compare {count} offers from multiple marketplaces. ANE is a meta search engine that aggregates listings across Kleinanzeigen, eBay and other platforms. Attributes and prices are AI-assisted and may contain errors — if something looks wrong, please report it."
+      "description": "{name} — compare {count} offers from multiple marketplaces. ANE is a meta search engine that aggregates listings across Kleinanzeigen, eBay and other platforms. Attributes and prices are AI-assisted and may contain errors — if something looks wrong, please report it.",
+      "howItWorks": "ANE continuously scans major second-hand marketplaces including Kleinanzeigen, eBay, Vinted, Shpock and more. Listings are grouped by product using AI-powered matching so you can compare prices from different sellers in one place. Each product page shows available offers, price history, and key attributes extracted automatically from listing descriptions.",
+      "priceComparison": "By comparing all current listings for {name} side by side you can quickly identify the best deal. The price history chart reveals whether prices are trending up or down, helping you decide the right moment to buy. Filter by condition (new, used, refurbished) and sort by price to find exactly what you need.",
+      "disclaimer": "All data shown on this page is aggregated automatically. Prices, product attributes and condition ratings are extracted using machine learning and may occasionally be inaccurate. Always verify details on the seller's original listing before purchasing. If you notice incorrect information, use the report button to help us improve."
     },
     "priceHistoryTitle": "Price History",
     "priceHistoryDays": "{days} days of price data"
@@ -888,5 +891,30 @@
   "fuel_gas": "Gas (LPG/CNG)",
   "fuel_hydrogen": "Hydrogen",
   "transmission_manual": "Manual",
-  "transmission_automatic": "Automatic"
+  "transmission_automatic": "Automatic",
+  "sortDefault": "Sort: Default",
+  "sortPriceAsc": "Price: Low → High",
+  "sortPriceDesc": "Price: High → Low",
+  "sortOldest": "Oldest First",
+  "distance": "Distance",
+  "enterZip": "ZIP / Postal code",
+  "locationSet": "Location set",
+  "useMyLocation": "Use my location",
+  "browseCategories": "Browse Categories",
+  "subcategories": "subcategories",
+  "showProducts": "Show Products",
+  "country": "Country",
+  "anyCountry": "Any country",
+  "countryDE": "Germany",
+  "countryAT": "Austria",
+  "countryNL": "Netherlands",
+  "countryCH": "Switzerland",
+  "countryBE": "Belgium",
+  "countryFR": "France",
+  "flipper.seo.title": "Flipper – Find Profitable Deals to Resell",
+  "flipper.seo.intro": "Flipping is the art of buying undervalued items and reselling them at a profit. ANE's Flipper tool automatically scans thousands of new listings across Kleinanzeigen, eBay, Vinted, Shpock and other marketplaces to find items listed significantly below their market value. Each flip shows the listing price, the estimated market value based on recent sales, and your potential profit margin.",
+  "flipper.seo.howItWorks": "How does it work? ANE continuously monitors marketplace listings in real-time. When a new listing appears, our AI compares its price against recent sold items for the same product. If the listing price is well below the median selling price, it appears in your Flipper feed as a potential flip opportunity. The more reference sales we find, the more reliable the profit estimate.",
+  "flipper.seo.tips": "Tips for successful flipping: Focus on product categories you know well – electronics, gaming consoles, smartphones and branded clothing tend to have the most consistent resale values. Check the condition carefully by reading the full listing description. Factor in shipping costs and marketplace fees when calculating your actual profit. Act quickly – the best deals get snapped up within minutes.",
+  "flipper.seo.examples": "Popular flipping categories include smartphones (especially iPhones and Samsung Galaxy), gaming consoles (PS5, Nintendo Switch), designer fashion, LEGO sets, vintage watches, and power tools. Many successful flippers focus on a niche and build expertise that helps them spot genuine deals faster than the competition.",
+  "flipper.seo.cta": "Sign up for free and start finding profitable flips today. Upgrade to the Flipper tier for real-time notifications, distance-based sorting, and priority access to the newest deals."
 }
