@@ -40,12 +40,24 @@
             class="bg-slate-800 border border-slate-600/50 rounded-lg px-3 py-1.5 text-sm text-slate-200 focus:border-blue-500/50 focus:outline-none"
             @change="onSortChange($event)"
           >
-            <option value="">{{ $t('sortDefault', 'Sort: Default') }}</option>
-            <option value="price_asc">{{ $t('sortPriceAsc', 'Price: Low → High') }}</option>
-            <option value="price_desc">{{ $t('sortPriceDesc', 'Price: High → Low') }}</option>
-            <option value="newest">{{ $t('sortNewest', 'Newest First') }}</option>
-            <option value="oldest">{{ $t('sortOldest', 'Oldest First') }}</option>
-            <option value="distance">{{ $t('sortDistance', 'Nearest First') }}</option>
+            <option value="">
+              {{ $t('sortDefault', 'Sort: Default') }}
+            </option>
+            <option value="price_asc">
+              {{ $t('sortPriceAsc', 'Price: Low → High') }}
+            </option>
+            <option value="price_desc">
+              {{ $t('sortPriceDesc', 'Price: High → Low') }}
+            </option>
+            <option value="newest">
+              {{ $t('sortNewest', 'Newest First') }}
+            </option>
+            <option value="oldest">
+              {{ $t('sortOldest', 'Oldest First') }}
+            </option>
+            <option value="distance">
+              {{ $t('sortDistance', 'Nearest First') }}
+            </option>
           </select>
         </div>
       </div>
@@ -62,58 +74,58 @@
             @click="clearDistanceFilter"
           >&times;</button>
         </span>
-          <span
-            v-if="selectedCategory"
-            class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-xs border border-blue-500/30"
-          >
-            {{ localizeCategory(selectedCategory) }}
-            <button
-              class="ml-1 hover:text-white"
-              @click="clearFilter('category')"
-            >&times;</button>
-          </span>
-          <span
-            v-if="selectedCondition"
-            class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-xs border border-green-500/30"
-          >
-            {{ localizeCondition(selectedCondition) }}
-            <button
-              class="ml-1 hover:text-white"
-              @click="clearFilter('condition')"
-            >&times;</button>
-          </span>
-          <span
-            v-if="selectedMinPrice || selectedMaxPrice"
-            class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-400 text-xs border border-yellow-500/30"
-          >
-            {{ $t('price', 'Price') }}: {{ selectedMinPrice ? formatPrice(selectedMinPrice) : '€0' }} – {{ selectedMaxPrice ? formatPrice(selectedMaxPrice) : '∞' }}
-            <button
-              class="ml-1 hover:text-white"
-              @click="clearPriceFilter"
-            >&times;</button>
-          </span>
-          <span
-            v-for="(value, key) in activeAttributeFilters"
-            :key="key"
-            class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-purple-500/20 text-purple-400 text-xs border border-purple-500/30"
-          >
-            {{ localizeAttrKey(String(key)) }}: {{ localizeAttrValue(String(key), value) }}
-            <button
-              class="ml-1 hover:text-white"
-              @click="removeAttributeFilter(String(key))"
-            >&times;</button>
-          </span>
-          <!-- Battery range badge -->
-          <span
-            v-if="selectedBatteryMin || selectedBatteryMax"
-            class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-purple-500/20 text-purple-400 text-xs border border-purple-500/30"
-          >
-            {{ localizeAttrKey('battery') }}: {{ selectedBatteryMin ?? batteryRangeMin }}% – {{ selectedBatteryMax ?? batteryRangeMax }}%
-            <button
-              class="ml-1 hover:text-white"
-              @click="() => { batteryFilterMin = batteryRangeMin; batteryFilterMax = batteryRangeMax; const q = { ...route.query } as Record<string, string>; delete q.attr_battery_min; delete q.attr_battery_max; router.push({ query: q }) }"
-            >&times;</button>
-          </span>
+        <span
+          v-if="selectedCategory"
+          class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-xs border border-blue-500/30"
+        >
+          {{ localizeCategory(selectedCategory) }}
+          <button
+            class="ml-1 hover:text-white"
+            @click="clearFilter('category')"
+          >&times;</button>
+        </span>
+        <span
+          v-if="selectedCondition"
+          class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-xs border border-green-500/30"
+        >
+          {{ localizeCondition(selectedCondition) }}
+          <button
+            class="ml-1 hover:text-white"
+            @click="clearFilter('condition')"
+          >&times;</button>
+        </span>
+        <span
+          v-if="selectedMinPrice || selectedMaxPrice"
+          class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-400 text-xs border border-yellow-500/30"
+        >
+          {{ $t('price', 'Price') }}: {{ selectedMinPrice ? formatPrice(selectedMinPrice) : '€0' }} – {{ selectedMaxPrice ? formatPrice(selectedMaxPrice) : '∞' }}
+          <button
+            class="ml-1 hover:text-white"
+            @click="clearPriceFilter"
+          >&times;</button>
+        </span>
+        <span
+          v-for="(value, key) in activeAttributeFilters"
+          :key="key"
+          class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-purple-500/20 text-purple-400 text-xs border border-purple-500/30"
+        >
+          {{ localizeAttrKey(String(key)) }}: {{ localizeAttrValue(String(key), value) }}
+          <button
+            class="ml-1 hover:text-white"
+            @click="removeAttributeFilter(String(key))"
+          >&times;</button>
+        </span>
+        <!-- Battery range badge -->
+        <span
+          v-if="selectedBatteryMin || selectedBatteryMax"
+          class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-purple-500/20 text-purple-400 text-xs border border-purple-500/30"
+        >
+          {{ localizeAttrKey('battery') }}: {{ selectedBatteryMin ?? batteryRangeMin }}% – {{ selectedBatteryMax ?? batteryRangeMax }}%
+          <button
+            class="ml-1 hover:text-white"
+            @click="() => { batteryFilterMin = batteryRangeMin; batteryFilterMax = batteryRangeMax; const q = { ...route.query } as Record<string, string>; delete q.attr_battery_min; delete q.attr_battery_max; router.push({ query: q }) }"
+          >&times;</button>
+        </span>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -365,13 +377,27 @@
                   class="w-full px-3 py-2 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-slate-200 focus:border-blue-500/50 focus:outline-none"
                   @change="onCountrySelect($event)"
                 >
-                  <option value="">{{ $t('anyCountry', 'Any country') }}</option>
-                  <option value="DE">{{ $t('countryDE', 'Germany') }}</option>
-                  <option value="AT">{{ $t('countryAT', 'Austria') }}</option>
-                  <option value="CH">{{ $t('countryCH', 'Switzerland') }}</option>
-                  <option value="NL">{{ $t('countryNL', 'Netherlands') }}</option>
-                  <option value="BE">{{ $t('countryBE', 'Belgium') }}</option>
-                  <option value="FR">{{ $t('countryFR', 'France') }}</option>
+                  <option value="">
+                    {{ $t('anyCountry', 'Any country') }}
+                  </option>
+                  <option value="DE">
+                    {{ $t('countryDE', 'Germany') }}
+                  </option>
+                  <option value="AT">
+                    {{ $t('countryAT', 'Austria') }}
+                  </option>
+                  <option value="CH">
+                    {{ $t('countryCH', 'Switzerland') }}
+                  </option>
+                  <option value="NL">
+                    {{ $t('countryNL', 'Netherlands') }}
+                  </option>
+                  <option value="BE">
+                    {{ $t('countryBE', 'Belgium') }}
+                  </option>
+                  <option value="FR">
+                    {{ $t('countryFR', 'France') }}
+                  </option>
                 </select>
               </div>
               <!-- ZIP code input -->
@@ -394,10 +420,16 @@
                 </button>
               </div>
               <!-- Location status -->
-              <div v-if="locationName" class="text-xs text-green-400">
+              <div
+                v-if="locationName"
+                class="text-xs text-green-400"
+              >
                 📍 {{ locationName }}
               </div>
-              <div v-else-if="zipError" class="text-xs text-red-400">
+              <div
+                v-else-if="zipError"
+                class="text-xs text-red-400"
+              >
                 {{ zipError }}
               </div>
               <!-- Or use browser geolocation -->
@@ -409,7 +441,10 @@
                 <span v-if="userLocation && !locationName">📍 {{ $t('locationSet', 'Location set') }}</span>
                 <span v-else>📍 {{ $t('useMyLocation', 'Use my location') }}</span>
               </button>
-              <div v-if="userLocation" class="space-y-2">
+              <div
+                v-if="userLocation"
+                class="space-y-2"
+              >
                 <label class="text-xs text-slate-400">{{ $t('maxDistance', 'Max distance (km)') }}</label>
                 <div class="flex items-center gap-2">
                   <input
@@ -501,9 +536,12 @@
                   </h3>
 
                   <!-- Top Attributes -->
-                  <div v-if="getTopAttributes(product).length > 0" class="flex flex-wrap gap-1.5 mt-2 mb-2 min-h-[24px]">
-                    <span 
-                      v-for="attr in getTopAttributes(product)" 
+                  <div
+                    v-if="getTopAttributes(product).length > 0"
+                    class="flex flex-wrap gap-1.5 mt-2 mb-2 min-h-[24px]"
+                  >
+                    <span
+                      v-for="attr in getTopAttributes(product)"
                       :key="attr.key"
                       class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-slate-700/50 text-slate-300 border border-slate-600/50 truncate max-w-full"
                     >
@@ -698,7 +736,7 @@ const hasActiveFilters = computed(
 )
 
 // Geolocation state
-const userLocation = ref<{ lat: number; lon: number } | null>(null)
+const userLocation = ref<{ lat: number, lon: number } | null>(null)
 const distanceFilterKm = ref<number>(50)
 const zipCodeInput = ref<string>((route.query.zip as string) || '')
 const locationName = ref<string>('')
@@ -842,9 +880,9 @@ onBeforeUnmount(() => {
 // --- Category browsing ---
 const { topLevelCategories, loadingCategories, fetchTopLevelCategories, fetchSubCategories, toUrlSlug, toApiSlug, slugToLabel } = useCategories()
 
-interface BrowseSegment { slug: string; label: string }
+interface BrowseSegment { slug: string, label: string }
 const browsePath = ref<BrowseSegment[]>([])
-const browseSubCats = ref<Array<{ slug: string; label: string; subCategories?: any[] | null }>>([])
+const browseSubCats = ref<Array<{ slug: string, label: string, subCategories?: any[] | null }>>([])
 
 // Global category counts (from aggregation) to hide empty categories and show product counts
 const globalCategoryCounts = ref<Record<string, number>>({})
@@ -859,10 +897,11 @@ async function fetchGlobalCategoryCounts() {
       }
       globalCategoryCounts.value = normalized
     }
-  } catch { /* ignore — show all categories as fallback */ }
+  }
+  catch { /* ignore — show all categories as fallback */ }
 }
 
-function countForCategory(cat: { slug: string; label?: string }): number {
+function countForCategory(cat: { slug: string, label?: string }): number {
   const counts = globalCategoryCounts.value
   return (counts[cat.slug?.toLowerCase()] ?? 0) + (counts[(cat as any).label?.toLowerCase()] ?? 0)
 }
@@ -871,7 +910,7 @@ function countForCategory(cat: { slug: string; label?: string }): number {
 const displayCategories = computed(() => {
   const cats = browseSubCats.value.length > 0 ? browseSubCats.value : topLevelCategories.value
   if (Object.keys(globalCategoryCounts.value).length === 0) return cats
-  return cats.filter(cat => {
+  return cats.filter((cat) => {
     // Show a category if it or any of its subcategories has listings (match by slug or label)
     if (countForCategory(cat) > 0) return true
     if (cat.subCategories?.some((sub: any) => countForCategory(sub) > 0)) return true
@@ -908,7 +947,7 @@ function getCategoryIcon(slug: string, label: string): string {
   return categoryIconMap[label] || 'tabler:category'
 }
 
-function getCategoryProductCount(cat: { slug: string; label?: string; subCategories?: any[] | null }): number {
+function getCategoryProductCount(cat: { slug: string, label?: string, subCategories?: any[] | null }): number {
   let total = countForCategory(cat)
   if (cat.subCategories) {
     for (const sub of cat.subCategories) {
@@ -928,7 +967,7 @@ function formatCount(n: number): string {
   return n.toString()
 }
 
-async function onUnifiedCategoryClick(cat: { slug: string; label: string; subCategories?: any[] | null }) {
+async function onUnifiedCategoryClick(cat: { slug: string, label: string, subCategories?: any[] | null }) {
   if (cat.subCategories && cat.subCategories.length > 0) {
     // Navigate deeper into the tree
     browsePath.value = [...browsePath.value, { slug: cat.slug, label: cat.label }]
@@ -961,7 +1000,7 @@ function navigateToBreadcrumb(idx: number) {
   // Re-fetch subcategories for this level
   if (targetCat) {
     fetchSubCategories(targetCat.slug).then((subs: unknown[]) => {
-      browseSubCats.value = (subs || []) as Array<{ slug: string; label: string; subCategories?: unknown[] | null }>
+      browseSubCats.value = (subs || []) as Array<{ slug: string, label: string, subCategories?: unknown[] | null }>
     })
   }
 }
@@ -1048,7 +1087,7 @@ const categoryTranslationMap: Record<string, string> = {
   'pc-zubehoer': 'cat_accessories',
   'taschen': 'cat_bags',
   'sammlungen': 'cat_collectibles',
-  
+
   // Keep English ones for fallback
   'Electronics': 'cat_electronics',
   'Smartphones': 'cat_smartphones',
@@ -1350,7 +1389,7 @@ async function performSearch(append = false) {
     const batteryBuckets = attributeBuckets.value['battery']
     if (batteryBuckets && batteryBuckets.length > 0) {
       const numericValues = batteryBuckets
-        .map(b => parseInt(String(b.value).replace('%', ''), 10))
+        .map(b => Number.parseInt(String(b.value).replace('%', ''), 10))
         .filter(n => !isNaN(n))
       if (numericValues.length > 0) {
         batteryRangeMin.value = Math.min(...numericValues)
@@ -1457,7 +1496,8 @@ function onSortChange(event: Event) {
   const query = { ...route.query } as Record<string, string>
   if (value) {
     query.sort = value
-  } else {
+  }
+  else {
     delete query.sort
   }
   router.push({ query })
@@ -1485,7 +1525,7 @@ function requestLocation() {
         console.error('Geolocation error:', err)
         alert('Could not get your location. Please allow location access or enter a ZIP code.')
       },
-      { enableHighAccuracy: false, timeout: 10000 }
+      { enableHighAccuracy: false, timeout: 10000 },
     )
   }
 }
@@ -1531,12 +1571,14 @@ async function lookupZipCode() {
       await nextTick()
       performSearch()
     }
-  } catch (err) {
+  }
+  catch (err) {
     console.error('ZIP lookup error:', err)
     zipError.value = 'Could not resolve ZIP code'
     zipResolving.value = false
     performSearch() // Still search, just without distance filter
-  } finally {
+  }
+  finally {
     zipLoading.value = false
   }
 }
@@ -1545,7 +1587,8 @@ function applyDistanceFilter() {
   const query = { ...route.query } as Record<string, string>
   if (distanceFilterKm.value > 0 && userLocation.value) {
     query.max_distance = String(distanceFilterKm.value)
-  } else {
+  }
+  else {
     delete query.max_distance
   }
   router.push({ query })
@@ -1570,7 +1613,8 @@ function onCountrySelect(event: Event) {
   const query = { ...route.query } as Record<string, string>
   if (!code) {
     delete query.country
-  } else {
+  }
+  else {
     query.country = code
   }
   router.push({ query })
@@ -1700,7 +1744,7 @@ function productDisplayName(product: any): string {
 function getDisplayCategory(product: any): string | null {
   if (!product.categories || !Array.isArray(product.categories)) return null
   return product.categories.find((c: string) =>
-    c && c !== 'general' && !/^\d+(,\s*\d+)*$/.test(c)
+    c && c !== 'general' && !/^\d+(,\s*\d+)*$/.test(c),
   ) ?? null
 }
 

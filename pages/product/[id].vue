@@ -699,48 +699,48 @@ function formatDate(dateStr: string | undefined) {
 }
 
 const attrKeyTranslationMap: Record<string, string> = {
-  'color': 'attr_color',
-  'size': 'attr_size',
-  'brand': 'attr_brand',
-  'model': 'attr_model',
-  'material': 'attr_material',
-  'gender': 'attr_gender',
-  'style': 'attr_style',
-  'pattern': 'attr_pattern',
-  'condition': 'attr_condition',
-  'category': 'attr_category',
-  'type': 'attr_type',
-  'year': 'attr_year',
-  'weight': 'attr_weight',
-  'dimensions': 'attr_dimensions',
-  'voltage': 'attr_voltage',
-  'power': 'attr_power',
-  'capacity': 'attr_capacity',
-  'resolution': 'attr_resolution',
-  'storage': 'attr_storage',
-  'ram': 'attr_ram',
-  'processor': 'attr_processor',
-  'os': 'attr_os',
-  'camera': 'attr_camera',
-  'battery': 'attr_battery',
-  'screen_size': 'attr_screen_size',
-  'connectivity': 'attr_connectivity',
-  'features': 'attr_features',
-  'warranty': 'attr_warranty',
-  'origin': 'attr_origin',
-  'manufacturer': 'attr_manufacturer',
-  'manufactureaddress': 'attr_manufacturer',
-  'manufacturertradename': 'attr_manufacturer',
-  'mileage': 'attr_mileage',
-  'fuel': 'attr_fuel',
-  'transmission': 'attr_transmission',
-  'horsepower': 'attr_horsepower',
-  'displacement': 'attr_displacement',
-  'doors': 'attr_doors',
-  'seats': 'attr_seats',
-  'drive_type': 'attr_drive_type',
-  'body_type': 'attr_body_type',
-  'registration_year': 'attr_registration_year',
+  color: 'attr_color',
+  size: 'attr_size',
+  brand: 'attr_brand',
+  model: 'attr_model',
+  material: 'attr_material',
+  gender: 'attr_gender',
+  style: 'attr_style',
+  pattern: 'attr_pattern',
+  condition: 'attr_condition',
+  category: 'attr_category',
+  type: 'attr_type',
+  year: 'attr_year',
+  weight: 'attr_weight',
+  dimensions: 'attr_dimensions',
+  voltage: 'attr_voltage',
+  power: 'attr_power',
+  capacity: 'attr_capacity',
+  resolution: 'attr_resolution',
+  storage: 'attr_storage',
+  ram: 'attr_ram',
+  processor: 'attr_processor',
+  os: 'attr_os',
+  camera: 'attr_camera',
+  battery: 'attr_battery',
+  screen_size: 'attr_screen_size',
+  connectivity: 'attr_connectivity',
+  features: 'attr_features',
+  warranty: 'attr_warranty',
+  origin: 'attr_origin',
+  manufacturer: 'attr_manufacturer',
+  manufactureaddress: 'attr_manufacturer',
+  manufacturertradename: 'attr_manufacturer',
+  mileage: 'attr_mileage',
+  fuel: 'attr_fuel',
+  transmission: 'attr_transmission',
+  horsepower: 'attr_horsepower',
+  displacement: 'attr_displacement',
+  doors: 'attr_doors',
+  seats: 'attr_seats',
+  drive_type: 'attr_drive_type',
+  body_type: 'attr_body_type',
+  registration_year: 'attr_registration_year',
 }
 
 const attrValueTranslationMap: Record<string, Record<string, string>> = {
@@ -767,13 +767,13 @@ const attrValueTranslationMap: Record<string, Record<string, string>> = {
     Unisex: 'gender_unisex',
   },
   fuel: {
-    petrol: 'fuel_petrol',
-    diesel: 'fuel_diesel',
-    electric: 'fuel_electric',
-    hybrid: 'fuel_hybrid',
+    'petrol': 'fuel_petrol',
+    'diesel': 'fuel_diesel',
+    'electric': 'fuel_electric',
+    'hybrid': 'fuel_hybrid',
     'plug-in-hybrid': 'fuel_plugin_hybrid',
-    gas: 'fuel_gas',
-    hydrogen: 'fuel_hydrogen',
+    'gas': 'fuel_gas',
+    'hydrogen': 'fuel_hydrogen',
   },
   transmission: {
     manual: 'transmission_manual',
@@ -853,13 +853,13 @@ function localizeAttrValue(attrKey: string, value: string): string {
 function formatMileageRange(value: string): string {
   const locale = t('nav.home') === 'Startseite' ? 'de-DE' : 'en-US'
   if (value.endsWith('+')) {
-    const num = parseInt(value.replace('+', ''))
+    const num = Number.parseInt(value.replace('+', ''))
     if (!isNaN(num)) return `${num.toLocaleString(locale)}+ km`
   }
   const parts = value.split('-')
   if (parts.length === 2) {
-    const a = parseInt(parts[0])
-    const b = parseInt(parts[1])
+    const a = Number.parseInt(parts[0])
+    const b = Number.parseInt(parts[1])
     if (!isNaN(a) && !isNaN(b)) return `${a.toLocaleString(locale)} - ${b.toLocaleString(locale)} km`
   }
   return value
@@ -888,7 +888,7 @@ function conditionClass(condition: string) {
 }
 
 function buildRelatedProductsUrl(id: string): string {
-  let url = `/api/Product/${id}/related`
+  const url = `/api/Product/${id}/related`
   const params = new URLSearchParams()
   if (zipCode.value) params.append('zip', zipCode.value)
   if (lat.value) params.append('lat', lat.value.toString())
@@ -899,7 +899,7 @@ function buildRelatedProductsUrl(id: string): string {
 }
 
 function buildMatchesUrl(id: string): string {
-  let url = `/api/Product/${id}/matches`
+  const url = `/api/Product/${id}/matches`
   const params = new URLSearchParams()
   if (zipCode.value) params.append('zip', zipCode.value)
   if (lat.value) params.append('lat', lat.value.toString())

@@ -1,6 +1,6 @@
-import { randomUUID } from 'crypto'
-import { appendFile, mkdir } from 'fs/promises'
-import { join } from 'path'
+import { randomUUID } from 'node:crypto'
+import { appendFile, mkdir } from 'node:fs/promises'
+import { join } from 'node:path'
 
 const DATA_DIR = join(process.cwd(), 'data', 'reports')
 

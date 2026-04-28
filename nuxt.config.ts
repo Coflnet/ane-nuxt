@@ -31,6 +31,7 @@ export default defineNuxtConfig({
 
   routeRules: {
     '/': { prerender: true },
+    '/blog/**': { prerender: true },
     '/_ipx/**': { prerender: false },
   },
 
@@ -91,17 +92,17 @@ export default defineNuxtConfig({
     position: 'top-right',
   },
 
-  sitemap: {
-    sources: [
-      '/api/__sitemap__/urls',
-    ],
-  },
-
   robots: {
     sitemap: [
       '/sitemap_index.xml',
       '/product-sitemap.xml',
       '/product-sitemap-de.xml',
+    ],
+  },
+
+  sitemap: {
+    sources: [
+      '/api/__sitemap__/urls',
     ],
   },
 

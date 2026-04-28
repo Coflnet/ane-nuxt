@@ -1277,6 +1277,12 @@
               </h4>
               <ul class="space-y-2">
                 <li>
+                  <NuxtLink
+                    :to="localePath('/blog')"
+                    class="text-gray-400 hover:text-white transition"
+                  >Blog</NuxtLink>
+                </li>
+                <li>
                   <a
                     href="https://coflnet.com/privacy"
                     class="text-gray-400 hover:text-white transition"

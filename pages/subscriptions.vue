@@ -77,7 +77,7 @@ const localePath = useLocalePath()
 
 const displayPlans = computed<Plan[]>(() => {
   if (!discountApplied.value) return plans
-  return plans.map(p => {
+  return plans.map((p) => {
     if (p.id === 'basic') return p
     return {
       ...p,

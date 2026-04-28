@@ -1,14 +1,27 @@
 import { createConfigForNuxt } from '@nuxt/eslint-config/flat'
 
-export default createConfigForNuxt({
+const config = createConfigForNuxt({
   features: {
+    typescript: true,
     tooling: true,
     stylistic: true,
   },
-}, {
+})
+
+config.override('nuxt/vue/rules', current => ({
+  ...current,
   rules: {
+    ...current.rules,
     'vue/multi-word-component-names': 'off',
-    '@typescript-eslint/ban-types': 'off',
+  },
+}))
+
+config.override('nuxt/typescript/rules', current => ({
+  ...current,
+  rules: {
+    ...current.rules,
     '@typescript-eslint/no-unused-vars': 'warn',
   },
-})
+}))
+
+export default config

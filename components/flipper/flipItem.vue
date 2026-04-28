@@ -35,35 +35,48 @@
         </h3>
         <div class="flex flex-col gap-1 shrink-0">
           <button
-            @click="emit('bookmark')"
             class="w-7 h-7 rounded-md bg-gray-700/50 hover:bg-yellow-500/20 flex items-center justify-center transition-colors"
             :class="props.isBookmarked ? 'text-yellow-400' : 'text-gray-400 hover:text-yellow-400'"
             :title="props.isBookmarked ? 'Remove Bookmark' : 'Bookmark'"
+            @click="emit('bookmark')"
           >
-            <Icon :name="props.isBookmarked ? 'mdi:bookmark' : 'mdi:bookmark-outline'" size="14" />
+            <Icon
+              :name="props.isBookmarked ? 'mdi:bookmark' : 'mdi:bookmark-outline'"
+              size="14"
+            />
           </button>
           <button
             v-if="props.showDelete"
-            @click="emit('delete')"
             class="w-7 h-7 rounded-md bg-gray-700/50 hover:bg-red-500/20 text-gray-400 hover:text-red-400 flex items-center justify-center transition-colors"
             title="Delete Bookmark"
+            @click="emit('delete')"
           >
-            <Icon name="mdi:delete-outline" size="14" />
+            <Icon
+              name="mdi:delete-outline"
+              size="14"
+            />
           </button>
           <button
-            @click="reportFlip"
             class="w-7 h-7 rounded-md bg-gray-700/50 hover:bg-red-500/20 text-gray-400 hover:text-red-400 flex items-center justify-center transition-colors"
             :disabled="reportSubmitting"
             title="Report Flip"
+            @click="reportFlip"
           >
-            <Icon :name="reportSubmitting ? 'mdi:loading' : 'mdi:flag-outline'" size="14" :class="{ 'animate-spin': reportSubmitting }" />
+            <Icon
+              :name="reportSubmitting ? 'mdi:loading' : 'mdi:flag-outline'"
+              size="14"
+              :class="{ 'animate-spin': reportSubmitting }"
+            />
           </button>
           <button
-            @click="showReferences = !showReferences"
             class="w-7 h-7 rounded-md bg-gray-700/50 hover:bg-blue-500/20 text-gray-400 hover:text-blue-400 flex items-center justify-center transition-colors"
             title="Show References"
+            @click="showReferences = !showReferences"
           >
-            <Icon name="mdi:format-list-bulleted" size="14" />
+            <Icon
+              name="mdi:format-list-bulleted"
+              size="14"
+            />
           </button>
         </div>
       </div>
@@ -96,8 +109,13 @@
       </div>
 
       <!-- References List -->
-      <div v-if="showReferences && item.recentSells?.length" class="mb-4 bg-gray-900/50 rounded p-2 max-h-40 overflow-y-auto">
-        <div class="text-xs font-semibold text-gray-400 mb-2 border-b border-gray-700 pb-1">Found References ({{ item.recentSells.length }})</div>
+      <div
+        v-if="showReferences && item.recentSells?.length"
+        class="mb-4 bg-gray-900/50 rounded p-2 max-h-40 overflow-y-auto"
+      >
+        <div class="text-xs font-semibold text-gray-400 mb-2 border-b border-gray-700 pb-1">
+          Found References ({{ item.recentSells.length }})
+        </div>
         <div class="flex flex-col gap-2">
           <a
             v-for="(sell, idx) in item.recentSells"
@@ -106,10 +124,16 @@
             target="_blank"
             class="flex justify-between items-center text-xs hover:bg-gray-700/50 p-1 rounded"
           >
-            <span class="text-blue-400 truncate max-w-[120px]" :title="sell.key ?? undefined">{{ sell.key }}</span>
+            <span
+              class="text-blue-400 truncate max-w-[120px]"
+              :title="sell.key ?? undefined"
+            >{{ sell.key }}</span>
             <div class="flex items-center gap-2 shrink-0">
               <span class="text-green-400">{{ formatPrice(sell.price) }}</span>
-              <span class="text-gray-500" v-if="sell.date">{{ formatDistanceToNow(new Date(sell.date), { addSuffix: true, ...dateFnsLocale }) }}</span>
+              <span
+                v-if="sell.date"
+                class="text-gray-500"
+              >{{ formatDistanceToNow(new Date(sell.date), { addSuffix: true, ...dateFnsLocale }) }}</span>
             </div>
           </a>
         </div>
@@ -140,15 +164,26 @@
           <template v-if="!reportId">
             <div class="flex items-center gap-3 mb-4">
               <div class="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center">
-                <Icon name="mdi:flag-outline" size="24" class="text-red-400" />
+                <Icon
+                  name="mdi:flag-outline"
+                  size="24"
+                  class="text-red-400"
+                />
               </div>
-              <h3 class="text-lg font-bold text-white">Report Flip</h3>
+              <h3 class="text-lg font-bold text-white">
+                Report Flip
+              </h3>
             </div>
 
             <!-- Current grouping -->
-            <div v-if="currentSlug" class="mb-3">
+            <div
+              v-if="currentSlug"
+              class="mb-3"
+            >
               <label class="text-xs text-gray-400 block mb-1">Current grouping</label>
-              <div class="bg-gray-900/80 rounded-lg px-3 py-2 text-sm text-gray-300 font-mono">{{ currentSlug }}</div>
+              <div class="bg-gray-900/80 rounded-lg px-3 py-2 text-sm text-gray-300 font-mono">
+                {{ currentSlug }}
+              </div>
             </div>
 
             <!-- Reason (required) -->
@@ -162,7 +197,12 @@
                 :class="reasonInvalid ? 'border-red-500' : 'border-gray-600'"
                 @input="reasonInvalid = false"
               />
-              <p v-if="reasonInvalid" class="text-xs text-red-400 mt-1">Reason must be at least 5 characters</p>
+              <p
+                v-if="reasonInvalid"
+                class="text-xs text-red-400 mt-1"
+              >
+                Reason must be at least 5 characters
+              </p>
             </div>
 
             <!-- Suggested slug input (optional) -->
@@ -178,15 +218,15 @@
 
             <div class="flex gap-2">
               <button
-                @click="showReportDialog = false"
                 class="flex-1 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors text-sm"
+                @click="showReportDialog = false"
               >
                 Cancel
               </button>
               <button
-                @click="submitReport"
                 :disabled="reportSubmitting"
                 class="flex-1 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm disabled:opacity-50"
+                @click="submitReport"
               >
                 {{ reportSubmitting ? 'Submitting...' : 'Submit Report' }}
               </button>
@@ -197,9 +237,15 @@
           <template v-else>
             <div class="flex items-center gap-3 mb-4">
               <div class="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
-                <Icon name="mdi:check" size="24" class="text-green-400" />
+                <Icon
+                  name="mdi:check"
+                  size="24"
+                  class="text-green-400"
+                />
               </div>
-              <h3 class="text-lg font-bold text-white">Report Submitted</h3>
+              <h3 class="text-lg font-bold text-white">
+                Report Submitted
+              </h3>
             </div>
             <p class="text-gray-400 text-sm mb-4">
               Your report has been logged. Use the ID below for reference.
@@ -207,16 +253,19 @@
             <div class="bg-gray-900/80 rounded-lg p-3 flex items-center justify-between mb-4">
               <code class="text-blue-400 font-mono text-lg tracking-wider">{{ reportId }}</code>
               <button
-                @click="copyReportId"
                 class="text-gray-400 hover:text-white transition-colors px-2"
                 title="Copy ID"
+                @click="copyReportId"
               >
-                <Icon :name="copied ? 'mdi:check' : 'mdi:content-copy'" size="18" />
+                <Icon
+                  :name="copied ? 'mdi:check' : 'mdi:content-copy'"
+                  size="18"
+                />
               </button>
             </div>
             <button
-              @click="closeReportDialog"
               class="w-full py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors text-sm"
+              @click="closeReportDialog"
             >
               Close
             </button>
@@ -302,9 +351,11 @@ const submitReport = async () => {
       },
     })
     reportId.value = result?.reportId ?? 'ERROR'
-  } catch {
+  }
+  catch {
     reportId.value = 'ERROR'
-  } finally {
+  }
+  finally {
     reportSubmitting.value = false
   }
 }

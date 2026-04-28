@@ -8,9 +8,15 @@
     </h1>
 
     <!-- Flipper Tier Banner + Distance Sort & Location -->
-    <UiDefaultContainer class="mb-4 p-4" :class="!isFlipperTier ? 'border border-indigo-500/30 bg-indigo-900/20' : ''">
+    <UiDefaultContainer
+      class="mb-4 p-4"
+      :class="!isFlipperTier ? 'border border-indigo-500/30 bg-indigo-900/20' : ''"
+    >
       <!-- Promo banner for non-flipper users -->
-      <div v-if="!isFlipperTier" class="flex items-center justify-between flex-wrap gap-3 mb-4 pb-4 border-b border-indigo-500/20">
+      <div
+        v-if="!isFlipperTier"
+        class="flex items-center justify-between flex-wrap gap-3 mb-4 pb-4 border-b border-indigo-500/20"
+      >
         <div>
           <p class="text-white font-medium">
             {{ $t('flipperTierPromo') }}
@@ -37,9 +43,15 @@
               :disabled="!isFlipperTier"
               class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-40 focus:border-blue-500 focus:outline-none disabled:cursor-not-allowed"
             >
-              <option value="newest">{{ $t('sortNewest') }}</option>
-              <option value="profit">{{ $t('sortProfit') }}</option>
-              <option value="distance">{{ $t('sortDistance') }}</option>
+              <option value="newest">
+                {{ $t('sortNewest') }}
+              </option>
+              <option value="profit">
+                {{ $t('sortProfit') }}
+              </option>
+              <option value="distance">
+                {{ $t('sortDistance') }}
+              </option>
             </select>
           </div>
           <div class="flex flex-col gap-1">
@@ -58,19 +70,34 @@
                 class="flex items-center gap-1 text-xs text-white px-3 py-1.5 rounded-lg bg-gray-700 hover:bg-gray-600 border border-gray-600 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                 @click="useDeviceLocation"
               >
-                <Icon name="tabler:current-location" class="w-4 h-4" />
+                <Icon
+                  name="tabler:current-location"
+                  class="w-4 h-4"
+                />
                 {{ $t('useGPS') }}
               </button>
             </div>
           </div>
-          <div v-if="userLocation" class="flex items-center gap-2 text-xs text-green-400">
-            <Icon name="tabler:map-pin" class="w-4 h-4" />
+          <div
+            v-if="userLocation"
+            class="flex items-center gap-2 text-xs text-green-400"
+          >
+            <Icon
+              name="tabler:map-pin"
+              class="w-4 h-4"
+            />
             {{ locationLabel }}
           </div>
-          <div v-if="locationError" class="text-xs text-red-400">
+          <div
+            v-if="locationError"
+            class="text-xs text-red-400"
+          >
             {{ locationError }}
           </div>
-          <div v-if="sortMode === 'distance' && filters.maxDistance > 0" class="flex flex-col gap-1">
+          <div
+            v-if="sortMode === 'distance' && filters.maxDistance > 0"
+            class="flex flex-col gap-1"
+          >
             <label class="text-xs text-gray-400">{{ $t('maxDistance') }}</label>
             <div class="flex items-center gap-2">
               <input
@@ -84,8 +111,14 @@
             </div>
           </div>
         </div>
-        <div v-if="!isFlipperTier" class="mt-2 flex items-center gap-2">
-          <Icon name="tabler:lock" class="w-4 h-4 text-indigo-400" />
+        <div
+          v-if="!isFlipperTier"
+          class="mt-2 flex items-center gap-2"
+        >
+          <Icon
+            name="tabler:lock"
+            class="w-4 h-4 text-indigo-400"
+          />
           <span class="text-xs text-indigo-400">
             {{ $t('distanceSortFlipperOnly') }}
           </span>
@@ -323,7 +356,9 @@
         @click.self="deleteTarget = null"
       >
         <div class="bg-gray-800 rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl border border-gray-700">
-          <h3 class="text-lg font-bold text-white mb-2">{{ $t('removeBookmark') }}</h3>
+          <h3 class="text-lg font-bold text-white mb-2">
+            {{ $t('removeBookmark') }}
+          </h3>
           <p class="text-gray-400 text-sm mb-4">
             {{ $t('removeBookmarkConfirm', { title: deleteTarget.listing?.title ?? '' }) }}
           </p>
@@ -389,7 +424,8 @@ function loadAutoScroll(): boolean {
   try {
     const saved = localStorage.getItem(STORAGE_KEY_AUTOSCROLL)
     return saved === null ? true : saved === 'true'
-  } catch { return true }
+  }
+  catch { return true }
 }
 const autoScroll = ref(loadAutoScroll())
 watch(autoScroll, (val) => {
@@ -523,7 +559,7 @@ async function geocodeZip() {
       locationError.value = useI18n().t('zipNotFound')
       return
     }
-    userLocation.value = { lat: parseFloat(res[0].lat), lng: parseFloat(res[0].lon) }
+    userLocation.value = { lat: Number.parseFloat(res[0].lat), lng: Number.parseFloat(res[0].lon) }
     locationLabel.value = res[0].display_name.split(',').slice(0, 2).join(', ')
     if (sortMode.value !== 'distance') sortMode.value = 'distance'
   }
@@ -537,7 +573,8 @@ function loadFilters() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY_FILTERS)
     return saved ? { ...defaultFilters, ...JSON.parse(saved) } : { ...defaultFilters }
-  } catch { return { ...defaultFilters } }
+  }
+  catch { return { ...defaultFilters } }
 }
 
 function saveFilters() {
@@ -563,7 +600,8 @@ function loadBookmarks(): Flip[] {
   try {
     const saved = localStorage.getItem(STORAGE_KEY_BOOKMARKS)
     return saved ? JSON.parse(saved) : []
-  } catch { return [] }
+  }
+  catch { return [] }
 }
 
 function saveBookmarks() {
@@ -578,7 +616,8 @@ function isBookmarked(flip: Flip): boolean {
 function toggleBookmark(flip: Flip) {
   if (isBookmarked(flip)) {
     bookmarkedFlips.value = bookmarkedFlips.value.filter(b => b.listing?.id !== flip.listing?.id)
-  } else {
+  }
+  else {
     bookmarkedFlips.value = [...bookmarkedFlips.value, JSON.parse(JSON.stringify(flip))]
   }
   saveBookmarks()
@@ -625,8 +664,8 @@ async function loadFlips(isRefresh = false) {
 
       const existingIds = new Set(items.value.map(i => i.listing?.id))
       const added = newItems.filter(i => !existingIds.has(i.listing?.id))
-      
-if (added.length > 0) {
+
+      if (added.length > 0) {
         let toAddImmediately = added
         let toAddLater: typeof added = []
 
@@ -666,7 +705,8 @@ if (added.length > 0) {
               if (toAddLater[1]) setTimeout(() => addNewItem(toAddLater[1]!), 15000)
             }
           }
-        } else {
+        }
+        else {
           // Subsequent refresh: scroll right to reveal new items if autoScroll is on
           if (autoScroll.value) {
             await nextTick()
@@ -676,12 +716,14 @@ if (added.length > 0) {
             }
           }
         }
-      } else if (items.value.length === 0) {
+      }
+      else if (items.value.length === 0) {
         items.value = newItems
         isFirstLoad.value = false
       }
-    } else if (!isRefresh) {
-       items.value = []
+    }
+    else if (!isRefresh) {
+      items.value = []
     }
   }
   catch (e) {

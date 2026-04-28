@@ -1,6 +1,9 @@
 <template>
   <div class="w-full max-w-2xl mx-auto">
-    <div class="relative group" ref="containerRef">
+    <div
+      ref="containerRef"
+      class="relative group"
+    >
       <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200" />
       <div class="relative flex items-center bg-slate-800 rounded-lg shadow-xl ring-1 ring-slate-700/50">
         <div class="pl-4 text-slate-400">
@@ -23,8 +26,14 @@
           @keydown.up.prevent="moveHighlight(-1)"
           @keydown.escape="showDropdown = false"
         >
-        <div v-if="isLoading" class="pr-2">
-          <Icon name="tabler:loader-2" class="w-5 h-5 text-slate-400 animate-spin" />
+        <div
+          v-if="isLoading"
+          class="pr-2"
+        >
+          <Icon
+            name="tabler:loader-2"
+            class="w-5 h-5 text-slate-400 animate-spin"
+          />
         </div>
         <div class="pr-2">
           <button
@@ -57,7 +66,10 @@
             @mouseenter="highlightIndex = i"
             @click="selectCategory(cat)"
           >
-            <Icon name="tabler:category" class="w-4 h-4 text-blue-400 shrink-0" />
+            <Icon
+              name="tabler:category"
+              class="w-4 h-4 text-blue-400 shrink-0"
+            />
             <span class="truncate">{{ cat.label }}</span>
             <span class="ml-auto text-xs text-slate-500">{{ cat.path }}</span>
           </button>
@@ -65,7 +77,10 @@
 
         <!-- Product suggestions -->
         <div v-if="suggestions.length > 0">
-          <div class="px-3 py-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wider" :class="{ 'border-t border-slate-700': categorySuggestions.length > 0 }">
+          <div
+            class="px-3 py-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wider"
+            :class="{ 'border-t border-slate-700': categorySuggestions.length > 0 }"
+          >
             Products
           </div>
           <button
@@ -82,13 +97,27 @@
               class="w-8 h-8 rounded object-cover shrink-0"
               loading="lazy"
               onerror="this.style.display='none'"
+            >
+            <Icon
+              v-else
+              name="tabler:package"
+              class="w-5 h-5 text-slate-500 shrink-0"
             />
-            <Icon v-else name="tabler:package" class="w-5 h-5 text-slate-500 shrink-0" />
             <div class="min-w-0 flex-1">
-              <div class="truncate font-medium">{{ s.text }}</div>
-              <div v-if="s.category" class="text-xs text-slate-500 truncate">{{ s.category }}</div>
+              <div class="truncate font-medium">
+                {{ s.text }}
+              </div>
+              <div
+                v-if="s.category"
+                class="text-xs text-slate-500 truncate"
+              >
+                {{ s.category }}
+              </div>
             </div>
-            <span v-if="s.minPrice" class="text-sm text-emerald-400 shrink-0">
+            <span
+              v-if="s.minPrice"
+              class="text-sm text-emerald-400 shrink-0"
+            >
               ab {{ formatPrice(s.minPrice) }}
             </span>
           </button>
@@ -110,7 +139,7 @@ const emit = defineEmits<{
 
 const query = ref(props.initialQuery || '')
 const suggestions = ref<any[]>([])
-const categorySuggestions = ref<{ label: string; slug: string; path: string }[]>([])
+const categorySuggestions = ref<{ label: string, slug: string, path: string }[]>([])
 const showDropdown = ref(false)
 const highlightIndex = ref(-1)
 const isLoading = ref(false)
@@ -152,16 +181,16 @@ async function fetchSuggestions(q: string) {
     // Fetch product suggestions and category matches in parallel
     const [productResults, categoryResults] = await Promise.all([
       $fetch<any[]>(`${API_BASE}/api/Product/suggest`, {
-        params: { q, limit: 6 }
+        params: { q, limit: 6 },
       }).catch(() => []),
-      $fetch<any[]>(`${API_BASE}/api/Categories/top-level`).catch(() => [])
+      $fetch<any[]>(`${API_BASE}/api/Categories/top-level`).catch(() => []),
     ])
 
     suggestions.value = productResults || []
 
     // Match categories client-side from the tree
     const lower = q.toLowerCase()
-    const matched: { label: string; slug: string; path: string }[] = []
+    const matched: { label: string, slug: string, path: string }[] = []
     if (categoryResults) {
       for (const cat of categoryResults) {
         if (cat.label?.toLowerCase().includes(lower)) {
@@ -180,10 +209,12 @@ async function fetchSuggestions(q: string) {
     categorySuggestions.value = matched.slice(0, 4)
 
     showDropdown.value = suggestions.value.length > 0 || categorySuggestions.value.length > 0
-  } catch {
+  }
+  catch {
     suggestions.value = []
     categorySuggestions.value = []
-  } finally {
+  }
+  finally {
     isLoading.value = false
   }
 }
@@ -200,7 +231,8 @@ function handleSearch() {
     const catLen = categorySuggestions.value.length
     if (highlightIndex.value < catLen) {
       selectCategory(categorySuggestions.value[highlightIndex.value])
-    } else {
+    }
+    else {
       selectSuggestion(suggestions.value[highlightIndex.value - catLen])
     }
     return
@@ -215,12 +247,13 @@ function selectSuggestion(s: any) {
   query.value = s.text
   if (s.seoId) {
     navigateTo(`/product/${s.seoId}`)
-  } else {
+  }
+  else {
     emit('search', s.text)
   }
 }
 
-function selectCategory(cat: { label: string; slug: string; path: string }) {
+function selectCategory(cat: { label: string, slug: string, path: string }) {
   showDropdown.value = false
   query.value = ''
   emit('selectCategory', cat.slug)

@@ -9,11 +9,14 @@ export default defineEventHandler(async (event) => {
   let backendPath: string
   if (locale && index != null) {
     backendPath = `/api/sitemap-de-products-${index}.xml`
-  } else if (locale) {
+  }
+  else if (locale) {
     backendPath = '/api/sitemap-de-products.xml'
-  } else if (index != null) {
+  }
+  else if (index != null) {
     backendPath = `/api/sitemap-products-${index}.xml`
-  } else {
+  }
+  else {
     backendPath = '/api/sitemap-products.xml'
   }
 
