@@ -47,6 +47,7 @@
             :model-value="filter.keywords"
           />
           <FiltersFuzzyFilter :model-value="filter" />
+          <FiltersVisualSimilarityFilter v-model="filter.visualSimilarity" />
         </UiExpandOption>
         <FiltersNotificationSettingsFilter v-model="filter" />
 
@@ -117,6 +118,7 @@ const filter = ref<Filter>({
   deliveryMethod: '',
   frequency: '',
   fuzzyness: '0',
+  visualSimilarity: '',
 })
 
 watch([filter], (_) => {
@@ -240,6 +242,10 @@ async function loadEditParam() {
           break
         case 'Country':
           filter.value.country = item.value ?? ''
+          break
+        case 'VisualSimilarityFilter':
+          filter.value.visualSimilarity = item.value ?? ''
+          break
       }
     })
   }
@@ -357,6 +363,13 @@ async function handleFilters(): Promise<{ name: string, value: string | number |
   }
   if (rawFilter.blacklist.length != 0)
     filters.push({ name: 'NotContainsKeyWord', value: rawFilter.blacklist.join(',') })
+
+  // Visual similarity payload is JSON-encoded base64 thumbnail + CLIP embedding
+  // produced client-side via /api/filters/visual-similarity/prepare. Empty when
+  // the user did not pick a reference image.
+  if (rawFilter.visualSimilarity && rawFilter.visualSimilarity.length > 0)
+    filters.push({ name: 'VisualSimilarityFilter', value: rawFilter.visualSimilarity })
+
   return filters
 }
 

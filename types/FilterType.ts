@@ -42,4 +42,6 @@ export interface Filter {
   deliveryMethod: string
   frequency: string
   fuzzyness: string
+  /** Serialized JSON payload for VisualSimilarityFilter ('' = disabled). */
+  visualSimilarity: string
 }

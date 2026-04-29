@@ -704,6 +704,17 @@
   "lowFuzzy": "Light Fuzziness",
   "mediumFuzzy": "Medium Fuzziness",
   "fuzzyInfo": "Amount of letters that can be different from your search value: ( Switch -> Swtich ) \n NOTE: changing this value can cause your search to match other products. This setting is restricted to paid tiers",
+  "visualSimilarity": {
+    "title": "Visual Similarity",
+    "info": "Upload a reference image. Listings whose primary image looks similar (CLIP cosine similarity) will be notified — applied AFTER all other filters (price, brand keywords, etc.) match. Collectors tier or higher.",
+    "uploadHint": "Click to upload reference image",
+    "threshold": "Similarity threshold",
+    "broader": "Broader matches",
+    "stricter": "Stricter matches",
+    "preparing": "Preparing image embedding…",
+    "ready": "Reference image embedded — filter is active.",
+    "collectorRequired": "Visual similarity requires the Collectors tier."
+  },
   "appHeaderSearch": "Search",
   "findBestDeals": "Find the Best Second-Hand Deals",
   "homeSubtitle": "Compare prices across multiple marketplaces. Save money and the planet.",
