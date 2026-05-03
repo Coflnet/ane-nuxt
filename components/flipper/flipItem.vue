@@ -394,6 +394,8 @@ function getPlatformUrl(platform: Platform | undefined, id: string): string {
       return id.includes('/')
         ? `https://www.marktplaats.nl${id}`
         : `https://www.marktplaats.nl/v/redirect/redirect/${id}-test`
+    case 'Vinted':
+      return `https://www.vinted.de/items/${id}`
     default:
       return `https://ane.deals/auctions?platform=${String(platform ?? 'unknown').toLowerCase()}&id=${encodeURIComponent(id)}`
   }

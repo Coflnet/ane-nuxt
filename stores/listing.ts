@@ -116,6 +116,9 @@ export const useListingStore = defineStore('listing', () => {
         return `https://www.marktplaats.nl/v/redirect/redirect/${id}-test`
       }
     }
+    if (listing === 'Vinted') {
+      return `https://www.vinted.de/items/${id}`
+    }
     // fallback
     return `https://ane.deals/auctions?platform=${listing.toString().toLowerCase()}&id=${encodeURIComponent(id)}`
   }
