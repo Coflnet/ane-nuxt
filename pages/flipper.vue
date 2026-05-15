@@ -406,18 +406,54 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
-import type { Flip } from '~/src/api-client/types.gen'
-import { getFlips } from '~/src/api-client'
+import { client as apiClient } from '~/src/api-client/client.gen'
+import { getFlips, getSubscription, type ActiveSubscription, type Flip } from '~/src/api-client'
+
+type FeedTier = 'free' | 'collector' | 'flipper'
+type LiveFlipMessage = {
+  type?: string | null
+  category?: string | null
+  flip?: Flip | null
+}
 
 const { t } = useI18n()
 
 const STORAGE_KEY_FILTERS = 'flipper-filters'
 const STORAGE_KEY_BOOKMARKS = 'flipper-bookmarks'
 const STORAGE_KEY_AUTOSCROLL = 'flipper-autoscroll'
+const FEED_LIMIT = 24
+const MAX_FEED_ITEMS = 100
+const FREE_INITIAL_VISIBLE_COUNT = 10
+const FREE_BACKFILL_INTERVAL_MS = 60000
+const PREMIUM_BACKFILL_INTERVAL_MS = 120000
+const FREE_REPLAY_MIN_INTERVAL_MS = 2000
+const FREE_REPLAY_MAX_INTERVAL_MS = 5000
+const FREE_REPLAY_FALLBACK_INTERVAL_MS = 3000
+const FREE_REPLAY_COMPLETION_BUFFER_MS = 3000
 
 const items = ref<Flip[]>([])
 const loading = ref(true)
 const scrollContainer = ref<HTMLElement | null>(null)
+const route = useRoute()
+const userStore = useUserStore()
+const deleteTarget = ref<Flip | null>(null)
+const localePath = useLocalePath()
+const replayQueue = ref<Flip[]>([])
+const hasInitializedFeed = ref(false)
+
+let removeWheelHandler: (() => void) | null = null
+let refreshInterval: ReturnType<typeof setInterval> | null = null
+let replayTimer: ReturnType<typeof setTimeout> | null = null
+let liveSocket: WebSocket | null = null
+let liveReconnectTimer: ReturnType<typeof setTimeout> | null = null
+let liveReconnectAttempt = 0
+let allowLiveReconnect = false
+let nextFreeBackfillAt: number | null = null
+
+const selectedCategory = computed(() => {
+  const category = route.query.category
+  return typeof category === 'string' && category.trim() !== '' ? category : '1'
+})
 
 function loadAutoScroll(): boolean {
   if (import.meta.server) return true
@@ -425,24 +461,26 @@ function loadAutoScroll(): boolean {
     const saved = localStorage.getItem(STORAGE_KEY_AUTOSCROLL)
     return saved === null ? true : saved === 'true'
   }
-  catch { return true }
+  catch {
+    return true
+  }
 }
-const autoScroll = ref(loadAutoScroll())
-watch(autoScroll, (val) => {
-  if (import.meta.server) return
-  localStorage.setItem(STORAGE_KEY_AUTOSCROLL, String(val))
-})
-const route = useRoute()
-const userStore = useUserStore()
-const deleteTarget = ref<Flip | null>(null)
-const isFirstLoad = ref(true)
-const localePath = useLocalePath()
 
-// --- Flipper tier check ---
-const isFlipperTier = computed(() => {
-  const plan = userStore.currentPlan?.product
-  return plan === 'flipper'
+const autoScroll = ref(loadAutoScroll())
+
+watch(autoScroll, (value) => {
+  if (import.meta.server) return
+  localStorage.setItem(STORAGE_KEY_AUTOSCROLL, String(value))
 })
+
+const feedTier = computed<FeedTier>(() => {
+  const plan = userStore.currentPlan?.product
+  if (plan === 'flipper') return 'flipper'
+  if (plan) return 'collector'
+  return 'free'
+})
+
+const isFlipperTier = computed(() => feedTier.value === 'flipper')
 
 // --- Save filter dialog ---
 const showSaveFilterDialog = ref(false)
@@ -454,7 +492,6 @@ async function saveFlipFilter() {
   if (!filterName.value.trim()) return
 
   const filterData: Array<{ name: string, value: string }> = []
-  // Mark this as a flip notification (not a regular listing filter)
   filterData.push({ name: 'IsFlipNotification', value: 'true' })
   if (filters.search) filterData.push({ name: 'SearchTerm', value: filters.search })
   if (filters.minProfit > 0) filterData.push({ name: 'MinProfit', value: String(filters.minProfit) })
@@ -489,17 +526,11 @@ async function saveFlipFilter() {
     filterNotifyTarget.value = ''
     push.success(useI18n().t('filterSaved'))
   }
-  catch (e) {
-    console.error('Failed to save filter:', e)
+  catch (error) {
+    console.error('Failed to save filter:', error)
     push.error(useI18n().t('errorSavingFilter'))
   }
 }
-
-const FEED_LIMIT = 24
-const MAX_FEED_ITEMS = 100
-
-let removeWheelHandler: (() => void) | null = null
-let refreshInterval: ReturnType<typeof setInterval> | null = null
 
 // --- Filters (persisted to localStorage) ---
 const defaultFilters = { search: '', minProfit: 0, minMarginPct: 0, minRefs: 0, category: '', maxDistance: 0 }
@@ -513,11 +544,11 @@ const locationLabel = ref('')
 const locationError = ref('')
 
 function haversineDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
-  const R = 6371 // km
+  const radiusKm = 6371
   const dLat = (lat2 - lat1) * Math.PI / 180
   const dLng = (lng2 - lng1) * Math.PI / 180
   const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) ** 2
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+  return radiusKm * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 }
 
 function getFlipDistance(flip: Flip): number | null {
@@ -534,11 +565,11 @@ function useDeviceLocation() {
     locationError.value = useI18n().t('geolocationNotSupported')
     return
   }
+
   navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      userLocation.value = { lat: pos.coords.latitude, lng: pos.coords.longitude }
-      locationLabel.value = `${pos.coords.latitude.toFixed(2)}, ${pos.coords.longitude.toFixed(2)}`
-      locationError.value = ''
+    (position) => {
+      userLocation.value = { lat: position.coords.latitude, lng: position.coords.longitude }
+      locationLabel.value = `${position.coords.latitude.toFixed(2)}, ${position.coords.longitude.toFixed(2)}`
       if (sortMode.value !== 'distance') sortMode.value = 'distance'
     },
     () => {
@@ -550,17 +581,29 @@ function useDeviceLocation() {
 async function geocodeZip() {
   if (!locationZip.value.trim()) return
   locationError.value = ''
+
   try {
     const query = encodeURIComponent(locationZip.value.trim())
-    const res = await $fetch<Array<{ lat: string, lon: string, display_name: string }>>(`https://nominatim.openstreetmap.org/search?postalcode=${query}&format=json&limit=1`, {
+    const result = await $fetch<Array<{ lat: string, lon: string, display_name: string }>>(`https://nominatim.openstreetmap.org/search?postalcode=${query}&format=json&limit=1`, {
       headers: { 'User-Agent': 'ane.deals' },
     })
-    if (res.length === 0) {
+
+    if (result.length === 0) {
       locationError.value = useI18n().t('zipNotFound')
       return
     }
-    userLocation.value = { lat: Number.parseFloat(res[0].lat), lng: Number.parseFloat(res[0].lon) }
-    locationLabel.value = res[0].display_name.split(',').slice(0, 2).join(', ')
+
+    const match = result[0]
+    if (!match) {
+      locationError.value = useI18n().t('zipNotFound')
+      return
+    }
+
+    userLocation.value = {
+      lat: Number.parseFloat(match.lat),
+      lng: Number.parseFloat(match.lon),
+    }
+    locationLabel.value = match.display_name.split(',').slice(0, 2).join(', ')
     if (sortMode.value !== 'distance') sortMode.value = 'distance'
   }
   catch {
@@ -574,7 +617,9 @@ function loadFilters() {
     const saved = localStorage.getItem(STORAGE_KEY_FILTERS)
     return saved ? { ...defaultFilters, ...JSON.parse(saved) } : { ...defaultFilters }
   }
-  catch { return { ...defaultFilters } }
+  catch {
+    return { ...defaultFilters }
+  }
 }
 
 function saveFilters() {
@@ -601,7 +646,9 @@ function loadBookmarks(): Flip[] {
     const saved = localStorage.getItem(STORAGE_KEY_BOOKMARKS)
     return saved ? JSON.parse(saved) : []
   }
-  catch { return [] }
+  catch {
+    return []
+  }
 }
 
 function saveBookmarks() {
@@ -610,12 +657,12 @@ function saveBookmarks() {
 }
 
 function isBookmarked(flip: Flip): boolean {
-  return bookmarkedFlips.value.some(b => b.listing?.id === flip.listing?.id)
+  return bookmarkedFlips.value.some(bookmark => bookmark.listing?.id === flip.listing?.id)
 }
 
 function toggleBookmark(flip: Flip) {
   if (isBookmarked(flip)) {
-    bookmarkedFlips.value = bookmarkedFlips.value.filter(b => b.listing?.id !== flip.listing?.id)
+    bookmarkedFlips.value = bookmarkedFlips.value.filter(bookmark => bookmark.listing?.id !== flip.listing?.id)
   }
   else {
     bookmarkedFlips.value = [...bookmarkedFlips.value, JSON.parse(JSON.stringify(flip))]
@@ -624,10 +671,9 @@ function toggleBookmark(flip: Flip) {
 }
 
 function handleFlipClick(flip: Flip) {
-  if (!isBookmarked(flip)) {
-    bookmarkedFlips.value = [...bookmarkedFlips.value, JSON.parse(JSON.stringify(flip))]
-    saveBookmarks()
-  }
+  if (isBookmarked(flip)) return
+  bookmarkedFlips.value = [...bookmarkedFlips.value, JSON.parse(JSON.stringify(flip))]
+  saveBookmarks()
 }
 
 function confirmDeleteBookmark(flip: Flip) {
@@ -635,104 +681,327 @@ function confirmDeleteBookmark(flip: Flip) {
 }
 
 function removeBookmark(flip: Flip) {
-  bookmarkedFlips.value = bookmarkedFlips.value.filter(b => b.listing?.id !== flip.listing?.id)
+  bookmarkedFlips.value = bookmarkedFlips.value.filter(bookmark => bookmark.listing?.id !== flip.listing?.id)
   saveBookmarks()
   deleteTarget.value = null
 }
 
-// --- Data loading ---
 function getAuthHeaders() {
   if (!userStore.token) return undefined
   return { Authorization: `Bearer ${userStore.token}` }
 }
 
+function isActiveSubscription(subscription: ActiveSubscription): boolean {
+  return !subscription.endsAt || new Date(subscription.endsAt) > new Date()
+}
+
+function pickCurrentPlan(subscriptions: ActiveSubscription[]): ActiveSubscription | null {
+  const activeSubscriptions = subscriptions.filter(isActiveSubscription)
+  return activeSubscriptions.find(subscription => subscription.product === 'flipper') ?? activeSubscriptions[0] ?? null
+}
+
+async function syncCurrentPlan() {
+  await userStore.checkAuth(useFirebaseAuth()!)
+  if (!userStore.token) {
+    userStore.currentPlan = null
+    return
+  }
+
+  try {
+    const subscriptions = await getSubscription({
+      composable: '$fetch',
+      headers: { Authorization: `Bearer ${userStore.token}` },
+    })
+    userStore.currentPlan = pickCurrentPlan(subscriptions)
+  }
+  catch (error) {
+    console.error('Failed to refresh current plan:', error)
+  }
+}
+
+function getFlipTimestamp(flip: Flip): number {
+  const value = flip.foundAt ?? flip.listing?.foundAt ?? flip.listing?.createdAt ?? ''
+  const parsed = Date.parse(value)
+  return Number.isNaN(parsed) ? 0 : parsed
+}
+
+function getFlipKey(flip: Flip): string {
+  return flip.listing?.id ?? `${getFlipTimestamp(flip)}:${flip.listing?.title ?? ''}:${flip.listing?.price ?? ''}`
+}
+
+function sortByFoundAt(flips: Flip[]): Flip[] {
+  return [...flips].sort((left, right) => getFlipTimestamp(left) - getFlipTimestamp(right))
+}
+
+function trimFeed(flips: Flip[]): Flip[] {
+  return sortByFoundAt(flips).slice(-MAX_FEED_ITEMS)
+}
+
+function getKnownFlipKeys(): Set<string> {
+  const knownKeys = new Set<string>()
+  for (const item of items.value)
+    knownKeys.add(getFlipKey(item))
+  for (const item of replayQueue.value)
+    knownKeys.add(getFlipKey(item))
+  return knownKeys
+}
+
+function prepareIncomingFlips(flips: Flip[]): Flip[] {
+  const knownKeys = getKnownFlipKeys()
+  return sortByFoundAt(flips).filter((flip) => {
+    const key = getFlipKey(flip)
+    if (knownKeys.has(key)) return false
+    knownKeys.add(key)
+    return true
+  })
+}
+
+async function scrollToLatest(behavior: ScrollBehavior = 'smooth') {
+  await nextTick()
+  if (!scrollContainer.value) return
+  scrollContainer.value.scrollTo({ left: scrollContainer.value.scrollWidth, behavior })
+}
+
+async function commitFlips(flips: Flip[], behavior: ScrollBehavior = 'smooth', forceScroll = false) {
+  if (flips.length === 0) return
+  const wasEmpty = items.value.length === 0
+  items.value = trimFeed([...items.value, ...flips])
+  if (forceScroll || autoScroll.value || wasEmpty)
+    await scrollToLatest(behavior)
+}
+
+function stopReplayLoop() {
+  if (!replayTimer) return
+  clearTimeout(replayTimer)
+  replayTimer = null
+}
+
+function getFreeReplayDelayMs(queueLength = replayQueue.value.length): number {
+  if (queueLength <= 0)
+    return FREE_REPLAY_MIN_INTERVAL_MS
+
+  if (!nextFreeBackfillAt)
+    return FREE_REPLAY_FALLBACK_INTERVAL_MS
+
+  const remainingWindowMs = Math.max(
+    FREE_REPLAY_MIN_INTERVAL_MS,
+    nextFreeBackfillAt - Date.now() - FREE_REPLAY_COMPLETION_BUFFER_MS,
+  )
+  const calculatedDelayMs = Math.floor(remainingWindowMs / queueLength)
+
+  return Math.min(
+    FREE_REPLAY_MAX_INTERVAL_MS,
+    Math.max(FREE_REPLAY_MIN_INTERVAL_MS, calculatedDelayMs),
+  )
+}
+
+function scheduleReplayTick(forceReschedule = false) {
+  if (replayQueue.value.length === 0) {
+    stopReplayLoop()
+    return
+  }
+
+  if (forceReschedule)
+    stopReplayLoop()
+
+  if (replayTimer)
+    return
+
+  replayTimer = setTimeout(async () => {
+    replayTimer = null
+
+    const nextFlip = replayQueue.value.shift()
+    if (!nextFlip) {
+      stopReplayLoop()
+      return
+    }
+
+    await commitFlips([nextFlip])
+    scheduleReplayTick()
+  }, getFreeReplayDelayMs())
+}
+
+async function enqueueReplayFlips(flips: Flip[]) {
+  if (flips.length === 0) return
+
+  const shouldPrimeImmediately = items.value.length === 0 && replayQueue.value.length === 0
+  replayQueue.value = [...replayQueue.value, ...flips]
+
+  if (shouldPrimeImmediately) {
+    const initialVisibleCount = Math.min(FREE_INITIAL_VISIBLE_COUNT, replayQueue.value.length)
+    const initialFlips = replayQueue.value.splice(0, initialVisibleCount)
+    if (initialFlips.length > 0)
+      await commitFlips(initialFlips, 'auto', true)
+  }
+
+  scheduleReplayTick(true)
+}
+
+async function appendIncomingFlips(flips: Flip[]) {
+  const incoming = prepareIncomingFlips(flips)
+  if (incoming.length === 0) return
+
+  if (feedTier.value === 'free') {
+    await enqueueReplayFlips(incoming)
+    return
+  }
+
+  const initialLoad = items.value.length === 0
+  await commitFlips(incoming, initialLoad ? 'auto' : 'smooth', initialLoad)
+}
+
+function clearLiveReconnectTimer() {
+  if (!liveReconnectTimer) return
+  clearTimeout(liveReconnectTimer)
+  liveReconnectTimer = null
+}
+
+function disconnectLiveFlips() {
+  allowLiveReconnect = false
+  clearLiveReconnectTimer()
+
+  if (!liveSocket) return
+
+  const socket = liveSocket
+  liveSocket = null
+  if (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)
+    socket.close()
+}
+
+function buildLiveFlipsUrl(): string | null {
+  if (!userStore.token) return null
+
+  const url = new URL(`/api/flips/live/${selectedCategory.value}`, apiClient.getConfig().baseURL)
+  url.searchParams.set('token', userStore.token)
+  url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:'
+  return url.toString()
+}
+
+function scheduleLiveReconnect() {
+  if (!allowLiveReconnect) return
+
+  clearLiveReconnectTimer()
+  const delay = Math.min(30000, 1000 * 2 ** Math.min(liveReconnectAttempt, 5))
+  liveReconnectTimer = setTimeout(() => {
+    liveReconnectTimer = null
+    void connectLiveFlips()
+  }, delay)
+}
+
+async function connectLiveFlips() {
+  if (feedTier.value === 'free') return
+  if (liveSocket && (liveSocket.readyState === WebSocket.OPEN || liveSocket.readyState === WebSocket.CONNECTING)) return
+
+  const url = buildLiveFlipsUrl()
+  if (!url) return
+
+  allowLiveReconnect = true
+  const socket = new WebSocket(url)
+  liveSocket = socket
+
+  socket.onopen = () => {
+    liveReconnectAttempt = 0
+  }
+
+  socket.onmessage = (event) => {
+    try {
+      const message = JSON.parse(event.data) as LiveFlipMessage
+      if (message.type !== 'flip' || !message.flip) return
+      void appendIncomingFlips([message.flip])
+    }
+    catch (error) {
+      console.error('Failed to parse live flip message:', error)
+    }
+  }
+
+  socket.onerror = () => {
+    if (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)
+      socket.close()
+  }
+
+  socket.onclose = () => {
+    if (liveSocket === socket)
+      liveSocket = null
+
+    if (!allowLiveReconnect) return
+    liveReconnectAttempt += 1
+    scheduleLiveReconnect()
+  }
+}
+
+function restartLiveTransport() {
+  disconnectLiveFlips()
+  if (feedTier.value !== 'free')
+    void connectLiveFlips()
+}
+
+function restartRefreshLoop() {
+  if (refreshInterval)
+    clearInterval(refreshInterval)
+
+  const interval = feedTier.value === 'free' ? FREE_BACKFILL_INTERVAL_MS : PREMIUM_BACKFILL_INTERVAL_MS
+  nextFreeBackfillAt = feedTier.value === 'free' ? Date.now() + interval : null
+
+  refreshInterval = setInterval(() => {
+    if (feedTier.value === 'free')
+      nextFreeBackfillAt = Date.now() + FREE_BACKFILL_INTERVAL_MS
+    void loadFlips(true)
+  }, interval)
+
+  if (feedTier.value === 'free')
+    scheduleReplayTick(true)
+}
+
+function resetFeedState() {
+  items.value = []
+  replayQueue.value = []
+  loading.value = true
+  stopReplayLoop()
+  disconnectLiveFlips()
+  nextFreeBackfillAt = null
+}
+
 async function loadFlips(isRefresh = false) {
   if (!isRefresh) loading.value = true
+
   try {
     await userStore.checkAuth(useFirebaseAuth()!)
+    if (feedTier.value === 'free' && !nextFreeBackfillAt)
+      nextFreeBackfillAt = Date.now() + FREE_BACKFILL_INTERVAL_MS
     const headers = getAuthHeaders()
-
     const response = await getFlips({
       composable: '$fetch',
-      path: { category: '1' },
+      path: { category: selectedCategory.value },
       query: { limit: FEED_LIMIT },
       ...(headers ? { headers } : {}),
     })
 
-    if (response) {
-      const newItems = (Array.isArray(response) ? response : Array.from(response)) as Flip[]
-
-      const existingIds = new Set(items.value.map(i => i.listing?.id))
-      const added = newItems.filter(i => !existingIds.has(i.listing?.id))
-
-      if (added.length > 0) {
-        let toAddImmediately = added
-        let toAddLater: typeof added = []
-
-        if (isFirstLoad.value && added.length >= 3) {
-          // Hold back 2 newest to animate in at 5s and 10s
-          toAddLater = added.slice(-2)
-          toAddImmediately = added.slice(0, -2)
-        }
-
-        // Append new items to the right end (newest = rightmost)
-        items.value = [...items.value, ...toAddImmediately].slice(-MAX_FEED_ITEMS)
-
-        if (isFirstLoad.value) {
-          isFirstLoad.value = false
-          // First load: start at left (oldest), smooth-scroll right to newest
-          await nextTick()
-          const el = scrollContainer.value
-          if (el) {
-            el.scrollLeft = 0
-            setTimeout(() => {
-              el.scrollTo({ left: el.scrollWidth, behavior: 'smooth' })
-            }, 300)
-
-            // Simulate 2 more flips arriving
-            if (toAddLater.length > 0) {
-              const addNewItem = async (item: Flip) => {
-                const existing = new Set(items.value.map(i => i.listing?.id))
-                if (existing.has(item.listing?.id)) return
-                items.value = [...items.value, item].slice(-MAX_FEED_ITEMS)
-                await nextTick()
-                if (autoScroll.value && scrollContainer.value) {
-                  scrollContainer.value.scrollTo({ left: scrollContainer.value.scrollWidth, behavior: 'smooth' })
-                }
-              }
-
-              if (toAddLater[0]) setTimeout(() => addNewItem(toAddLater[0]!), 8000)
-              if (toAddLater[1]) setTimeout(() => addNewItem(toAddLater[1]!), 15000)
-            }
-          }
-        }
-        else {
-          // Subsequent refresh: scroll right to reveal new items if autoScroll is on
-          if (autoScroll.value) {
-            await nextTick()
-            const el = scrollContainer.value
-            if (el) {
-              el.scrollTo({ left: el.scrollWidth, behavior: 'smooth' })
-            }
-          }
-        }
-      }
-      else if (items.value.length === 0) {
-        items.value = newItems
-        isFirstLoad.value = false
-      }
-    }
-    else if (!isRefresh) {
+    const newItems = (Array.isArray(response) ? response : Array.from(response ?? [])) as Flip[]
+    if (!newItems.length && !isRefresh && items.value.length === 0) {
       items.value = []
+      replayQueue.value = []
+      return
     }
+
+    await appendIncomingFlips(newItems)
   }
-  catch (e) {
-    console.error('Failed to load flips:', e)
-    if (!isRefresh) items.value = []
+  catch (error) {
+    console.error('Failed to load flips:', error)
+    if (!isRefresh) {
+      items.value = []
+      replayQueue.value = []
+    }
   }
   finally {
     if (!isRefresh) loading.value = false
   }
+}
+
+async function refreshFeed() {
+  resetFeedState()
+  await loadFlips()
+  restartRefreshLoop()
+  restartLiveTransport()
 }
 
 // --- Filtering ---
@@ -750,58 +1019,55 @@ const filteredItems = computed(() => {
     if (filters.minRefs > 0 && refs < filters.minRefs) return false
 
     if (filters.search) {
-      const q = filters.search.toLowerCase()
+      const query = filters.search.toLowerCase()
       const title = (listing?.title ?? '').toLowerCase()
-      const desc = (listing?.descriptionShort ?? '').toLowerCase()
-      if (!title.includes(q) && !desc.includes(q)) return false
+      const description = (listing?.descriptionShort ?? '').toLowerCase()
+      if (!title.includes(query) && !description.includes(query)) return false
     }
 
     if (filters.category) {
-      const cat = filters.category.toLowerCase()
-      const listingCat = (listing?.category ?? '').toLowerCase()
-      const sellKeys = (item.recentSells ?? []).map(s => (s.key ?? '').toLowerCase())
-      if (!listingCat.includes(cat) && !sellKeys.some(k => k.includes(cat))) return false
+      const category = filters.category.toLowerCase()
+      const listingCategory = (listing?.category ?? '').toLowerCase()
+      const sellKeys = (item.recentSells ?? []).map(sell => (sell.key ?? '').toLowerCase())
+      if (!listingCategory.includes(category) && !sellKeys.some(key => key.includes(category))) return false
     }
 
-    // Max distance filter
     if (filters.maxDistance > 0 && userLocation.value) {
-      const dist = getFlipDistance(item)
-      if (dist != null && dist > filters.maxDistance) return false
+      const distance = getFlipDistance(item)
+      if (distance != null && distance > filters.maxDistance) return false
     }
 
     return true
   })
 
-  // Sort
   if (sortMode.value === 'profit') {
-    result = [...result].sort((a, b) => (b.potentialProfit ?? 0) - (a.potentialProfit ?? 0))
+    result = [...result].sort((left, right) => (right.potentialProfit ?? 0) - (left.potentialProfit ?? 0))
   }
   else if (sortMode.value === 'distance' && userLocation.value) {
-    result = [...result].sort((a, b) => {
-      const da = getFlipDistance(a)
-      const db = getFlipDistance(b)
-      // Items without coordinates go to the end
-      if (da == null && db == null) return 0
-      if (da == null) return 1
-      if (db == null) return -1
-      return da - db
+    result = [...result].sort((left, right) => {
+      const leftDistance = getFlipDistance(left)
+      const rightDistance = getFlipDistance(right)
+      if (leftDistance == null && rightDistance == null) return 0
+      if (leftDistance == null) return 1
+      if (rightDistance == null) return -1
+      return leftDistance - rightDistance
     })
   }
 
   return result
 })
 
-onMounted(() => {
-  loadFlips()
-  // Flipper tier gets faster refresh (15s vs 60s)
-  const interval = isFlipperTier.value ? 15000 : 60000
-  refreshInterval = setInterval(() => loadFlips(true), interval)
+onMounted(async () => {
+  await syncCurrentPlan()
+  await loadFlips()
+  restartRefreshLoop()
+  restartLiveTransport()
+  hasInitializedFeed.value = true
 
   if (scrollContainer.value) {
-    const wheelHandler = (e: WheelEvent) => {
-      e.preventDefault()
-      const el = scrollContainer.value!
-      el.scrollLeft += e.deltaY
+    const wheelHandler = (event: WheelEvent) => {
+      event.preventDefault()
+      scrollContainer.value!.scrollLeft += event.deltaY
     }
 
     scrollContainer.value.addEventListener('wheel', wheelHandler, { passive: false })
@@ -811,14 +1077,23 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   removeWheelHandler?.()
-  if (refreshInterval) {
+  if (refreshInterval)
     clearInterval(refreshInterval)
-  }
+  stopReplayLoop()
+  disconnectLiveFlips()
+  clearLiveReconnectTimer()
 })
 
-watch(() => route.query.category, () => {
-  items.value = []
-  loadFlips()
+watch([feedTier, selectedCategory, () => userStore.token], async ([nextTier, nextCategory, nextToken], [previousTier, previousCategory, previousToken]) => {
+  if (!hasInitializedFeed.value) return
+
+  if (nextToken !== previousToken)
+    await syncCurrentPlan()
+
+  if (nextTier === previousTier && nextCategory === previousCategory && nextToken === previousToken)
+    return
+
+  await refreshFeed()
 })
 
 useHead({
