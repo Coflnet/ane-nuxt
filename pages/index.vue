@@ -30,10 +30,10 @@
             </div>
             <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
               <a
-                :href="localePath(useUserStore().isLoggedIn ? '/filters/create' : '/overview')"
+                :href="heroCtaPath"
                 class="px-8 py-4 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition-all text-center shadow-lg shadow-indigo-900/20 font-medium"
               >
-                {{ useUserStore().isLoggedIn ? $t('overview') : $t('hero.startFree') }}
+                {{ isLoggedIn ? $t('overview') : $t('hero.startFree') }}
               </a>
             </div>
           </div>
@@ -1315,6 +1315,9 @@ import { useIntersectionObserver } from '@vueuse/core'
 import { definePageMeta } from '#imports'
 
 const localePath = useLocalePath()
+const userStore = import.meta.client ? useUserStore() : null
+const isLoggedIn = computed(() => userStore?.isLoggedIn ?? false)
+const heroCtaPath = computed(() => localePath(isLoggedIn.value ? '/filters/create' : '/overview'))
 
 const vIntersect = {
   mounted: (el: Element, binding: { value: (el: Element) => void }) => {

@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-      v-if="userStore.isWebView"
+      v-if="isWebView"
       class="flex flex-col min-h-screen bg-slate-900 border-slate-800"
     >
       <AppHeader />
@@ -17,7 +17,7 @@
       <nav class=" py-4 sticky top-0 z-50 bg-gray-900/80 backdrop-blur-md border-b border-gray-800">
         <div class="flex items-center justify-between container mx-auto">
           <div class="flex items-center ml-4">
-            <UiLogo :location="localePath(userStore.isLoggedIn ? '/overview': '/')" />
+            <UiLogo :location="logoPath" />
           </div>
           <div class="hidden md:block">
             <div class="flex items-center space-x-8">
@@ -47,11 +47,11 @@
               >{{
                 $t('signIn') }}</a>
               <a
-                :href="localePath(userStore.isLoggedIn ? '/overview' : '/filters/create')"
+                :href="desktopCtaPath"
                 aria-label="Header Get Started"
                 class="px-4 py-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-900/20"
               >
-                {{ userStore.isLoggedIn ? $t('overview') : $t('getStarted') }}
+                {{ isLoggedIn ? $t('overview') : $t('getStarted') }}
               </a>
             </div>
           </div>
@@ -100,10 +100,10 @@
           >{{
             $t('signIn') }}</a>
           <a
-            :href="localePath(userStore.isLoggedIn ? '/filters/create' : '/overview')"
+            :href="mobileCtaPath"
             class="block px-4 py-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition-all text-center shadow-lg shadow-indigo-900/20"
           >
-            {{ userStore.isLoggedIn ? $t('overview') : $t('getStarted') }}
+            {{ isLoggedIn ? $t('overview') : $t('getStarted') }}
           </a>
         </div>
       </nav>
@@ -118,6 +118,11 @@
 <script setup lang="ts">
 const localePath = useLocalePath()
 const mobileMenuOpen = ref(false)
+const userStore = import.meta.client ? useUserStore() : null
 
-const userStore = useUserStore()
+const isLoggedIn = computed(() => userStore?.isLoggedIn ?? false)
+const isWebView = computed(() => userStore?.isWebView ?? false)
+const logoPath = computed(() => localePath(isLoggedIn.value ? '/overview' : '/'))
+const desktopCtaPath = computed(() => localePath(isLoggedIn.value ? '/overview' : '/filters/create'))
+const mobileCtaPath = computed(() => localePath(isLoggedIn.value ? '/filters/create' : '/overview'))
 </script>

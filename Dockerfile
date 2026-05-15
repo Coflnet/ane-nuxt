@@ -1,19 +1,27 @@
 FROM node:24-slim AS build
-WORKDIR /app
+WORKDIR /src
 
-ARG GOOGLE_APPLICATION_CREDENTIALS
-
-# Copy package.json and pnpm-lock.yaml
-COPY ./package.json ./package-lock.json ./
-
-# Install dependencies
-RUN npm install
-
-# Copy the rest of the application code
 COPY . .
 
-# Build the Nuxt app
-RUN npm run build
+RUN set -eu; \
+	if [ -f /src/package.json ]; then \
+		app_dir=/src; \
+	elif [ -f /src/Ane-nuxt/package.json ]; then \
+		app_dir=/src/Ane-nuxt; \
+	else \
+		echo "package.json not found in build context"; \
+		exit 1; \
+	fi; \
+	cd "$app_dir"; \
+	npm install; \
+	ANE_PRERENDER_MARKETING=false npm run build; \
+	mkdir -p /app; \
+	cp -R .output /app/.output
+
+FROM node:24-slim
+WORKDIR /app
+
+COPY --from=build /app/.output ./.output
 
 CMD ["node", ".output/server/index.mjs"]
 

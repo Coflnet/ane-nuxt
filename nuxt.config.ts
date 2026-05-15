@@ -1,4 +1,5 @@
 const hostName = 'https://ane.deals'
+const prerenderMarketingRoutes = process.env.ANE_PRERENDER_MARKETING !== 'false'
 
 export default defineNuxtConfig({
   modules: [
@@ -30,8 +31,8 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    '/': { prerender: true },
-    '/blog/**': { prerender: true },
+    '/': { prerender: prerenderMarketingRoutes },
+    '/blog/**': { prerender: prerenderMarketingRoutes },
     '/_ipx/**': { prerender: false },
   },
 
