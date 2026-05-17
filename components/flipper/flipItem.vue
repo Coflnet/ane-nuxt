@@ -337,11 +337,18 @@ const submitReport = async () => {
   }
   reportSubmitting.value = true
   try {
+    const reportListing = props.item.listing
+      ? {
+          ...props.item.listing,
+          seoId: currentSlug.value || (props.item.listing as (typeof props.item.listing & { seoId?: string | null }))?.seoId || undefined,
+        }
+      : undefined
+
     const result = await $fetch<{ reportId: string }>(`${API_BASE}/api/flips/report`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${userStore.token}` },
       body: {
-        listing: props.item.listing,
+        listing: reportListing,
         profit: props.item.potentialProfit,
         medianPrice: props.item.medianPrice,
         recentSells: props.item.recentSells,
