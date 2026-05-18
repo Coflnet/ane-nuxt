@@ -44,4 +44,12 @@ export interface Filter {
   fuzzyness: string
   /** Serialized JSON payload for VisualSimilarityFilter ('' = disabled). */
   visualSimilarity: string
+  referenceUrl: string
+  referenceTitle: string
+  referenceMarketplace: string
+  referencePrice: number
+  referenceCurrency: string
+  referenceSelector: string
+  referenceAdditionalSelectors?: string[]
+  referenceLastRefreshedAt: string
 }

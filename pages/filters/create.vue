@@ -18,6 +18,7 @@
         class="overflow-visible"
         @submit.prevent="saveFilter"
       >
+        <FiltersReferenceListingImport v-model="filter" />
         <FiltersSearchValueMarketplaceFilter v-model="filter" />
 
         <FiltersPriceConditionFilter v-model="filter" />
@@ -119,6 +120,14 @@ const filter = ref<Filter>({
   frequency: '',
   fuzzyness: '0',
   visualSimilarity: '',
+  referenceUrl: '',
+  referenceTitle: '',
+  referenceMarketplace: '',
+  referencePrice: 0,
+  referenceCurrency: '',
+  referenceSelector: '',
+  referenceAdditionalSelectors: [],
+  referenceLastRefreshedAt: '',
 })
 
 watch([filter], (_) => {
@@ -246,6 +255,33 @@ async function loadEditParam() {
         case 'VisualSimilarityFilter':
           filter.value.visualSimilarity = item.value ?? ''
           break
+        case 'ReferenceUrl':
+          filter.value.referenceUrl = item.value ?? ''
+          break
+        case 'ReferenceTitle':
+          filter.value.referenceTitle = item.value ?? ''
+          break
+        case 'ReferenceMarketplace':
+          filter.value.referenceMarketplace = item.value ?? ''
+          break
+        case 'ReferencePrice':
+          filter.value.referencePrice = Number(item.value ?? 0)
+          break
+        case 'ReferenceCurrency':
+          filter.value.referenceCurrency = item.value ?? ''
+          break
+        case 'ReferenceSelector':
+          filter.value.referenceSelector = item.value ?? ''
+          break
+        case 'ReferenceAdditionalSelectors':
+          filter.value.referenceAdditionalSelectors = (item.value ?? '')
+            .split('\n')
+            .map(s => s.trim())
+            .filter(s => s.length > 0)
+          break
+        case 'ReferenceLastRefreshedAt':
+          filter.value.referenceLastRefreshedAt = item.value ?? ''
+          break
       }
     })
   }
@@ -369,6 +405,23 @@ async function handleFilters(): Promise<{ name: string, value: string | number |
   // the user did not pick a reference image.
   if (rawFilter.visualSimilarity && rawFilter.visualSimilarity.length > 0)
     filters.push({ name: 'VisualSimilarityFilter', value: rawFilter.visualSimilarity })
+
+  if (rawFilter.referenceUrl)
+    filters.push({ name: 'ReferenceUrl', value: rawFilter.referenceUrl })
+  if (rawFilter.referenceTitle)
+    filters.push({ name: 'ReferenceTitle', value: rawFilter.referenceTitle })
+  if (rawFilter.referenceMarketplace)
+    filters.push({ name: 'ReferenceMarketplace', value: rawFilter.referenceMarketplace })
+  if (rawFilter.referencePrice)
+    filters.push({ name: 'ReferencePrice', value: String(rawFilter.referencePrice) })
+  if (rawFilter.referenceCurrency)
+    filters.push({ name: 'ReferenceCurrency', value: rawFilter.referenceCurrency })
+  if (rawFilter.referenceSelector)
+    filters.push({ name: 'ReferenceSelector', value: rawFilter.referenceSelector })
+  if (rawFilter.referenceAdditionalSelectors && rawFilter.referenceAdditionalSelectors.length > 0)
+    filters.push({ name: 'ReferenceAdditionalSelectors', value: rawFilter.referenceAdditionalSelectors.join('\n') })
+  if (rawFilter.referenceLastRefreshedAt)
+    filters.push({ name: 'ReferenceLastRefreshedAt', value: rawFilter.referenceLastRefreshedAt })
 
   return filters
 }

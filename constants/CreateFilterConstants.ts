@@ -6,6 +6,7 @@ export interface Options {
 
 export const marketplaces: Options[] = [
   { value: 'all', label: 'allMarket' },
+  { value: 'Ebay', label: 'eBay' },
   { value: 'Kleinanzeigen', label: 'Kleinanzeigen' },
   { value: 'AutoScout24', label: 'autoScoutMarketplace' },
   { value: 'Marktplaats', label: 'Marktplaats' },
