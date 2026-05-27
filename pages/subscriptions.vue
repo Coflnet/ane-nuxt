@@ -61,6 +61,18 @@
 <script setup lang="ts">
 import { plans, type PlanId, type Plan } from '~/constants/SubscriptionConstants'
 
+interface AuthErrorLike {
+  response?: {
+    status?: number
+  }
+  statusCode?: number
+}
+
+interface DiscountResponse {
+  discountPercent?: number | null
+  name?: string | null
+}
+
 const { t } = useI18n()
 const userStore = useUserStore()
 
@@ -100,7 +112,8 @@ async function ensureAuth() {
 }
 
 function handleAuthError(error: unknown) {
-  const status = (error as any)?.response?.status ?? (error as any)?.statusCode ?? 0
+  const authError = error as AuthErrorLike
+  const status = authError.response?.status ?? authError.statusCode ?? 0
   if (status === 401 || status === 403) {
     userStore.token = null
     const redirect = discountCode.value
@@ -118,10 +131,10 @@ async function applyDiscount() {
     const res = await getDiscount({
       composable: '$fetch',
       path: { code: discountCode.value.trim() },
-    })
+    }) as DiscountResponse
     discountPercent.value = res.discountPercent ?? 0
     discountApplied.value = true
-    discountName.value = (res as any).name ?? ''
+    discountName.value = res.name ?? ''
   }
   catch (error) {
     discountApplied.value = false

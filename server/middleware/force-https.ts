@@ -7,7 +7,8 @@ export default defineEventHandler((event) => {
   // Common header added by proxies/load-balancers to indicate original protocol
   const forwardedProto = (headers['x-forwarded-proto'] || headers['x-forwarded-protocol'] || '').toLowerCase()
 
-  const socketEncrypted = !!(event.node.req.socket && (event.node.req.socket as any).encrypted)
+  const socket = event.node.req.socket
+  const socketEncrypted = 'encrypted' in socket && socket.encrypted === true
   const isSecure = forwardedProto === 'https' || socketEncrypted
 
   // Only redirect for the production domain

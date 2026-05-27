@@ -56,7 +56,7 @@
         <!-- Category suggestions -->
         <div v-if="categorySuggestions.length > 0">
           <div class="px-3 py-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-            Categories
+            {{ $t('categories', 'Categories') }}
           </div>
           <button
             v-for="(cat, i) in categorySuggestions"
@@ -71,7 +71,7 @@
               class="w-4 h-4 text-blue-400 shrink-0"
             />
             <span class="truncate">{{ cat.label }}</span>
-            <span class="ml-auto text-xs text-slate-500">{{ cat.path }}</span>
+            <span class="hidden sm:block ml-auto text-xs text-slate-500 truncate max-w-[45%]">{{ cat.path }}</span>
           </button>
         </div>
 
@@ -81,7 +81,7 @@
             class="px-3 py-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wider"
             :class="{ 'border-t border-slate-700': categorySuggestions.length > 0 }"
           >
-            Products
+            {{ $t('products', 'Products') }}
           </div>
           <button
             v-for="(s, i) in suggestions"
@@ -128,22 +128,44 @@
 </template>
 
 <script setup lang="ts">
+import { useCategories } from '~/composable/useCategories'
+
 const props = defineProps<{
   initialQuery?: string
 }>()
 
+interface UnifiedCategory {
+  slug: string
+  label: string
+  subCategories?: UnifiedCategory[] | null
+}
+
+interface CategorySuggestion {
+  label: string
+  slug: string
+  path: string
+}
+
+interface ProductSuggestion {
+  text: string
+  imageUrl?: string
+  category?: string
+  minPrice?: number
+  seoId?: string
+}
+
 const emit = defineEmits<{
-  (e: 'search', query: string): void
-  (e: 'selectCategory', slug: string): void
+  (e: 'search' | 'selectCategory', value: string): void
 }>()
 
 const query = ref(props.initialQuery || '')
-const suggestions = ref<any[]>([])
-const categorySuggestions = ref<{ label: string, slug: string, path: string }[]>([])
+const suggestions = ref<ProductSuggestion[]>([])
+const categorySuggestions = ref<CategorySuggestion[]>([])
 const showDropdown = ref(false)
 const highlightIndex = ref(-1)
 const isLoading = ref(false)
 const containerRef = ref<HTMLElement | null>(null)
+const { topLevelCategories, fetchTopLevelCategories } = useCategories()
 
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
 
@@ -178,35 +200,19 @@ async function fetchSuggestions(q: string) {
   highlightIndex.value = -1
 
   try {
-    // Fetch product suggestions and category matches in parallel
     const [productResults, categoryResults] = await Promise.all([
-      $fetch<any[]>(`${API_BASE}/api/Product/suggest`, {
+      $fetch<ProductSuggestion[]>(`${API_BASE}/api/Product/suggest`, {
         params: { q, limit: 6 },
       }).catch(() => []),
-      $fetch<any[]>(`${API_BASE}/api/Categories/top-level`).catch(() => []),
+      topLevelCategories.value.length > 0
+        ? Promise.resolve(topLevelCategories.value)
+        : fetchTopLevelCategories(),
     ])
 
-    suggestions.value = productResults || []
+    if (query.value.trim() !== q) return
 
-    // Match categories client-side from the tree
-    const lower = q.toLowerCase()
-    const matched: { label: string, slug: string, path: string }[] = []
-    if (categoryResults) {
-      for (const cat of categoryResults) {
-        if (cat.label?.toLowerCase().includes(lower)) {
-          matched.push({ label: cat.label, slug: cat.slug, path: '' })
-        }
-        // Also check subcategories if available
-        if (cat.children) {
-          for (const sub of cat.children) {
-            if (sub.label?.toLowerCase().includes(lower)) {
-              matched.push({ label: sub.label, slug: sub.slug, path: cat.label })
-            }
-          }
-        }
-      }
-    }
-    categorySuggestions.value = matched.slice(0, 4)
+    suggestions.value = productResults || []
+    categorySuggestions.value = collectCategorySuggestions(categoryResults || [], q).slice(0, 4)
 
     showDropdown.value = suggestions.value.length > 0 || categorySuggestions.value.length > 0
   }
@@ -230,10 +236,12 @@ function handleSearch() {
   if (highlightIndex.value >= 0) {
     const catLen = categorySuggestions.value.length
     if (highlightIndex.value < catLen) {
-      selectCategory(categorySuggestions.value[highlightIndex.value])
+      const selectedCategory = categorySuggestions.value[highlightIndex.value]
+      if (selectedCategory) selectCategory(selectedCategory)
     }
     else {
-      selectSuggestion(suggestions.value[highlightIndex.value - catLen])
+      const selectedSuggestion = suggestions.value[highlightIndex.value - catLen]
+      if (selectedSuggestion) selectSuggestion(selectedSuggestion)
     }
     return
   }
@@ -242,7 +250,7 @@ function handleSearch() {
   }
 }
 
-function selectSuggestion(s: any) {
+function selectSuggestion(s: ProductSuggestion) {
   showDropdown.value = false
   query.value = s.text
   if (s.seoId) {
@@ -257,6 +265,49 @@ function selectCategory(cat: { label: string, slug: string, path: string }) {
   showDropdown.value = false
   query.value = ''
   emit('selectCategory', cat.slug)
+}
+
+function collectCategorySuggestions(categories: UnifiedCategory[], searchTerm: string): CategorySuggestion[] {
+  const normalizedSearch = normalizeSearchText(searchTerm)
+  if (!normalizedSearch) return []
+
+  const matches: CategorySuggestion[] = []
+
+  function visit(category: UnifiedCategory, parentLabels: string[]) {
+    const label = category.label || ''
+    const haystack = normalizeSearchText([...parentLabels, label].join(' '))
+
+    if (haystack.includes(normalizedSearch)) {
+      matches.push({
+        label,
+        slug: category.slug,
+        path: parentLabels.join(' / '),
+      })
+    }
+
+    for (const child of category.subCategories || []) {
+      visit(child, [...parentLabels, label])
+    }
+  }
+
+  for (const category of categories) {
+    visit(category, [])
+  }
+
+  return matches
+}
+
+function normalizeSearchText(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/ä/g, 'ae')
+    .replace(/ö/g, 'oe')
+    .replace(/ü/g, 'ue')
+    .replace(/ß/g, 'ss')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036F]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
 }
 
 function formatPrice(price: number) {

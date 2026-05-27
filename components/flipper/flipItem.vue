@@ -375,7 +375,9 @@ const closeReportDialog = () => {
 const copyReportId = async () => {
   await navigator.clipboard.writeText(reportId.value)
   copied.value = true
-  setTimeout(() => { copied.value = false }, 2000)
+  setTimeout(() => {
+    copied.value = false
+  }, 2000)
 }
 
 const formatPrice = (price: number | null | undefined) => {

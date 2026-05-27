@@ -486,8 +486,7 @@
 </template>
 
 <script setup lang="ts">
-import { getProduct, getProductMatches, reportProductIssue, getPriceHistory, getPriceStats } from '~/src/api-client'
-import { client } from '~/src/api-client/client.gen'
+import { getProduct, reportProductIssue, getPriceHistory, getPriceStats } from '~/src/api-client'
 import type { IssueType, Product, ProductMatch, PricePoint, PriceHistoryStats } from '~/src/api-client/types.gen'
 import ProductListingTable from '~/components/product/ProductListingTable.vue'
 import { useI18n } from 'vue-i18n'
@@ -548,10 +547,10 @@ const productIssueTypes: { value: IssueType }[] = [
 const availableOfferCount = computed(() => matches.value.length - unavailableCount.value)
 
 // Filter out 'condition' key from attributes (shown as top-level field)
-const filteredAttributes = computed(() => {
-  const attrs = product.value?.attributes as Record<string, any> | undefined
+const filteredAttributes = computed<Record<string, string>>(() => {
+  const attrs = product.value?.attributes
   if (!attrs) return {}
-  const result: Record<string, any> = {}
+  const result: Record<string, string> = {}
   for (const [key, value] of Object.entries(attrs)) {
     if (key.toLowerCase() === 'condition') continue
     result[key] = value
@@ -602,7 +601,7 @@ const attributeOptions = computed(() => {
       // Try numeric sort first
       const numA = Number.parseFloat(a.value)
       const numB = Number.parseFloat(b.value)
-      if (!isNaN(numA) && !isNaN(numB)) {
+      if (!Number.isNaN(numA) && !Number.isNaN(numB)) {
         return numA - numB
       }
       return a.value.localeCompare(b.value)
@@ -854,13 +853,13 @@ function formatMileageRange(value: string): string {
   const locale = t('nav.home') === 'Startseite' ? 'de-DE' : 'en-US'
   if (value.endsWith('+')) {
     const num = Number.parseInt(value.replace('+', ''))
-    if (!isNaN(num)) return `${num.toLocaleString(locale)}+ km`
+    if (!Number.isNaN(num)) return `${num.toLocaleString(locale)}+ km`
   }
   const parts = value.split('-')
   if (parts.length === 2) {
     const a = Number.parseInt(parts[0])
     const b = Number.parseInt(parts[1])
-    if (!isNaN(a) && !isNaN(b)) return `${a.toLocaleString(locale)} - ${b.toLocaleString(locale)} km`
+    if (!Number.isNaN(a) && !Number.isNaN(b)) return `${a.toLocaleString(locale)} - ${b.toLocaleString(locale)} km`
   }
   return value
 }
@@ -952,17 +951,17 @@ onMounted(async () => {
     // Parallel fetch all data
     const [pRes, mRes, histRes, statsRes, relatedRes] = await Promise.all([
       getProduct({ path: { id: productId } }),
-      client.get<ProductMatch[]>({ url: buildMatchesUrl(productId) }).catch(() => ({ data: [] })),
+      $fetch<ProductMatch[]>(buildMatchesUrl(productId)).catch(() => []),
       getPriceHistory({ path: { id: productId }, query: { days: 90 } }).catch(() => []),
       getPriceStats({ path: { id: productId }, query: { days: 90 } }).catch(() => null),
-      client.get<Product[]>({ url: buildRelatedProductsUrl(productId) }).catch(() => ({ data: [] })),
+      $fetch<Product[]>(buildRelatedProductsUrl(productId)).catch(() => []),
     ])
 
     product.value = pRes as Product
-    matches.value = (mRes as any)?.data || mRes || []
-    priceHistory.value = (histRes as PricePoint[]) || []
+    matches.value = mRes
+    priceHistory.value = histRes as PricePoint[]
     priceStats.value = statsRes as PriceHistoryStats | null
-    relatedProducts.value = (relatedRes as any)?.data || relatedRes || []
+    relatedProducts.value = relatedRes
   }
   catch (e) {
     console.error('Failed to load product', e)

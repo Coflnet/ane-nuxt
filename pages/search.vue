@@ -1,7 +1,7 @@
 <template>
-  <div class="container mx-auto px-4 py-8">
+  <div class="container mx-auto px-4 py-6 sm:py-8">
     <!-- Hero Section -->
-    <div class="text-center mb-16 pt-12">
+    <div class="text-center mb-10 pt-6 sm:mb-14 sm:pt-10">
       <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent mb-6 whitespace-normal break-words">
         {{ $t('findBestDeals', 'Find the Best Second-Hand Deals') }}
       </h1>
@@ -21,7 +21,7 @@
       v-if="loading || products.length > 0 || hasSearched"
       class="max-w-7xl mx-auto"
     >
-      <div class="flex items-center justify-between mb-6">
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
         <h2 class="text-2xl font-semibold text-slate-200">
           <span v-if="loading && products.length === 0">{{ $t('searching', 'Searching...') }}</span>
           <span v-else-if="products.length > 0">
@@ -34,7 +34,22 @@
           <span v-else>{{ $t('noResultsFound', 'No results found') }}</span>
         </h2>
         <!-- Sort dropdown -->
-        <div class="flex items-center gap-3">
+        <div class="flex flex-wrap items-center gap-3">
+          <button
+            class="lg:hidden inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-slate-200 bg-slate-800 border border-slate-600/50 hover:bg-slate-700 transition-colors"
+            type="button"
+            @click="isFilterPanelOpen = !isFilterPanelOpen"
+          >
+            <Icon
+              :name="isFilterPanelOpen ? 'tabler:x' : 'tabler:adjustments-horizontal'"
+              class="w-4 h-4"
+            />
+            <span>{{ $t('filters', 'Filters') }}</span>
+            <span
+              v-if="hasActiveFilters"
+              class="h-2 w-2 rounded-full bg-blue-400"
+            />
+          </button>
           <select
             :value="selectedSort"
             class="bg-slate-800 border border-slate-600/50 rounded-lg px-3 py-1.5 text-sm text-slate-200 focus:border-blue-500/50 focus:outline-none"
@@ -128,9 +143,12 @@
         </span>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
         <!-- Sidebar Filters -->
-        <div class="lg:col-span-1 space-y-4 min-w-0 overflow-hidden">
+        <div
+          class="lg:col-span-1 space-y-4 min-w-0 overflow-hidden"
+          :class="isFilterPanelOpen ? 'block' : 'hidden lg:block'"
+        >
           <!-- Category Filter -->
           <div
             v-if="availableCategoryBuckets.length > 0"
@@ -141,9 +159,9 @@
             </h3>
             <div class="flex flex-wrap gap-2 max-h-56 overflow-y-auto">
               <button
-                v-for="bucket in availableCategoryBuckets"
-                :key="bucket.value"
-                class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors max-w-[200px]"
+                v-for="(bucket, index) in availableCategoryBuckets"
+                :key="bucket.value ?? `category-${index}`"
+                class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors min-w-0 max-w-full sm:max-w-[220px]"
                 :class="isCategorySelected(bucket.value!) ? 'bg-blue-500/20 text-blue-400 font-medium' : 'text-slate-400 hover:bg-slate-700/50 hover:text-slate-200'"
                 @click="toggleFilter('category', toUrlSlug(bucket.value!) || bucket.value!)"
               >
@@ -163,9 +181,9 @@
             </h3>
             <div class="flex flex-wrap gap-2">
               <button
-                v-for="bucket in availableConditionBuckets"
-                :key="bucket.value"
-                class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors max-w-[200px]"
+                v-for="(bucket, index) in availableConditionBuckets"
+                :key="bucket.value ?? `condition-${index}`"
+                class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors min-w-0 max-w-full sm:max-w-[220px]"
                 :class="selectedCondition === bucket.value ? 'bg-green-500/20 text-green-400 font-medium' : 'text-slate-400 hover:bg-slate-700/50 hover:text-slate-200'"
                 @click="toggleFilter('condition', bucket.value!)"
               >
@@ -274,9 +292,9 @@
             </h3>
             <div class="flex flex-wrap gap-2 max-h-44 overflow-y-auto">
               <button
-                v-for="bucket in buckets.slice(0, 15)"
-                :key="bucket.value"
-                class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors max-w-[200px]"
+                v-for="(bucket, index) in buckets.slice(0, 15)"
+                :key="bucket.value ?? `${attrKey}-${index}`"
+                class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors min-w-0 max-w-full sm:max-w-[220px]"
                 :class="activeAttributeFilters[attrKey] === bucket.value ? 'bg-purple-500/20 text-purple-400 font-medium' : 'text-slate-400 hover:bg-slate-700/50 hover:text-slate-200'"
                 @click="toggleAttributeFilter(attrKey, bucket.value!)"
               >
@@ -415,16 +433,28 @@
                   :disabled="!zipCodeInput || zipLoading"
                   @click="lookupZipCode"
                 >
-                  <span v-if="zipLoading">...</span>
-                  <span v-else>📍</span>
+                  <Icon
+                    v-if="zipLoading"
+                    name="tabler:loader-2"
+                    class="w-4 h-4 animate-spin"
+                  />
+                  <Icon
+                    v-else
+                    name="tabler:map-pin"
+                    class="w-4 h-4"
+                  />
                 </button>
               </div>
               <!-- Location status -->
               <div
                 v-if="locationName"
-                class="text-xs text-green-400"
+                class="text-xs text-green-400 flex items-center gap-1"
               >
-                📍 {{ locationName }}
+                <Icon
+                  name="tabler:map-pin"
+                  class="w-3.5 h-3.5"
+                />
+                <span>{{ locationName }}</span>
               </div>
               <div
                 v-else-if="zipError"
@@ -438,8 +468,14 @@
                 :class="userLocation && !locationName ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-slate-200 border border-slate-600/50'"
                 @click="requestLocation"
               >
-                <span v-if="userLocation && !locationName">📍 {{ $t('locationSet', 'Location set') }}</span>
-                <span v-else>📍 {{ $t('useMyLocation', 'Use my location') }}</span>
+                <span class="inline-flex items-center justify-center gap-2">
+                  <Icon
+                    name="tabler:current-location"
+                    class="w-4 h-4"
+                  />
+                  <span v-if="userLocation && !locationName">{{ $t('locationSet', 'Location set') }}</span>
+                  <span v-else>{{ $t('useMyLocation', 'Use my location') }}</span>
+                </span>
               </button>
               <div
                 v-if="userLocation"
@@ -502,7 +538,7 @@
               <NuxtLink
                 v-for="product in products"
                 :key="product.seoId ?? 'unknown'"
-                :to="localePath(`/product/${product.seoId}${buildProductLink(product)}`)"
+                :to="localePath(`/product/${product.seoId}${buildProductLink()}`)"
                 class="block bg-slate-800 rounded-xl overflow-hidden hover:ring-2 hover:ring-blue-500/50 transition-all hover:scale-[1.02] group"
               >
                 <div class="aspect-video bg-slate-900 relative">
@@ -541,12 +577,12 @@
                     class="flex flex-wrap gap-1.5 mt-2 mb-2 min-h-[24px]"
                   >
                     <span
-                      v-for="attr in getTopAttributes(product)"
-                      :key="attr.key"
+                      v-for="(attr, index) in getTopAttributes(product)"
+                      :key="attr.key ?? `attr-${index}`"
                       class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-slate-700/50 text-slate-300 border border-slate-600/50 truncate max-w-full"
                     >
-                      <span class="opacity-70 mr-1 shrink-0">{{ localizeAttrKey(attr.key) }}:</span>
-                      <span class="truncate">{{ localizeAttrValue(attr.key, attr.value) }}</span>
+                      <span class="opacity-70 mr-1 shrink-0">{{ localizeAttrKey(attr.key ?? '') }}:</span>
+                      <span class="truncate">{{ localizeAttrValue(attr.key ?? '', attr.value ?? '') }}</span>
                     </span>
                   </div>
 
@@ -630,7 +666,7 @@
       </div>
 
       <h2 class="text-2xl font-bold text-center text-slate-300 mb-10">
-        {{ browsePath.length > 0 ? browsePath[browsePath.length - 1].label : $t('browseCategories', 'Browse Categories') }}
+        {{ currentBrowseLabel }}
       </h2>
 
       <!-- Category grid from unified categories API -->
@@ -687,7 +723,7 @@
           class="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition-colors font-medium"
           @click="searchInCurrentCategory"
         >
-          {{ $t('showProducts', 'Show Products') }} — {{ browsePath[browsePath.length - 1].label }}
+          {{ $t('showProducts', 'Show Products') }} — {{ selectedBrowseLabel }}
         </button>
       </div>
     </div>
@@ -697,7 +733,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { searchProducts } from '~/src/api-client'
-import type { ProductDocument, FilterBucket } from '~/src/api-client/types.gen'
+import type { ProductAttribute, ProductDocument, FilterBucket } from '~/src/api-client/types.gen'
 import { useCategories } from '~/composable/useCategories'
 
 const router = useRouter()
@@ -742,7 +778,7 @@ const zipCodeInput = ref<string>((route.query.zip as string) || '')
 const locationName = ref<string>('')
 const zipLoading = ref(false)
 const zipError = ref<string>('')
-// Flag: true while we're resolving a ZIP from URL on page load (blocks initial search until geo ready)
+// Flag: true while we're resolving a ZIP from URL on page load; initial results still load without distance.
 const zipResolving = ref(!!route.query.zip)
 const selectedCountryCode = ref<string>((route.query.country as string) || '')
 
@@ -778,6 +814,7 @@ const selectedBatteryMax = computed(() => route.query.attr_battery_max ? Number(
 const loading = ref(false)
 const loadingMore = ref(false)
 const hasSearched = ref(false)
+const isFilterPanelOpen = ref(false)
 
 // Track previous query params to detect server-side filter changes that need a re-fetch
 const prevQuery = reactive({ q: '' as string | undefined, category: '' as string | undefined, condition: '' as string | undefined, price_min: '' as string | undefined, price_max: '' as string | undefined, attrs: '' as string | undefined, sort: '' as string | undefined, max_distance: '' as string | undefined })
@@ -881,8 +918,16 @@ onBeforeUnmount(() => {
 const { topLevelCategories, loadingCategories, fetchTopLevelCategories, fetchSubCategories, toUrlSlug, toApiSlug, slugToLabel } = useCategories()
 
 interface BrowseSegment { slug: string, label: string }
+interface CategoryNode {
+  slug: string
+  label: string
+  subCategories?: CategoryNode[] | null
+}
+
 const browsePath = ref<BrowseSegment[]>([])
-const browseSubCats = ref<Array<{ slug: string, label: string, subCategories?: any[] | null }>>([])
+const browseSubCats = ref<CategoryNode[]>([])
+const currentBrowseLabel = computed(() => browsePath.value[browsePath.value.length - 1]?.label ?? t('browseCategories', 'Browse Categories'))
+const selectedBrowseLabel = computed(() => browsePath.value[browsePath.value.length - 1]?.label ?? '')
 
 // Global category counts (from aggregation) to hide empty categories and show product counts
 const globalCategoryCounts = ref<Record<string, number>>({})
@@ -903,7 +948,8 @@ async function fetchGlobalCategoryCounts() {
 
 function countForCategory(cat: { slug: string, label?: string }): number {
   const counts = globalCategoryCounts.value
-  return (counts[cat.slug?.toLowerCase()] ?? 0) + (counts[(cat as any).label?.toLowerCase()] ?? 0)
+  const labelCount = cat.label ? (counts[cat.label.toLowerCase()] ?? 0) : 0
+  return (counts[cat.slug.toLowerCase()] ?? 0) + labelCount
 }
 
 // Categories to display in the browser (filtered to those with listings)
@@ -913,7 +959,7 @@ const displayCategories = computed(() => {
   return cats.filter((cat) => {
     // Show a category if it or any of its subcategories has listings (match by slug or label)
     if (countForCategory(cat) > 0) return true
-    if (cat.subCategories?.some((sub: any) => countForCategory(sub) > 0)) return true
+    if (cat.subCategories?.some(sub => countForCategory(sub) > 0)) return true
     return false
   })
 })
@@ -947,7 +993,7 @@ function getCategoryIcon(slug: string, label: string): string {
   return categoryIconMap[label] || 'tabler:category'
 }
 
-function getCategoryProductCount(cat: { slug: string, label?: string, subCategories?: any[] | null }): number {
+function getCategoryProductCount(cat: CategoryNode): number {
   let total = countForCategory(cat)
   if (cat.subCategories) {
     for (const sub of cat.subCategories) {
@@ -967,7 +1013,7 @@ function formatCount(n: number): string {
   return n.toString()
 }
 
-async function onUnifiedCategoryClick(cat: { slug: string, label: string, subCategories?: any[] | null }) {
+async function onUnifiedCategoryClick(cat: CategoryNode) {
   if (cat.subCategories && cat.subCategories.length > 0) {
     // Navigate deeper into the tree
     browsePath.value = [...browsePath.value, { slug: cat.slug, label: cat.label }]
@@ -999,8 +1045,8 @@ function navigateToBreadcrumb(idx: number) {
   browsePath.value = browsePath.value.slice(0, idx + 1)
   // Re-fetch subcategories for this level
   if (targetCat) {
-    fetchSubCategories(targetCat.slug).then((subs: unknown[]) => {
-      browseSubCats.value = (subs || []) as Array<{ slug: string, label: string, subCategories?: unknown[] | null }>
+    fetchSubCategories(targetCat.slug).then((subs) => {
+      browseSubCats.value = (subs || []) as CategoryNode[]
     })
   }
 }
@@ -1246,7 +1292,7 @@ function localizeAttrValue(attrKey: string, value: string): string {
 // --- Search & filter logic ---
 
 function buildSearchParams(offset = 0) {
-  const params: Record<string, any> = { offset, limit: PAGE_SIZE }
+  const params: Record<string, string | number | string[]> = { offset, limit: PAGE_SIZE }
   if (searchQuery.value) params.query = searchQuery.value
   // Category values: URL uses readable slugs, API expects the original slug
   if (selectedCategory.value) params.category = toApiSlug(selectedCategory.value)
@@ -1356,8 +1402,8 @@ async function performSearch(append = false) {
           if (p.attributes) {
             for (const attr of p.attributes) {
               if (attr.key && attr.value) {
-                if (!attrCounts[attr.key]) attrCounts[attr.key] = {}
-                attrCounts[attr.key][attr.value] = (attrCounts[attr.key][attr.value] || 0) + 1
+                const attrValues = attrCounts[attr.key] ?? (attrCounts[attr.key] = {})
+                attrValues[attr.value] = (attrValues[attr.value] || 0) + 1
               }
             }
           }
@@ -1390,7 +1436,7 @@ async function performSearch(append = false) {
     if (batteryBuckets && batteryBuckets.length > 0) {
       const numericValues = batteryBuckets
         .map(b => Number.parseInt(String(b.value).replace('%', ''), 10))
-        .filter(n => !isNaN(n))
+        .filter(n => !Number.isNaN(n))
       if (numericValues.length > 0) {
         batteryRangeMin.value = Math.min(...numericValues)
         batteryRangeMax.value = Math.max(...numericValues)
@@ -1434,39 +1480,48 @@ function loadMore() {
   performSearch(true)
 }
 
+function queryWithoutKeys(...keys: string[]): Record<string, string> {
+  const excluded = new Set(keys)
+  const query: Record<string, string> = {}
+
+  for (const [key, value] of Object.entries(route.query)) {
+    if (!excluded.has(key) && typeof value === 'string') {
+      query[key] = value
+    }
+  }
+
+  return query
+}
+
 function toggleFilter(type: 'category' | 'condition', value: string) {
-  const query = { ...route.query }
-  if (query[type] === value) {
-    delete query[type]
+  if (route.query[type] === value) {
+    router.push({ query: queryWithoutKeys(type) })
+    return
   }
-  else {
-    query[type] = value
-  }
+
+  const query = queryWithoutKeys()
+  query[type] = value
   router.push({ query })
 }
 
 function clearFilter(type: string) {
-  const query = { ...route.query }
-  delete query[type]
-  router.push({ query })
+  router.push({ query: queryWithoutKeys(type) })
 }
 
 function toggleAttributeFilter(key: string, value: string) {
-  const query = { ...route.query }
   const paramKey = `attr_${key}`
-  if (query[paramKey] === value) {
-    delete query[paramKey]
+  if (route.query[paramKey] === value) {
+    router.push({ query: queryWithoutKeys(paramKey) })
+    return
   }
-  else {
-    query[paramKey] = value
-  }
+
+  const query = queryWithoutKeys()
+  query[paramKey] = value
   router.push({ query })
 }
 
 function removeAttributeFilter(key: string) {
-  const query = { ...route.query }
-  delete query[`attr_${key}`]
-  router.push({ query })
+  router.push({ query: queryWithoutKeys(`attr_${key}`) })
 }
 
 function clearAllFilters() {
@@ -1476,12 +1531,7 @@ function clearAllFilters() {
 }
 
 function applyBatteryFilter() {
-  const query: Record<string, string> = {}
-  for (const [k, v] of Object.entries(route.query)) {
-    if (k !== 'attr_battery_min' && k !== 'attr_battery_max' && typeof v === 'string') {
-      query[k] = v
-    }
-  }
+  const query = queryWithoutKeys('attr_battery_min', 'attr_battery_max')
   if (batteryFilterMin.value > batteryRangeMin.value) {
     query.attr_battery_min = String(Math.round(batteryFilterMin.value))
   }
@@ -1621,13 +1671,7 @@ function onCountrySelect(event: Event) {
 }
 
 function applyPriceFilter() {
-  const query: Record<string, string> = {}
-  // Preserve all existing query params except price
-  for (const [k, v] of Object.entries(route.query)) {
-    if (k !== 'price_min' && k !== 'price_max' && typeof v === 'string') {
-      query[k] = v
-    }
-  }
+  const query = queryWithoutKeys('price_min', 'price_max')
   if (priceFilterMin.value > priceRangeMin.value) {
     query.price_min = String(Math.round(priceFilterMin.value))
   }
@@ -1638,12 +1682,7 @@ function applyPriceFilter() {
 }
 
 function clearPriceFilter() {
-  const query: Record<string, string> = {}
-  for (const [k, v] of Object.entries(route.query)) {
-    if (k !== 'price_min' && k !== 'price_max' && typeof v === 'string') {
-      query[k] = v
-    }
-  }
+  const query = queryWithoutKeys('price_min', 'price_max')
   priceFilterMin.value = priceRangeMin.value
   priceFilterMax.value = priceRangeMax.value
   router.push({ query })
@@ -1664,8 +1703,6 @@ watch(() => route.query, () => {
     || route.query.zip || route.query.country
     || Object.keys(route.query).some(k => k.startsWith('attr_'))
   if (hasQuery) {
-    // Skip search while ZIP is being resolved from URL — distance filter won't work without coordinates
-    if (zipResolving.value) return
     // Detect if server-side filter params changed (search, category, condition, price, sort, distance, or attributes)
     const currentQ = route.query.q ? String(route.query.q) : ''
     const currentCategory = route.query.category ? String(route.query.category) : ''
@@ -1720,7 +1757,7 @@ function formatPrice(amount: number) {
 }
 
 /** Build a better display name when product.name is just the brand or too generic */
-function productDisplayName(product: any): string {
+function productDisplayName(product: ProductDocument): string {
   const name = product.name?.trim()
   const brand = product.brand?.trim()
   const model = product.model?.trim()
@@ -1741,14 +1778,14 @@ function productDisplayName(product: any): string {
   return cleanName || name
 }
 
-function getDisplayCategory(product: any): string | null {
+function getDisplayCategory(product: ProductDocument): string | null {
   if (!product.categories || !Array.isArray(product.categories)) return null
   return product.categories.find((c: string) =>
-    c && c !== 'general' && !/^\d+(,\s*\d+)*$/.test(c),
+    c && c !== 'general' && !/^\d+(?:,\s*\d+)*$/.test(c),
   ) ?? null
 }
 
-function buildProductLink(product: any): string {
+function buildProductLink(): string {
   const params = new URLSearchParams()
   if (route.query.zip) params.append('zip', route.query.zip as string)
   if (route.query.lat) params.append('lat', route.query.lat as string)
@@ -1766,7 +1803,7 @@ function buildProductLink(product: any): string {
   return queryString ? `?${queryString}` : ''
 }
 
-function getTopAttributes(product: any, limit = 4) {
+function getTopAttributes(product: ProductDocument, limit = 4): ProductAttribute[] {
   if (!product.attributes || !Array.isArray(product.attributes)) return []
   const excludedKeys = new Set([
     'condition', 'title', 'price', 'description', 'name', 'image', 'url', 'id', 'seo_id',
@@ -1783,7 +1820,7 @@ function getTopAttributes(product: any, limit = 4) {
     'does_not_come_from_search_engine__teaser_attribute', 'teaser_attribute',
   ])
   return product.attributes
-    .filter((a: any) => a.key && a.value
+    .filter((a: ProductAttribute) => a.key && a.value
       && !excludedKeys.has(a.key.toLowerCase())
       && a.value !== '0' && a.value !== 'null' && a.value !== 'unknown'
       && !a.value.startsWith('http') && a.value.length <= 80)

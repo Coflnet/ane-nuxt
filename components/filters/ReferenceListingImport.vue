@@ -376,6 +376,7 @@ const summedPrice = computed(() => {
 const sandboxSrcDoc = computed(() => {
   if (!preview.value?.sandboxHtml)
     return ''
+  const scriptCloseTag = '</scr' + 'ipt>'
   const injection = `<script>(function(){
     function getXPath(el){if(!el||el.nodeType!==1)return '';var segs=[];for(var cur=el;cur&&cur.nodeType===1;cur=cur.parentNode){if(!cur.parentNode)break;var i=1,sib=cur.previousSibling;while(sib){if(sib.nodeType===1&&sib.nodeName===cur.nodeName)i++;sib=sib.previousSibling;}var tag=cur.nodeName.toLowerCase();segs.unshift(tag+'['+i+']');if(tag==='html')break;}return '/'+segs.join('/');}
     var pressTimer=null;var pressFired=false;
@@ -385,7 +386,7 @@ const sandboxSrcDoc = computed(() => {
     document.addEventListener('touchend',function(){if(pressTimer){clearTimeout(pressTimer);pressTimer=null;}},true);
     document.addEventListener('touchcancel',function(){if(pressTimer){clearTimeout(pressTimer);pressTimer=null;}},true);
     document.addEventListener('submit',function(e){e.preventDefault();},true);
-  })();<\/script>`
+  })();${scriptCloseTag}`
   // Inject before </head> if present, otherwise before <body>.
   const html = preview.value.sandboxHtml
   if (/<\/head>/i.test(html))
