@@ -41,4 +41,9 @@ useSeoMeta({
   description: () => t('aneDescription', { name: t(`${marketplaceName.value}Marketplace`) }),
   ogDescription: () => t('aneDescription', { name: t(`${marketplaceName.value}Marketplace`) }),
 })
+
+useJsonLd(() => buildBreadcrumbJsonLd([
+  { name: t('nav.home'), url: '/' },
+  { name: t(`${marketplaceName.value}Marketplace`), url: route.path },
+]))
 </script>

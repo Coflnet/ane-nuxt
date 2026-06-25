@@ -2,8 +2,11 @@
 import { CalendarDays, Clock } from 'lucide-vue-next'
 import { getPublishedArticles } from '~/utils/articles'
 
+const route = useRoute()
 const localePath = useLocalePath()
 const articles = getPublishedArticles()
+
+useJsonLd(() => buildBlogListJsonLd(articles, absoluteUrl(route.path)))
 
 useSeoMeta({
   title: 'Flipping-Guides für Kleinanzeigen, eBay und Sammlerstücke | Ane Deals',
