@@ -14,7 +14,7 @@ RUN set -eu; \
 	fi; \
 	cd "$app_dir"; \
 	npm install; \
-	GOOGLE_APPLICATION_CREDENTIALS=/config/google/credentials.json ANE_PRERENDER_MARKETING=false npm run build; \
+	GOOGLE_APPLICATION_CREDENTIALS=/config/google/credentials.json npm run build; \
 	mkdir -p /app; \
 	cp -R .output /app/.output
 

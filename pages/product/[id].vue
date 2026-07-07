@@ -359,6 +359,7 @@
               <NuxtImg
                 v-if="rp.imageUrl"
                 :src="rp.imageUrl"
+                loading="lazy"
                 class="w-full h-full object-contain"
               />
               <div
@@ -504,12 +505,31 @@ const lat = computed(() => route.query.lat ? Number(route.query.lat) : undefined
 const lon = computed(() => route.query.lon ? Number(route.query.lon) : undefined)
 const maxDistance = computed(() => route.query.max_distance ? Number(route.query.max_distance) : undefined)
 
-const product = ref<Product | null>(null)
+// SEO-critical data: server-rendered when the backend is quick, otherwise a
+// skeleton renders and the client re-fetches it after hydration.
+const { data: coreData, loading } = useRaceableAsyncData(
+  `product-${productId}`,
+  async () => {
+    const [productRes, histRes, statsRes] = await Promise.all([
+      getProduct({ path: { id: productId } }),
+      getPriceHistory({ path: { id: productId }, query: { days: 90 } }).catch(() => []),
+      getPriceStats({ path: { id: productId }, query: { days: 90 } }).catch(() => null),
+    ])
+    return {
+      product: productRes as Product,
+      priceHistory: (histRes as PricePoint[]) || [],
+      priceStats: (statsRes as PriceHistoryStats | null) ?? null,
+    }
+  },
+)
+
+const product = computed<Product | null>(() => coreData.value?.product ?? null)
+const priceHistory = computed<PricePoint[]>(() => coreData.value?.priceHistory ?? [])
+const priceStats = computed<PriceHistoryStats | null>(() => coreData.value?.priceStats ?? null)
+
+// Secondary, non-SEO data — always fetched on the client after mount.
 const relatedProducts = ref<Product[]>([])
 const matches = ref<ProductMatch[]>([])
-const priceHistory = ref<PricePoint[]>([])
-const priceStats = ref<PriceHistoryStats | null>(null)
-const loading = ref(true)
 const unavailableCount = ref(0)
 const imageErrorCount = ref(0)
 
@@ -544,7 +564,11 @@ const productIssueTypes: { value: IssueType }[] = [
   { value: 'Other' },
 ]
 
-const availableOfferCount = computed(() => matches.value.length - unavailableCount.value)
+const availableOfferCount = computed(() => {
+  // Matches load client-side; fall back to the SSR-available listing count.
+  if (matches.value.length) return matches.value.length - unavailableCount.value
+  return product.value?.listingCount ?? 0
+})
 
 // Filter out 'condition' key from attributes (shown as top-level field)
 const filteredAttributes = computed<Record<string, string>>(() => {
@@ -946,35 +970,41 @@ async function submitProductReport() {
   }
 }
 
+// Listings + related products are interactive, non-SEO data — load on the
+// client so the server only waits on the SEO-critical product/price data.
 onMounted(async () => {
-  try {
-    // Parallel fetch all data
-    const [pRes, mRes, histRes, statsRes, relatedRes] = await Promise.all([
-      getProduct({ path: { id: productId } }),
-      $fetch<ProductMatch[]>(buildMatchesUrl(productId)).catch(() => []),
-      getPriceHistory({ path: { id: productId }, query: { days: 90 } }).catch(() => []),
-      getPriceStats({ path: { id: productId }, query: { days: 90 } }).catch(() => null),
-      $fetch<Product[]>(buildRelatedProductsUrl(productId)).catch(() => []),
-    ])
-
-    product.value = pRes as Product
-    matches.value = mRes
-    priceHistory.value = histRes as PricePoint[]
-    priceStats.value = statsRes as PriceHistoryStats | null
-    relatedProducts.value = relatedRes
-  }
-  catch (e) {
-    console.error('Failed to load product', e)
-  }
-  finally {
-    loading.value = false
-  }
+  const [mRes, relatedRes] = await Promise.all([
+    $fetch<ProductMatch[]>(buildMatchesUrl(productId)).catch(() => []),
+    $fetch<Product[]>(buildRelatedProductsUrl(productId)).catch(() => []),
+  ])
+  matches.value = mRes
+  relatedProducts.value = relatedRes
 })
 
-useHead({
-  title: computed(() => product.value?.name || 'Product'),
-  meta: [
-    { name: 'description', content: computed(() => product.value ? t('product.seo.description', { name: product.value.name, count: matches.value.length }) : '') },
-  ],
+const productDescription = computed(() =>
+  product.value
+    ? t('product.seo.description', { name: product.value.name, count: availableOfferCount.value })
+    : '',
+)
+
+useSeoMeta({
+  title: () => product.value?.name || 'Product',
+  description: () => productDescription.value,
+  ogTitle: () => product.value?.name || 'Product',
+  ogDescription: () => productDescription.value,
+  ogImage: () => product.value?.imageUrl || undefined,
+  ogType: 'website',
+})
+
+useJsonLd(() => {
+  if (!product.value) return null
+  return [
+    buildProductJsonLd(product.value, absoluteUrl(route.path)),
+    buildBreadcrumbJsonLd([
+      { name: t('nav.home'), url: '/' },
+      { name: t('nav.search'), url: '/search' },
+      { name: product.value.name || '', url: route.path },
+    ]),
+  ]
 })
 </script>

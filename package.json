@@ -59,6 +59,9 @@
     "shadcn-nuxt": "^2.1.0",
     "vue-tsc": "3.2.6"
   },
+  "overrides": {
+    "buffer-equal-constant-time": "file:./shims/buffer-equal-constant-time"
+  },
   "pnpm": {
     "onlyBuiltDependencies": [
       "esbuild",

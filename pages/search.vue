@@ -811,13 +811,61 @@ const batteryFilterMax = ref<number>(100)
 const selectedBatteryMin = computed(() => route.query.attr_battery_min ? Number(route.query.attr_battery_min) : undefined)
 const selectedBatteryMax = computed(() => route.query.attr_battery_max ? Number(route.query.attr_battery_max) : undefined)
 
-const loading = ref(false)
+const manualLoading = ref(false)
 const loadingMore = ref(false)
 const hasSearched = ref(false)
 const isFilterPanelOpen = ref(false)
 
+function routeHasSearchQuery(query: typeof route.query): boolean {
+  return !!(query.q || query.category || query.condition
+    || query.price_min || query.price_max || query.sort || query.max_distance
+    || query.zip || query.country
+    || Object.keys(query).some(k => k.startsWith('attr_')))
+}
+
 // Track previous query params to detect server-side filter changes that need a re-fetch
 const prevQuery = reactive({ q: '' as string | undefined, category: '' as string | undefined, condition: '' as string | undefined, price_min: '' as string | undefined, price_max: '' as string | undefined, attrs: '' as string | undefined, sort: '' as string | undefined, max_distance: '' as string | undefined })
+
+function syncPrevQuery() {
+  prevQuery.q = route.query.q ? String(route.query.q) : ''
+  prevQuery.category = route.query.category ? String(route.query.category) : ''
+  prevQuery.condition = route.query.condition ? String(route.query.condition) : ''
+  prevQuery.price_min = route.query.price_min ? String(route.query.price_min) : ''
+  prevQuery.price_max = route.query.price_max ? String(route.query.price_max) : ''
+  prevQuery.sort = route.query.sort ? String(route.query.sort) : ''
+  prevQuery.max_distance = route.query.max_distance ? String(route.query.max_distance) : ''
+  prevQuery.attrs = Object.entries(route.query)
+    .filter(([k]) => k.startsWith('attr_'))
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([k, v]) => `${k}=${v}`)
+    .join('&')
+}
+
+// First results page: rendered server-side when the backend is quick, otherwise
+// a skeleton is sent and the client re-fetches after hydration. ZIP-based
+// searches need client geolocation, so they always fall back to the client.
+const { data: initialSearch, loading: initialLoading } = useRaceableAsyncData(
+  `search-${route.fullPath}`,
+  () => {
+    if (!routeHasSearchQuery(route.query) || zipResolving.value) {
+      return Promise.resolve(null)
+    }
+    return searchProducts({ query: buildSearchParams(0) })
+  },
+)
+
+// Combined loading: initial SSR fetch OR a client-side re-filter.
+const loading = computed(() => initialLoading.value || manualLoading.value)
+
+// Apply the SSR result on both server render and client hydration, and prime
+// the change-detection state so the route watcher doesn't re-fetch on load.
+watch(initialSearch, (resp) => {
+  if (resp) {
+    applySearchResponse(resp, false)
+    hasSearched.value = true
+    syncPrevQuery()
+  }
+}, { immediate: true })
 
 // Compute available category buckets — use server-provided aggregation counts directly
 const availableCategoryBuckets = computed(() => {
@@ -1323,9 +1371,11 @@ function buildSearchParams(offset = 0) {
   return params
 }
 
+// Client-only: SSR'd first page is handled by the raceable composable below.
 async function performSearch(append = false) {
+  if (import.meta.server) return
   if (!append) {
-    loading.value = true
+    manualLoading.value = true
   }
   else {
     loadingMore.value = true
@@ -1336,7 +1386,19 @@ async function performSearch(append = false) {
     const offset = append ? allProducts.value.length : 0
     const params = buildSearchParams(offset)
     const response = await searchProducts({ query: params })
+    applySearchResponse(response, append)
+  }
+  catch (e) {
+    console.error('Search failed', e)
+  }
+  finally {
+    manualLoading.value = false
+    loadingMore.value = false
+  }
+}
 
+function applySearchResponse(response: any, append: boolean) {
+  {
     if (append) {
       allProducts.value = [...allProducts.value, ...(response?.products || [])]
     }
@@ -1466,13 +1528,6 @@ async function performSearch(append = false) {
         priceFilterMax.value = selectedMaxPrice.value ?? priceRangeMax.value
       }
     }
-  }
-  catch (e) {
-    console.error('Search failed', e)
-  }
-  finally {
-    loading.value = false
-    loadingMore.value = false
   }
 }
 
@@ -1750,7 +1805,9 @@ watch(() => route.query, () => {
     conditionBuckets.value = []
     attributeBuckets.value = {}
   }
-}, { immediate: true })
+// Initial load (incl. timeout refetch) is handled by useRaceableAsyncData above;
+// this watcher only reacts to subsequent query changes.
+})
 
 function formatPrice(amount: number) {
   return new Intl.NumberFormat(locale.value === 'de' ? 'de-DE' : 'en-US', { style: 'currency', currency: 'EUR' }).format(amount)
@@ -1827,7 +1884,15 @@ function getTopAttributes(product: ProductDocument, limit = 4): ProductAttribute
     .slice(0, limit)
 }
 
-useHead({
-  title: t('searchPageTitle', 'Search - Compare Prices'),
+const searchTitle = computed(() => {
+  const base = t('searchPageTitle', 'Search - Compare Prices')
+  return searchQuery.value ? `${searchQuery.value} – ${base}` : base
+})
+
+useSeoMeta({
+  title: () => searchTitle.value,
+  ogTitle: () => searchTitle.value,
+  description: () => t('searchPageDescription', 'Compare prices across marketplaces and find the best deals.'),
+  ogType: 'website',
 })
 </script>

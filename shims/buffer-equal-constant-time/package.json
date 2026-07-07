@@ -1,0 +1,7 @@
+{
+  "name": "buffer-equal-constant-time",
+  "version": "1.0.1",
+  "description": "Node >= 24 safe drop-in: original touches the removed buffer.SlowBuffer at import time and crashes SSR.",
+  "main": "index.js",
+  "license": "BSD-3-Clause"
+}

@@ -1,5 +1,22 @@
+import { getPublishedArticles } from './utils/articles'
+
 const hostName = 'https://ane.deals'
 const prerenderMarketingRoutes = process.env.ANE_PRERENDER_MARKETING !== 'false'
+
+// Finite set of pages that can be fully prebuilt at build time.
+// i18n strategy is `prefix_except_default` (en = no prefix, de = `/de`).
+const marketplaceIds = ['craigslist', 'kleinanzeigen', 'autoscout24']
+const localePrefixes = ['', '/de']
+const withLocales = (path: string) => localePrefixes.map(p => `${p}${path}` || '/')
+
+const prerenderRoutes = prerenderMarketingRoutes
+  ? [
+      ...withLocales(''),
+      ...withLocales('/blog'),
+      ...getPublishedArticles().flatMap(a => withLocales(`/blog/${a.slug}`)),
+      ...marketplaceIds.flatMap(id => withLocales(`/marketplaces/${id}`)),
+    ]
+  : []
 
 export default defineNuxtConfig({
   modules: [
@@ -46,7 +63,29 @@ export default defineNuxtConfig({
   routeRules: {
     '/': { prerender: prerenderMarketingRoutes },
     '/blog/**': { prerender: prerenderMarketingRoutes },
+    '/marketplaces/**': { prerender: prerenderMarketingRoutes },
+    // SSR'd on demand, then cached + revalidated in the background (big repeat-load win).
+    '/product/**': { swr: 600 },
+    '/search': { swr: 60 },
     '/_ipx/**': { prerender: false },
+  },
+
+  nitro: {
+    prerender: {
+      // Explicit route list only — avoid crawling into dynamic pages
+      // (/search, /product/**), which must stay SSR/SWR, not static skeletons.
+      crawlLinks: false,
+      routes: prerenderRoutes,
+    },
+  },
+
+  runtimeConfig: {
+    public: {
+      // Max time (ms) the server waits for the backend before rendering a
+      // skeleton and letting the client re-fetch. Override with
+      // NUXT_PUBLIC_SSR_FETCH_TIMEOUT_MS.
+      ssrFetchTimeoutMs: 2500,
+    },
   },
 
   future: {
@@ -69,6 +108,7 @@ export default defineNuxtConfig({
   },
 
   i18n: ({
+    baseUrl: hostName,
     locales: [
       {
         code: 'en',

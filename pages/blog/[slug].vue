@@ -22,6 +22,15 @@ useSeoMeta({
 useHead({
   htmlAttrs: { lang: article.locale },
 })
+
+const canonical = absoluteUrl(route.path)
+useJsonLd(() => [
+  buildArticleJsonLd(article, canonical),
+  buildBreadcrumbJsonLd([
+    { name: 'Blog', url: '/blog' },
+    { name: article.title, url: route.path },
+  ]),
+])
 </script>
 
 <template>

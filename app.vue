@@ -14,14 +14,25 @@
 
 <script setup>
 // App-wide setup
+
+// Canonical + hreflang alternates for every route (i18n: en default, /de prefix).
+const localeHead = useLocaleHead({ dir: true, lang: true, seo: true })
+useHead(localeHead)
+
 useHead({
   title: 'ANE - Advanced Notification Engine',
-  meta: [
-    { name: 'description', content: 'Track auctions across marketplaces with custom filters and notifications' },
-  ],
   link: [
     { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
   ],
+})
+
+// Site-wide defaults; per-page useSeoMeta calls override title/description/image.
+useSeoMeta({
+  description: 'Track auctions across marketplaces with custom filters and notifications',
+  ogSiteName: 'Ane Deals',
+  ogType: 'website',
+  ogImage: 'https://ane.deals/DashboardPreview.webp',
+  twitterCard: 'summary_large_image',
 })
 
 onMounted(async () => {
