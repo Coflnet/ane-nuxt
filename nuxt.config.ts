@@ -30,6 +30,19 @@ export default defineNuxtConfig({
     name: 'Ane Deals',
   },
 
+  runtimeConfig: {
+    // Server-only (SSR). Points at the in-cluster backend Service so server-side
+    // rendering calls the API directly and never leaves the cluster — no round
+    // trip out through the public load balancer / Cloudflare (that external loop
+    // was hanging SSR and taking the site down). Override: NUXT_API_INTERNAL_BASE_URL.
+    apiInternalBaseUrl: 'http://aneapi:8000',
+    public: {
+      // Browser-facing API base — the public load balancer on ane.coflnet.com.
+      // Override: NUXT_PUBLIC_API_BASE_URL.
+      apiBaseUrl: 'https://ane.coflnet.com',
+    },
+  },
+
   routeRules: {
     '/': { prerender: prerenderMarketingRoutes },
     '/blog/**': { prerender: prerenderMarketingRoutes },

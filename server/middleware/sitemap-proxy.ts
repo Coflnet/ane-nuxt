@@ -1,6 +1,7 @@
-const API_BASE = 'https://ane.coflnet.com'
-
 export default defineEventHandler(async (event) => {
+  // Server middleware always runs in the cluster — call the backend internally.
+  const { apiInternalBaseUrl, public: { apiBaseUrl } } = useRuntimeConfig(event)
+  const API_BASE = apiInternalBaseUrl || apiBaseUrl
   const path = getRequestURL(event).pathname
   const match = path.match(/^\/product-sitemap(?:-(de))?(?:-(\d+))?\.xml$/)
   if (!match) return

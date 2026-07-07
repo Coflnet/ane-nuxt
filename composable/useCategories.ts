@@ -6,8 +6,6 @@ interface UnifiedCategory {
   attributes?: Record<string, string> | null
 }
 
-const API_BASE = 'https://ane.coflnet.com'
-
 /** Convert a label like "Baby & Kleinkind" → "baby-kleinkind" */
 function labelToUrlSlug(label: string): string {
   return label
@@ -18,6 +16,9 @@ function labelToUrlSlug(label: string): string {
 }
 
 export function useCategories() {
+  // Internal Service base during SSR, public base in the browser.
+  const API_BASE = useApiBaseUrl()
+
   const topLevelCategories = useState<UnifiedCategory[]>('topLevelCategories', () => [])
   const subCategories = useState<Record<string, UnifiedCategory[]>>('subCategories', () => ({}))
   const loadingCategories = useState<boolean>('loadingCategories', () => false)
