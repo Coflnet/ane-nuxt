@@ -4,11 +4,12 @@ Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduct
 
 ## Setup
 
-Make sure to install dependencies:
+Install Node.js 26 and npm 11. The expected Node.js major is also recorded in `.nvmrc`.
+Then install dependencies from the lockfile:
 
 ```bash
 # npm
-npm install
+npm ci
 ```
 
 Add a [firebase service account](https://firebase.google.com/docs/admin/setup#initialize_the_sdk_in_non-google_environments)
@@ -32,15 +33,15 @@ npm run dev
 Build the application for production:
 
 ```bash
-# pnpm
-npm build
+# npm
+npm run build
 ```
 
 Locally preview production build:
 
 ```bash
-# pnpm
-npm preview
+# npm
+npm run preview
 ```
 
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.

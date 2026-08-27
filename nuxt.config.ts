@@ -1,7 +1,9 @@
 import { getPublishedArticles } from './utils/articles'
 
 const hostName = 'https://ane.deals'
-const prerenderMarketingRoutes = process.env.ANE_PRERENDER_MARKETING !== 'false'
+const prerenderMarketingRoutes
+  = process.env.ANE_PRERENDER_MARKETING !== 'false'
+    && Boolean(process.env.GOOGLE_APPLICATION_CREDENTIALS)
 
 // Finite set of pages that can be fully prebuilt at build time.
 // i18n strategy is `prefix_except_default` (en = no prefix, de = `/de`).
@@ -60,6 +62,15 @@ export default defineNuxtConfig({
     },
   },
 
+  runtimeConfig: {
+    public: {
+      // Max time (ms) the server waits for the backend before rendering a
+      // skeleton and letting the client re-fetch. Override with
+      // NUXT_PUBLIC_SSR_FETCH_TIMEOUT_MS.
+      ssrFetchTimeoutMs: 2500,
+    },
+  },
+
   routeRules: {
     '/': { prerender: prerenderMarketingRoutes },
     '/blog/**': { prerender: prerenderMarketingRoutes },
@@ -70,6 +81,11 @@ export default defineNuxtConfig({
     '/_ipx/**': { prerender: false },
   },
 
+  future: {
+    compatibilityVersion: 4,
+  },
+  compatibilityDate: '2024-11-01',
+
   nitro: {
     prerender: {
       // Explicit route list only — avoid crawling into dynamic pages
@@ -78,20 +94,6 @@ export default defineNuxtConfig({
       routes: prerenderRoutes,
     },
   },
-
-  runtimeConfig: {
-    public: {
-      // Max time (ms) the server waits for the backend before rendering a
-      // skeleton and letting the client re-fetch. Override with
-      // NUXT_PUBLIC_SSR_FETCH_TIMEOUT_MS.
-      ssrFetchTimeoutMs: 2500,
-    },
-  },
-
-  future: {
-    compatibilityVersion: 4,
-  },
-  compatibilityDate: '2024-11-01',
 
   eslint: {
     checker: true,
