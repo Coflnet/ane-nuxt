@@ -733,7 +733,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { searchProducts } from '~/src/api-client'
-import type { ProductAttribute, ProductDocument, FilterBucket } from '~/src/api-client/types.gen'
+import type { ProductAttribute, ProductDocument, FilterBucket, SearchProductsResponse } from '~/src/api-client/types.gen'
 import { useCategories } from '~/composable/useCategories'
 
 const router = useRouter()
@@ -1397,7 +1397,7 @@ async function performSearch(append = false) {
   }
 }
 
-function applySearchResponse(response: any, append: boolean) {
+function applySearchResponse(response: SearchProductsResponse, append: boolean) {
   {
     if (append) {
       allProducts.value = [...allProducts.value, ...(response?.products || [])]
