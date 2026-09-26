@@ -2,8 +2,9 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { createUserWithEmailAndPassword, type EmailAuthCredential, EmailAuthProvider, GoogleAuthProvider, linkWithCredential, linkWithPopup, signInAnonymously, signInWithEmailAndPassword, signInWithPopup, type Auth, updateProfile, type UserCredential, getAdditionalUserInfo } from 'firebase/auth'
 import { navigateTo } from '#app'
-import { getStats, loginFirebase, useLink } from '~/src/api-client'
+import { createLink, getStats, listLinks, loginFirebase, useLink } from '~/src/api-client'
 import type { ActiveSubscription } from '#hey-api'
+import { canCreateReferralLink, REFERRAL_LINK_NAME, REFERRAL_LINK_TEXT } from '~/utils/referral'
 
 // Types
 export interface User {
@@ -93,12 +94,24 @@ export const useUserStore = defineStore('user', () => {
 
   const localePath = useLocalePath()
 
+  /**
+   * Returns the id of the signed-in user's invite link, reusing an existing one before creating it.
+   * Anonymous visitors have no referral link (the endpoint requires an account), so no request is made.
+   */
   async function generateReferralCode(): Promise<string> {
-    const apiToken = `Bearer ${token.value}`
+    if (!canCreateReferralLink({ isLoggedIn: isLoggedIn.value, token: token.value }))
+      return ''
+
+    const headers = { Authorization: `Bearer ${token.value}` }
+    const existing = await listLinks({ composable: '$fetch', headers })
+    const reusable = existing.find(link => link.name === REFERRAL_LINK_NAME && link.id)
+    if (reusable?.id)
+      return reusable.id
+
     const refCode = await createLink({
       composable: '$fetch',
-      query: { name: 'i', text: 'i' },
-      headers: { Authorization: apiToken },
+      query: { name: REFERRAL_LINK_NAME, text: REFERRAL_LINK_TEXT },
+      headers,
     })
 
     return refCode.id ?? ''
@@ -277,6 +290,8 @@ export const useUserStore = defineStore('user', () => {
     user.value = null
     isAuthenticated.value = false
     token.value = null
+    // the cached invite link belongs to the signed-out account
+    userReferralCode.value = ''
 
     navigateTo(localePath('/login'))
   }

@@ -17,8 +17,27 @@ const { t } = useI18n()
 const localePath = useLocalePath()
 const userStore = useUserStore()
 
+/** Cached invite link id; created only for signed-in (non-anonymous) users. */
+async function loadReferralCode(): Promise<string> {
+  if (userStore.userReferralCode || !userStore.isLoggedIn)
+    return userStore.userReferralCode
+  try {
+    userStore.userReferralCode = await userStore.generateReferralCode()
+  }
+  catch (error) {
+    console.warn('Could not load the referral link', error)
+  }
+  return userStore.userReferralCode
+}
+
 async function copyReferralCode() {
-  const referralCode = userStore.userReferralCode
+  if (!userStore.isLoggedIn) {
+    // anonymous visitors need an account before they can invite others
+    navigateTo(localePath('/login'))
+    return
+  }
+
+  const referralCode = await loadReferralCode()
 
   if (referralCode) {
     const path = localePath(`/overview?ref=${referralCode}`)
@@ -30,13 +49,11 @@ async function copyReferralCode() {
   push.error(t('errorCopyingReferralCode'))
 }
 
-onMounted(async () => {
-  // user already generated a referral code
-  if (userStore.userReferralCode != '')
-    return
-
-  const referralCode = await userStore.generateReferralCode()
-
-  userStore.userReferralCode = referralCode
+onMounted(() => {
+  // prefetch so the clipboard write happens right in the click handler; no request for anonymous visitors
+  watch(() => userStore.isLoggedIn, (loggedIn) => {
+    if (loggedIn)
+      loadReferralCode()
+  }, { immediate: true })
 })
 </script>
