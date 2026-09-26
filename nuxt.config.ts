@@ -1,9 +1,24 @@
+import { existsSync } from 'node:fs'
 import { getPublishedArticles } from './utils/articles'
 
 const hostName = 'https://ane.deals'
+
+// nuxt-vuefire wires its Firebase Admin/SSR-auth server plugins into the
+// build whenever GOOGLE_APPLICATION_CREDENTIALS is merely *set* (see its
+// `hasServiceAccount` check) — the Dockerfile always sets it so those
+// plugins ship in the runtime bundle for production, where the service
+// account is mounted at that path. But the image build itself never has the
+// file, and Nitro's prerender crawl actually executes those plugins against
+// the marketing routes, so gate prerendering on the file really existing
+// rather than just the env var being set. This only affects which routes get
+// statically prerendered at build time; it does not change nuxt-vuefire's
+// own env-var-driven decision to include the admin/auth plugins, so runtime
+// SSR auth against the real mounted credentials is unaffected.
+const googleCredentialsPath = process.env.GOOGLE_APPLICATION_CREDENTIALS ?? '/config/google/credentials.json'
+const hasGoogleCredentials = existsSync(googleCredentialsPath)
 const prerenderMarketingRoutes
   = process.env.ANE_PRERENDER_MARKETING !== 'false'
-    && Boolean(process.env.GOOGLE_APPLICATION_CREDENTIALS)
+    && hasGoogleCredentials
 
 // Finite set of pages that can be fully prebuilt at build time.
 // i18n strategy is `prefix_except_default` (en = no prefix, de = `/de`).
