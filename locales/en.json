@@ -964,5 +964,20 @@
   "flipper.seo.howItWorks": "How does it work? ANE continuously monitors marketplace listings in real-time. When a new listing appears, our AI compares its price against recent sold items for the same product. If the listing price is well below the median selling price, it appears in your Flipper feed as a potential flip opportunity. The more reference sales we find, the more reliable the profit estimate.",
   "flipper.seo.tips": "Tips for successful flipping: Focus on product categories you know well – electronics, gaming consoles, smartphones and branded clothing tend to have the most consistent resale values. Check the condition carefully by reading the full listing description. Factor in shipping costs and marketplace fees when calculating your actual profit. Act quickly – the best deals get snapped up within minutes.",
   "flipper.seo.examples": "Popular flipping categories include smartphones (especially iPhones and Samsung Galaxy), gaming consoles (PS5, Nintendo Switch), designer fashion, LEGO sets, vintage watches, and power tools. Many successful flippers focus on a niche and build expertise that helps them spot genuine deals faster than the competition.",
-  "flipper.seo.cta": "Sign up for free and start finding profitable flips today. Upgrade to the Flipper tier for real-time notifications, distance-based sorting, and priority access to the newest deals."
+  "flipper.seo.cta": "Sign up for free and start finding profitable flips today. Upgrade to the Flipper tier for real-time notifications, distance-based sorting, and priority access to the newest deals.",
+  "noResultsFor": "No results for “{query}”",
+  "noResultsHint": "Check the spelling, use fewer words or remove filters.",
+  "tryQuery": "Try “{query}”",
+  "browseAllCategories": "Show all categories",
+  "searchFailed": "Search failed",
+  "searchFailedHint": "The search service did not respond. Please try again in a moment.",
+  "retry": "Try again",
+  "sortRelevance": "Relevance",
+  "sortPriceAscShort": "Price ↑",
+  "sortPriceDescShort": "Price ↓",
+  "sortNewestShort": "Newest",
+  "hintSortedByPrice": "Sorted by lowest price because you asked for cheap items.",
+  "hintSortByRelevance": "Sort by relevance",
+  "hintMaxPrice": "Showing items up to {price} as mentioned in your search.",
+  "clearSearch": "Clear search"
 }

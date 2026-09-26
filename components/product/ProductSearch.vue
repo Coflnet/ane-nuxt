@@ -1,8 +1,10 @@
 <template>
   <div class="w-full max-w-2xl mx-auto">
-    <div
+    <form
       ref="containerRef"
       class="relative group"
+      role="search"
+      @submit.prevent="handleSearch"
     >
       <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200" />
       <div class="relative flex items-center bg-slate-800 rounded-lg shadow-xl ring-1 ring-slate-700/50">
@@ -13,32 +15,53 @@
           />
         </div>
         <input
+          ref="inputRef"
           v-model="query"
           type="text"
+          enterkeyhint="search"
           :placeholder="$t('searchProductsPlaceholder', 'Search for products (e.g. iPhone 15, MacBook)...')"
-          class="w-full p-4 bg-transparent border-none text-slate-100 placeholder-slate-500 focus:ring-0 text-lg"
+          :aria-label="$t('searchProductsPlaceholder', 'Search for products (e.g. iPhone 15, MacBook)...')"
+          class="w-full min-w-0 p-4 bg-transparent border-none text-slate-100 placeholder-slate-500 focus:ring-0 text-lg"
           data-testid="search-input"
           autocomplete="off"
-          @keyup.enter="handleSearch"
+          autocapitalize="off"
+          spellcheck="false"
+          role="combobox"
+          aria-autocomplete="list"
+          :aria-expanded="isDropdownVisible"
+          :aria-controls="listboxId"
+          :aria-activedescendant="isDropdownVisible && highlightIndex >= 0 ? optionId(highlightIndex) : undefined"
           @input="onInput"
           @focus="onFocus"
           @keydown.down.prevent="moveHighlight(1)"
           @keydown.up.prevent="moveHighlight(-1)"
-          @keydown.escape="showDropdown = false"
+          @keydown.escape.prevent="onEscape"
         >
-        <div
-          v-if="isLoading"
-          class="pr-2"
+        <button
+          v-if="query"
+          type="button"
+          class="p-2 text-slate-500 hover:text-white transition-colors"
+          :aria-label="$t('clearSearch', 'Clear search')"
+          @click="clearQuery"
         >
           <Icon
+            name="tabler:x"
+            class="w-5 h-5"
+          />
+        </button>
+        <!-- Fixed-width slot so the spinner does not shift the submit button -->
+        <div class="w-7 flex justify-center shrink-0">
+          <Icon
+            v-if="isLoading"
             name="tabler:loader-2"
             class="w-5 h-5 text-slate-400 animate-spin"
           />
         </div>
         <div class="pr-2">
           <button
+            type="submit"
             class="p-2 text-slate-400 hover:text-white transition-colors"
-            @click="handleSearch"
+            :aria-label="$t('search', 'Search')"
           >
             <Icon
               name="tabler:arrow-right"
@@ -50,20 +73,30 @@
 
       <!-- Suggestions dropdown -->
       <div
-        v-if="showDropdown && (suggestions.length > 0 || categorySuggestions.length > 0)"
-        class="absolute z-50 mt-2 w-full bg-slate-800 rounded-lg shadow-2xl ring-1 ring-slate-700/50 overflow-hidden"
+        v-if="isDropdownVisible"
+        :id="listboxId"
+        role="listbox"
+        class="absolute z-50 mt-2 w-full bg-slate-800 rounded-lg shadow-2xl ring-1 ring-slate-700/50 overflow-hidden text-left"
       >
         <!-- Category suggestions -->
-        <div v-if="categorySuggestions.length > 0">
+        <div
+          v-if="categorySuggestions.length > 0"
+          role="group"
+        >
           <div class="px-3 py-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">
             {{ $t('categories', 'Categories') }}
           </div>
           <button
             v-for="(cat, i) in categorySuggestions"
-            :key="'cat-' + i"
+            :id="optionId(i)"
+            :key="'cat-' + cat.slug"
+            type="button"
+            role="option"
+            :aria-selected="highlightIndex === i"
             class="w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors"
             :class="highlightIndex === i ? 'bg-slate-700 text-white' : 'text-slate-300 hover:bg-slate-700/50'"
-            @mouseenter="highlightIndex = i"
+            @mouseenter="hoverOption(i)"
+            @mousedown.prevent
             @click="selectCategory(cat)"
           >
             <Icon
@@ -76,7 +109,10 @@
         </div>
 
         <!-- Product suggestions -->
-        <div v-if="suggestions.length > 0">
+        <div
+          v-if="suggestions.length > 0"
+          role="group"
+        >
           <div
             class="px-3 py-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wider"
             :class="{ 'border-t border-slate-700': categorySuggestions.length > 0 }"
@@ -85,15 +121,21 @@
           </div>
           <button
             v-for="(s, i) in suggestions"
-            :key="'prod-' + i"
+            :id="optionId(i + categorySuggestions.length)"
+            :key="'prod-' + (s.seoId ?? s.text)"
+            type="button"
+            role="option"
+            :aria-selected="highlightIndex === i + categorySuggestions.length"
             class="w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors"
             :class="highlightIndex === (i + categorySuggestions.length) ? 'bg-slate-700 text-white' : 'text-slate-300 hover:bg-slate-700/50'"
-            @mouseenter="highlightIndex = i + categorySuggestions.length"
+            @mouseenter="hoverOption(i + categorySuggestions.length)"
+            @mousedown.prevent
             @click="selectSuggestion(s)"
           >
             <img
               v-if="s.imageUrl"
               :src="s.imageUrl"
+              alt=""
               class="w-8 h-8 rounded object-cover shrink-0"
               loading="lazy"
               onerror="this.style.display='none'"
@@ -108,26 +150,27 @@
                 {{ s.text }}
               </div>
               <div
-                v-if="s.category"
+                v-if="s.category && categoryLabel(s.category)"
                 class="text-xs text-slate-500 truncate"
               >
-                {{ s.category }}
+                {{ categoryLabel(s.category) }}
               </div>
             </div>
             <span
               v-if="s.minPrice"
               class="text-sm text-emerald-400 shrink-0"
             >
-              ab {{ formatPrice(s.minPrice) }}
+              {{ $t('startingFrom', 'from') }} {{ formatPrice(s.minPrice) }}
             </span>
           </button>
         </div>
       </div>
-    </div>
+    </form>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { useCategories } from '~/composable/useCategories'
 
 const props = defineProps<{
@@ -148,6 +191,7 @@ interface CategorySuggestion {
 
 interface ProductSuggestion {
   text: string
+  type?: string
   imageUrl?: string
   category?: string
   minPrice?: number
@@ -158,6 +202,11 @@ const emit = defineEmits<{
   (e: 'search' | 'selectCategory', value: string): void
 }>()
 
+const SUGGEST_DEBOUNCE_MS = 250
+
+const { locale } = useI18n()
+const localePath = useLocalePath()
+const apiBase = useApiBaseUrl()
 const query = ref(props.initialQuery || '')
 const suggestions = ref<ProductSuggestion[]>([])
 const categorySuggestions = ref<CategorySuggestion[]>([])
@@ -165,19 +214,52 @@ const showDropdown = ref(false)
 const highlightIndex = ref(-1)
 const isLoading = ref(false)
 const containerRef = ref<HTMLElement | null>(null)
-const { topLevelCategories, fetchTopLevelCategories } = useCategories()
+const inputRef = ref<HTMLInputElement | null>(null)
+const { topLevelCategories, fetchTopLevelCategories, slugToLabel } = useCategories()
+const listboxId = useId()
 
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
+let suggestAbort: AbortController | null = null
+// Enter only picks a suggestion the user moved to with the arrow keys. A row that
+// is merely hovered (e.g. the list opened under a resting mouse pointer) must not
+// hijack Enter and navigate away from what was typed.
+let highlightFromKeyboard = false
 
-const API_BASE = 'https://ane.coflnet.com'
+const totalOptions = computed(() => categorySuggestions.value.length + suggestions.value.length)
+const isDropdownVisible = computed(() => showDropdown.value && totalOptions.value > 0)
 
+function optionId(index: number) {
+  return `${listboxId}-option-${index}`
+}
+
+// Keep the input in sync with the URL (back/forward, shared links) without
+// clobbering what the user is typing when the value is effectively the same.
 watch(() => props.initialQuery, (newQuery) => {
-  query.value = newQuery || ''
+  if ((newQuery || '') !== query.value.trim()) {
+    query.value = newQuery || ''
+    // Suggestions belonged to the previous text
+    cancelPendingSuggestions()
+    suggestions.value = []
+    categorySuggestions.value = []
+    showDropdown.value = false
+  }
 })
+
+function cancelPendingSuggestions() {
+  if (debounceTimer) {
+    clearTimeout(debounceTimer)
+    debounceTimer = null
+  }
+  suggestAbort?.abort()
+  suggestAbort = null
+  isLoading.value = false
+}
 
 function onInput() {
   const q = query.value.trim()
-  if (debounceTimer) clearTimeout(debounceTimer)
+  cancelPendingSuggestions()
+  highlightIndex.value = -1
+  highlightFromKeyboard = false
 
   if (q.length < 2) {
     suggestions.value = []
@@ -186,85 +268,142 @@ function onInput() {
     return
   }
 
-  debounceTimer = setTimeout(() => fetchSuggestions(q), 250)
+  debounceTimer = setTimeout(() => fetchSuggestions(q), SUGGEST_DEBOUNCE_MS)
 }
 
 function onFocus() {
-  if (suggestions.value.length > 0 || categorySuggestions.value.length > 0) {
+  if (totalOptions.value > 0 && query.value.trim().length >= 2) {
     showDropdown.value = true
   }
 }
 
-async function fetchSuggestions(q: string) {
-  isLoading.value = true
+function onEscape() {
+  if (isDropdownVisible.value) {
+    showDropdown.value = false
+    highlightIndex.value = -1
+    highlightFromKeyboard = false
+  }
+  else if (query.value) {
+    clearQuery()
+  }
+}
+
+function clearQuery() {
+  cancelPendingSuggestions()
+  query.value = ''
+  suggestions.value = []
+  categorySuggestions.value = []
+  showDropdown.value = false
   highlightIndex.value = -1
+  highlightFromKeyboard = false
+  inputRef.value?.focus()
+}
+
+async function fetchSuggestions(q: string) {
+  const controller = new AbortController()
+  suggestAbort = controller
+  isLoading.value = true
 
   try {
     const [productResults, categoryResults] = await Promise.all([
-      $fetch<ProductSuggestion[]>(`${API_BASE}/api/Product/suggest`, {
+      $fetch<ProductSuggestion[]>(`${apiBase}/api/Product/suggest`, {
         params: { q, limit: 6 },
-      }).catch(() => []),
+        signal: controller.signal,
+      }).catch(() => [] as ProductSuggestion[]),
       topLevelCategories.value.length > 0
         ? Promise.resolve(topLevelCategories.value)
         : fetchTopLevelCategories(),
     ])
 
-    if (query.value.trim() !== q) return
+    // A newer keystroke or a submitted search superseded this request
+    if (controller.signal.aborted || query.value.trim() !== q) return
 
     suggestions.value = productResults || []
     categorySuggestions.value = collectCategorySuggestions(categoryResults || [], q).slice(0, 4)
-
-    showDropdown.value = suggestions.value.length > 0 || categorySuggestions.value.length > 0
+    highlightIndex.value = -1
+    highlightFromKeyboard = false
+    showDropdown.value = totalOptions.value > 0 && document.activeElement === inputRef.value
   }
   catch {
-    suggestions.value = []
-    categorySuggestions.value = []
+    if (!controller.signal.aborted) {
+      suggestions.value = []
+      categorySuggestions.value = []
+    }
   }
   finally {
-    isLoading.value = false
+    if (suggestAbort === controller) {
+      suggestAbort = null
+      isLoading.value = false
+    }
   }
 }
 
 function moveHighlight(dir: number) {
-  const total = categorySuggestions.value.length + suggestions.value.length
-  if (total === 0) return
-  highlightIndex.value = (highlightIndex.value + dir + total) % total
+  if (totalOptions.value === 0) return
+  if (!showDropdown.value) {
+    // First arrow press re-opens the list the user closed with Escape
+    showDropdown.value = true
+    return
+  }
+  highlightIndex.value = (highlightIndex.value + dir + totalOptions.value) % totalOptions.value
+  highlightFromKeyboard = true
+}
+
+function hoverOption(index: number) {
+  highlightIndex.value = index
+  highlightFromKeyboard = false
 }
 
 function handleSearch() {
+  // Only a visible option chosen with the arrow keys may take over Enter
+  const highlighted = isDropdownVisible.value && highlightFromKeyboard ? highlightIndex.value : -1
+  cancelPendingSuggestions()
   showDropdown.value = false
-  if (highlightIndex.value >= 0) {
+  highlightIndex.value = -1
+  highlightFromKeyboard = false
+
+  if (highlighted >= 0) {
     const catLen = categorySuggestions.value.length
-    if (highlightIndex.value < catLen) {
-      const selectedCategory = categorySuggestions.value[highlightIndex.value]
+    if (highlighted < catLen) {
+      const selectedCategory = categorySuggestions.value[highlighted]
       if (selectedCategory) selectCategory(selectedCategory)
     }
     else {
-      const selectedSuggestion = suggestions.value[highlightIndex.value - catLen]
+      const selectedSuggestion = suggestions.value[highlighted - catLen]
       if (selectedSuggestion) selectSuggestion(selectedSuggestion)
     }
     return
   }
-  if (query.value.trim()) {
-    emit('search', query.value)
+  const q = query.value.trim()
+  if (q) {
+    emit('search', q)
   }
 }
 
 function selectSuggestion(s: ProductSuggestion) {
+  cancelPendingSuggestions()
   showDropdown.value = false
   query.value = s.text
   if (s.seoId) {
-    navigateTo(`/product/${s.seoId}`)
+    navigateTo(localePath(`/product/${s.seoId}`))
   }
   else {
     emit('search', s.text)
   }
 }
 
-function selectCategory(cat: { label: string, slug: string, path: string }) {
+function selectCategory(cat: CategorySuggestion) {
+  cancelPendingSuggestions()
   showDropdown.value = false
   query.value = ''
   emit('selectCategory', cat.slug)
+}
+
+function categoryLabel(category: string): string | null {
+  const label = slugToLabel.value[category]
+  if (label) return label
+  // Bare taxonomy ids ("267") mean nothing to users
+  return /^\d+(?:,\s*\d+)*$/.test(category) ? null : category
 }
 
 function collectCategorySuggestions(categories: UnifiedCategory[], searchTerm: string): CategorySuggestion[] {
@@ -305,13 +444,13 @@ function normalizeSearchText(value: string): string {
     .replace(/ü/g, 'ue')
     .replace(/ß/g, 'ss')
     .normalize('NFD')
-    .replace(/[\u0300-\u036F]/g, '')
+    .replace(/\p{M}/gu, '')
     .replace(/[^a-z0-9]+/g, ' ')
     .trim()
 }
 
 function formatPrice(price: number) {
-  return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(price)
+  return new Intl.NumberFormat(locale.value === 'de' ? 'de-DE' : 'en-US', { style: 'currency', currency: 'EUR' }).format(price)
 }
 
 // Close dropdown when clicking outside
@@ -321,6 +460,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
+  cancelPendingSuggestions()
 })
 
 function handleClickOutside(e: MouseEvent) {

@@ -1,11 +1,20 @@
 <template>
   <div class="container mx-auto px-4 py-6 sm:py-8">
     <!-- Hero Section -->
-    <div class="text-center mb-10 pt-6 sm:mb-14 sm:pt-10">
-      <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent mb-6 whitespace-normal break-words">
+    <div
+      class="text-center"
+      :class="isSearchMode ? 'mb-6 pt-2 sm:mb-8 sm:pt-4' : 'mb-10 pt-6 sm:mb-14 sm:pt-10'"
+    >
+      <h1
+        class="font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent whitespace-normal break-words"
+        :class="isSearchMode ? 'text-2xl md:text-3xl mb-4' : 'text-3xl md:text-4xl lg:text-5xl mb-6'"
+      >
         {{ $t('findBestDeals', 'Find the Best Second-Hand Deals') }}
       </h1>
-      <p class="text-base md:text-lg text-slate-400 mb-8 max-w-2xl mx-auto">
+      <p
+        v-if="!isSearchMode"
+        class="text-base md:text-lg text-slate-400 mb-8 max-w-2xl mx-auto"
+      >
         {{ $t('homeSubtitle', 'Compare prices across multiple marketplaces. Save money and the planet.') }}
       </p>
 
@@ -21,9 +30,13 @@
       v-if="loading || products.length > 0 || hasSearched"
       class="max-w-7xl mx-auto"
     >
-      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
-        <h2 class="text-2xl font-semibold text-slate-200">
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-4">
+        <h2
+          class="text-2xl font-semibold text-slate-200 min-w-0 break-words"
+          aria-live="polite"
+        >
           <span v-if="loading && products.length === 0">{{ $t('searching', 'Searching...') }}</span>
+          <span v-else-if="searchError && products.length === 0">{{ $t('searchFailed', 'Search failed') }}</span>
           <span v-else-if="products.length > 0">
             {{ $t('searchResults', 'Search Results') }}
             <span
@@ -31,13 +44,14 @@
               class="text-slate-400 text-lg ml-2"
             >({{ totalResults }} {{ $t('found', 'found') }})</span>
           </span>
+          <span v-else-if="searchQuery">{{ $t('noResultsFor', { query: searchQuery }) }}</span>
           <span v-else>{{ $t('noResultsFound', 'No results found') }}</span>
         </h2>
-        <!-- Sort dropdown -->
         <div class="flex flex-wrap items-center gap-3">
           <button
             class="lg:hidden inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-slate-200 bg-slate-800 border border-slate-600/50 hover:bg-slate-700 transition-colors"
             type="button"
+            :aria-expanded="isFilterPanelOpen"
             @click="isFilterPanelOpen = !isFilterPanelOpen"
           >
             <Icon
@@ -50,31 +64,51 @@
               class="h-2 w-2 rounded-full bg-blue-400"
             />
           </button>
-          <select
-            :value="selectedSort"
-            class="bg-slate-800 border border-slate-600/50 rounded-lg px-3 py-1.5 text-sm text-slate-200 focus:border-blue-500/50 focus:outline-none"
-            @change="onSortChange($event)"
+          <!-- Sort switch -->
+          <div
+            role="radiogroup"
+            :aria-label="$t('sortBy', 'Sort by')"
+            class="inline-flex max-w-full overflow-x-auto rounded-lg border border-slate-600/50 bg-slate-800 p-0.5 text-sm"
+            data-testid="sort-switch"
           >
-            <option value="">
-              {{ $t('sortDefault', 'Sort: Default') }}
-            </option>
-            <option value="price_asc">
-              {{ $t('sortPriceAsc', 'Price: Low → High') }}
-            </option>
-            <option value="price_desc">
-              {{ $t('sortPriceDesc', 'Price: High → Low') }}
-            </option>
-            <option value="newest">
-              {{ $t('sortNewest', 'Newest First') }}
-            </option>
-            <option value="oldest">
-              {{ $t('sortOldest', 'Oldest First') }}
-            </option>
-            <option value="distance">
-              {{ $t('sortDistance', 'Nearest First') }}
-            </option>
-          </select>
+            <button
+              v-for="option in sortOptions"
+              :key="option.value"
+              type="button"
+              role="radio"
+              :aria-checked="activeSort === option.value"
+              class="whitespace-nowrap rounded-md px-3 py-1 transition-colors"
+              :class="activeSort === option.value ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-700 hover:text-white'"
+              @click="onSortSelect(option.value)"
+            >
+              {{ option.label }}
+            </button>
+          </div>
         </div>
+      </div>
+      <!-- How the query was understood (e.g. "cheap" → sorted by price) -->
+      <div
+        v-if="queryHints.length > 0"
+        class="flex flex-wrap items-center gap-2 mb-4 text-sm text-slate-400"
+        data-testid="search-interpretation"
+      >
+        <Icon
+          name="tabler:info-circle"
+          class="w-4 h-4 text-blue-400 shrink-0"
+        />
+        <span
+          v-for="hint in queryHints"
+          :key="hint.key"
+          class="inline-flex items-center gap-2"
+        >
+          <span>{{ hint.text }}</span>
+          <button
+            v-if="hint.action"
+            type="button"
+            class="text-blue-400 hover:text-blue-300 underline underline-offset-2"
+            @click="hint.action.run"
+          >{{ hint.action.label }}</button>
+        </span>
       </div>
       <!-- Active filters badges -->
       <div class="flex flex-wrap gap-2 mb-4">
@@ -519,20 +553,67 @@
         </div>
 
         <!-- Product Grid -->
-        <div class="lg:col-span-3">
+        <div
+          class="lg:col-span-3"
+          :aria-busy="loading"
+        >
+          <!-- Skeleton mirrors the card layout so results do not jump in -->
           <div
             v-if="loading && products.length === 0"
             class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            data-testid="search-skeleton"
           >
             <div
               v-for="i in 6"
               :key="i"
-              class="h-64 bg-slate-800/50 rounded-xl animate-pulse"
+              class="bg-slate-800 rounded-xl overflow-hidden animate-pulse"
+            >
+              <div class="aspect-video bg-slate-700/40" />
+              <div class="p-5 space-y-3">
+                <div class="h-5 bg-slate-700/50 rounded w-5/6" />
+                <div class="h-5 bg-slate-700/50 rounded w-3/5" />
+                <div class="flex gap-1.5 pt-1">
+                  <div class="h-4 w-16 bg-slate-700/40 rounded" />
+                  <div class="h-4 w-12 bg-slate-700/40 rounded" />
+                </div>
+                <div class="flex items-center justify-between pt-3">
+                  <div class="h-7 w-24 bg-slate-700/50 rounded" />
+                  <div class="h-6 w-16 bg-slate-700/40 rounded-full" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Error state -->
+          <div
+            v-else-if="searchError && products.length === 0"
+            class="bg-slate-800/50 border border-red-500/30 rounded-xl p-8 text-center"
+            role="alert"
+            data-testid="search-error"
+          >
+            <Icon
+              name="tabler:alert-triangle"
+              class="w-10 h-10 text-red-400 mx-auto mb-3"
             />
+            <p class="text-slate-200 font-medium mb-1">
+              {{ $t('searchFailed', 'Search failed') }}
+            </p>
+            <p class="text-sm text-slate-400 mb-5">
+              {{ $t('searchFailedHint', 'The search service did not respond. Please try again in a moment.') }}
+            </p>
+            <button
+              type="button"
+              class="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors text-sm font-medium"
+              @click="performSearch()"
+            >
+              {{ $t('retry', 'Try again') }}
+            </button>
           </div>
 
           <div
             v-else-if="products.length > 0"
+            class="transition-opacity duration-150"
+            :class="{ 'opacity-50 pointer-events-none': manualLoading }"
           >
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <NuxtLink
@@ -625,6 +706,53 @@
                 v-if="loadingMore"
                 class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"
               />
+            </div>
+          </div>
+
+          <!-- Empty state -->
+          <div
+            v-else-if="hasSearched"
+            class="bg-slate-800/50 border border-slate-700/50 rounded-xl p-8 text-center"
+            data-testid="search-empty"
+          >
+            <Icon
+              name="tabler:search-off"
+              class="w-10 h-10 text-slate-500 mx-auto mb-3"
+            />
+            <p class="text-slate-200 font-medium mb-1">
+              <template v-if="searchQuery">
+                {{ $t('noResultsFor', { query: searchQuery }) }}
+              </template>
+              <template v-else>
+                {{ $t('noResultsFound', 'No results found') }}
+              </template>
+            </p>
+            <p class="text-sm text-slate-400 mb-5">
+              {{ $t('noResultsHint', 'Check the spelling, use fewer words or remove filters.') }}
+            </p>
+            <div class="flex flex-wrap justify-center gap-2">
+              <button
+                v-if="hasActiveFilters"
+                type="button"
+                class="px-3 py-1.5 rounded-full text-sm bg-red-500/10 text-red-300 border border-red-500/30 hover:bg-red-500/20 transition-colors"
+                @click="clearAllFilters"
+              >
+                {{ $t('clearAllFilters', 'Clear All Filters') }}
+              </button>
+              <NuxtLink
+                v-for="alternative in alternativeQueries"
+                :key="alternative"
+                :to="localePath({ path: '/search', query: { q: alternative } })"
+                class="px-3 py-1.5 rounded-full text-sm bg-blue-500/10 text-blue-300 border border-blue-500/30 hover:bg-blue-500/20 transition-colors"
+              >
+                {{ $t('tryQuery', { query: alternative }) }}
+              </NuxtLink>
+              <NuxtLink
+                :to="localePath('/search')"
+                class="px-3 py-1.5 rounded-full text-sm bg-slate-700/50 text-slate-300 border border-slate-600/50 hover:bg-slate-700 transition-colors"
+              >
+                {{ $t('browseAllCategories', 'Show all categories') }}
+              </NuxtLink>
             </div>
           </div>
         </div>
@@ -890,6 +1018,19 @@ const manualLoading = ref(false)
 const loadingMore = ref(false)
 const hasSearched = ref(false)
 const isFilterPanelOpen = ref(false)
+const searchError = ref(false)
+
+/** How the backend understood the query (added to the search response; optional for older backends). */
+interface SearchInterpretation {
+  query?: string | null
+  appliedSort?: string | null
+  sortImplied?: boolean
+  impliedMaxPrice?: number | null
+  productTypes?: string[] | null
+}
+const interpretation = ref<SearchInterpretation | null>(null)
+
+const isSearchMode = computed(() => routeHasSearchQuery(route.query))
 
 function routeHasSearchQuery(query: typeof route.query): boolean {
   return !!(query.q || query.category || query.condition
@@ -919,24 +1060,48 @@ function syncPrevQuery() {
 // First results page: rendered server-side when the backend is quick, otherwise
 // a skeleton is sent and the client re-fetches after hydration. ZIP-based
 // searches need client geolocation, so they always fall back to the client.
-const { data: initialSearch, loading: initialLoading } = useRaceableAsyncData(
+const { data: initialSearch, loading: initialLoading, error: initialError } = useRaceableAsyncData(
   `search-${route.fullPath}`,
   () => {
     if (!routeHasSearchQuery(route.query) || zipResolving.value) {
       return Promise.resolve(null)
     }
-    return searchProducts({ query: buildSearchParams(0) })
+    const request = searchProducts({ query: buildSearchParams(0) })
+    if (import.meta.server) {
+      // Watchers do not run during SSR, so apply the result right here; otherwise
+      // the server renders the category browser and the client swaps in results
+      // after hydration (flash + hydration mismatch).
+      return request.then((resp) => {
+        applySearchResponse(resp, false)
+        hasSearched.value = true
+        return resp
+      }, (err) => {
+        searchError.value = true
+        hasSearched.value = true
+        throw err
+      })
+    }
+    return request
   },
 )
 
 // Combined loading: initial SSR fetch OR a client-side re-filter.
-const loading = computed(() => initialLoading.value || manualLoading.value)
+const loading = computed(() => (initialLoading.value && !initialError.value) || manualLoading.value)
 
 // Apply the SSR result on both server render and client hydration, and prime
 // the change-detection state so the route watcher doesn't re-fetch on load.
 watch(initialSearch, (resp) => {
   if (resp) {
     applySearchResponse(resp, false)
+    hasSearched.value = true
+    syncPrevQuery()
+  }
+}, { immediate: true })
+
+// A failing first page must show the error state, not the category browser.
+watch(initialError, (err) => {
+  if (err && routeHasSearchQuery(route.query)) {
+    searchError.value = true
     hasSearched.value = true
     syncPrevQuery()
   }
@@ -1008,6 +1173,72 @@ const hasBatteryBuckets = computed(() => {
 const products = computed(() => allProducts.value)
 
 const canLoadMore = computed(() => totalResults.value > allProducts.value.length)
+
+// --- Sorting ---
+const naturalSort = computed(() => (searchQuery.value ? 'relevance' : 'newest'))
+const activeSort = computed(() => {
+  if (selectedSort.value) return selectedSort.value
+  if (interpretation.value?.sortImplied && interpretation.value.appliedSort) return interpretation.value.appliedSort
+  return naturalSort.value
+})
+const sortOptions = computed(() => {
+  const options: { value: string, label: string }[] = []
+  if (searchQuery.value) options.push({ value: 'relevance', label: t('sortRelevance', 'Relevance') })
+  options.push(
+    { value: 'price_asc', label: t('sortPriceAscShort', 'Price ↑') },
+    { value: 'price_desc', label: t('sortPriceDescShort', 'Price ↓') },
+    { value: 'newest', label: t('sortNewestShort', 'Newest') },
+  )
+  if (userLocation.value) options.push({ value: 'distance', label: t('sortDistance', 'Nearest') })
+  return options
+})
+
+function onSortSelect(value: string) {
+  const query = queryWithoutKeys('sort')
+  // Keep URLs clean for the default order, unless it must override an implied sort ("cheap …")
+  if (value !== naturalSort.value || interpretation.value?.sortImplied) {
+    query.sort = value
+  }
+  router.push({ query })
+}
+
+// --- Query interpretation hints ---
+const queryHints = computed(() => {
+  const hints: { key: string, text: string, action?: { label: string, run: () => void } }[] = []
+  const info = interpretation.value
+  if (!info || !searchQuery.value) return hints
+  if (info.sortImplied && info.appliedSort === 'price_asc' && !selectedSort.value) {
+    hints.push({
+      key: 'cheap',
+      text: t('hintSortedByPrice', 'Sorted by lowest price because you asked for cheap items.'),
+      action: { label: t('hintSortByRelevance', 'Sort by relevance'), run: () => onSortSelect('relevance') },
+    })
+  }
+  if (info.impliedMaxPrice != null && selectedMaxPrice.value === undefined) {
+    hints.push({
+      key: 'max-price',
+      text: t('hintMaxPrice', { price: formatPrice(info.impliedMaxPrice) }),
+    })
+  }
+  return hints
+})
+
+// --- Empty state: broader queries to try (drop one word at a time) ---
+const alternativeQueries = computed(() => {
+  const words = searchQuery.value.trim().split(/\s+/).filter(Boolean)
+  if (words.length < 2) return []
+  const seen = new Set<string>()
+  const result: string[] = []
+  for (let i = words.length - 1; i >= 0 && result.length < 3; i--) {
+    const candidate = words.filter((_, idx) => idx !== i).join(' ')
+    const key = candidate.toLowerCase()
+    if (!seen.has(key)) {
+      seen.add(key)
+      result.push(candidate)
+    }
+  }
+  return result
+})
 
 const PAGE_SIZE = 20
 const AUTO_LOAD_MAX = 100
@@ -1461,8 +1692,17 @@ function buildSearchParams(offset = 0) {
 }
 
 // Client-only: SSR'd first page is handled by the raceable composable below.
+// Every new search supersedes the previous one: a late response of an older
+// request is ignored, so fast filter clicks never show stale results.
+// (The generated client deep-clones its options, so an AbortSignal cannot be passed.)
+let searchSeq = 0
+
 async function performSearch(append = false) {
   if (import.meta.server) return
+  if (append && (loadingMore.value || manualLoading.value)) return
+
+  const seq = ++searchSeq
+
   if (!append) {
     manualLoading.value = true
   }
@@ -1475,14 +1715,24 @@ async function performSearch(append = false) {
     const offset = append ? allProducts.value.length : 0
     const params = buildSearchParams(offset)
     const response = await searchProducts({ query: params })
+    if (seq !== searchSeq) return
+    searchError.value = false
     applySearchResponse(response, append)
   }
   catch (e) {
-    console.error('Search failed', e)
+    if (seq !== searchSeq) return
+    console.warn('Search failed', e)
+    if (!append) {
+      searchError.value = true
+      allProducts.value = []
+      totalResults.value = 0
+    }
   }
   finally {
-    manualLoading.value = false
-    loadingMore.value = false
+    if (seq === searchSeq) {
+      manualLoading.value = false
+      loadingMore.value = false
+    }
   }
 }
 
@@ -1493,6 +1743,7 @@ function applySearchResponse(response: SearchProductsResponse, append: boolean) 
     }
     else {
       allProducts.value = response?.products || []
+      interpretation.value = (response as SearchProductsResponse & { interpretation?: SearchInterpretation | null })?.interpretation ?? null
 
       // Use aggregation buckets if available (new backend), otherwise derive from products
       if (response?.categoryBuckets && response.categoryBuckets.length > 0) {
@@ -1681,18 +1932,6 @@ function applyBatteryFilter() {
   }
   if (batteryFilterMax.value < batteryRangeMax.value) {
     query.attr_battery_max = String(Math.round(batteryFilterMax.value))
-  }
-  router.push({ query })
-}
-
-function onSortChange(event: Event) {
-  const value = (event.target as HTMLSelectElement).value
-  const query = { ...route.query } as Record<string, string>
-  if (value) {
-    query.sort = value
-  }
-  else {
-    delete query.sort
   }
   router.push({ query })
 }
@@ -1887,6 +2126,10 @@ watch(() => route.query, () => {
     prevQuery.condition = currentCondition
   }
   else {
+    searchSeq++
+    manualLoading.value = false
+    searchError.value = false
+    interpretation.value = null
     allProducts.value = []
     hasSearched.value = false
     totalResults.value = 0

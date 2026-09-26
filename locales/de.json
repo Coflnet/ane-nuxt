@@ -964,5 +964,20 @@
   "flipper.seo.howItWorks": "Wie funktioniert es? ANE überwacht Marktplatz-Angebote kontinuierlich in Echtzeit. Wenn ein neues Angebot erscheint, vergleicht unsere KI den Preis mit kürzlich verkauften Artikeln desselben Produkts. Liegt der Angebotspreis deutlich unter dem mittleren Verkaufspreis, erscheint es als potenzielle Flip-Chance in deinem Flipper-Feed. Je mehr Referenzverkäufe wir finden, desto zuverlässiger ist die Gewinnschätzung.",
   "flipper.seo.tips": "Tipps für erfolgreiches Flipping: Konzentriere dich auf Produktkategorien, die du gut kennst – Elektronik, Spielkonsolen, Smartphones und Markenkleidung haben meist die konstantesten Wiederverkaufswerte. Prüfe den Zustand sorgfältig, indem du die vollständige Anzeigenbeschreibung liest. Berücksichtige Versandkosten und Marktplatzgebühren bei der Berechnung deines tatsächlichen Gewinns. Handle schnell – die besten Deals sind innerhalb von Minuten vergriffen.",
   "flipper.seo.examples": "Beliebte Flipping-Kategorien sind Smartphones (besonders iPhones und Samsung Galaxy), Spielkonsolen (PS5, Nintendo Switch), Designermode, LEGO-Sets, Vintage-Uhren und Elektrowerkzeuge. Viele erfolgreiche Flipper spezialisieren sich auf eine Nische und bauen Expertenwissen auf, das ihnen hilft, echte Schnäppchen schneller zu erkennen als die Konkurrenz.",
-  "flipper.seo.cta": "Melde dich kostenlos an und finde noch heute profitable Flips. Upgrade auf den Flipper-Tarif für Echtzeit-Benachrichtigungen, entfernungsbasierte Sortierung und bevorzugten Zugang zu den neuesten Deals."
+  "flipper.seo.cta": "Melde dich kostenlos an und finde noch heute profitable Flips. Upgrade auf den Flipper-Tarif für Echtzeit-Benachrichtigungen, entfernungsbasierte Sortierung und bevorzugten Zugang zu den neuesten Deals.",
+  "noResultsFor": "Keine Ergebnisse für „{query}“",
+  "noResultsHint": "Prüfe die Schreibweise, verwende weniger Wörter oder entferne Filter.",
+  "tryQuery": "„{query}“ versuchen",
+  "browseAllCategories": "Alle Kategorien anzeigen",
+  "searchFailed": "Suche fehlgeschlagen",
+  "searchFailedHint": "Der Suchdienst hat nicht geantwortet. Bitte versuche es gleich noch einmal.",
+  "retry": "Erneut versuchen",
+  "sortRelevance": "Relevanz",
+  "sortPriceAscShort": "Preis ↑",
+  "sortPriceDescShort": "Preis ↓",
+  "sortNewestShort": "Neueste",
+  "hintSortedByPrice": "Nach niedrigstem Preis sortiert, weil du nach günstigen Angeboten suchst.",
+  "hintSortByRelevance": "Nach Relevanz sortieren",
+  "hintMaxPrice": "Zeigt Angebote bis {price}, wie in deiner Suche angegeben.",
+  "clearSearch": "Suche löschen"
 }

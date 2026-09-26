@@ -26,7 +26,10 @@
               {{ $t('hero.description') }}
             </p>
             <div class="mb-8 max-w-lg">
-              <ProductSearch @search="handleSearch" />
+              <ProductSearch
+                @search="handleSearch"
+                @select-category="handleCategorySelect"
+              />
             </div>
             <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
               <a
@@ -1313,6 +1316,7 @@
 import { User } from 'lucide-vue-next'
 import { useIntersectionObserver } from '@vueuse/core'
 import { definePageMeta } from '#imports'
+import { useCategories } from '~/composable/useCategories'
 
 const localePath = useLocalePath()
 const userStore = import.meta.client ? useUserStore() : null
@@ -1348,8 +1352,15 @@ const fadeInUp = (el: Element) => {
   el.classList.add('opacity-100', 'translate-y-0')
 }
 
+const { toUrlSlug } = useCategories()
+
 const handleSearch = (query: string) => {
-  navigateTo(`/search?q=${encodeURIComponent(query)}`)
+  navigateTo(localePath({ path: '/search', query: { q: query } }))
+}
+
+// Category picked in the typeahead: previously unhandled on the home page
+const handleCategorySelect = (slug: string) => {
+  navigateTo(localePath({ path: '/search', query: { category: toUrlSlug(slug) || slug } }))
 }
 
 definePageMeta({
