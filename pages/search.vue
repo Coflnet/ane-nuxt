@@ -846,6 +846,7 @@
         <!-- Reduced launch scope: explain why other categories are missing -->
         <button
           v-if="browsePath.length === 0"
+          ref="moreCategoriesTile"
           type="button"
           class="p-6 bg-slate-800/30 hover:bg-slate-800 rounded-xl transition-colors text-center group relative border border-dashed border-slate-700"
           aria-haspopup="dialog"
@@ -1287,10 +1288,26 @@ const browsePath = ref<BrowseSegment[]>([])
 const supportDiscordUrl = 'https://discord.gg/vdjgMWDDzW'
 const showMoreCategoriesDialog = ref(false)
 const moreCategoriesCloseButton = ref<HTMLButtonElement | null>(null)
+const moreCategoriesTile = ref<HTMLButtonElement | null>(null)
+// Escape closes the dialog even when focus is not inside it (e.g. after clicking its text)
+function onMoreCategoriesKeydown(e: KeyboardEvent) {
+  if (e.key === 'Escape') showMoreCategoriesDialog.value = false
+}
 watch(showMoreCategoriesDialog, async (open) => {
-  if (!open) return
+  if (!import.meta.client) return
+  if (open) {
+    document.addEventListener('keydown', onMoreCategoriesKeydown)
+    await nextTick()
+    moreCategoriesCloseButton.value?.focus()
+    return
+  }
+  document.removeEventListener('keydown', onMoreCategoriesKeydown)
+  // return focus to the tile that opened the dialog
   await nextTick()
-  moreCategoriesCloseButton.value?.focus()
+  moreCategoriesTile.value?.focus()
+})
+onBeforeUnmount(() => {
+  if (import.meta.client) document.removeEventListener('keydown', onMoreCategoriesKeydown)
 })
 const browseSubCats = ref<CategoryNode[]>([])
 const currentBrowseLabel = computed(() => browsePath.value[browsePath.value.length - 1]?.label ?? t('browseCategories', 'Browse Categories'))
