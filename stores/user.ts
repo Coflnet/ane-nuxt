@@ -363,6 +363,23 @@ export const useUserStore = defineStore('user', () => {
     return { email: user.value?.email ?? '', id: result.id ?? '' }
   }
 
+  async function deleteAccount(): Promise<boolean> {
+    const apiToken = `Bearer ${token.value}`
+    try {
+      // TODO: switch to the generated SDK method (e.g. `deleteMe`) once AneApi's
+      // DELETE /api/user/me endpoint is deployed and the OpenAPI client is regenerated.
+      await $fetch(`${useApiBaseUrl()}/api/user/me`, {
+        method: 'DELETE',
+        headers: { Authorization: apiToken },
+      })
+      return true
+    }
+    catch (error) {
+      console.error('Error deleting account:', error)
+      return false
+    }
+  }
+
   // Return all state, getters, and actions
   return {
     user,
@@ -405,6 +422,7 @@ export const useUserStore = defineStore('user', () => {
     generateReferralCode,
     useRefferalCode,
     getUserData,
+    deleteAccount,
   }
 }, {
   persist: true,

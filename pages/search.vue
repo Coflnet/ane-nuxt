@@ -712,6 +712,28 @@
             {{ cat.subCategories.length }} {{ $t('subcategories', 'subcategories') }}
           </div>
         </button>
+        <!-- Reduced launch scope: explain why other categories are missing -->
+        <button
+          v-if="browsePath.length === 0"
+          type="button"
+          class="p-6 bg-slate-800/30 hover:bg-slate-800 rounded-xl transition-colors text-center group relative border border-dashed border-slate-700"
+          aria-haspopup="dialog"
+          data-testid="more-categories-tile"
+          @click="showMoreCategoriesDialog = true"
+        >
+          <div class="mb-2 inline-flex p-3 rounded-full bg-slate-700/50 group-hover:scale-110 transition-transform text-slate-400">
+            <Icon
+              name="tabler:category-plus"
+              class="w-8 h-8"
+            />
+          </div>
+          <div class="font-medium text-slate-200">
+            {{ $t('moreCategories', 'Other / more categories') }}
+          </div>
+          <div class="text-xs text-slate-500 mt-1">
+            {{ $t('moreCategoriesHint', 'Missing your category?') }}
+          </div>
+        </button>
       </div>
 
       <!-- Browse products in selected category -->
@@ -726,6 +748,59 @@
           {{ $t('showProducts', 'Show Products') }} — {{ selectedBrowseLabel }}
         </button>
       </div>
+
+      <!-- "Other / more categories" dialog -->
+      <Teleport to="body">
+        <div
+          v-if="showMoreCategoriesDialog"
+          class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50"
+          @click.self="showMoreCategoriesDialog = false"
+          @keydown.esc="showMoreCategoriesDialog = false"
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="more-categories-title"
+            aria-describedby="more-categories-text"
+            class="bg-slate-800 rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl border border-slate-700"
+          >
+            <h3
+              id="more-categories-title"
+              class="text-lg font-bold text-white mb-3"
+            >
+              {{ $t('moreCategoriesTitle', 'Why only these categories?') }}
+            </h3>
+            <p
+              id="more-categories-text"
+              class="text-sm text-slate-300 leading-relaxed"
+            >
+              {{ $t('moreCategoriesText') }}
+            </p>
+            <div class="flex gap-3 mt-5">
+              <button
+                ref="moreCategoriesCloseButton"
+                type="button"
+                class="flex-1 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors text-sm"
+                @click="showMoreCategoriesDialog = false"
+              >
+                {{ $t('moreCategoriesClose', 'Close') }}
+              </button>
+              <a
+                :href="supportDiscordUrl"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex-1 inline-flex items-center justify-center gap-2 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors text-sm font-medium"
+              >
+                <Icon
+                  name="tabler:brand-discord"
+                  class="w-4 h-4"
+                />
+                {{ $t('moreCategoriesContact', 'Contact us on Discord') }}
+              </a>
+            </div>
+          </div>
+        </div>
+      </Teleport>
     </div>
   </div>
 </template>
@@ -973,6 +1048,16 @@ interface CategoryNode {
 }
 
 const browsePath = ref<BrowseSegment[]>([])
+
+// "Other / more categories" tile: we launched with a reduced category scope
+const supportDiscordUrl = 'https://discord.gg/vdjgMWDDzW'
+const showMoreCategoriesDialog = ref(false)
+const moreCategoriesCloseButton = ref<HTMLButtonElement | null>(null)
+watch(showMoreCategoriesDialog, async (open) => {
+  if (!open) return
+  await nextTick()
+  moreCategoriesCloseButton.value?.focus()
+})
 const browseSubCats = ref<CategoryNode[]>([])
 const currentBrowseLabel = computed(() => browsePath.value[browsePath.value.length - 1]?.label ?? t('browseCategories', 'Browse Categories'))
 const selectedBrowseLabel = computed(() => browsePath.value[browsePath.value.length - 1]?.label ?? '')
@@ -1002,7 +1087,9 @@ function countForCategory(cat: { slug: string, label?: string }): number {
 
 // Categories to display in the browser (filtered to those with listings)
 const displayCategories = computed(() => {
-  const cats = browseSubCats.value.length > 0 ? browseSubCats.value : topLevelCategories.value
+  // Top level is the curated category scope from the API — always show all of it
+  if (browseSubCats.value.length === 0) return topLevelCategories.value
+  const cats = browseSubCats.value
   if (Object.keys(globalCategoryCounts.value).length === 0) return cats
   return cats.filter((cat) => {
     // Show a category if it or any of its subcategories has listings (match by slug or label)
@@ -1018,6 +1105,8 @@ const categoryIconMap: Record<string, string> = {
   'Sportartikel': 'tabler:run',
   'Elektronik': 'tabler:device-laptop',
   'Bekleidung & Accessoires': 'tabler:shirt',
+  'Bekleidung': 'tabler:shirt',
+  'Sammelkarten': 'tabler:cards',
   'Haus & Garten': 'tabler:home',
   'Fahrzeuge & Teile': 'tabler:car',
   'Gesundheit & Schönheit': 'tabler:heart',

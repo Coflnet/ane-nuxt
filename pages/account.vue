@@ -109,12 +109,40 @@
         </UiButton>
       </div>
     </UiDefaultContainer>
+
+    <!-- Danger Zone -->
+    <UiDefaultContainer class="p-6 mt-6 border border-red-900/50">
+      <UiHeaderLabel :label="$t('dangerZone')" />
+      <UiFooterLabel
+        :label="$t('deleteAccountDescription')"
+        class="mt-2 mb-4"
+      />
+
+      <UiButton
+        :warning="true"
+        class="w-full h-12"
+        aria-label="Delete Account"
+        @on-click="isDeleteAccountModalOpen = true"
+      >
+        <Trash2 class="w-5 h-5 mr-2" />
+        {{ $t('deleteAccount') }}
+      </UiButton>
+    </UiDefaultContainer>
+
+    <UiConformationPopup
+      v-model="isDeleteAccountModalOpen"
+      :header="$t('confirmAccountDeletion')"
+      :footer="$t('deleteAccountConfirmMessage')"
+      :confirm-text="$t('deleteAccount')"
+      @confirm="deleteAccount"
+      @cancel="isDeleteAccountModalOpen = false"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { CreditCard, LogOut } from 'lucide-vue-next'
+import { CreditCard, LogOut, Trash2 } from 'lucide-vue-next'
 
 const { locale, locales, t } = useI18n()
 const localePath = useLocalePath()
@@ -149,6 +177,23 @@ async function copyReferralCode() {
 }
 
 async function signOut() {
+  await userStore.logout()
+  localStorage.clear()
+  navigateTo(localePath('/login'))
+}
+
+const isDeleteAccountModalOpen = ref(false)
+
+async function deleteAccount() {
+  const success = await userStore.deleteAccount()
+  isDeleteAccountModalOpen.value = false
+
+  if (!success) {
+    push.error(t('errorDeletingAccount'))
+    return
+  }
+
+  push.success(t('accountDeletedSuccess'))
   await userStore.logout()
   localStorage.clear()
   navigateTo(localePath('/login'))
