@@ -1,3 +1,5 @@
+import { categoryLabelLanguage } from '~/utils/categoryLanguage'
+
 interface UnifiedCategory {
   slug: string
   label: string
@@ -18,6 +20,9 @@ function labelToUrlSlug(label: string): string {
 export function useCategories() {
   // Internal Service base during SSR, public base in the browser.
   const API_BASE = useApiBaseUrl()
+  // Category labels come from the API in the UI language (German fallback for untranslated nodes).
+  const locale = useNuxtApp().$i18n.locale
+  const lang = () => categoryLabelLanguage(locale.value)
 
   const topLevelCategories = useState<UnifiedCategory[]>('topLevelCategories', () => [])
   const subCategories = useState<Record<string, UnifiedCategory[]>>('subCategories', () => ({}))
@@ -28,6 +33,17 @@ export function useCategories() {
   const urlToNumeric = useState<Record<string, string>>('catUrlToNumeric', () => ({}))
   // Label lookup by numeric slug
   const slugToLabel = useState<Record<string, string>>('catSlugToLabel', () => ({}))
+  // Language the cached lists/labels were fetched in; a locale switch refetches them.
+  const categoriesLang = useState<string>('catLang', () => '')
+
+  function ensureLanguage() {
+    if (categoriesLang.value === lang()) return
+    categoriesLang.value = lang()
+    topLevelCategories.value = []
+    subCategories.value = {}
+    slugToLabel.value = {}
+    // url slug mappings are kept, so a category url from the other locale still resolves
+  }
 
   function registerCategory(cat: UnifiedCategory) {
     const urlSlug = labelToUrlSlug(cat.label)
@@ -52,10 +68,11 @@ export function useCategories() {
   }
 
   async function fetchTopLevelCategories() {
+    ensureLanguage()
     if (topLevelCategories.value.length > 0) return topLevelCategories.value
     loadingCategories.value = true
     try {
-      const data = await $fetch<UnifiedCategory[]>(`${API_BASE}/api/Categories/top-level`)
+      const data = await $fetch<UnifiedCategory[]>(`${API_BASE}/api/Categories/top-level`, { query: { lang: lang() } })
       topLevelCategories.value = data || []
       for (const cat of topLevelCategories.value) {
         registerCategory(cat)
@@ -72,9 +89,10 @@ export function useCategories() {
   }
 
   async function fetchSubCategories(parentSlug: string) {
+    ensureLanguage()
     if (subCategories.value[parentSlug]) return subCategories.value[parentSlug]
     try {
-      const data = await $fetch<UnifiedCategory[]>(`${API_BASE}/api/Categories/${parentSlug}/subcategories`)
+      const data = await $fetch<UnifiedCategory[]>(`${API_BASE}/api/Categories/${parentSlug}/subcategories`, { query: { lang: lang() } })
       subCategories.value[parentSlug] = data || []
       for (const cat of subCategories.value[parentSlug]) {
         registerCategory(cat)
