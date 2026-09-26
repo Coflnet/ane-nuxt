@@ -452,18 +452,21 @@
                   </option>
                 </select>
               </div>
-              <!-- ZIP code input -->
-              <div class="flex items-center gap-2">
+              <!-- ZIP code input: min-w-0 lets the input shrink so the button stays inside the card -->
+              <div class="flex items-center gap-2 min-w-0">
                 <input
                   v-model="zipCodeInput"
                   type="text"
                   inputmode="numeric"
                   :placeholder="$t('enterZip', 'PLZ / ZIP code')"
-                  class="flex-1 px-3 py-2 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-slate-200 focus:border-blue-500/50 focus:outline-none placeholder-slate-500"
+                  :aria-label="$t('enterZip', 'PLZ / ZIP code')"
+                  class="flex-1 min-w-0 w-full px-3 py-2 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-slate-200 focus:border-blue-500/50 focus:outline-none placeholder-slate-500"
                   @keydown.enter="lookupZipCode"
                 >
                 <button
+                  type="button"
                   class="px-3 py-2 rounded-lg text-sm bg-cyan-600/30 text-cyan-400 hover:bg-cyan-600/50 border border-cyan-500/30 transition-colors flex-shrink-0"
+                  :aria-label="$t('apply', 'Apply')"
                   :disabled="!zipCodeInput || zipLoading"
                   @click="lookupZipCode"
                 >
@@ -523,7 +526,7 @@
                     :min="1"
                     :max="500"
                     placeholder="50"
-                    class="w-full px-3 py-1.5 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-slate-200 focus:border-blue-500/50 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    class="w-full min-w-0 px-3 py-1.5 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-slate-200 focus:border-blue-500/50 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     @change="applyDistanceFilter"
                   >
                   <span class="text-xs text-slate-500 flex-shrink-0">km</span>
