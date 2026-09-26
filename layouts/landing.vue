@@ -111,6 +111,7 @@
       <main class="flex-grow">
         <slot />
       </main>
+      <AppFooter />
     </div>
   </div>
 </template>

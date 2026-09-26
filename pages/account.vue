@@ -121,7 +121,7 @@
       <UiButton
         :warning="true"
         class="w-full h-12"
-        aria-label="Delete Account"
+        :aria-label="$t('deleteAccount')"
         @on-click="isDeleteAccountModalOpen = true"
       >
         <Trash2 class="w-5 h-5 mr-2" />

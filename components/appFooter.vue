@@ -44,7 +44,9 @@
             <ul class="space-y-2">
               <li>
                 <UiLinkLabel
-                  :href="'https://coflnet.com/privacy'"
+                  :href="$i18n.locale === 'de'
+                    ? 'https://coflnet.com/de/privacy'
+                    : 'https://coflnet.com/privacy'"
                   :gray="true"
                 >
                   {{ $t('privacy') }}
@@ -52,10 +54,32 @@
               </li>
               <li>
                 <UiLinkLabel
-                  :href="'https://coflnet.com/terms-of-service'"
+                  :href="$i18n.locale === 'de'
+                    ? 'https://coflnet.com/de/terms-of-service'
+                    : 'https://coflnet.com/terms-of-service'"
                   :gray="true"
                 >
                   {{ $t('tos') }}
+                </UiLinkLabel>
+              </li>
+              <li class="rounded border border-indigo-400 px-2 py-1 font-semibold">
+                <UiLinkLabel
+                  :href="$i18n.locale === 'de'
+                    ? 'https://coflnet.com/de/cancel-contract#cancel-contract'
+                    : 'https://coflnet.com/cancel-contract#cancel-contract'"
+                  :white="true"
+                >
+                  {{ $t('cancelContractsHere') }}
+                </UiLinkLabel>
+              </li>
+              <li class="rounded border border-indigo-400 px-2 py-1 font-semibold">
+                <UiLinkLabel
+                  :href="$i18n.locale === 'de'
+                    ? 'https://coflnet.com/de/withdrawal#withdraw-contract'
+                    : 'https://coflnet.com/withdrawal#withdraw-contract'"
+                  :white="true"
+                >
+                  {{ $t('withdrawContract') }}
                 </UiLinkLabel>
               </li>
             </ul>
