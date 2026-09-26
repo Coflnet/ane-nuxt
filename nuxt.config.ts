@@ -74,11 +74,6 @@ export default defineNuxtConfig({
       // Browser-facing API base — the public load balancer on ane.coflnet.com.
       // Override: NUXT_PUBLIC_API_BASE_URL.
       apiBaseUrl: 'https://ane.coflnet.com',
-    },
-  },
-
-  runtimeConfig: {
-    public: {
       // Max time (ms) the server waits for the backend before rendering a
       // skeleton and letting the client re-fetch. Override with
       // NUXT_PUBLIC_SSR_FETCH_TIMEOUT_MS.
