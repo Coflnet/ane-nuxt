@@ -15,6 +15,13 @@ RUN set -eu; \
 	cd "$app_dir"; \
 	npm ci; \
 	GOOGLE_APPLICATION_CREDENTIALS=/config/google/credentials.json npm run build; \
+	# sharp >=0.33 loads its native binding and libvips from platform-specific
+	# @img packages via a dynamic require that nitro cannot trace, so ship the
+	# ones npm installed for this platform next to the traced sharp package.
+	mkdir -p .output/server/node_modules/@img; \
+	for pkg in node_modules/@img/sharp-*; do \
+		cp -R "$pkg" .output/server/node_modules/@img/; \
+	done; \
 	mkdir -p /app; \
 	cp -R .output /app/.output
 

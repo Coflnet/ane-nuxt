@@ -67,7 +67,9 @@
     "vue-tsc": "3.2.6"
   },
   "overrides": {
-    "buffer-equal-constant-time": "$buffer-equal-constant-time"
+    "buffer-equal-constant-time": "$buffer-equal-constant-time",
+    "sharp": "^0.35.4",
+    "defu": "^6.1.7"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
