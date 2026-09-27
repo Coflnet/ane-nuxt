@@ -125,11 +125,15 @@ export default defineNuxtConfig({
       {
         code: 'en',
         name: 'English',
+        // ISO language tag: without it useLocaleHead() has no `currentLanguage` to set
+        // <html lang> (or hreflang alternates) from, so both were silently omitted.
+        language: 'en-US',
         file: 'en.json',
       },
       {
         code: 'de',
         name: 'Deutsch',
+        language: 'de-DE',
         file: 'de.json',
       },
     ],
@@ -139,9 +143,12 @@ export default defineNuxtConfig({
     lazy: true,
     detectBrowserLanguage: {
       useCookie: true,
-      alwaysRedirect: true,
+      // Only auto-redirect on the very first visit to `/`; an explicit locale prefix
+      // (e.g. /de/search) must be respected, not bounced back by browser-language detection.
+      // The `i18n_redirected` cookie remembers the choice either way.
+      alwaysRedirect: false,
       cookieKey: 'i18n_redirected',
-      redirectOn: 'all',
+      redirectOn: 'root',
     },
     bundle: {
       optimizeTranslationDirective: false,
