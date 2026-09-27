@@ -50,7 +50,7 @@
             <UiButton
               :primary="true"
               class="mb-4 w-full"
-              @on-click="navigateTo(localePath('/filters/create'))"
+              @on-click="goCreateFilter"
             >
               {{ $t('createFilter') }}
             </UiButton>
@@ -82,6 +82,10 @@ const referred = router.currentRoute.value.query.ref as string | undefined
 function closePopup() {
   open.value = false
   console.log('closing')
+}
+
+function goCreateFilter() {
+  navigateTo(localePath('/filters/create'))
 }
 
 onMounted(() => {

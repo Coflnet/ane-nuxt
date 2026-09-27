@@ -44,7 +44,7 @@
             <ul class="space-y-2">
               <li>
                 <UiLinkLabel
-                  :href="$i18n.locale === 'de'
+                  :href="locale === 'de'
                     ? 'https://coflnet.com/de/privacy'
                     : 'https://coflnet.com/privacy'"
                   :gray="true"
@@ -54,7 +54,7 @@
               </li>
               <li>
                 <UiLinkLabel
-                  :href="$i18n.locale === 'de'
+                  :href="locale === 'de'
                     ? 'https://coflnet.com/de/terms-of-service'
                     : 'https://coflnet.com/terms-of-service'"
                   :gray="true"
@@ -64,7 +64,7 @@
               </li>
               <li class="rounded border border-indigo-400 px-2 py-1 font-semibold">
                 <UiLinkLabel
-                  :href="$i18n.locale === 'de'
+                  :href="locale === 'de'
                     ? 'https://coflnet.com/de/cancel-contract#cancel-contract'
                     : 'https://coflnet.com/cancel-contract#cancel-contract'"
                   :white="true"
@@ -74,7 +74,7 @@
               </li>
               <li class="rounded border border-indigo-400 px-2 py-1 font-semibold">
                 <UiLinkLabel
-                  :href="$i18n.locale === 'de'
+                  :href="locale === 'de'
                     ? 'https://coflnet.com/de/withdrawal#withdraw-contract'
                     : 'https://coflnet.com/withdrawal#withdraw-contract'"
                   :white="true"
@@ -95,3 +95,7 @@
     </div>
   </footer>
 </template>
+
+<script setup lang="ts">
+const { locale } = useI18n()
+</script>

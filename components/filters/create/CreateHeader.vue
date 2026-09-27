@@ -1,7 +1,7 @@
 <template>
   <div class="w-full justify-between flex">
     <div class="mb-8">
-      <UiTextButton @on-click="navigateTo(localePath('/filters'))">
+      <UiTextButton @on-click="goToFilters">
         <Icon
           name="tabler:arrow-left"
           class="mr-2"
@@ -51,6 +51,10 @@ const filterStore = useFilterStore()
 const deleting = ref(false)
 
 const isModalOpen = ref(false)
+
+function goToFilters() {
+  navigateTo(localePath('/filters'))
+}
 
 const deleteFilterId = async () => {
   deleting.value = true

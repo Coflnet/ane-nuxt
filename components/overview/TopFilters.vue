@@ -8,7 +8,7 @@
       >
         <a
           class="flex items-center justify-between"
-          :href="localePath(`/filters/create?id=${useFilterStore().getSimplifiedFilters[filter.id ?? '']![1]}`)"
+          :href="editHref(filter)"
         >
           <div
             class="flex items-center space-x-3"
@@ -46,6 +46,7 @@
 import type { TopFilter } from '~/types/FilterType'
 
 const localePath = useLocalePath()
+const filterStore = useFilterStore()
 const props = defineProps<{
   topFilters: Record<string, TopFilter>
 }>()
@@ -55,5 +56,9 @@ function sortTopFilers(): TopFilter[] {
 
   const sortedArray = array.sort((a: TopFilter, b: TopFilter) => b.matches - a.matches)
   return sortedArray.slice(0, 3)
+}
+
+function editHref(filter: TopFilter) {
+  return localePath(`/filters/create?id=${filterStore.getSimplifiedFilters[filter.id ?? '']![1]}`)
 }
 </script>

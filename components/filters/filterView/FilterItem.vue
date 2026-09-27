@@ -9,7 +9,7 @@
     </span>
     <a
       aria-label="Edit Filter"
-      :href="localePath(`/filters/create?id=${useFilterStore().getSimplifiedFilters[filter.id ?? '']![1]}`)"
+      :href="editHref"
     >
       <FiltersFilterViewItemSettings :filter="filter" />
       <div class="flex items-center justify-between pt-3 border-t border-slate-700">
@@ -25,6 +25,9 @@
 import type { FilterFace } from '~/types/FilterType'
 
 const localePath = useLocalePath()
+const filterStore = useFilterStore()
 
-defineProps<{ filter: FilterFace }>()
+const props = defineProps<{ filter: FilterFace }>()
+
+const editHref = computed(() => localePath(`/filters/create?id=${filterStore.getSimplifiedFilters[props.filter.id ?? '']![1]}`))
 </script>

@@ -72,7 +72,7 @@
           v-for="locale in availableLocales"
           :key="locale.code"
           aria-label="Profile Switch Locale Button"
-          @on-click="navigateTo(switchLocalePath(locale.code))"
+          @on-click="switchLocale(locale.code)"
         >
           <Icon
             name="tabler:language"
@@ -151,6 +151,10 @@ const switchLocalePath = useSwitchLocalePath()
 const availableLocales = computed(() => {
   return locales.value.filter(i => i.code !== locale.value)
 })
+
+function switchLocale(code: Parameters<typeof switchLocalePath>[0]) {
+  navigateTo(switchLocalePath(code))
+}
 
 const userStore = useUserStore()
 const userEmail = ref(userStore.getUser?.email)

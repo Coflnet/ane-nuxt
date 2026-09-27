@@ -53,7 +53,7 @@
         :label="useFormat().formatCurrency(
           auction.listingData!.price ?? 0,
           auction.listingData?.currency ?? '',
-          useI18n().locale.value,
+          locale,
         )"
       />
     </div>
@@ -73,7 +73,7 @@
 
 <script setup lang="ts">
 import { Icon, UiHeaderLabel } from '#components'
-import type { FilterMatch } from '#hey-api'
+import type { FilterMatch } from '~/src/api-client'
 import { useFormat } from '~/composable/useFormat'
 import { useAvailabilityCheck } from '~/composable/useAvailabilityCheck'
 
