@@ -321,15 +321,27 @@
 
       <!-- Listings Section -->
       <div class="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-xl">
-        <div class="p-6 border-b border-slate-800 flex justify-between items-center">
+        <div class="p-6 border-b border-slate-800 flex flex-wrap gap-3 justify-between items-center">
           <h2 class="text-2xl font-bold text-white">
             {{ $t('product.availableOffers') }}
           </h2>
+          <NuxtLink
+            v-if="notifyFilterHref"
+            :to="notifyFilterHref"
+            class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-400 hover:text-blue-300 border border-blue-500/30 hover:border-blue-500/50 rounded-lg transition-colors"
+          >
+            <Icon
+              name="tabler:bell-plus"
+              class="w-4 h-4"
+            />
+            {{ $t('product.notifyMe') }}
+          </NuxtLink>
         </div>
 
         <ProductListingTable
           :listings="matches"
           :product-id="productId"
+          :notify-url="notifyFilterHref"
           @listing-unavailable="handleListingUnavailable"
         />
 
@@ -493,6 +505,7 @@ import ProductListingTable from '~/components/product/ProductListingTable.vue'
 import { useI18n } from 'vue-i18n'
 import { useUserStore } from '~/stores/user'
 import { buildProductResourceUrl } from '~/utils/productApiUrl'
+import { buildNotifyFilterUrl } from '~/utils/notifyFilterUrl'
 
 const route = useRoute()
 const productId = route.params.id as string
@@ -551,6 +564,14 @@ const productImageUrl = computed(() => {
 function onProductImageError() {
   imageErrorCount.value++
 }
+
+// "Notify me about new offers" — always visible near the offers header, and the primary
+// CTA inside ProductListingTable's empty state (see buildNotifyFilterUrl for the prefill).
+const notifyFilterHref = computed(() => {
+  if (!product.value) return null
+  const { path, query } = buildNotifyFilterUrl(product.value)
+  return localePath({ path, query })
+})
 
 // Product report dialog state
 const showProductReportDialog = ref(false)

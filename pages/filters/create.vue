@@ -74,6 +74,7 @@ import { useFirebaseApp } from 'vuefire'
 import type { FilterMatch, ListingListener } from '~/src/api-client'
 import type { Filter, TargetType } from '~/types/FilterType'
 import { constructOptionsFromString, detectLocationNA, filterFreeMarketplaces, marketplaces, usMarketplaces, valididateAllMarketplace } from '~/constants/CreateFilterConstants'
+import { parseFilterPrefillQuery } from '~/utils/filterPrefill'
 
 const { debounce } = lodash
 
@@ -163,6 +164,20 @@ async function testFilter() {
 }
 
 const radiusError = ref(false)
+
+// Prefill a new filter from query params, e.g. the "Notify me about new offers" link on a
+// product page (utils/notifyFilterUrl.ts builds it, this reads it back). Only applies when
+// creating a new filter — editing an existing one always loads its saved values instead —
+// and only runs once on mount; every field stays freely editable afterwards.
+function applyPrefillFromQuery() {
+  if (!isNewFilter.value) return
+
+  const prefill = parseFilterPrefillQuery(route.query)
+  if (prefill.searchValue !== undefined) filter.value.searchValue = prefill.searchValue
+  if (prefill.minPrice !== undefined) filter.value.minPrice = prefill.minPrice
+  if (prefill.maxPrice !== undefined) filter.value.maxPrice = prefill.maxPrice
+  if (prefill.condition !== undefined) filter.value.condition = prefill.condition
+}
 
 async function loadEditParam() {
   if (isNewFilter.value) {
@@ -468,6 +483,9 @@ async function connectPushNotifications(): Promise<string> {
 }
 
 onMounted(async () => {
+  // Only reads route.query — independent of auth/filter-store state, so it runs first and
+  // isn't skipped if checkAuth/loadFilters below ever reject.
+  applyPrefillFromQuery()
   await useUserStore().checkAuth(useFirebaseAuth()!)
   await Promise.allSettled([filterStore.loadFilters()])
   await loadEditParam()

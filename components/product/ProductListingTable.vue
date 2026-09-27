@@ -110,7 +110,20 @@
       v-if="listings.length === 0"
       class="p-8 text-center text-slate-500"
     >
-      No listings found for this product currently.
+      <p class="mb-4">
+        No listings found for this product currently.
+      </p>
+      <NuxtLink
+        v-if="notifyUrl"
+        :to="notifyUrl"
+        class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors"
+      >
+        <Icon
+          name="tabler:bell-plus"
+          class="w-4 h-4"
+        />
+        {{ $t('product.notifyMe') }}
+      </NuxtLink>
     </div>
 
     <!-- Report Dialog -->
@@ -187,6 +200,11 @@ import { useAvailabilityCheck } from '~/composable/useAvailabilityCheck'
 const props = defineProps<{
   listings: ProductMatch[]
   productId?: string
+  /**
+   * Localized href for the "Notify me about new offers" CTA — built by the parent via
+   * utils/notifyFilterUrl.ts (needs product data + the i18n locale path helper).
+   */
+  notifyUrl?: string | null
 }>()
 
 const emit = defineEmits<{
