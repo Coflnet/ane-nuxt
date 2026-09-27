@@ -492,6 +492,7 @@ import type { IssueType, Product, ProductMatch, PricePoint, PriceHistoryStats } 
 import ProductListingTable from '~/components/product/ProductListingTable.vue'
 import { useI18n } from 'vue-i18n'
 import { useUserStore } from '~/stores/user'
+import { buildProductResourceUrl } from '~/utils/productApiUrl'
 
 const route = useRoute()
 const productId = route.params.id as string
@@ -499,6 +500,7 @@ const router = useRouter()
 const localePath = useLocalePath()
 const { t } = useI18n()
 const userStore = useUserStore()
+const API_BASE = useApiBaseUrl()
 
 const zipCode = computed(() => (route.query.zip as string) || '')
 const lat = computed(() => route.query.lat ? Number(route.query.lat) : undefined)
@@ -911,25 +913,21 @@ function conditionClass(condition: string) {
 }
 
 function buildRelatedProductsUrl(id: string): string {
-  const url = `/api/Product/${id}/related`
-  const params = new URLSearchParams()
-  if (zipCode.value) params.append('zip', zipCode.value)
-  if (lat.value) params.append('lat', lat.value.toString())
-  if (lon.value) params.append('lon', lon.value.toString())
-  if (maxDistance.value) params.append('maxDistance', maxDistance.value.toString())
-  const queryString = params.toString()
-  return queryString ? `${url}?${queryString}` : url
+  return buildProductResourceUrl(API_BASE, id, 'related', {
+    zip: zipCode.value,
+    lat: lat.value,
+    lon: lon.value,
+    maxDistance: maxDistance.value,
+  })
 }
 
 function buildMatchesUrl(id: string): string {
-  const url = `/api/Product/${id}/matches`
-  const params = new URLSearchParams()
-  if (zipCode.value) params.append('zip', zipCode.value)
-  if (lat.value) params.append('lat', lat.value.toString())
-  if (lon.value) params.append('lon', lon.value.toString())
-  if (maxDistance.value) params.append('maxDistance', maxDistance.value.toString())
-  const queryString = params.toString()
-  return queryString ? `${url}?${queryString}` : url
+  return buildProductResourceUrl(API_BASE, id, 'matches', {
+    zip: zipCode.value,
+    lat: lat.value,
+    lon: lon.value,
+    maxDistance: maxDistance.value,
+  })
 }
 
 function handleListingUnavailable(_listingId: number | string) {
