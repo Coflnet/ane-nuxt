@@ -35,6 +35,9 @@ export function useCategories() {
   const slugToLabel = useState<Record<string, string>>('catSlugToLabel', () => ({}))
   // Language the cached lists/labels were fetched in; a locale switch refetches them.
   const categoriesLang = useState<string>('catLang', () => '')
+  // German label per numeric slug, fetched once regardless of UI language — lets counts
+  // (keyed by German label, see utils/categoryCounts.ts) be resolved on any locale.
+  const germanLabelBySlug = useState<Record<string, string>>('catGermanLabelBySlug', () => ({}))
 
   function ensureLanguage() {
     if (categoriesLang.value === lang()) return
@@ -54,6 +57,33 @@ export function useCategories() {
       for (const sub of cat.subCategories) {
         registerCategory(sub)
       }
+    }
+  }
+
+  function registerGermanLabel(cat: UnifiedCategory) {
+    germanLabelBySlug.value[cat.slug] = cat.label
+    if (cat.subCategories) {
+      for (const sub of cat.subCategories) {
+        registerGermanLabel(sub)
+      }
+    }
+  }
+
+  /**
+   * Fetch the German label for every category slug once, independent of the current UI
+   * language. The product-counts API is keyed by German label, so this lets counts be
+   * resolved correctly no matter which language the category tiles are displayed in.
+   */
+  async function ensureGermanLabels() {
+    if (Object.keys(germanLabelBySlug.value).length > 0) return
+    try {
+      const data = await $fetch<UnifiedCategory[]>(`${API_BASE}/api/Categories/top-level`, { query: { lang: 'de' } })
+      for (const cat of data || []) {
+        registerGermanLabel(cat)
+      }
+    }
+    catch (e) {
+      console.error('Failed to fetch German category labels', e)
     }
   }
 
@@ -114,6 +144,8 @@ export function useCategories() {
     numericToUrl,
     urlToNumeric,
     slugToLabel,
+    germanLabelBySlug,
+    ensureGermanLabels,
     toUrlSlug,
     toApiSlug,
   }

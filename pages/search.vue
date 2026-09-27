@@ -942,6 +942,7 @@ import { useI18n } from 'vue-i18n'
 import { searchProducts } from '~/src/api-client'
 import type { ProductAttribute, ProductDocument, FilterBucket, SearchProductsResponse } from '~/src/api-client/types.gen'
 import { useCategories } from '~/composable/useCategories'
+import { formatCategoryCount, getCategoryProductCount as getCategoryProductCountFor, normalizeCategoryCounts, resolveCategoryCount } from '~/utils/categoryCounts'
 
 const router = useRouter()
 const route = useRoute()
@@ -1273,7 +1274,7 @@ onBeforeUnmount(() => {
 })
 
 // --- Category browsing ---
-const { topLevelCategories, loadingCategories, fetchTopLevelCategories, fetchSubCategories, toUrlSlug, toApiSlug, slugToLabel } = useCategories()
+const { topLevelCategories, loadingCategories, fetchTopLevelCategories, fetchSubCategories, toUrlSlug, toApiSlug, slugToLabel, germanLabelBySlug, ensureGermanLabels } = useCategories()
 
 interface BrowseSegment { slug: string, label: string }
 interface CategoryNode {
@@ -1320,20 +1321,17 @@ async function fetchGlobalCategoryCounts() {
   try {
     const counts = await $fetch<Record<string, number>>('https://ane.coflnet.com/api/Categories/with-counts')
     if (counts && Object.keys(counts).length > 0) {
-      const normalized: Record<string, number> = {}
-      for (const [slug, count] of Object.entries(counts)) {
-        normalized[slug.toLowerCase()] = count
-      }
-      globalCategoryCounts.value = normalized
+      globalCategoryCounts.value = normalizeCategoryCounts(counts)
     }
   }
   catch { /* ignore — show all categories as fallback */ }
 }
 
+// The counts map above is keyed by German label regardless of UI language, so counts are
+// resolved via each category's German label (from useCategories' germanLabelBySlug) rather
+// than its currently-displayed label — see utils/categoryCounts.ts.
 function countForCategory(cat: { slug: string, label?: string }): number {
-  const counts = globalCategoryCounts.value
-  const labelCount = cat.label ? (counts[cat.label.toLowerCase()] ?? 0) : 0
-  return (counts[cat.slug.toLowerCase()] ?? 0) + labelCount
+  return resolveCategoryCount(cat, globalCategoryCounts.value, germanLabelBySlug.value)
 }
 
 // Categories to display in the browser (filtered to those with listings)
@@ -1382,23 +1380,11 @@ function getCategoryIcon(slug: string, label: string): string {
 }
 
 function getCategoryProductCount(cat: CategoryNode): number {
-  let total = countForCategory(cat)
-  if (cat.subCategories) {
-    for (const sub of cat.subCategories) {
-      total += countForCategory(sub)
-      if (sub.subCategories) {
-        for (const sub2 of sub.subCategories) {
-          total += countForCategory(sub2)
-        }
-      }
-    }
-  }
-  return total
+  return getCategoryProductCountFor(cat, globalCategoryCounts.value, germanLabelBySlug.value)
 }
 
 function formatCount(n: number): string {
-  if (n >= 1000) return `${(n / 1000).toFixed(1).replace(/\.0$/, '')}k`
-  return n.toString()
+  return formatCategoryCount(n)
 }
 
 async function onUnifiedCategoryClick(cat: CategoryNode) {
@@ -1450,6 +1436,7 @@ function searchInCurrentCategory() {
 onMounted(async () => {
   fetchTopLevelCategories()
   fetchGlobalCategoryCounts()
+  ensureGermanLabels()
   setupScrollObserver()
   // Restore country from URL
   const urlCountry = route.query.country as string
