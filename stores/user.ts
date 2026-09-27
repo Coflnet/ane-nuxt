@@ -5,6 +5,7 @@ import { navigateTo } from '#app'
 import { createLink, getStats, listLinks, loginFirebase, useLink } from '~/src/api-client'
 import type { ActiveSubscription } from '#hey-api'
 import { canCreateReferralLink, isSelfReferral, REFERRAL_LINK_NAME, REFERRAL_LINK_TEXT } from '~/utils/referral'
+import { canLoadStats } from '~/utils/stats'
 
 // Types
 export interface User {
@@ -342,7 +343,15 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  /**
+   * Search/subscription stats belong to a signed-in, non-anonymous account; `/api/stats`
+   * answers 401 for anonymous visitors (e.g. the invite-link landing page), so no request is
+   * made until the user is logged in.
+   */
   async function loadRemainingSearches(): Promise<{ used: number, total: number, refreshData: number }> {
+    if (!canLoadStats({ isLoggedIn: isLoggedIn.value, token: token.value }))
+      return { used: 0, total: 0, refreshData: 0 }
+
     const apiToken = `Bearer ${token.value}`
     try {
       const response = await getStats({
