@@ -36,17 +36,16 @@ async function loginWithGoogle() {
     userStore.isAnonymous = false
 
     if (userStore.acceptingReferralCode != '') {
-      const useRefferalResult = await userStore.useRefferalCode()
-      if (useRefferalResult) {
+      const referralResult = await userStore.useRefferalCode()
+      if (referralResult === 'used')
         push.success(t('successfullReferral'))
-        userStore.userReferralCode = ''
-      }
-      else {
+      else if (referralResult === 'error')
         push.error(t('errorReffering'))
-      }
+      // 'self': the code is the user's own invite link; ignored silently.
     }
 
-    navigateTo(localePath(redirectTo ?? (googleSignInRequest.newUser ? '/filters/create' : '/overview')))
+    const target = safeRedirect(redirectTo, googleSignInRequest.newUser ? '/filters/create' : '/overview')
+    navigateTo(target.startsWith('/') ? localePath(target) : target)
     return
   }
   push.error(t(googleSignInRequest.error ?? 'Something is very wrong'))

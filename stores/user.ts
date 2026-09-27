@@ -4,7 +4,7 @@ import { createUserWithEmailAndPassword, type EmailAuthCredential, EmailAuthProv
 import { navigateTo } from '#app'
 import { createLink, getStats, listLinks, loginFirebase, useLink } from '~/src/api-client'
 import type { ActiveSubscription } from '#hey-api'
-import { canCreateReferralLink, REFERRAL_LINK_NAME, REFERRAL_LINK_TEXT } from '~/utils/referral'
+import { canCreateReferralLink, isSelfReferral, REFERRAL_LINK_NAME, REFERRAL_LINK_TEXT } from '~/utils/referral'
 
 // Types
 export interface User {
@@ -117,21 +117,42 @@ export const useUserStore = defineStore('user', () => {
     return refCode.id ?? ''
   }
 
-  async function useRefferalCode(): Promise<boolean> {
-    console.log(acceptingReferralCode.value)
+  /**
+   * Redeems the stored referral code for the signed-in user.
+   *
+   * Returns 'self' (no error toast should be shown) when the code turns out to be the user's
+   * own invite link: skipped locally when the user's link id is already cached, otherwise the
+   * API rejects the self-invite with 400, which is treated the same way. Either way the stored
+   * code is cleared so it isn't retried on a later login.
+   */
+  async function useRefferalCode(): Promise<'used' | 'self' | 'error'> {
+    const code = acceptingReferralCode.value
+
+    if (isSelfReferral(code, userReferralCode.value)) {
+      acceptingReferralCode.value = ''
+      return 'self'
+    }
 
     const apiToken = `Bearer ${token.value}`
     try {
       await useLink({
         composable: '$fetch',
-        query: { inviter: acceptingReferralCode.value },
+        query: { inviter: code },
         headers: { Authorization: apiToken },
       })
-      return true
+      acceptingReferralCode.value = ''
+      return 'used'
     }
     catch (error) {
+      const apiError = error as { response?: { status?: number }, statusCode?: number }
+      const status = apiError?.response?.status ?? apiError?.statusCode ?? 0
+      if (status === 400) {
+        // Self-invite: the API rejects a referral code that resolves to the user's own link.
+        acceptingReferralCode.value = ''
+        return 'self'
+      }
       console.error(error)
-      return false
+      return 'error'
     }
   }
 

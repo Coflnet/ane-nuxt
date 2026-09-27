@@ -168,7 +168,7 @@ async function copyReferralCode() {
 
   if (referralCode) {
     const path = localePath(`/overview?ref=${referralCode}`)
-    const inviteLink = `https://ane.deals${path}`
+    const inviteLink = `${useRequestURL().origin}${path}`
     navigator.clipboard.writeText(inviteLink)
     push.success(t('copyReferralCodeSuccess'))
     return

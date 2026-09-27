@@ -85,8 +85,9 @@ function closePopup() {
 }
 
 onMounted(() => {
-  // no referral code in url
-  if (referred == null)
+  // no referral code in url, or it's not a canonical UUID (invite link ids are UUIDs) —
+  // ignore silently rather than storing an attacker-controlled value
+  if (!isValidReferralCode(referred))
     return
 
   // user already clicked a referral code

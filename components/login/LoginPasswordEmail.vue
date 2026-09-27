@@ -68,17 +68,16 @@ async function login() {
   userStore.isAuthenticated = true
   userStore.isAnonymous = false
   if (userStore.acceptingReferralCode != '') {
-    const useRefferalResult = await userStore.useRefferalCode()
-    if (useRefferalResult) {
+    const referralResult = await userStore.useRefferalCode()
+    if (referralResult === 'used')
       push.success(t('successfullReferral'))
-      userStore.acceptingReferralCode = ''
-    }
-    else {
+    else if (referralResult === 'error')
       push.error(t('errorReffering'))
-    }
+    // 'self': the code is the user's own invite link; ignored silently.
   }
 
-  navigateTo(localePath(redirectTo ?? (props.isLogin ? '/overview' : '/filters/create')))
+  const target = safeRedirect(redirectTo, props.isLogin ? '/overview' : '/filters/create')
+  navigateTo(target.startsWith('/') ? localePath(target) : target)
 }
 
 async function loginEmailPasswordWebView() {
