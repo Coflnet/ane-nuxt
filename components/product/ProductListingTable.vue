@@ -37,15 +37,15 @@
       <tbody>
         <tr
           v-for="listing in listings"
-          :key="listing.listingId || listing.id"
+          :key="listing.listingId || listing.productId || ''"
           class="border-b border-slate-700/50 hover:bg-slate-800/30"
-          :class="{ 'opacity-50': unavailableListings.has(listing.listingId || listing.id) }"
+          :class="{ 'opacity-50': unavailableListings.has(listing.listingId || listing.productId || '') }"
         >
           <td class="px-6 py-4 font-medium text-slate-200">
             <span class="inline-flex items-center gap-2">
               {{ getMarketplaceName(listing.listingUrl) }}
               <span
-                v-if="unavailableListings.has(listing.listingId || listing.id)"
+                v-if="unavailableListings.has(listing.listingId || listing.productId || '')"
                 class="text-xs text-red-400"
               >
                 (Unavailable)
@@ -54,15 +54,12 @@
           </td>
           <td class="px-6 py-4">
             <a
-              :href="listing.listingUrl"
+              :href="listing.listingUrl ?? undefined"
               target="_blank"
               class="hover:text-blue-400 transition-colors line-clamp-1"
             >
               {{ listing.title }}
             </a>
-            <p class="text-xs text-slate-500 mt-1 line-clamp-1">
-              {{ listing.description }}
-            </p>
           </td>
           <td class="px-6 py-4 font-bold text-slate-200">
             {{ formatPrice(listing.price) }}
@@ -73,15 +70,15 @@
           <td class="px-6 py-4">
             <div class="flex items-center gap-2">
               <a
-                :href="listing.listingUrl"
+                :href="listing.listingUrl ?? undefined"
                 target="_blank"
                 rel="noopener"
                 class="inline-flex items-center gap-1 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-full transition-all hover:scale-105 shadow-lg shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-                :class="{ 'pointer-events-none opacity-50': checkingAvailability.has(listing.listingId || listing.id) }"
+                :class="{ 'pointer-events-none opacity-50': checkingAvailability.has(listing.listingId || listing.productId || '') }"
                 @click.prevent="handleViewDeal(listing)"
               >
                 <Icon
-                  v-if="checkingAvailability.has(listing.listingId || listing.id)"
+                  v-if="checkingAvailability.has(listing.listingId || listing.productId || '')"
                   name="tabler:loader-2"
                   class="w-3 h-3 animate-spin"
                 />
@@ -230,12 +227,12 @@ function formatDate(dateStr: string | undefined | null) {
 }
 
 async function checkAvailability(listing: ProductMatch): Promise<boolean> {
-  const listingId = listing.listingId || listing.productId
+  const listingId = listing.listingId || listing.productId || ''
   return checkAvailabilityUtil(listingId, listing.listingUrl)
 }
 
 async function handleViewDeal(listing: ProductMatch) {
-  const listingId = listing.listingId || listing.productId
+  const listingId = listing.listingId || listing.productId || ''
 
   if (listingId) {
     checkingAvailability.value.add(listingId)
