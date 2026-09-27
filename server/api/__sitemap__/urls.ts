@@ -1,5 +1,4 @@
 // server/api/__sitemap__/urls.ts
-import { defineSitemapEventHandler } from '#imports'
 import type { SitemapUrlInput } from '#sitemap/types'
 import { getPublishedArticles } from '~/utils/articles'
 

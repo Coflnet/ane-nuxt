@@ -33,7 +33,7 @@ defineProps<{
   disabled?: boolean }>()
 
 const isOpen = ref<boolean>(false)
-let timeoutId: number | null = null
+let timeoutId: ReturnType<typeof setTimeout> | null = null
 
 const toggleTooltip = (): void => {
   isOpen.value = !isOpen.value

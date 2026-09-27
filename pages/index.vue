@@ -1324,12 +1324,12 @@ const isLoggedIn = computed(() => userStore?.isLoggedIn ?? false)
 const heroCtaPath = computed(() => localePath(isLoggedIn.value ? '/filters/create' : '/overview'))
 
 const vIntersect = {
-  mounted: (el: Element, binding: { value: (el: Element) => void }) => {
+  mounted: (el: HTMLElement, binding: { value: (el: HTMLElement) => void }) => {
     const callback = binding.value
     const { stop } = useIntersectionObserver(
       el,
-      ([{ isIntersecting }]) => {
-        if (isIntersecting) {
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
           callback(el)
           stop()
         }
@@ -1340,13 +1340,13 @@ const vIntersect = {
 }
 
 // Animation functions
-const fadeIn = (el: Element) => {
+const fadeIn = (el: HTMLElement) => {
   el.classList.add('transition-opacity', 'duration-1000')
   el.classList.remove('opacity-0')
   el.classList.add('opacity-100')
 }
 
-const fadeInUp = (el: Element) => {
+const fadeInUp = (el: HTMLElement) => {
   el.classList.add('transition-all', 'duration-1000')
   el.classList.remove('opacity-0', 'translate-y-10')
   el.classList.add('opacity-100', 'translate-y-0')

@@ -10,9 +10,7 @@ declare global {
   }
 }
 
-export default defineNuxtPlugin((nuxtApp) => {
-  const { $i18n } = nuxtApp
-
+export default defineNuxtPlugin(() => {
   if (import.meta.client) {
     window.updateNuxtMessage = async (message: string) => {
       console.log('Nuxt.js received updateNuxtMessage:', message)
@@ -113,7 +111,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   }
 
   function errorMessage(message: string) {
-    push.error($i18n?.t(message))
+    push.error(useI18n().t(message))
   }
 
   function setNotificationToken(token: string) {

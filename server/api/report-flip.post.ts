@@ -7,7 +7,7 @@ const DATA_DIR = join(process.cwd(), 'data', 'reports')
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
 
-  const reportId = randomUUID().split('-')[0].toUpperCase()
+  const reportId = (randomUUID().split('-')[0] ?? '').toUpperCase()
 
   const report = {
     reportId,

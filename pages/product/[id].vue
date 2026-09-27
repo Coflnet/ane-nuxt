@@ -27,14 +27,14 @@
           {{ $t('nav.search') }}
         </NuxtLink>
         <span
-          v-if="product.categories && product.categories.length > 0 && product.categories[0] !== 'general' && !/^[\d,\s]+$/.test(product.categories[0])"
+          v-if="product.categories && product.categories.length > 0 && product.categories[0] !== 'general' && !/^[\d,\s]+$/.test(product.categories[0] ?? '')"
           class="mx-2"
         >/</span>
         <NuxtLink
-          v-if="product.categories && product.categories.length > 0 && product.categories[0] !== 'general' && !/^[\d,\s]+$/.test(product.categories[0])"
-          :to="localePath(`/search?category=${encodeURIComponent(product.categories[0])}`)"
+          v-if="product.categories && product.categories.length > 0 && product.categories[0] !== 'general' && !/^[\d,\s]+$/.test(product.categories[0] ?? '')"
+          :to="localePath(`/search?category=${encodeURIComponent(product.categories[0] ?? '')}`)"
           class="hover:text-blue-400"
-        >{{ localizeCategory(product.categories[0]) }}</NuxtLink>
+        >{{ localizeCategory(product.categories[0] ?? '') }}</NuxtLink>
         <span class="mx-2">/</span>
         <span class="text-slate-200 truncate">{{ product.name }}</span>
       </nav>
@@ -351,7 +351,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
           <NuxtLink
             v-for="rp in relatedProducts.slice(0, 5)"
-            :key="rp.id"
+            :key="rp.id ?? undefined"
             :to="localePath(`/product/${rp.id}`)"
             class="bg-slate-900 rounded-xl border border-slate-800 p-4 hover:border-blue-500/50 transition-colors group"
           >
@@ -621,7 +621,7 @@ const attributeOptions = computed(() => {
 
   // Sort options by value
   for (const key in options) {
-    options[key].sort((a, b) => {
+    options[key]?.sort((a, b) => {
       // Try numeric sort first
       const numA = Number.parseFloat(a.value)
       const numB = Number.parseFloat(b.value)
@@ -881,8 +881,8 @@ function formatMileageRange(value: string): string {
   }
   const parts = value.split('-')
   if (parts.length === 2) {
-    const a = Number.parseInt(parts[0])
-    const b = Number.parseInt(parts[1])
+    const a = Number.parseInt(parts[0] ?? '')
+    const b = Number.parseInt(parts[1] ?? '')
     if (!Number.isNaN(a) && !Number.isNaN(b)) return `${a.toLocaleString(locale)} - ${b.toLocaleString(locale)} km`
   }
   return value

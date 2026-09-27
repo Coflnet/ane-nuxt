@@ -5,7 +5,7 @@ import { getArticleBySlug } from '~/utils/articles'
 const route = useRoute()
 const localePath = useLocalePath()
 const slug = Array.isArray(route.params.slug) ? route.params.slug[0] : route.params.slug
-const article = getArticleBySlug(slug)
+const article = getArticleBySlug(slug ?? '')
 
 if (!article) {
   throw createError({ statusCode: 404, statusMessage: 'Article not found' })
