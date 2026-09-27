@@ -837,10 +837,10 @@
             {{ formatCount(getCategoryProductCount(cat)) }} {{ $t('products', 'products') }}
           </div>
           <div
-            v-else-if="cat.subCategories && cat.subCategories.length > 0"
+            v-else-if="populatedSubCategoryCount(cat) > 0"
             class="text-xs text-slate-500 mt-1"
           >
-            {{ cat.subCategories.length }} {{ $t('subcategories', 'subcategories') }}
+            {{ populatedSubCategoryCount(cat) }} {{ $t('subcategories', 'subcategories') }}
           </div>
         </button>
         <!-- Reduced launch scope: explain why other categories are missing -->
@@ -942,12 +942,21 @@ import { useI18n } from 'vue-i18n'
 import { searchProducts } from '~/src/api-client'
 import type { ProductAttribute, ProductDocument, FilterBucket, SearchProductsResponse } from '~/src/api-client/types.gen'
 import { useCategories } from '~/composable/useCategories'
-import { formatCategoryCount, getCategoryProductCount as getCategoryProductCountFor, normalizeCategoryCounts, resolveCategoryCount } from '~/utils/categoryCounts'
+import { countPopulatedSubCategories, formatCategoryCount, getCategoryProductCount as getCategoryProductCountFor, normalizeCategoryCounts, resolveCategoryCount } from '~/utils/categoryCounts'
+import { resolveSearchCategoryParam } from '~/utils/searchCategoryParam'
 
 const router = useRouter()
 const route = useRoute()
 const localePath = useLocalePath()
 const { t, locale } = useI18n()
+
+// Destructured before useRaceableAsyncData below: its fetcher runs buildSearchParams()
+// eagerly (Nuxt's useAsyncData fetches immediately on setup), and buildSearchParams()
+// needs toApiSlug/urlToNumeric/germanLabelBySlug when a category is in the URL. Declaring
+// this after that call left those bindings in the temporal dead zone during that first,
+// eager call whenever `?category=` was present, throwing a ReferenceError before any
+// search request was even made.
+const { topLevelCategories, loadingCategories, fetchTopLevelCategories, fetchSubCategories, toUrlSlug, toApiSlug, urlToNumeric, slugToLabel, germanLabelBySlug, ensureGermanLabels } = useCategories()
 
 // URL-derived state
 const searchQuery = computed(() => (route.query.q as string) || '')
@@ -1071,7 +1080,16 @@ const { data: initialSearch, loading: initialLoading, error: initialError } = us
     if (!routeHasSearchQuery(route.query) || zipResolving.value) {
       return Promise.resolve(null)
     }
-    const request = searchProducts({ query: buildSearchParams(0) })
+    // The category param needs both the URL-slug -> numeric-slug map (fetchTopLevelCategories,
+    // in the current UI locale) and the numeric-slug -> German-label map (ensureGermanLabels,
+    // always German) to resolve a URL like `?category=clothing` to the German label the search
+    // API matches on (see resolveSearchCategoryParam). Load both before the first search when a
+    // category is in the URL, so that request — SSR or the initial client fetch — already sends
+    // the label instead of falling back to a slug the API returns 0 results for.
+    const labelsReady = selectedCategory.value
+      ? Promise.all([fetchTopLevelCategories(), ensureGermanLabels()])
+      : Promise.resolve()
+    const request = labelsReady.then(() => searchProducts({ query: buildSearchParams(0) }))
     if (import.meta.server) {
       // Watchers do not run during SSR, so apply the result right here; otherwise
       // the server renders the category browser and the client swaps in results
@@ -1274,7 +1292,6 @@ onBeforeUnmount(() => {
 })
 
 // --- Category browsing ---
-const { topLevelCategories, loadingCategories, fetchTopLevelCategories, fetchSubCategories, toUrlSlug, toApiSlug, slugToLabel, germanLabelBySlug, ensureGermanLabels } = useCategories()
 
 interface BrowseSegment { slug: string, label: string }
 interface CategoryNode {
@@ -1383,28 +1400,39 @@ function getCategoryProductCount(cat: CategoryNode): number {
   return getCategoryProductCountFor(cat, globalCategoryCounts.value, germanLabelBySlug.value)
 }
 
+// Direct subcategories that actually have products — what the "N subcategories" badge shows,
+// and what decides whether clicking a category browses deeper or jumps straight to results.
+function populatedSubCategoryCount(cat: CategoryNode): number {
+  return countPopulatedSubCategories(cat, globalCategoryCounts.value, germanLabelBySlug.value)
+}
+
 function formatCount(n: number): string {
   return formatCategoryCount(n)
 }
 
 async function onUnifiedCategoryClick(cat: CategoryNode) {
-  if (cat.subCategories && cat.subCategories.length > 0) {
-    // Navigate deeper into the tree
-    browsePath.value = [...browsePath.value, { slug: cat.slug, label: cat.label }]
-    browseSubCats.value = cat.subCategories
-  }
-  else {
+  let subs: CategoryNode[] | null | undefined = cat.subCategories
+  if (!subs || subs.length === 0) {
     // Try to fetch subcategories from API
-    const subs = await fetchSubCategories(cat.slug)
-    if (subs && subs.length > 0) {
+    subs = await fetchSubCategories(cat.slug)
+  }
+
+  if (subs && subs.length > 0) {
+    // Counts may not have loaded yet (fetchGlobalCategoryCounts runs in parallel on mount) —
+    // fall back to browsing when we can't yet tell which children are populated, rather than
+    // skipping straight to a leaf search that might be wrong.
+    const countsLoaded = Object.keys(globalCategoryCounts.value).length > 0
+    const hasPopulatedSubs = !countsLoaded || subs.some(sub => getCategoryProductCount(sub) > 0)
+    if (hasPopulatedSubs) {
+      // Navigate deeper into the tree
       browsePath.value = [...browsePath.value, { slug: cat.slug, label: cat.label }]
       browseSubCats.value = subs
-    }
-    else {
-      // Leaf category — search for products with this category
-      router.push({ query: { category: toUrlSlug(cat.slug) } })
+      return
     }
   }
+  // Leaf category, or none of its subcategories have products — search directly instead of
+  // landing on an empty browse page (same navigation as the "Show Products" button).
+  router.push({ query: { category: toUrlSlug(cat.slug) } })
 }
 
 function navigateToBreadcrumb(idx: number) {
@@ -1669,8 +1697,10 @@ function localizeAttrValue(attrKey: string, value: string): string {
 function buildSearchParams(offset = 0) {
   const params: Record<string, string | number | string[]> = { offset, limit: PAGE_SIZE }
   if (searchQuery.value) params.query = searchQuery.value
-  // Category values: URL uses readable slugs, API expects the original slug
-  if (selectedCategory.value) params.category = toApiSlug(selectedCategory.value)
+  // Category values: the API only matches the German taxonomy label, so send that
+  // when it's known (see resolveSearchCategoryParam), falling back to the numeric/API
+  // slug otherwise.
+  if (selectedCategory.value) params.category = resolveSearchCategoryParam(selectedCategory.value, urlToNumeric.value, germanLabelBySlug.value)
   if (selectedCondition.value) params.condition = selectedCondition.value.toLowerCase()
   if (selectedMinPrice.value !== undefined) params.minPrice = selectedMinPrice.value
   if (selectedMaxPrice.value !== undefined) params.maxPrice = selectedMaxPrice.value

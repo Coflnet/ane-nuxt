@@ -65,6 +65,24 @@ export function getCategoryProductCount(
   return total
 }
 
+/**
+ * Number of a category's DIRECT subcategories that actually have products (rolled up across
+ * their own descendants, independent of the UI language). A subcategory tree taken straight
+ * from the taxonomy API can list children that have zero matching listings (e.g. Google-taxonomy
+ * categories like "Suits" or "Baby & Toddler Clothing" under "Clothing") — showing "N
+ * subcategories" for those, then landing on an all-empty browse page after the click, is
+ * confusing. This is what the "N subcategories" badge and the click-through decision should
+ * both count instead of the raw `subCategories.length`.
+ */
+export function countPopulatedSubCategories(
+  node: CategoryCountNode,
+  counts: CategoryCountsMap,
+  germanLabelBySlug: Record<string, string> = {},
+): number {
+  if (!node.subCategories) return 0
+  return node.subCategories.filter(sub => getCategoryProductCount(sub, counts, germanLabelBySlug) > 0).length
+}
+
 /** Format a product count for display, e.g. 2400 -> "2.4k". */
 export function formatCategoryCount(n: number): string {
   if (n >= 1000) return `${(n / 1000).toFixed(1).replace(/\.0$/, '')}k`
