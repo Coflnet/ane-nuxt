@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { getFilters, addFilter, getOptions, testFilter as callTestFilter } from '~/src/api-client'
-import type { ListingListener, FilterOptions } from '~/src/api-client'
+import type { ListingListener, FilterOptions, StoredListing } from '~/src/api-client'
 
 type NamedOption = {
   name: string
@@ -68,7 +68,7 @@ export const useFilterStore = defineStore('filter', () => {
     }
   }
 
-  async function testFilter(filter: ListingListener): Promise<Listing[] | null> {
+  async function testFilter(filter: ListingListener): Promise<StoredListing[] | null> {
     try {
       if (!userStore.token) {
         console.error('No token found, can not test filter')

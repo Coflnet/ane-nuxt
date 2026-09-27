@@ -1,4 +1,4 @@
-import { getMatches, type FilterMatch, type Platform } from '~/src/api-client'
+import { getMatches, type FilterMatch, type Platform, type StoredListing } from '~/src/api-client'
 
 export const useListingStore = defineStore('listing', () => {
   const userStore = useUserStore()
@@ -42,7 +42,7 @@ export const useListingStore = defineStore('listing', () => {
     const apiToken = `Bearer ${userStore.token}`
 
     const response = await getMatches({
-      query: { limit: 21, before: loadedItems.at(-1)?.matchedAt },
+      query: { limit: 21, before: loadedItems.at(-1)?.matchedAt ?? undefined },
       composable: '$fetch',
       headers: { Authorization: apiToken },
     })
@@ -56,8 +56,8 @@ export const useListingStore = defineStore('listing', () => {
     return [true, loadedItems]
   }
 
-  function constructListingUrl(listing: Listing, lang: string): string | null {
-    if (!listing.platform)
+  function constructListingUrl(listing: StoredListing | undefined, lang: string): string | null {
+    if (!listing?.platform)
       return null
     if (!listing.id)
       return null
@@ -96,9 +96,6 @@ export const useListingStore = defineStore('listing', () => {
       'es-ES': 'es',
     }
     const localDomain = localeDomainMap[lang] ?? 'com'
-    if (listing === 'Craigslist') {
-      return `https://${id}`
-    }
     if (listing === 'Willhaben') {
       return `https://www.willhaben.at/iad/${id.replace(/^\//, '')}`
     }
