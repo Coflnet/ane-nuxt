@@ -72,7 +72,7 @@ import lodash from 'lodash'
 import { getMessaging, getToken } from 'firebase/messaging'
 import { useFirebaseApp } from 'vuefire'
 import type { FilterMatch, ListingListener } from '~/src/api-client'
-import type { Filter } from '~/types/FilterType'
+import type { Filter, TargetType } from '~/types/FilterType'
 import { constructOptionsFromString, detectLocationNA, filterFreeMarketplaces, marketplaces, usMarketplaces, valididateAllMarketplace } from '~/constants/CreateFilterConstants'
 
 const { debounce } = lodash
@@ -333,13 +333,16 @@ async function filterToCreate(): Promise<ListingListener | null> {
     userStore.notificationSettings.email.address = rawFilter.notificationTarget
   }
 
-  const filterToCreate = {
+  const filterToCreate: ListingListener = {
     name: rawFilter.searchValue.slice(0, 12),
     userId: '',
     id: filter.value.id,
     target: rawFilter.notificationTarget,
     targetType: rawFilter.notificationType as TargetType,
-    filters: await handleFilters(),
+    // FilterInfo.value is typed as `string` in the generated spec, but this
+    // pipeline intentionally stores numeric/boolean filter values (radius,
+    // price, toggles) as-is; narrow adapter to keep the wire payload unchanged.
+    filters: await handleFilters() as unknown as ListingListener['filters'],
   }
 
   return filterToCreate

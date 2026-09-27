@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 import { createUserWithEmailAndPassword, type EmailAuthCredential, EmailAuthProvider, GoogleAuthProvider, linkWithCredential, linkWithPopup, signInAnonymously, signInWithEmailAndPassword, signInWithPopup, type Auth, updateProfile, type UserCredential, getAdditionalUserInfo } from 'firebase/auth'
 import { navigateTo } from '#app'
 import { createLink, getStats, listLinks, loginFirebase, useLink } from '~/src/api-client'
-import type { ActiveSubscription } from '#hey-api'
+import type { ActiveSubscription, FilterMatch } from '~/src/api-client'
 import { canCreateReferralLink, isSelfReferral, REFERRAL_LINK_NAME, REFERRAL_LINK_TEXT } from '~/utils/referral'
 import { canLoadStats } from '~/utils/stats'
 

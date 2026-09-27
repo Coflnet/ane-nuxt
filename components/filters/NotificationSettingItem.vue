@@ -52,7 +52,7 @@
 
 <script setup lang="ts">
 import DefaultInputBox from '../ui/DefaultInputBox.vue'
-import type { Filter } from '~/types/FilterType'
+import type { Filter, TargetType } from '~/types/FilterType'
 
 const emit = defineEmits(['itemSelected'])
 const model = defineModel<string>()
@@ -61,7 +61,7 @@ const props = defineProps<{
   filter: Filter
   config: {
     predefinedValue: string
-    notificationType: string
+    notificationType: TargetType
     name: string
     placeholder?: string
     icon: string

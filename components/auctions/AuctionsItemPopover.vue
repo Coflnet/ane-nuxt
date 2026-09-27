@@ -68,6 +68,7 @@
 
 <script setup lang="ts">
 import { Popover, PopoverButton, PopoverPanel, Disclosure, DisclosureButton } from '@headlessui/vue'
+import type { FilterMatch } from '~/src/api-client'
 
 const { t } = useI18n()
 
@@ -77,13 +78,16 @@ const props = defineProps<{ auction: FilterMatch }>()
 
 async function sendWrongMatchMessage() {
   const apiToken = `Bearer ${useUserStore().token}`
-  // Destructure props.auction to get a plain object
-  const { auction: plainAuction } = props
 
   const response = await reportMatch({
     composable: '$fetch',
     headers: { Authorization: apiToken },
-    body: { match: plainAuction as unknown as FilterMatch, message: auctionBadText },
+    // The generated client's `WithRefs<>` body-field mapping (which lets `message` be a
+    // live Ref, as used below) recursively drops `null` from every nested field's type via
+    // `NonNullable`, even though the API itself accepts the nullable `FilterMatch` shape.
+    // Passing a Ref instead of a plain value satisfies `WithRefs<T> | Ref<T>` directly and
+    // skips that recursive mapping, without changing what gets sent.
+    body: { match: ref(props.auction), message: auctionBadText },
   })
 
   push.success(t('reportSuccessfull', { id: response }))
