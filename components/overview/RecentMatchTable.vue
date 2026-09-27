@@ -47,7 +47,7 @@
             {{ useFormat().formatCurrency(
               auction.listingData?.price ?? 0,
               auction.listingData?.currency ?? '',
-              useI18n().locale.value,
+              locale,
             ) }}
           </td>
           <td
@@ -112,17 +112,19 @@ const filterStore = useFilterStore()
 const { checkAvailability } = useAvailabilityCheck()
 
 async function tableClicked(auction: FilterMatch) {
+  const url = listingStore.constructListingUrl(auction.listingData, locale.value)
+
   // Check availability before opening link
   const listingId = auction.listingData?.id
   if (listingId) {
-    const isAvailable = await checkAvailability(listingId, auction.listingData?.url)
+    const isAvailable = await checkAvailability(listingId, url)
     if (!isAvailable) {
       console.warn('Listing unavailable:', listingId)
       // Still open the link, but user is warned via console
     }
   }
 
-  navigateTo(listingStore.constructListingUrl(auction.listingData, locale.value), {
+  navigateTo(url, {
     external: true,
     open: {
       target: '_blank',
