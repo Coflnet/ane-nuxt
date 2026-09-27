@@ -42,7 +42,7 @@
             <span
               v-if="totalResults"
               class="text-slate-400 text-lg ml-2"
-            >({{ totalResults }} {{ $t('found', 'found') }})</span>
+            >({{ formattedTotalResults }} {{ $t('found', 'found') }})</span>
           </span>
           <span v-else-if="searchQuery">{{ $t('noResultsFor', { query: searchQuery }) }}</span>
           <span v-else>{{ $t('noResultsFound', 'No results found') }}</span>
@@ -696,7 +696,7 @@
                 @click="loadMore"
               >
                 <span v-if="loadingMore">{{ $t('loading', 'Loading...') }}</span>
-                <span v-else>{{ $t('loadMore', 'Load More') }} ({{ allProducts.length }} / {{ totalResults }})</span>
+                <span v-else>{{ $t('loadMore', 'Load More') }} ({{ allProducts.length }} / {{ formattedTotalResults }})</span>
               </button>
             </div>
             <!-- Infinite scroll sentinel (auto-loads until AUTO_LOAD_MAX) -->
@@ -942,6 +942,7 @@ import { useI18n } from 'vue-i18n'
 import { searchProducts } from '~/src/api-client'
 import type { ProductAttribute, ProductDocument, FilterBucket, SearchProductsResponse } from '~/src/api-client/types.gen'
 import { useCategories } from '~/composable/useCategories'
+import { useFormat } from '~/composable/useFormat'
 import { countPopulatedSubCategories, formatCategoryCount, getCategoryProductCount as getCategoryProductCountFor, normalizeCategoryCounts, resolveCategoryCount } from '~/utils/categoryCounts'
 import { resolveSearchCategoryParam } from '~/utils/searchCategoryParam'
 
@@ -956,7 +957,7 @@ const { t, locale } = useI18n()
 // this after that call left those bindings in the temporal dead zone during that first,
 // eager call whenever `?category=` was present, throwing a ReferenceError before any
 // search request was even made.
-const { topLevelCategories, loadingCategories, fetchTopLevelCategories, fetchSubCategories, toUrlSlug, toApiSlug, urlToNumeric, slugToLabel, germanLabelBySlug, ensureGermanLabels } = useCategories()
+const { topLevelCategories, loadingCategories, fetchTopLevelCategories, fetchSubCategories, toUrlSlug, toApiSlug, urlToNumeric, slugToLabel, germanLabelBySlug, ensureGermanLabels, countsBySlug, ensureCountsBySlug } = useCategories()
 
 // URL-derived state
 const searchQuery = computed(() => (route.query.q as string) || '')
@@ -1002,6 +1003,16 @@ const selectedCountryCode = ref<string>((route.query.country as string) || '')
 // Data state
 const allProducts = ref<ProductDocument[]>([])
 const totalResults = ref<number>(0)
+// The search API caps its hit count at 10000 (OpenSearch's default track_total_hits limit); at
+// that exact value the real count is >= 10000 but unknown, so show "10,000+" instead of a number
+// that would look like a precise (and possibly category-tile-contradicting) total.
+const SEARCH_TOTAL_CAP = 10000
+const { formatNumber } = useFormat()
+const formattedTotalResults = computed(() => (
+  totalResults.value >= SEARCH_TOTAL_CAP
+    ? `${formatNumber(SEARCH_TOTAL_CAP, locale.value)}+`
+    : totalResults.value.toString()
+))
 const categoryBuckets = ref<FilterBucket[]>([])
 const conditionBuckets = ref<FilterBucket[]>([])
 const attributeBuckets = ref<Record<string, FilterBucket[]>>({})
@@ -1344,11 +1355,11 @@ async function fetchGlobalCategoryCounts() {
   catch { /* ignore — show all categories as fallback */ }
 }
 
-// The counts map above is keyed by German label regardless of UI language, so counts are
-// resolved via each category's German label (from useCategories' germanLabelBySlug) rather
-// than its currently-displayed label — see utils/categoryCounts.ts.
+// Prefers the exact per-slug counts (countsBySlug, see useCategories' ensureCountsBySlug) when
+// available; otherwise falls back to the counts map keyed by German label regardless of UI
+// language, resolved via each category's German label — see utils/categoryCounts.ts.
 function countForCategory(cat: { slug: string, label?: string }): number {
-  return resolveCategoryCount(cat, globalCategoryCounts.value, germanLabelBySlug.value)
+  return resolveCategoryCount(cat, globalCategoryCounts.value, germanLabelBySlug.value, countsBySlug.value)
 }
 
 // Categories to display in the browser (filtered to those with listings)
@@ -1397,13 +1408,13 @@ function getCategoryIcon(slug: string, label: string): string {
 }
 
 function getCategoryProductCount(cat: CategoryNode): number {
-  return getCategoryProductCountFor(cat, globalCategoryCounts.value, germanLabelBySlug.value)
+  return getCategoryProductCountFor(cat, globalCategoryCounts.value, germanLabelBySlug.value, countsBySlug.value)
 }
 
 // Direct subcategories that actually have products — what the "N subcategories" badge shows,
 // and what decides whether clicking a category browses deeper or jumps straight to results.
 function populatedSubCategoryCount(cat: CategoryNode): number {
-  return countPopulatedSubCategories(cat, globalCategoryCounts.value, germanLabelBySlug.value)
+  return countPopulatedSubCategories(cat, globalCategoryCounts.value, germanLabelBySlug.value, countsBySlug.value)
 }
 
 function formatCount(n: number): string {
@@ -1465,6 +1476,7 @@ onMounted(async () => {
   fetchTopLevelCategories()
   fetchGlobalCategoryCounts()
   ensureGermanLabels()
+  ensureCountsBySlug()
   setupScrollObserver()
   // Restore country from URL
   const urlCountry = route.query.country as string
@@ -1638,8 +1650,11 @@ const attrValueTranslationMap: Record<string, Record<string, string>> = {
 }
 
 function localizeCategory(cat: string): string {
-  // If it's a numeric slug, try to show the label
-  const label = slugToLabel.value[cat]
+  // If it's a numeric slug, try to show the label directly; if it's a URL slug (e.g. "clothing"
+  // from ?category=clothing), resolve it to the numeric slug first — slugToLabel is keyed by
+  // numeric slug, so looking it up by the raw URL slug always missed and fell through to
+  // showing the raw URL value ("clothing") instead of the localized label.
+  const label = slugToLabel.value[cat] || slugToLabel.value[toApiSlug(cat)]
   if (label) return label
 
   const key = categoryTranslationMap[cat]

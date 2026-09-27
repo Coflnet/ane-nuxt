@@ -38,6 +38,12 @@ export function useCategories() {
   // German label per numeric slug, fetched once regardless of UI language — lets counts
   // (keyed by German label, see utils/categoryCounts.ts) be resolved on any locale.
   const germanLabelBySlug = useState<Record<string, string>>('catGermanLabelBySlug', () => ({}))
+  // Exact per-slug product counts from GET /api/Categories/counts-by-slug (the same category query
+  // the search endpoint uses per slug), preferred over the label-based lookup in
+  // utils/categoryCounts.ts. Stays null when the endpoint is missing (older API deployment) or the
+  // request failed, so callers fall back to the label-based logic instead of showing no counts at all.
+  const countsBySlug = useState<Record<string, number> | null>('catCountsBySlug', () => null)
+  const countsBySlugFetched = useState<boolean>('catCountsBySlugFetched', () => false)
 
   function ensureLanguage() {
     if (categoriesLang.value === lang()) return
@@ -85,6 +91,26 @@ export function useCategories() {
     catch (e) {
       console.error('Failed to fetch German category labels', e)
     }
+  }
+
+  /**
+   * Fetch exact per-slug product counts once (GET /api/Categories/counts-by-slug). Leaves
+   * `countsBySlug` as `null` on failure — including a 404 from an API deployment that doesn't have
+   * the endpoint yet — so callers can tell "unavailable" apart from "loaded but empty" and fall
+   * back to the label-based counts.
+   */
+  async function ensureCountsBySlug() {
+    if (countsBySlugFetched.value) return countsBySlug.value
+    countsBySlugFetched.value = true
+    try {
+      const data = await $fetch<Record<string, number>>(`${API_BASE}/api/Categories/counts-by-slug`)
+      countsBySlug.value = data || {}
+    }
+    catch (e) {
+      console.error('Failed to fetch counts-by-slug', e)
+      countsBySlug.value = null
+    }
+    return countsBySlug.value
   }
 
   /** Convert a numeric slug (e.g. "537") to a URL-friendly slug. Returns the original if no mapping exists. */
@@ -146,6 +172,8 @@ export function useCategories() {
     slugToLabel,
     germanLabelBySlug,
     ensureGermanLabels,
+    countsBySlug,
+    ensureCountsBySlug,
     toUrlSlug,
     toApiSlug,
   }

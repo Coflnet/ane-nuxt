@@ -101,3 +101,74 @@ test('formatCategoryCount abbreviates thousands', () => {
   assert.equal(formatCategoryCount(411), '411')
   assert.equal(formatCategoryCount(0), '0')
 })
+
+// Regression: the category tiles (with-counts, a label terms aggregation) and the search results
+// total (CategoryQueryResolver + the category filter query) used different resolution paths, so
+// e.g. the Clothing tile showed "494 products" while ?category=clothing found 1487. The exact,
+// numeric-slug-keyed GET /api/Categories/counts-by-slug is computed with the same query the search
+// endpoint uses per slug and must be preferred over the label-based lookup whenever present.
+test('resolveCategoryCount prefers countsBySlug over the label-based lookup', () => {
+  const counts = normalizeCategoryCounts({ bekleidung: 494 }) // the old, mismatched tile source
+  const countsBySlug = { 1604: 1487 } // exact count for the same category, from the new endpoint
+
+  assert.equal(resolveCategoryCount({ slug: '1604', label: 'Clothing' }, counts, {}, countsBySlug), 1487)
+})
+
+test('resolveCategoryCount falls back to the label-based lookup when countsBySlug has no entry for the slug', () => {
+  const counts = normalizeCategoryCounts({ elektronik: 18600 })
+  const germanLabelBySlug = { 222: 'Elektronik' }
+  const countsBySlug = { 1604: 1487 } // some other slug present, but not 222
+
+  assert.equal(resolveCategoryCount({ slug: '222', label: 'Electronics' }, counts, germanLabelBySlug, countsBySlug), 18600)
+})
+
+test('resolveCategoryCount falls back to the label-based lookup when countsBySlug is null (endpoint unavailable)', () => {
+  const counts = normalizeCategoryCounts({ elektronik: 18600 })
+  const germanLabelBySlug = { 222: 'Elektronik' }
+
+  assert.equal(resolveCategoryCount({ slug: '222', label: 'Electronics' }, counts, germanLabelBySlug, null), 18600)
+})
+
+// getCategoryProductCount must return countsBySlug's value AS-IS for a node it covers, not add its
+// (already-included) children's counts on top - countsBySlug is authoritative for the whole subtree.
+test('getCategoryProductCount does not add child counts on top of an authoritative countsBySlug entry', () => {
+  const counts = normalizeCategoryCounts({ herrenbekleidung: 40 })
+  const countsBySlug = { 1604: 1487 }
+  const node = {
+    slug: '1604',
+    label: 'Clothing',
+    subCategories: [{ slug: '1605', label: 'Men\'s Clothing' }],
+  }
+
+  assert.equal(getCategoryProductCount(node, counts, {}, countsBySlug), 1487)
+})
+
+test('getCategoryProductCount rolls up child slugs individually when the parent has no countsBySlug entry', () => {
+  const counts = normalizeCategoryCounts({})
+  const countsBySlug = { 1605: 40, 1606: 15 } // parent 1604 missing, but both children present
+  const node = {
+    slug: '1604',
+    label: 'Clothing',
+    subCategories: [
+      { slug: '1605', label: 'Men\'s Clothing' },
+      { slug: '1606', label: 'T-Shirts' },
+    ],
+  }
+
+  assert.equal(getCategoryProductCount(node, counts, {}, countsBySlug), 40 + 15)
+})
+
+test('countPopulatedSubCategories uses countsBySlug per direct child when available', () => {
+  const counts = normalizeCategoryCounts({})
+  const countsBySlug = { 1605: 40, 1594: 0 }
+  const node = {
+    slug: '1604',
+    label: 'Clothing',
+    subCategories: [
+      { slug: '1605', label: 'Men\'s Clothing' },
+      { slug: '1594', label: 'Suits' },
+    ],
+  }
+
+  assert.equal(countPopulatedSubCategories(node, counts, {}, countsBySlug), 1)
+})
