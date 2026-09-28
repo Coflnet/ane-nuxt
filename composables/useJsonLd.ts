@@ -1,5 +1,5 @@
-import type { Product } from '~/src/api-client/types.gen'
 import type { SeoArticle } from '~/utils/articles'
+import type { ProductWithOffers } from '~/utils/productAlternatives'
 
 type JsonLdNode = Record<string, unknown>
 
@@ -46,7 +46,7 @@ export function buildBreadcrumbJsonLd(items: { name: string, url: string }[]): J
   }
 }
 
-export function buildProductJsonLd(product: Product, canonical: string): JsonLdNode {
+export function buildProductJsonLd(product: ProductWithOffers, canonical: string): JsonLdNode {
   const node: JsonLdNode = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -64,7 +64,9 @@ export function buildProductJsonLd(product: Product, canonical: string): JsonLdN
   const count = product.listingCount ?? 0
   const low = product.minPrice ?? product.avgPrice
   const high = product.maxPrice ?? product.avgPrice
-  if (low != null && count > 0) {
+  // Never advertise an offer count once the product is known to have none — a stale
+  // listingCount must not contradict the page (see utils/productAlternatives.ts).
+  if (product.hasActiveOffers !== false && low != null && count > 0) {
     node.offers = {
       '@type': 'AggregateOffer',
       'priceCurrency': 'EUR',

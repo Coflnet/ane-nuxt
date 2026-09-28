@@ -14,7 +14,7 @@
       <!-- Breadcrumb -->
       <nav class="flex text-sm text-slate-400 mb-6">
         <NuxtLink
-          to="/home"
+          :to="localePath('/')"
           class="hover:text-blue-400"
         >
           {{ $t('nav.home') }}
@@ -125,8 +125,16 @@
               <div class="text-slate-500 text-xs uppercase font-bold mb-1">
                 {{ $t('product.available') }}
               </div>
-              <div class="text-xl font-bold text-green-400">
-                {{ $t('product.offersCount', { count: availableOfferCount }) }}
+              <div
+                class="text-xl font-bold"
+                :class="product.hasActiveOffers === false ? 'text-slate-400' : 'text-green-400'"
+              >
+                <template v-if="product.hasActiveOffers === false">
+                  {{ $t('product.noOffers.shortLabel') }}
+                </template>
+                <template v-else>
+                  {{ $t('product.offersCount', { count: availableOfferCount }) }}
+                </template>
               </div>
             </div>
             <div
@@ -319,8 +327,104 @@
         </div>
       </div>
 
+      <!-- No Offers: alternatives + notify, so the page is never a dead end -->
+      <div
+        v-if="showAlternatives"
+        class="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-xl"
+      >
+        <div class="p-6 border-b border-slate-800 flex flex-wrap gap-3 justify-between items-center">
+          <div>
+            <h2 class="text-2xl font-bold text-white">
+              {{ $t('product.noOffers.title') }}
+            </h2>
+            <p
+              v-if="alternatives.length > 0"
+              class="text-sm text-slate-400 mt-1"
+            >
+              {{ $t('product.noOffers.similarProducts') }}
+            </p>
+          </div>
+          <NuxtLink
+            v-if="notifyFilterHref"
+            :to="notifyFilterHref"
+            class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-400 hover:text-blue-300 border border-blue-500/30 hover:border-blue-500/50 rounded-lg transition-colors"
+          >
+            <Icon
+              name="tabler:bell-plus"
+              class="w-4 h-4"
+            />
+            {{ $t('product.notifyMe') }}
+          </NuxtLink>
+        </div>
+
+        <div
+          v-if="alternatives.length > 0"
+          class="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+        >
+          <NuxtLink
+            v-for="alt in alternatives"
+            :key="alt.id ?? undefined"
+            :to="localePath(`/product/${alt.id}`)"
+            class="bg-slate-800/50 rounded-xl border border-slate-700/50 p-4 hover:border-blue-500/50 transition-colors group"
+          >
+            <div class="aspect-square bg-slate-900 rounded-lg overflow-hidden mb-3 relative">
+              <NuxtImg
+                v-if="alt.imageUrl"
+                :src="alt.imageUrl"
+                :alt="alt.name ?? ''"
+                loading="lazy"
+                class="w-full h-full object-contain"
+              />
+              <div
+                v-else
+                class="w-full h-full flex items-center justify-center text-slate-600"
+              >
+                <Icon
+                  name="tabler:photo"
+                  class="w-10 h-10"
+                />
+              </div>
+              <span class="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-slate-900/80 text-[11px] font-medium text-cyan-400 border border-slate-700">
+                {{ $t(alternativeReasonLabelKey(alt.reason)) }}
+              </span>
+            </div>
+            <h3 class="text-sm font-medium text-white truncate group-hover:text-blue-400 transition-colors">
+              {{ alt.name }}
+            </h3>
+            <p
+              v-if="alt.minPrice ?? alt.avgPrice"
+              class="text-sm text-emerald-400 mt-1"
+            >
+              {{ $t('product.noOffers.priceFrom', { price: formatPrice(alt.minPrice ?? alt.avgPrice) }) }}
+            </p>
+            <p class="text-xs text-slate-500 mt-1">
+              {{ $t('product.offersCount', { count: alt.listingCount ?? 0 }) }}
+            </p>
+          </NuxtLink>
+        </div>
+
+        <div
+          v-else
+          class="p-6"
+        >
+          <p class="text-sm text-slate-400 mb-3">
+            {{ $t('product.noOffers.noAlternatives') }}
+          </p>
+          <NuxtLink
+            v-if="categoryFallbackHref && categoryFallbackLabel"
+            :to="categoryFallbackHref"
+            class="text-blue-400 hover:text-blue-300 hover:underline text-sm font-medium"
+          >
+            {{ $t('product.noOffers.browseCategory', { category: categoryFallbackLabel }) }}
+          </NuxtLink>
+        </div>
+      </div>
+
       <!-- Listings Section -->
-      <div class="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-xl">
+      <div
+        v-else
+        class="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-xl"
+      >
         <div class="p-6 border-b border-slate-800 flex flex-wrap gap-3 justify-between items-center">
           <h2 class="text-2xl font-bold text-white">
             {{ $t('product.availableOffers') }}
@@ -403,7 +507,7 @@
       <!-- SEO Description -->
       <div class="mt-8 bg-slate-900/50 rounded-xl border border-slate-800 p-6 space-y-4">
         <p class="text-sm text-slate-400 leading-relaxed">
-          {{ $t('product.seo.description', { name: product.name, count: matches.length }) }}
+          {{ productDescription }}
         </p>
         <p class="text-sm text-slate-400 leading-relaxed">
           {{ $t('product.seo.howItWorks') }}
@@ -489,7 +593,7 @@
         Product not found
       </h2>
       <NuxtLink
-        to="/home"
+        :to="localePath('/')"
         class="text-blue-500 hover:underline mt-4 inline-block"
       >
         Back to Home
@@ -506,6 +610,15 @@ import { useI18n } from 'vue-i18n'
 import { useUserStore } from '~/stores/user'
 import { buildProductResourceUrl } from '~/utils/productApiUrl'
 import { buildNotifyFilterUrl } from '~/utils/notifyFilterUrl'
+import {
+  alternativeReasonLabelKey,
+  buildCategoryFallbackUrl,
+  mostSpecificCategory,
+  resolveAvailableOfferCount,
+  shouldLoadAlternatives,
+  type ProductAlternative,
+  type ProductWithOffers,
+} from '~/utils/productAlternatives'
 
 const route = useRoute()
 const productId = route.params.id as string
@@ -520,8 +633,16 @@ const lat = computed(() => route.query.lat ? Number(route.query.lat) : undefined
 const lon = computed(() => route.query.lon ? Number(route.query.lon) : undefined)
 const maxDistance = computed(() => route.query.max_distance ? Number(route.query.max_distance) : undefined)
 
+function buildAlternativesUrl(id: string): string {
+  return buildProductResourceUrl(API_BASE, id, 'alternatives', { limit: 3 })
+}
+
 // SEO-critical data: server-rendered when the backend is quick, otherwise a
-// skeleton renders and the client re-fetches it after hydration.
+// skeleton renders and the client re-fetches it after hydration. Alternatives are
+// fetched here too (not in the client-only onMounted block below, unlike matches/
+// related) so a product without offers still has links to alternatives in the SSR
+// HTML — a product page must never be a dead end. Fetched only when the product's
+// `hasActiveOffers` flag already says there are none; see shouldLoadAlternatives.
 const { data: coreData, loading } = useRaceableAsyncData(
   `product-${productId}`,
   async () => {
@@ -530,15 +651,20 @@ const { data: coreData, loading } = useRaceableAsyncData(
       getPriceHistory({ path: { id: productId }, query: { days: 90 } }).catch(() => []),
       getPriceStats({ path: { id: productId }, query: { days: 90 } }).catch(() => null),
     ])
+    const product = productRes as ProductWithOffers
+    const alternatives = shouldLoadAlternatives(product.hasActiveOffers, null)
+      ? await $fetch<ProductAlternative[]>(buildAlternativesUrl(productId)).catch(() => [])
+      : []
     return {
-      product: productRes as Product,
+      product,
       priceHistory: (histRes as PricePoint[]) || [],
       priceStats: (statsRes as PriceHistoryStats | null) ?? null,
+      alternatives,
     }
   },
 )
 
-const product = computed<Product | null>(() => coreData.value?.product ?? null)
+const product = computed<ProductWithOffers | null>(() => coreData.value?.product ?? null)
 const priceHistory = computed<PricePoint[]>(() => coreData.value?.priceHistory ?? [])
 const priceStats = computed<PriceHistoryStats | null>(() => coreData.value?.priceStats ?? null)
 
@@ -547,6 +673,33 @@ const relatedProducts = ref<Product[]>([])
 const matches = ref<ProductMatch[]>([])
 const unavailableCount = ref(0)
 const imageErrorCount = ref(0)
+
+// Alternatives fetched client-side — only when the SSR fetch above didn't already
+// handle it (hasActiveOffers wasn't known-false yet) and matches turned out empty
+// anyway. `alternativesChecked` gates the section's visibility in that case so it
+// appears fully formed instead of an empty shell that fills in after (no layout
+// shift): see `showAlternatives` below.
+const clientAlternatives = ref<ProductAlternative[]>([])
+const alternativesChecked = ref(false)
+
+const alternatives = computed<ProductAlternative[]>(() =>
+  product.value?.hasActiveOffers === false ? (coreData.value?.alternatives ?? []) : clientAlternatives.value,
+)
+
+const showAlternatives = computed(() => {
+  if (!product.value) return false
+  if (product.value.hasActiveOffers === false) return true
+  return matches.value.length === 0 && alternativesChecked.value
+})
+
+const categoryFallbackLabel = computed(() => {
+  const category = mostSpecificCategory(product.value?.categories)
+  return category ? localizeCategory(category) : null
+})
+const categoryFallbackHref = computed(() => {
+  const url = buildCategoryFallbackUrl(product.value?.categories)
+  return url ? localePath(url) : null
+})
 
 // Product image with fallback: try product.imageUrl first, then listing images
 const productImageUrl = computed(() => {
@@ -587,11 +740,12 @@ const productIssueTypes: { value: IssueType }[] = [
   { value: 'Other' },
 ]
 
-const availableOfferCount = computed(() => {
-  // Matches load client-side; fall back to the SSR-available listing count.
-  if (matches.value.length) return matches.value.length - unavailableCount.value
-  return product.value?.listingCount ?? 0
-})
+const availableOfferCount = computed(() => resolveAvailableOfferCount({
+  hasActiveOffers: product.value?.hasActiveOffers,
+  matchesCount: matches.value.length,
+  unavailableCount: unavailableCount.value,
+  fallbackListingCount: product.value?.listingCount ?? 0,
+}))
 
 // Filter out 'condition' key from attributes (shown as top-level field)
 const filteredAttributes = computed<Record<string, string>>(() => {
@@ -998,13 +1152,23 @@ onMounted(async () => {
   ])
   matches.value = mRes
   relatedProducts.value = relatedRes
+
+  // Recheck: hasActiveOffers said "has offers" (or wasn't known yet) but the actual
+  // matches list came back empty — the SSR fetch above skipped alternatives for
+  // this case, so fetch them now. Skipped when hasActiveOffers already forced the
+  // SSR fetch (=== false), since that result (even if empty) is authoritative.
+  if (product.value?.hasActiveOffers !== false && matches.value.length === 0) {
+    clientAlternatives.value = await $fetch<ProductAlternative[]>(buildAlternativesUrl(productId)).catch(() => [])
+  }
+  alternativesChecked.value = true
 })
 
-const productDescription = computed(() =>
-  product.value
-    ? t('product.seo.description', { name: product.value.name, count: availableOfferCount.value })
-    : '',
-)
+const productDescription = computed(() => {
+  if (!product.value) return ''
+  return product.value.hasActiveOffers === false
+    ? t('product.seo.descriptionNoOffers', { name: product.value.name })
+    : t('product.seo.description', { name: product.value.name, count: availableOfferCount.value })
+})
 
 useSeoMeta({
   title: () => product.value?.name || 'Product',

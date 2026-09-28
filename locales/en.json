@@ -906,8 +906,23 @@
     },
     "relatedProducts": "Related Products",
     "listings": "listings",
+    "noOffers": {
+      "title": "Currently no offers",
+      "shortLabel": "No offers currently",
+      "similarProducts": "Similar products with offers:",
+      "noAlternatives": "We couldn't find similar products with offers right now.",
+      "browseCategory": "Browse {category}",
+      "priceFrom": "From {price}",
+      "reason": {
+        "same_model": "Other variant",
+        "sibling_model": "Similar model",
+        "same_brand_category": "Same brand",
+        "same_category": "Similar product"
+      }
+    },
     "seo": {
       "description": "{name} — compare {count} offers from multiple marketplaces. ANE is a meta search engine that aggregates listings across Kleinanzeigen, eBay and other platforms. Attributes and prices are AI-assisted and may contain errors — if something looks wrong, please report it.",
+      "descriptionNoOffers": "{name} — currently no active offers on Kleinanzeigen, eBay or other marketplaces. Get notified the moment a new listing appears, or browse similar products with offers below. ANE is a meta search engine that aggregates listings across multiple platforms — attributes and prices are AI-assisted and may contain errors.",
       "howItWorks": "ANE continuously scans major second-hand marketplaces including Kleinanzeigen, eBay, Vinted, Shpock and more. Listings are grouped by product using AI-powered matching so you can compare prices from different sellers in one place. Each product page shows available offers, price history, and key attributes extracted automatically from listing descriptions.",
       "priceComparison": "By comparing all current listings for {name} side by side you can quickly identify the best deal. The price history chart reveals whether prices are trending up or down, helping you decide the right moment to buy. Filter by condition (new, used, refurbished) and sort by price to find exactly what you need.",
       "disclaimer": "All data shown on this page is aggregated automatically. Prices, product attributes and condition ratings are extracted using machine learning and may occasionally be inaccurate. Always verify details on the seller's original listing before purchasing. If you notice incorrect information, use the report button to help us improve."

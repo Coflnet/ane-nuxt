@@ -906,8 +906,23 @@
     },
     "relatedProducts": "Ähnliche Produkte",
     "listings": "Angebote",
+    "noOffers": {
+      "title": "Aktuell keine Angebote",
+      "shortLabel": "Aktuell keine Angebote",
+      "similarProducts": "Ähnliche Produkte mit Angeboten:",
+      "noAlternatives": "Wir konnten gerade keine ähnlichen Produkte mit Angeboten finden.",
+      "browseCategory": "{category} durchsuchen",
+      "priceFrom": "Ab {price}",
+      "reason": {
+        "same_model": "Andere Variante",
+        "sibling_model": "Ähnliches Modell",
+        "same_brand_category": "Gleiche Marke",
+        "same_category": "Ähnliches Produkt"
+      }
+    },
     "seo": {
       "description": "{name} — vergleiche {count} Angebote von mehreren Marktplätzen. ANE ist eine Meta-Suchmaschine, die Angebote von Kleinanzeigen, eBay und anderen Plattformen zusammenfasst. Attribute und Preise werden KI-gestützt ermittelt und können Fehler enthalten – falls etwas nicht stimmt, melde es bitte.",
+      "descriptionNoOffers": "{name} — aktuell keine aktiven Angebote auf Kleinanzeigen, eBay oder anderen Marktplätzen. Lass dich benachrichtigen, sobald ein neues Angebot erscheint, oder entdecke unten ähnliche Produkte mit Angeboten. ANE ist eine Meta-Suchmaschine, die Angebote von mehreren Plattformen zusammenfasst — Attribute und Preise werden KI-gestützt ermittelt und können Fehler enthalten.",
       "howItWorks": "ANE durchsucht kontinuierlich große Second-Hand-Marktplätze wie Kleinanzeigen, eBay, Vinted, Shpock und weitere. Angebote werden mithilfe KI-gestützter Zuordnung nach Produkt gruppiert, sodass du Preise verschiedener Verkäufer an einem Ort vergleichen kannst. Jede Produktseite zeigt verfügbare Angebote, den Preisverlauf und wichtige Attribute, die automatisch aus den Anzeigenbeschreibungen extrahiert werden.",
       "priceComparison": "Durch den Vergleich aller aktuellen Angebote für {name} nebeneinander findest du schnell das beste Angebot. Das Preisverlauf-Diagramm zeigt, ob die Preise steigen oder fallen, und hilft dir, den richtigen Kaufzeitpunkt zu wählen. Filtere nach Zustand (neu, gebraucht, generalüberholt) und sortiere nach Preis, um genau das zu finden, was du brauchst.",
       "disclaimer": "Alle Daten auf dieser Seite werden automatisch aggregiert. Preise, Produkteigenschaften und Zustandsbewertungen werden mittels maschinellem Lernen extrahiert und können gelegentlich ungenau sein. Überprüfe die Details immer im Originalangebot des Verkäufers, bevor du kaufst. Falls du falsche Informationen bemerkst, nutze bitte die Melden-Funktion, um uns zu helfen."
