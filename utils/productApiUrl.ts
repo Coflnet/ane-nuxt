@@ -1,5 +1,6 @@
 /**
- * Build an absolute URL for a Product sub-resource (`related` or `matches`).
+ * Build an absolute URL for a Product sub-resource (`related`, `matches` or
+ * `alternatives`).
  *
  * These were previously built as bare `/api/Product/${id}/...` paths, which the browser
  * resolves against the Nuxt origin (ane.deals) instead of the API (ane.coflnet.com) — the
@@ -13,6 +14,8 @@ export interface ProductResourceUrlParams {
   lat?: number
   lon?: number
   maxDistance?: number
+  /** `alternatives` only: caps the number of suggestions (API default/max is 3). */
+  limit?: number
 }
 
 function buildQueryString(params: ProductResourceUrlParams): string {
@@ -21,13 +24,14 @@ function buildQueryString(params: ProductResourceUrlParams): string {
   if (params.lat) search.append('lat', params.lat.toString())
   if (params.lon) search.append('lon', params.lon.toString())
   if (params.maxDistance) search.append('maxDistance', params.maxDistance.toString())
+  if (params.limit) search.append('limit', params.limit.toString())
   return search.toString()
 }
 
 export function buildProductResourceUrl(
   base: string,
   id: string,
-  resource: 'related' | 'matches',
+  resource: 'related' | 'matches' | 'alternatives',
   params: ProductResourceUrlParams = {},
 ): string {
   const url = `${base}/api/Product/${id}/${resource}`

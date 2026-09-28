@@ -35,3 +35,21 @@ test('an internal SSR base is honored the same way as the public browser base', 
   const url = buildProductResourceUrl('http://aneapi:8000', '123', 'related')
   assert.equal(url, 'http://aneapi:8000/api/Product/123/related')
 })
+
+// Regression: the alternatives request (like related/matches before it, fixed above)
+// must also be built against the API base, not a bare relative path.
+test('product resource url supports the alternatives resource with a limit', () => {
+  const url = buildProductResourceUrl('https://ane.coflnet.com', '123', 'alternatives', { limit: 3 })
+  assert.equal(url, 'https://ane.coflnet.com/api/Product/123/alternatives?limit=3')
+})
+
+test('product resource url omits limit when unset or zero', () => {
+  assert.equal(
+    buildProductResourceUrl('https://ane.coflnet.com', '123', 'alternatives'),
+    'https://ane.coflnet.com/api/Product/123/alternatives',
+  )
+  assert.equal(
+    buildProductResourceUrl('https://ane.coflnet.com', '123', 'alternatives', { limit: 0 }),
+    'https://ane.coflnet.com/api/Product/123/alternatives',
+  )
+})
