@@ -914,6 +914,7 @@
     "price": "Preis",
     "date": "Datum",
     "action": "Aktion",
+    "catchAllHint": "Diese Angebote konnten keinem bestimmten Produkt zugeordnet werden.",
     "offersCount": "{count} Angebote",
     "listedPrice": "Listenpreis",
     "marketValue": "Marktwert",

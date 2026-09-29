@@ -426,9 +426,18 @@
         class="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-xl"
       >
         <div class="p-6 border-b border-slate-800 flex flex-wrap gap-3 justify-between items-center">
-          <h2 class="text-2xl font-bold text-white">
-            {{ $t('product.availableOffers') }}
-          </h2>
+          <div>
+            <h2 class="text-2xl font-bold text-white">
+              {{ $t('product.availableOffers') }}
+            </h2>
+            <p
+              v-if="product.isCatchAll"
+              class="text-sm text-slate-400 mt-1"
+              data-testid="catch-all-hint"
+            >
+              {{ $t('product.catchAllHint') }}
+            </p>
+          </div>
           <NuxtLink
             v-if="notifyFilterHref"
             :to="notifyFilterHref"
@@ -1301,6 +1310,8 @@ useSeoMeta({
   ogDescription: () => productDescription.value,
   ogImage: () => product.value?.imageUrl || undefined,
   ogType: 'website',
+  // catch-all pages (offers that could not be assigned to a product) are not indexed; the flag depends on the product, not the visitor, so the swr cache is fine
+  robots: () => (product.value?.isCatchAll ? 'noindex, follow' : undefined),
 })
 
 useJsonLd(() => {

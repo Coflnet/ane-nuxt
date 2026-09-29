@@ -914,6 +914,7 @@
     "price": "Price",
     "date": "Date",
     "action": "Action",
+    "catchAllHint": "These offers could not be assigned to a specific product.",
     "offersCount": "{count} Offers",
     "listedPrice": "Listed Price",
     "marketValue": "Market Value",

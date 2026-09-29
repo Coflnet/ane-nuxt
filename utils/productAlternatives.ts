@@ -17,6 +17,8 @@ import type { Product } from '~/src/api-client/types.gen'
  */
 export interface ProductWithOffers extends Product {
   hasActiveOffers?: boolean | null
+  /** True for catch-all pages (offers that could not be assigned to a specific product). */
+  isCatchAll?: boolean | null
 }
 
 export type AlternativeReason = 'same_model' | 'sibling_model' | 'same_brand_category' | 'same_category'
