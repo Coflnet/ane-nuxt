@@ -67,6 +67,20 @@
           {{ $t('subscriptions') }}
         </UiLinkButton>
 
+        <UiLinkButton
+          v-if="canLabel"
+          aria-label="Profile Photo Labeling Navigation Button"
+          class="m-1 mt-2"
+          :white="true"
+          :to="localePath('/labeling')"
+        >
+          <Icon
+            name="tabler:photo-check"
+            class="w-4 h-4 mr-2"
+          />
+          {{ $t('labelingMenu') }}
+        </UiLinkButton>
+
         <AppHeaderCopyReferralCodeButton />
 
         <UiTextButton
@@ -87,7 +101,10 @@
 </template>
 
 <script setup lang="ts">
+import { useLabelingAccess } from '~/composables/useLabelingAccess'
+
 const localePath = useLocalePath()
+const { canLabel, load: loadLabelingAccess } = useLabelingAccess()
 
 const userStore = useUserStore()
 const isProfileMenuOpen = ref(false)
@@ -107,7 +124,10 @@ async function logout() {
 }
 
 onMounted(async () => {
-  if (await getCurrentUser()) loggedIn.value = true
+  if (await getCurrentUser()) {
+    loggedIn.value = true
+    loadLabelingAccess()
+  }
 
   document.addEventListener('click', (e) => {
     if (profileMenuRef.value && !profileMenuRef.value.contains(e.target as Node)) {

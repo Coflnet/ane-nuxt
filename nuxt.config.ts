@@ -89,6 +89,9 @@ export default defineNuxtConfig({
     '/product/**': { swr: 600 },
     '/search': { swr: 60 },
     '/_ipx/**': { prerender: false },
+    // Internal tool: depends on the visitor, so never prerendered or cached, and never indexed.
+    '/labeling': { prerender: false, swr: false, cache: false, robots: false },
+    '/de/labeling': { prerender: false, swr: false, cache: false, robots: false },
   },
 
   future: {
@@ -174,6 +177,7 @@ export default defineNuxtConfig({
   },
 
   sitemap: {
+    exclude: ['/labeling', '/de/labeling'],
     sources: [
       '/api/__sitemap__/urls',
     ],
