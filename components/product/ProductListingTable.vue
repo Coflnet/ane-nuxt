@@ -43,7 +43,14 @@
         >
           <td class="px-6 py-4 font-medium text-slate-200">
             <span class="inline-flex items-center gap-2">
-              {{ getMarketplaceName(listing.listingUrl) }}
+              {{ listing.platform || getMarketplaceName(listing.listingUrl) }}
+              <span
+                v-if="listing.country"
+                class="text-xs font-normal text-slate-400 whitespace-nowrap"
+                :title="listing.country"
+              >
+                <span aria-hidden="true">{{ countryFlag(listing.country) }}</span> {{ listing.country }}
+              </span>
               <span
                 v-if="unavailableListings.has(listing.listingId || listing.productId || '')"
                 class="text-xs text-red-400"
@@ -60,6 +67,12 @@
             >
               {{ listing.title }}
             </a>
+            <span
+              v-if="showDistance && typeof listing.distanceKm === 'number'"
+              class="block text-xs text-slate-500 mt-0.5"
+            >
+              {{ $t('product.filters.distanceKm', { km: Math.round(listing.distanceKm) }) }}
+            </span>
           </td>
           <td class="px-6 py-4 font-bold text-slate-200">
             {{ formatPrice(listing.price) }}
@@ -107,7 +120,7 @@
     </table>
 
     <div
-      v-if="listings.length === 0"
+      v-if="listings.length === 0 && !hasActiveFilter"
       class="p-8 text-center text-slate-500"
     >
       <p class="mb-4">
@@ -194,12 +207,21 @@
 
 <script setup lang="ts">
 import { reportProductIssue } from '~/src/api-client'
-import type { IssueType, ProductMatch } from '~/src/api-client/types.gen'
+import type { IssueType, ProductMatch as GeneratedProductMatch } from '~/src/api-client/types.gen'
+import { countryFlag } from '~/utils/countryDetection'
+import type { OfferMatchExtras } from '~/utils/offerFilters'
 import { useAvailabilityCheck } from '~/composable/useAvailabilityCheck'
+
+// the generated client predates platform/country/shipping/distanceKm; all optional so an old API still works
+type ProductMatch = GeneratedProductMatch & OfferMatchExtras
 
 const props = defineProps<{
   listings: ProductMatch[]
   productId?: string
+  /** A filter is active: the parent renders the empty state. */
+  hasActiveFilter?: boolean
+  /** A position filter is active: show the distance of each offer. */
+  showDistance?: boolean
   /**
    * Localized href for the "Notify me about new offers" CTA — built by the parent via
    * utils/notifyFilterUrl.ts (needs product data + the i18n locale path helper).
