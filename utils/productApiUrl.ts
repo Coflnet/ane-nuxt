@@ -16,6 +16,14 @@ export interface ProductResourceUrlParams {
   maxDistance?: number
   /** `alternatives` only: caps the number of suggestions (API default/max is 3). */
   limit?: number
+  /** `matches` only: ISO code used to resolve `zip` (API default DE). */
+  zipCountry?: string
+  /** `matches` only: comma separated marketplace names. */
+  platforms?: string
+  /** `matches` only: comma separated ISO codes, special value `EU`. */
+  countries?: string
+  /** `matches` only: only offers that can be shipped. */
+  shippingOnly?: boolean
 }
 
 function buildQueryString(params: ProductResourceUrlParams): string {
@@ -25,6 +33,10 @@ function buildQueryString(params: ProductResourceUrlParams): string {
   if (params.lon) search.append('lon', params.lon.toString())
   if (params.maxDistance) search.append('maxDistance', params.maxDistance.toString())
   if (params.limit) search.append('limit', params.limit.toString())
+  if (params.zipCountry) search.append('zipCountry', params.zipCountry)
+  if (params.platforms) search.append('platforms', params.platforms)
+  if (params.countries) search.append('countries', params.countries)
+  if (params.shippingOnly) search.append('shippingOnly', 'true')
   return search.toString()
 }
 
