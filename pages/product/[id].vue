@@ -658,6 +658,7 @@ import ProductListingTable from '~/components/product/ProductListingTable.vue'
 import ProductOfferFilters from '~/components/product/OfferFilters.vue'
 import { useI18n } from 'vue-i18n'
 import { useUserStore } from '~/stores/user'
+import { useOfferCountry } from '~/composable/useOfferCountry'
 import { buildProductResourceUrl } from '~/utils/productApiUrl'
 import { buildNotifyFilterUrl } from '~/utils/notifyFilterUrl'
 import {

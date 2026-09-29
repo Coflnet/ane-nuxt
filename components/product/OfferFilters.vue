@@ -268,6 +268,7 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
+import { useUserLocation } from '~/composable/useUserLocation'
 import { countryFlag, countryName } from '~/utils/countryDetection'
 import {
   NEARBY_DISTANCE_KM,
