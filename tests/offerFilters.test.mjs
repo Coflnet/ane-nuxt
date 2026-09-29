@@ -6,9 +6,11 @@ import {
   buildMatchesParams,
   buildOfferFilterQuery,
   buildSimilarSearchQuery,
+  changeMyCountry,
   emptyOfferFilter,
   extractApiErrorMessage,
   hasActiveOfferFilter,
+  moreFilterCount,
   parseOfferFacets,
   parseOfferFilterQuery,
   toggleListValue,
@@ -148,4 +150,20 @@ test('stored position round trip and rejection of garbage', () => {
   assert.equal(parseStoredPosition('{"lat":"1","lon":2}'), null)
   assert.equal(parseStoredPosition('{"lat":91,"lon":2}'), null)
   assert.equal(parseStoredPosition(null), null)
+})
+
+test('changing the country dropdown moves an active My country filter along', () => {
+  const active = { ...emptyOfferFilter(), countries: ['DE'] }
+  assert.deepEqual(changeMyCountry(active, 'DE', 'AT').countries, ['AT'])
+  assert.equal(activeQuickAction(changeMyCountry(active, 'DE', 'AT'), 'AT'), 'country')
+  const other = { ...emptyOfferFilter(), countries: ['NL'] }
+  assert.equal(changeMyCountry(other, 'DE', 'AT'), other)
+  assert.deepEqual(changeMyCountry(emptyOfferFilter(), 'DE', 'AT'), emptyOfferFilter())
+})
+
+test('more filters count ignores what a quick action already shows', () => {
+  assert.equal(moreFilterCount({ ...emptyOfferFilter(), countries: ['AT'] }, 'AT'), 0)
+  assert.equal(moreFilterCount({ ...emptyOfferFilter(), countries: ['EU'], shipping: true }, 'AT'), 0)
+  assert.equal(moreFilterCount({ ...emptyOfferFilter(), countries: ['NL'], platforms: ['Vinted'] }, 'AT'), 2)
+  assert.equal(moreFilterCount({ ...emptyOfferFilter(), countries: ['AT'], platforms: ['Vinted'] }, 'AT'), 1)
 })

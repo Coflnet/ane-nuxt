@@ -239,3 +239,18 @@ export function buildSimilarSearchQuery(productName: string, state: OfferFilterS
   if (single && single !== 'EU') query.country = single
   return query
 }
+
+/**
+ * The country dropdown next to "My country" changed. While that quick action is active the
+ * filter follows the dropdown, otherwise the URL would keep filtering the old country.
+ */
+export function changeMyCountry(state: OfferFilterState, previousCountry: string, nextCountry: string): OfferFilterState {
+  return activeQuickAction(state, previousCountry) === 'country' ? { ...state, countries: [nextCountry] } : state
+}
+
+/** Number shown on "More filters": selections a quick action does not already account for. */
+export function moreFilterCount(state: OfferFilterState, myCountry: string): number {
+  const quick = activeQuickAction(state, myCountry)
+  const countries = quick === 'country' || quick === 'eu' ? 0 : state.countries.filter(c => c !== 'EU').length
+  return state.platforms.length + countries
+}

@@ -274,8 +274,10 @@ import {
   NEARBY_DISTANCE_KM,
   activeQuickAction,
   applyNearby,
+  changeMyCountry,
   emptyOfferFilter,
   hasActiveOfferFilter,
+  moreFilterCount,
   toggleListValue,
   toggleQuickAction,
   type OfferFacets,
@@ -345,7 +347,7 @@ const countryOptions = computed(() => {
   return base
 })
 
-const moreCount = computed(() => props.state.platforms.length + props.state.countries.filter(c => c !== 'EU').length)
+const moreCount = computed(() => moreFilterCount(props.state, props.country))
 
 watch(() => props.state.zip, (value) => {
   if (value) zip.value = value
@@ -357,7 +359,10 @@ watch(() => props.loading, (loading) => {
 })
 
 function onCountrySelect(event: Event) {
-  emit('country', (event.target as HTMLSelectElement).value)
+  const next = (event.target as HTMLSelectElement).value
+  const changed = changeMyCountry(props.state, props.country, next)
+  emit('country', next)
+  if (changed !== props.state) emit('change', changed)
 }
 
 function closePanels(focusTrigger = false) {
