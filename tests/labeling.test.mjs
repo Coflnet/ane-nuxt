@@ -155,7 +155,7 @@ test('labeling strings exist in both locales and contain no bare plural separato
   assert.ok(keys.length > 30)
   for (const k of keys) {
     assert.ok(k in de, `${k} missing in de`)
-    assert.ok(!/(^|[^'])\|(?!')/.test(en[k].replaceAll("{'|'}", '')), `${k} en has bare pipe`)
-    assert.ok(!/\|/.test(de[k].replaceAll("{'|'}", '')), `${k} de has bare pipe`)
+    assert.ok(!en[k].replaceAll('{\'|\'}', '').includes('|'), `${k} en has bare pipe`)
+    assert.ok(!de[k].replaceAll('{\'|\'}', '').includes('|'), `${k} de has bare pipe`)
   }
 })
