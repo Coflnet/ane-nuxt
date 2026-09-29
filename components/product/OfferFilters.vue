@@ -1,6 +1,6 @@
 <template>
   <div
-    class="px-6 py-4 border-b border-slate-800 space-y-3"
+    class="relative px-6 py-4 border-b border-slate-800 space-y-3"
     role="group"
     :aria-label="$t('product.filters.groupLabel')"
     @keydown.esc="closePanels"
@@ -52,7 +52,7 @@
       </button>
 
       <!-- Nearby + popover -->
-      <div class="relative">
+      <div class="sm:relative">
         <button
           ref="nearbyButton"
           type="button"
@@ -72,7 +72,7 @@
         </button>
         <div
           v-if="nearbyOpen"
-          class="absolute left-0 z-30 mt-2 w-72 max-w-[calc(100vw-3rem)] rounded-xl bg-slate-800 border border-slate-600/50 shadow-2xl p-4 space-y-3"
+          class="absolute inset-x-6 sm:inset-x-auto sm:left-0 z-30 mt-2 sm:w-72 rounded-xl bg-slate-800 border border-slate-600/50 shadow-2xl p-4 space-y-3"
           role="dialog"
           :aria-label="$t('product.filters.nearbyTitle', { km: NEARBY_DISTANCE_KM })"
         >
@@ -177,7 +177,7 @@
       </div>
 
       <!-- More filters -->
-      <div class="relative">
+      <div class="sm:relative">
         <button
           ref="moreButton"
           type="button"
@@ -196,7 +196,7 @@
         </button>
         <div
           v-if="moreOpen"
-          class="absolute left-0 z-30 mt-2 w-72 max-w-[calc(100vw-3rem)] max-h-96 overflow-y-auto rounded-xl bg-slate-800 border border-slate-600/50 shadow-2xl p-4 space-y-4"
+          class="absolute inset-x-6 sm:inset-x-auto sm:left-0 z-30 mt-2 sm:w-72 max-h-96 overflow-y-auto rounded-xl bg-slate-800 border border-slate-600/50 shadow-2xl p-4 space-y-4"
           role="dialog"
           :aria-label="$t('product.filters.moreFilters')"
         >
