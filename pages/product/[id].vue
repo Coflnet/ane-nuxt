@@ -442,12 +442,61 @@
           </NuxtLink>
         </div>
 
-        <ProductListingTable
-          :listings="matches"
-          :product-id="productId"
-          :notify-url="notifyFilterHref"
-          @listing-unavailable="handleListingUnavailable"
+        <ProductOfferFilters
+          :state="offerFilter"
+          :country="myCountry"
+          :facets="offerFacets"
+          :loading="matchesLoading"
+          :zip-error="zipError"
+          @change="onOfferFilterChange"
+          @country="setMyCountry"
         />
+
+        <div
+          :class="{ 'opacity-60 transition-opacity': matchesLoading }"
+          :aria-busy="matchesLoading"
+        >
+          <ProductListingTable
+            :listings="matches"
+            :product-id="productId"
+            :notify-url="notifyFilterHref"
+            :has-active-filter="offerFilterActive"
+            :show-distance="offerFilterNearby"
+            @listing-unavailable="handleListingUnavailable"
+          />
+        </div>
+
+        <div
+          v-if="offerFilterActive && matches.length === 0 && !matchesLoading && matchesLoaded"
+          class="p-8 text-center"
+          data-testid="offer-filter-empty"
+        >
+          <p class="text-lg font-semibold text-slate-200 mb-1">
+            {{ $t('product.filters.empty.title') }}
+          </p>
+          <p class="text-sm text-slate-400 mb-4">
+            {{ offerFilterNearby ? $t('product.filters.empty.nearby', { km: offerFilter.maxDistance }) : $t('product.filters.empty.other') }}
+          </p>
+          <div class="flex flex-wrap justify-center gap-3">
+            <NuxtLink
+              :to="similarSearchHref"
+              class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors"
+            >
+              <Icon
+                name="tabler:search"
+                class="w-4 h-4"
+              />
+              {{ offerFilterNearby ? $t('product.filters.empty.similarNearby') : $t('product.filters.empty.similar') }}
+            </NuxtLink>
+            <button
+              type="button"
+              class="px-5 py-2.5 text-sm font-medium text-blue-400 hover:text-blue-300 border border-blue-500/30 hover:border-blue-500/50 rounded-lg transition-colors"
+              @click="onOfferFilterChange(emptyOfferFilter())"
+            >
+              {{ $t('product.filters.empty.showAll') }}
+            </button>
+          </div>
+        </div>
 
         <div class="p-4 bg-slate-800/30 text-center">
           <button class="text-blue-400 hover:text-blue-300 text-sm font-medium">
@@ -606,10 +655,25 @@
 import { getProduct, reportProductIssue, getPriceHistory, getPriceStats } from '~/src/api-client'
 import type { IssueType, Product, ProductMatch, PricePoint, PriceHistoryStats } from '~/src/api-client/types.gen'
 import ProductListingTable from '~/components/product/ProductListingTable.vue'
+import ProductOfferFilters from '~/components/product/OfferFilters.vue'
 import { useI18n } from 'vue-i18n'
 import { useUserStore } from '~/stores/user'
 import { buildProductResourceUrl } from '~/utils/productApiUrl'
 import { buildNotifyFilterUrl } from '~/utils/notifyFilterUrl'
+import {
+  activeQuickAction,
+  buildMatchesParams,
+  buildOfferFilterQuery,
+  buildSimilarSearchQuery,
+  emptyOfferFilter,
+  extractApiErrorMessage,
+  hasActiveOfferFilter,
+  parseOfferFacets,
+  parseOfferFilterQuery,
+  type OfferFacets,
+  type OfferFilterState,
+  type OfferMatchExtras,
+} from '~/utils/offerFilters'
 import {
   alternativeReasonLabelKey,
   buildCategoryFallbackUrl,
@@ -632,6 +696,20 @@ const zipCode = computed(() => (route.query.zip as string) || '')
 const lat = computed(() => route.query.lat ? Number(route.query.lat) : undefined)
 const lon = computed(() => route.query.lon ? Number(route.query.lon) : undefined)
 const maxDistance = computed(() => route.query.max_distance ? Number(route.query.max_distance) : undefined)
+
+// Offers filter: the state lives in the URL query so a filtered view can be shared.
+const { country: myCountry, setCountry: setMyCountry } = useOfferCountry()
+const offerFilter = computed<OfferFilterState>(() => parseOfferFilterQuery(route.query))
+const offerFilterActive = computed(() => hasActiveOfferFilter(offerFilter.value))
+const offerFilterNearby = computed(() => activeQuickAction(offerFilter.value, myCountry.value) === 'nearby')
+const offerFacets = ref<OfferFacets | null>(null)
+const matchesLoading = ref(false)
+const matchesLoaded = ref(false)
+const zipError = ref('')
+
+const similarSearchHref = computed(() =>
+  localePath({ path: '/search', query: buildSimilarSearchQuery(product.value?.name ?? '', offerFilter.value) }),
+)
 
 function buildAlternativesUrl(id: string): string {
   return buildProductResourceUrl(API_BASE, id, 'alternatives', { limit: 3 })
@@ -670,7 +748,7 @@ const priceStats = computed<PriceHistoryStats | null>(() => coreData.value?.pric
 
 // Secondary, non-SEO data — always fetched on the client after mount.
 const relatedProducts = ref<Product[]>([])
-const matches = ref<ProductMatch[]>([])
+const matches = ref<(ProductMatch & OfferMatchExtras)[]>([])
 const unavailableCount = ref(0)
 const imageErrorCount = ref(0)
 
@@ -689,6 +767,8 @@ const alternatives = computed<ProductAlternative[]>(() =>
 const showAlternatives = computed(() => {
   if (!product.value) return false
   if (product.value.hasActiveOffers === false) return true
+  // a filtered empty list has its own empty state; alternatives are for products without any offer
+  if (offerFilterActive.value) return false
   return matches.value.length === 0 && alternativesChecked.value
 })
 
@@ -1097,13 +1177,54 @@ function buildRelatedProductsUrl(id: string): string {
 }
 
 function buildMatchesUrl(id: string): string {
-  return buildProductResourceUrl(API_BASE, id, 'matches', {
-    zip: zipCode.value,
-    lat: lat.value,
-    lon: lon.value,
-    maxDistance: maxDistance.value,
-  })
+  return buildProductResourceUrl(API_BASE, id, 'matches', buildMatchesParams(offerFilter.value))
 }
+
+function buildFacetsUrl(id: string): string {
+  return `${buildProductResourceUrl(API_BASE, id, 'matches')}/facets`
+}
+
+function onOfferFilterChange(next: OfferFilterState) {
+  router.replace({ query: buildOfferFilterQuery(next, route.query) })
+}
+
+// Client-side reload of the offers on every filter change. A newer request supersedes an older one.
+let matchesSeq = 0
+let revertingZip = false
+async function loadMatches() {
+  const seq = ++matchesSeq
+  matchesLoading.value = true
+  if (!revertingZip) zipError.value = ''
+  revertingZip = false
+  try {
+    const result = await $fetch<(ProductMatch & OfferMatchExtras)[]>(buildMatchesUrl(productId))
+    if (seq !== matchesSeq) return
+    matches.value = result
+  }
+  catch (error) {
+    if (seq !== matchesSeq) return
+    const status = (error as { statusCode?: number, status?: number })?.statusCode ?? (error as { status?: number })?.status
+    if (status === 400 && offerFilter.value.zip) {
+      // unresolvable zip: show the message next to the input and drop the zip from the URL
+      zipError.value = extractApiErrorMessage(error, t('product.filters.zipInvalid'))
+      revertingZip = true
+      onOfferFilterChange({ ...offerFilter.value, zip: '', zipCountry: '', maxDistance: undefined })
+      return
+    }
+    matches.value = []
+  }
+  finally {
+    if (seq === matchesSeq) {
+      matchesLoading.value = false
+      matchesLoaded.value = true
+    }
+  }
+}
+
+watch(
+  () => JSON.stringify(offerFilter.value),
+  () => { if (matchesLoaded.value || matchesLoading.value) loadMatches() },
+)
 
 function handleListingUnavailable(_listingId: number | string) {
   unavailableCount.value++
@@ -1146,18 +1267,20 @@ async function submitProductReport() {
 // Listings + related products are interactive, non-SEO data — load on the
 // client so the server only waits on the SEO-critical product/price data.
 onMounted(async () => {
-  const [mRes, relatedRes] = await Promise.all([
-    $fetch<ProductMatch[]>(buildMatchesUrl(productId)).catch(() => []),
+  const [, relatedRes, facetsRes] = await Promise.all([
+    loadMatches(),
     $fetch<Product[]>(buildRelatedProductsUrl(productId)).catch(() => []),
+    // 404 on an older API: the filter then hides the counts
+    $fetch<unknown>(buildFacetsUrl(productId)).catch(() => null),
   ])
-  matches.value = mRes
   relatedProducts.value = relatedRes
+  offerFacets.value = parseOfferFacets(facetsRes)
 
   // Recheck: hasActiveOffers said "has offers" (or wasn't known yet) but the actual
   // matches list came back empty — the SSR fetch above skipped alternatives for
   // this case, so fetch them now. Skipped when hasActiveOffers already forced the
   // SSR fetch (=== false), since that result (even if empty) is authoritative.
-  if (product.value?.hasActiveOffers !== false && matches.value.length === 0) {
+  if (product.value?.hasActiveOffers !== false && matches.value.length === 0 && !offerFilterActive.value) {
     clientAlternatives.value = await $fetch<ProductAlternative[]>(buildAlternativesUrl(productId)).catch(() => [])
   }
   alternativesChecked.value = true
