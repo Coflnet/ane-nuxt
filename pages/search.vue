@@ -990,6 +990,7 @@ const hasActiveFilters = computed(
 )
 
 // Geolocation state
+const { requestBrowserPosition } = useUserLocation()
 const userLocation = ref<{ lat: number, lon: number } | null>(null)
 const distanceFilterKm = ref<number>(50)
 const zipCodeInput = ref<string>((route.query.zip as string) || '')
@@ -1482,6 +1483,13 @@ onMounted(async () => {
   const urlCountry = route.query.country as string
   if (urlCountry) {
     selectedCountryCode.value = urlCountry
+  }
+  // Restore a position handed over by lat/lon in the URL (product page "Search similar offers nearby")
+  const urlLat = Number(route.query.lat)
+  const urlLon = Number(route.query.lon)
+  if (route.query.lat && route.query.lon && Number.isFinite(urlLat) && Number.isFinite(urlLon) && !route.query.zip) {
+    userLocation.value = { lat: urlLat, lon: urlLon }
+    if (selectedMaxDistance.value) performSearch()
   }
   // Auto-resolve ZIP code from URL on page load
   const urlZip = route.query.zip as string
@@ -1988,30 +1996,26 @@ function applyBatteryFilter() {
   router.push({ query })
 }
 
-function requestLocation() {
+async function requestLocation() {
   selectedCountryCode.value = ''
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        userLocation.value = { lat: pos.coords.latitude, lon: pos.coords.longitude }
-        locationName.value = ''
-        zipCodeInput.value = ''
-        zipError.value = ''
-        // Remove zip from URL since we're using browser location
-        const query = { ...route.query } as Record<string, string>
-        delete query.zip
-        router.push({ query })
-        // If distance filter already set, re-trigger search
-        if (selectedMaxDistance.value) {
-          performSearch()
-        }
-      },
-      (err) => {
-        console.error('Geolocation error:', err)
-        alert('Could not get your location. Please allow location access or enter a ZIP code.')
-      },
-      { enableHighAccuracy: false, timeout: 10000 },
-    )
+  try {
+    const position = await requestBrowserPosition()
+    userLocation.value = { lat: position.lat, lon: position.lon }
+    locationName.value = ''
+    zipCodeInput.value = ''
+    zipError.value = ''
+    // Remove zip from URL since we're using browser location
+    const query = { ...route.query } as Record<string, string>
+    delete query.zip
+    router.push({ query })
+    // If distance filter already set, re-trigger search
+    if (selectedMaxDistance.value) {
+      performSearch()
+    }
+  }
+  catch (err) {
+    console.error('Geolocation error:', err)
+    alert('Could not get your location. Please allow location access or enter a ZIP code.')
   }
 }
 
