@@ -308,7 +308,12 @@ const COMMON_COUNTRIES = ['DE', 'AT', 'CH', 'NL', 'BE', 'FR', 'IT', 'ES', 'PL']
 const nearbyOpen = ref(false)
 const moreOpen = ref(false)
 const zip = ref(props.state.zip)
-const zipCountry = ref(props.state.zipCountry || props.country)
+// an explicit pick for the zip code wins, otherwise the zip code follows "My country"
+const zipCountryPick = ref(props.state.zipCountry)
+const zipCountry = computed({
+  get: () => zipCountryPick.value || props.country,
+  set: (value: string) => { zipCountryPick.value = value },
+})
 const locating = ref(false)
 const locationError = ref('')
 const nearbyButton = ref<HTMLButtonElement | null>(null)
@@ -320,7 +325,8 @@ const anyActive = computed(() => hasActiveOfferFilter(props.state))
 const shownZipError = computed(() => props.zipError || '')
 
 const countryChoices = computed(() => {
-  const codes = new Set<string>([props.country, ...COMMON_COUNTRIES])
+  // stable order: moving options around when the country changes confuses the selects
+  const codes = new Set<string>([...COMMON_COUNTRIES, props.country])
   for (const entry of props.facets?.countries ?? []) codes.add(entry.code)
   return [...codes].filter(code => code !== 'EU')
 })
