@@ -144,3 +144,18 @@ test('a failing send rejects for the caller but does not block later sends', asy
   await send('p1', 'different')
   assert.equal(calls, 2)
 })
+
+// Regression: vue-i18n treats "|" as the plural separator, so a placeholder with plain pipes
+// showed only its second part ("sneakers").
+test('labeling strings exist in both locales and contain no bare plural separator', async () => {
+  const { readFile } = await import('node:fs/promises')
+  const load = async n => JSON.parse(await readFile(new URL(`../locales/${n}.json`, import.meta.url), 'utf8'))
+  const [en, de] = await Promise.all([load('en'), load('de')])
+  const keys = Object.keys(en).filter(k => k.startsWith('labeling'))
+  assert.ok(keys.length > 30)
+  for (const k of keys) {
+    assert.ok(k in de, `${k} missing in de`)
+    assert.ok(!/(^|[^'])\|(?!')/.test(en[k].replaceAll("{'|'}", '')), `${k} en has bare pipe`)
+    assert.ok(!/\|/.test(de[k].replaceAll("{'|'}", '')), `${k} de has bare pipe`)
+  }
+})
