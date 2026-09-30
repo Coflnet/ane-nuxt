@@ -26,6 +26,12 @@ RUN set -eu; \
 	cp -R .output /app/.output
 
 FROM node:26-slim
+# upgrade so fixed Debian packages (openssl) land before the node tag is rebuilt
+RUN apt-get update \
+	&& apt-get upgrade -y --no-install-recommends \
+	&& rm -rf /var/lib/apt/lists/* \
+	# npm is only needed in the build stage; its bundled packages are the only other scan findings
+	&& rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
 WORKDIR /app
 
 COPY --from=build /app/.output ./.output
