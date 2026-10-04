@@ -164,6 +164,36 @@
             @click="removeAttributeFilter(String(key))"
           >&times;</button>
         </span>
+        <span
+          v-if="selectedOsVersionMin || selectedOsVersionSupports"
+          class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-purple-500/20 text-purple-400 text-xs border border-purple-500/30"
+        >
+          {{ localizeAttrKey('os_version') }}: {{ selectedOsVersionMin ? `${selectedOsVersionMin}+` : $t('osVersionRuns', { version: selectedOsVersionSupports }) }}
+          <button
+            class="ml-1 hover:text-white"
+            @click="clearOsVersion"
+          >&times;</button>
+        </span>
+        <span
+          v-if="selectedReleaseYearMin !== undefined || selectedReleaseYearMax !== undefined"
+          class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-purple-500/20 text-purple-400 text-xs border border-purple-500/30"
+        >
+          {{ localizeAttrKey('release_year') }}: {{ selectedReleaseYearMin ?? '…' }} – {{ selectedReleaseYearMax ?? '…' }}
+          <button
+            class="ml-1 hover:text-white"
+            @click="clearRange('release_year')"
+          >&times;</button>
+        </span>
+        <span
+          v-if="selectedScreenSizeMin !== undefined || selectedScreenSizeMax !== undefined"
+          class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-purple-500/20 text-purple-400 text-xs border border-purple-500/30"
+        >
+          {{ localizeAttrKey('screen_size') }}: {{ selectedScreenSizeMin ?? '…' }}&quot; – {{ selectedScreenSizeMax ?? '…' }}&quot;
+          <button
+            class="ml-1 hover:text-white"
+            @click="clearRange('screen_size')"
+          >&times;</button>
+        </span>
         <!-- Battery range badge -->
         <span
           v-if="selectedBatteryMin || selectedBatteryMax"
@@ -337,6 +367,82 @@
               </button>
             </div>
           </div>
+
+          <!-- Operating system -->
+          <div
+            v-if="hasOsFilter"
+            class="bg-slate-800/50 p-5 rounded-xl border border-slate-700/50"
+            data-testid="os-filter"
+          >
+            <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-3">
+              {{ localizeAttrKey('os') }}
+            </h3>
+            <div class="flex flex-wrap gap-2 max-h-44 overflow-y-auto">
+              <button
+                v-for="bucket in osBuckets"
+                :key="`os-${bucket.value}`"
+                class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors min-w-0 max-w-full sm:max-w-[220px]"
+                :class="selectedOs === bucket.value ? 'bg-purple-500/20 text-purple-400 font-medium' : 'text-slate-400 hover:bg-slate-700/50 hover:text-slate-200'"
+                @click="toggleOs(bucket.value!)"
+              >
+                <span class="truncate">{{ bucket.value }}</span>
+                <span class="text-xs opacity-60 ml-1 flex-shrink-0">({{ bucket.count }})</span>
+              </button>
+            </div>
+            <template v-if="osVersionBuckets.length > 0 || selectedOsVersionValue">
+              <div class="flex items-center justify-between mt-4 mb-2">
+                <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                  {{ localizeAttrKey('os_version') }}
+                </h4>
+                <label class="flex items-center gap-1.5 text-xs text-slate-400 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    class="accent-purple-500"
+                    :checked="osVersionOrNewer"
+                    data-testid="os-version-or-newer"
+                    @change="toggleOsVersionOrNewer"
+                  >
+                  {{ $t('orNewer', 'or newer') }}
+                </label>
+              </div>
+              <div class="flex flex-wrap gap-2 max-h-44 overflow-y-auto">
+                <button
+                  v-for="bucket in osVersionBuckets"
+                  :key="`os-version-${bucket.value}`"
+                  class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors min-w-0"
+                  :class="selectedOsVersionValue === bucket.value ? 'bg-purple-500/20 text-purple-400 font-medium' : 'text-slate-400 hover:bg-slate-700/50 hover:text-slate-200'"
+                  @click="toggleOsVersion(bucket.value!)"
+                >
+                  <span class="truncate">{{ bucket.value }}{{ osVersionOrNewer ? '+' : '' }}</span>
+                  <span class="text-xs opacity-60 ml-1 flex-shrink-0">({{ bucket.count }})</span>
+                </button>
+              </div>
+            </template>
+          </div>
+
+          <!-- Screen size range (inches) -->
+          <FiltersNumberRangeFilter
+            v-if="screenSizeBounds && screenSizeBounds.min < screenSizeBounds.max"
+            :title="localizeAttrKey('screen_size')"
+            :bounds="screenSizeBounds"
+            :selected-min="selectedScreenSizeMin"
+            :selected-max="selectedScreenSizeMax"
+            :step="0.1"
+            unit="&quot;"
+            test-id="screen-size"
+            @apply="range => applyRange('screen_size', range, screenSizeBounds)"
+          />
+
+          <!-- Release year range -->
+          <FiltersNumberRangeFilter
+            v-if="releaseYearBounds && releaseYearBounds.min < releaseYearBounds.max"
+            :title="localizeAttrKey('release_year')"
+            :bounds="releaseYearBounds"
+            :selected-min="selectedReleaseYearMin"
+            :selected-max="selectedReleaseYearMax"
+            test-id="release-year"
+            @apply="range => applyRange('release_year', range, releaseYearBounds)"
+          />
 
           <!-- Battery Range Filter -->
           <div
@@ -626,21 +732,11 @@
                 class="block bg-slate-800 rounded-xl overflow-hidden hover:ring-2 hover:ring-blue-500/50 transition-all hover:scale-[1.02] group"
               >
                 <div class="aspect-video bg-slate-900 relative">
-                  <NuxtImg
-                    v-if="product.imageUrl"
+                  <ProductImage
                     :src="product.imageUrl"
-                    class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
-                    loading="lazy"
+                    :alt="productDisplayName(product)"
+                    image-class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
                   />
-                  <div
-                    v-else
-                    class="w-full h-full flex items-center justify-center text-slate-600"
-                  >
-                    <Icon
-                      name="tabler:photo"
-                      class="w-12 h-12"
-                    />
-                  </div>
                   <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent">
                     <span
                       v-if="getDisplayCategory(product)"
@@ -946,6 +1042,17 @@ import { useUserLocation } from '~/composable/useUserLocation'
 import { useFormat } from '~/composable/useFormat'
 import { countPopulatedSubCategories, formatCategoryCount, getCategoryProductCount as getCategoryProductCountFor, normalizeCategoryCounts, resolveCategoryCount } from '~/utils/categoryCounts'
 import { resolveSearchCategoryParam } from '~/utils/searchCategoryParam'
+import {
+  SPEC_ATTRIBUTE_KEYS,
+  SPEC_RANGE_PARAMS,
+  bucketNumberBounds,
+  buildSpecApiFilters,
+  impliedOsFilter,
+  impliedOsLabel,
+  removeImpliedPhrase,
+  sortOsVersionBuckets,
+  withRangeParams,
+} from '~/utils/specFilters'
 
 const router = useRouter()
 const route = useRoute()
@@ -971,7 +1078,7 @@ const selectedMaxDistance = computed(() => route.query.max_distance ? Number(rou
 const activeAttributeFilters = computed(() => {
   const filters: Record<string, string> = {}
   for (const [key, value] of Object.entries(route.query)) {
-    if (key.startsWith('attr_') && typeof value === 'string') {
+    if (key.startsWith('attr_') && typeof value === 'string' && !(SPEC_RANGE_PARAMS as readonly string[]).includes(key)) {
       filters[key.slice(5)] = value
     }
   }
@@ -987,6 +1094,7 @@ const hasActiveFilters = computed(
     || !!selectedMaxDistance.value
     || selectedBatteryMin.value !== undefined
     || selectedBatteryMax.value !== undefined
+    || hasSpecRangeSelection.value
     || Object.keys(activeAttributeFilters.value).length > 0,
 )
 
@@ -1041,6 +1149,23 @@ const batteryFilterMax = ref<number>(100)
 const selectedBatteryMin = computed(() => route.query.attr_battery_min ? Number(route.query.attr_battery_min) : undefined)
 const selectedBatteryMax = computed(() => route.query.attr_battery_max ? Number(route.query.attr_battery_max) : undefined)
 
+// Spec filters: operating system (+ "or newer"), release year range, screen size range
+const selectedOsVersionMin = computed(() => (route.query.attr_os_version_min as string) || '')
+const selectedOsVersionSupports = computed(() => (route.query.attr_os_version_supports as string) || '')
+const selectedOsVersion = computed(() => (route.query.attr_os_version as string) || '')
+const osVersionOrNewer = ref(!!route.query.attr_os_version_min)
+const selectedNumber = (param: string) => computed(() => {
+  const raw = Number(String(route.query[param] ?? '').replace(',', '.'))
+  return route.query[param] && Number.isFinite(raw) && raw > 0 ? raw : undefined
+})
+const selectedReleaseYearMin = selectedNumber('attr_release_year_min')
+const selectedReleaseYearMax = selectedNumber('attr_release_year_max')
+const selectedScreenSizeMin = selectedNumber('attr_screen_size_min')
+const selectedScreenSizeMax = selectedNumber('attr_screen_size_max')
+const hasSpecRangeSelection = computed(() => !!selectedOsVersionMin.value || !!selectedOsVersionSupports.value
+  || selectedReleaseYearMin.value !== undefined || selectedReleaseYearMax.value !== undefined
+  || selectedScreenSizeMin.value !== undefined || selectedScreenSizeMax.value !== undefined)
+
 const manualLoading = ref(false)
 const loadingMore = ref(false)
 const hasSearched = ref(false)
@@ -1054,6 +1179,10 @@ interface SearchInterpretation {
   sortImplied?: boolean
   impliedMaxPrice?: number | null
   productTypes?: string[] | null
+  /** Structured filters read from the query text, e.g. { os: 'Android', os_version: '15' } */
+  impliedAttributes?: Record<string, string> | null
+  /** The text typed for them ("android 15+"), removed from the query when the chip is dismissed */
+  impliedAttributesPhrase?: string | null
 }
 const interpretation = ref<SearchInterpretation | null>(null)
 
@@ -1179,6 +1308,7 @@ const availableAttributeBuckets = computed(() => {
   for (const [key, buckets] of Object.entries(attributeBuckets.value)) {
     if (key.toLowerCase() === 'condition') continue // Skip condition, it has its own section
     if (rangeFilterAttrs.has(key.toLowerCase())) continue // Skip range attributes, they get their own UI
+    if (SPEC_ATTRIBUTE_KEYS.has(key.toLowerCase())) continue // Spec attributes have dedicated controls
 
     if (attrFilters[key]) {
       // If this attribute is already selected, show only that value
@@ -1204,6 +1334,57 @@ const hasBatteryBuckets = computed(() => {
   const buckets = attributeBuckets.value['battery']
   return buckets && buckets.length > 0
 })
+
+// Spec filter controls, fed by the (spec) facet buckets of the response
+const osBuckets = computed(() => (attributeBuckets.value['os'] ?? []).filter(b => b.value && (b.count ?? 0) > 0))
+const osVersionBuckets = computed(() => sortOsVersionBuckets(attributeBuckets.value['os_version']))
+const selectedOs = computed(() => (route.query.attr_os as string) || '')
+const selectedOsVersionValue = computed(() => selectedOsVersionMin.value || selectedOsVersionSupports.value || selectedOsVersion.value)
+const hasOsFilter = computed(() => osBuckets.value.length > 0 || osVersionBuckets.value.length > 0 || !!selectedOs.value || !!selectedOsVersionValue.value)
+const releaseYearBounds = computed(() => bucketNumberBounds(attributeBuckets.value['release_year']))
+const screenSizeBounds = computed(() => bucketNumberBounds(attributeBuckets.value['screen_size']))
+
+watch(() => [route.query.attr_os_version_supports, route.query.attr_os_version, route.query.attr_os_version_min], ([supports, exact, min]) => {
+  if (min) osVersionOrNewer.value = true
+  else if (supports || exact) osVersionOrNewer.value = false
+})
+
+const OS_VERSION_PARAMS = ['attr_os_version', 'attr_os_version_min', 'attr_os_version_supports'] as const
+
+function toggleOs(value: string) {
+  const query = queryWithoutKeys('attr_os')
+  if (selectedOs.value !== value) query.attr_os = value
+  router.push({ query })
+}
+
+function toggleOsVersion(value: string) {
+  const query = queryWithoutKeys(...OS_VERSION_PARAMS)
+  if (selectedOsVersionValue.value !== value) {
+    query[osVersionOrNewer.value ? 'attr_os_version_min' : 'attr_os_version_supports'] = value
+  }
+  router.push({ query })
+}
+
+function toggleOsVersionOrNewer() {
+  osVersionOrNewer.value = !osVersionOrNewer.value
+  const version = selectedOsVersionValue.value
+  if (!version) return
+  const query = queryWithoutKeys(...OS_VERSION_PARAMS)
+  query[osVersionOrNewer.value ? 'attr_os_version_min' : 'attr_os_version_supports'] = version
+  router.push({ query })
+}
+
+function applyRange(name: 'release_year' | 'screen_size', range: { min: number | null, max: number | null }, bounds: { min: number, max: number } | null) {
+  router.push({ query: withRangeParams(queryWithoutKeys(), name, range, bounds) })
+}
+
+function clearRange(name: 'release_year' | 'screen_size') {
+  router.push({ query: queryWithoutKeys(`attr_${name}_min`, `attr_${name}_max`) })
+}
+
+function clearOsVersion() {
+  router.push({ query: queryWithoutKeys(...OS_VERSION_PARAMS) })
+}
 
 // Products are now server-side filtered (category, condition, attributes all sent to API)
 const products = computed(() => allProducts.value)
@@ -1250,6 +1431,14 @@ const queryHints = computed(() => {
       action: { label: t('hintSortByRelevance', 'Sort by relevance'), run: () => onSortSelect('relevance') },
     })
   }
+  const impliedOs = impliedOsFilter(info.impliedAttributes)
+  if (impliedOs) {
+    hints.push({
+      key: 'implied-os',
+      text: t(impliedOs.mode === 'min' || !impliedOs.version ? 'hintImpliedOs' : 'hintImpliedOsRuns', { filter: impliedOsLabel(impliedOs) }),
+      action: { label: t('hintRemoveFilter', 'Remove'), run: removeImpliedOsFilter },
+    })
+  }
   if (info.impliedMaxPrice != null && selectedMaxPrice.value === undefined) {
     hints.push({
       key: 'max-price',
@@ -1258,6 +1447,14 @@ const queryHints = computed(() => {
   }
   return hints
 })
+
+function removeImpliedOsFilter() {
+  const phrase = interpretation.value?.impliedAttributesPhrase
+  const query = queryWithoutKeys('q')
+  const remaining = removeImpliedPhrase(searchQuery.value, phrase)
+  if (remaining) query.q = remaining
+  router.push({ query })
+}
 
 // --- Empty state: broader queries to try (drop one word at a time) ---
 const alternativeQueries = computed(() => {
@@ -1603,6 +1800,9 @@ const attrKeyTranslationMap: Record<string, string> = {
   'ram_size': 'attr_ram',
   'ram': 'attr_ram',
   'screen_size': 'attr_screen_size',
+  'os': 'attr_os',
+  'os_version': 'attr_os_version',
+  'release_year': 'attr_release_year',
   'material': 'attr_material',
   'style': 'attr_style',
   'type': 'attr_type',
@@ -1746,6 +1946,7 @@ function buildSearchParams(offset = 0) {
   // Battery range filter
   if (selectedBatteryMin.value !== undefined) attrArray.push(`battery_min:${selectedBatteryMin.value}`)
   if (selectedBatteryMax.value !== undefined) attrArray.push(`battery_max:${selectedBatteryMax.value}`)
+  attrArray.push(...buildSpecApiFilters(route.query))
   if (attrArray.length > 0) {
     params.attributes = attrArray
   }

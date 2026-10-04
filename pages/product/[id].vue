@@ -45,7 +45,9 @@
           <div class="aspect-square bg-slate-800 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/5 p-4">
             <NuxtImg
               v-if="productImageUrl"
+              ref="mainImage"
               :src="productImageUrl"
+              referrerpolicy="no-referrer"
               class="w-full h-full object-contain"
               @error="onProductImageError"
             />
@@ -368,22 +370,12 @@
             class="bg-slate-800/50 rounded-xl border border-slate-700/50 p-4 hover:border-blue-500/50 transition-colors group"
           >
             <div class="aspect-square bg-slate-900 rounded-lg overflow-hidden mb-3 relative">
-              <NuxtImg
-                v-if="alt.imageUrl"
+              <ProductImage
                 :src="alt.imageUrl"
                 :alt="alt.name ?? ''"
-                loading="lazy"
-                class="w-full h-full object-contain"
+                image-class="w-full h-full object-contain"
+                icon-class="w-10 h-10"
               />
-              <div
-                v-else
-                class="w-full h-full flex items-center justify-center text-slate-600"
-              >
-                <Icon
-                  name="tabler:photo"
-                  class="w-10 h-10"
-                />
-              </div>
               <span class="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-slate-900/80 text-[11px] font-medium text-cyan-400 border border-slate-700">
                 {{ $t(alternativeReasonLabelKey(alt.reason)) }}
               </span>
@@ -530,21 +522,11 @@
             class="bg-slate-900 rounded-xl border border-slate-800 p-4 hover:border-blue-500/50 transition-colors group"
           >
             <div class="aspect-square bg-slate-800 rounded-lg overflow-hidden mb-3">
-              <NuxtImg
-                v-if="rp.imageUrl"
+              <ProductImage
                 :src="rp.imageUrl"
-                loading="lazy"
-                class="w-full h-full object-contain"
+                image-class="w-full h-full object-contain"
+                icon-class="w-10 h-10"
               />
-              <div
-                v-else
-                class="w-full h-full flex items-center justify-center text-slate-600"
-              >
-                <Icon
-                  name="tabler:photo"
-                  class="w-10 h-10"
-                />
-              </div>
             </div>
             <h3 class="text-sm font-medium text-white truncate group-hover:text-blue-400 transition-colors">
               {{ rp.name }}
@@ -806,6 +788,16 @@ const productImageUrl = computed(() => {
 
 function onProductImageError() {
   imageErrorCount.value++
+}
+
+// An error that fired before hydration is never seen by the @error handler: a finished but empty
+// main image (the marketplace listing is gone, the URL answers 404) is treated as failed on mount.
+const mainImage = ref<{ $el?: Element } | null>(null)
+function checkMainImageLoaded() {
+  const element = mainImage.value?.$el
+  if (element instanceof HTMLImageElement && element.complete && element.naturalWidth === 0 && element.currentSrc) {
+    onProductImageError()
+  }
 }
 
 // "Notify me about new offers" — always visible near the offers header, and the primary
@@ -1277,6 +1269,7 @@ async function submitProductReport() {
 // Listings + related products are interactive, non-SEO data — load on the
 // client so the server only waits on the SEO-critical product/price data.
 onMounted(async () => {
+  checkMainImageLoaded()
   const [, relatedRes, facetsRes] = await Promise.all([
     loadMatches(),
     $fetch<Product[]>(buildRelatedProductsUrl(productId)).catch(() => []),
