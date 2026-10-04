@@ -39,6 +39,32 @@
         <span class="text-slate-200 truncate">{{ product.name }}</span>
       </nav>
 
+      <!-- Empty game case: not the game itself -->
+      <div
+        v-if="isCasePage"
+        class="mb-6 rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 flex flex-wrap items-center gap-x-4 gap-y-2"
+        role="note"
+        data-testid="case-page-marker"
+      >
+        <Icon
+          name="tabler:alert-triangle"
+          class="w-6 h-6 text-amber-400 shrink-0"
+        />
+        <p class="text-amber-200 font-semibold text-lg">
+          {{ $t('product.relations.emptyCaseNotice') }}
+        </p>
+        <NuxtLink
+          v-if="gamePageId"
+          :to="localePath(`/product/${gamePageId}`)"
+          class="ml-auto text-sm font-medium text-blue-300 hover:text-blue-200 underline"
+          data-testid="case-page-game-link"
+        >
+          {{ $t('product.relations.goToGame') }}<template v-if="relations?.caseOf?.name">
+            : {{ relations.caseOf.name }}
+          </template>
+        </NuxtLink>
+      </div>
+
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
         <!-- Main Image -->
         <div class="lg:col-span-1">
@@ -95,8 +121,60 @@
           </div>
 
           <h1 class="text-4xl font-bold text-white mb-4 leading-tight">
-            {{ product.name }}
+            {{ isCasePage ? caseTitle(product.name ?? '', relations?.localizedNames, locale) : product.name }}
           </h1>
+          <p
+            v-if="nameSubtitle"
+            class="text-slate-400 text-lg -mt-2 mb-4"
+            data-testid="localized-subtitle"
+          >
+            {{ nameSubtitle }}
+          </p>
+
+          <!-- Related pages: not merged variants, always labelled -->
+          <div
+            v-if="relations && (relations.casePages.length > 0 || relations.editions.length > 0)"
+            class="mb-6 space-y-3"
+          >
+            <p
+              v-if="relations.casePages.length > 0"
+              class="text-sm text-slate-300"
+              data-testid="game-case-links"
+            >
+              <span class="text-amber-300 font-medium">{{ $t('product.relations.emptyCaseForGame') }}:</span>
+              <NuxtLink
+                v-for="(page, index) in relations.casePages"
+                :key="page.id"
+                :to="localePath(`/product/${page.id}`)"
+                class="ml-2 text-blue-400 hover:text-blue-300 underline"
+              >{{ caseTitle(page.name, null, locale) }}<span v-if="index < relations.casePages.length - 1">,</span></NuxtLink>
+            </p>
+            <div
+              v-if="relations.editions.length > 0"
+              data-testid="language-editions"
+            >
+              <h2 class="text-sm font-semibold text-slate-300 mb-2">
+                {{ $t('product.relations.otherEditions') }}
+              </h2>
+              <ul class="flex flex-wrap gap-2">
+                <li
+                  v-for="edition in relations.editions"
+                  :key="edition.id"
+                >
+                  <NuxtLink
+                    :to="localePath(`/product/${edition.id}`)"
+                    class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 text-sm text-slate-200 hover:border-blue-500"
+                  >
+                    <span
+                      v-if="editionLanguageLabel(edition.language)"
+                      class="text-xs font-semibold text-blue-400"
+                    >{{ editionLanguageLabel(edition.language) }}</span>
+                    <span>{{ edition.name }}</span>
+                  </NuxtLink>
+                </li>
+              </ul>
+            </div>
+          </div>
 
           <p
             v-if="product.description && product.description !== product.name"
@@ -653,6 +731,15 @@ import { useOfferCountry } from '~/composable/useOfferCountry'
 import { buildProductResourceUrl } from '~/utils/productApiUrl'
 import { buildNotifyFilterUrl } from '~/utils/notifyFilterUrl'
 import {
+  caseOfId,
+  caseTitle,
+  editionLanguageLabel,
+  fetchProductRelations,
+  isGameCaseProduct,
+  localizedSubtitle,
+  type ProductRelations,
+} from '~/utils/productRelations'
+import {
   activeQuickAction,
   buildMatchesParams,
   buildOfferFilterQuery,
@@ -680,7 +767,7 @@ const route = useRoute()
 const productId = route.params.id as string
 const router = useRouter()
 const localePath = useLocalePath()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const userStore = useUserStore()
 const API_BASE = useApiBaseUrl()
 
@@ -737,6 +824,15 @@ const { data: coreData, loading } = useRaceableAsyncData(
 const product = computed<ProductWithOffers | null>(() => coreData.value?.product ?? null)
 const priceHistory = computed<PricePoint[]>(() => coreData.value?.priceHistory ?? [])
 const priceStats = computed<PriceHistoryStats | null>(() => coreData.value?.priceStats ?? null)
+
+// Localized names, case page link and other language editions. The endpoint exists only on a deployed
+// API of this version: a 404 or any error simply leaves the section out. The case marker itself
+// comes from the product attributes, so it does not depend on this request.
+const relations = ref<ProductRelations | null>(null)
+const isCasePage = computed(() => isGameCaseProduct(product.value))
+const gamePageId = computed(() => relations.value?.caseOf?.id ?? caseOfId(product.value))
+const nameSubtitle = computed(() =>
+  isCasePage.value ? null : localizedSubtitle(relations.value?.localizedNames, locale.value, product.value?.name))
 
 // Secondary, non-SEO data — always fetched on the client after mount.
 const relatedProducts = ref<Product[]>([])
@@ -835,7 +931,7 @@ const filteredAttributes = computed<Record<string, string>>(() => {
   if (!attrs) return {}
   const result: Record<string, string> = {}
   for (const [key, value] of Object.entries(attrs)) {
-    if (key.toLowerCase() === 'condition') continue
+    if (key.toLowerCase() === 'condition' || key === 'product_kind' || key === 'case_of') continue
     result[key] = value
   }
   return result
@@ -1270,6 +1366,9 @@ async function submitProductReport() {
 // client so the server only waits on the SEO-critical product/price data.
 onMounted(async () => {
   checkMainImageLoaded()
+  fetchProductRelations(API_BASE, productId, url => $fetch(url)).then((result) => {
+    relations.value = result
+  })
   const [, relatedRes, facetsRes] = await Promise.all([
     loadMatches(),
     $fetch<Product[]>(buildRelatedProductsUrl(productId)).catch(() => []),

@@ -92,6 +92,8 @@ export default defineNuxtConfig({
     // Internal tool: depends on the visitor, so never prerendered or cached, and never indexed.
     '/labeling': { prerender: false, swr: false, cache: false, robots: false },
     '/de/labeling': { prerender: false, swr: false, cache: false, robots: false },
+    '/unidentified-games': { prerender: false, swr: false, cache: false, robots: false },
+    '/de/unidentified-games': { prerender: false, swr: false, cache: false, robots: false },
   },
 
   future: {
@@ -177,7 +179,7 @@ export default defineNuxtConfig({
   },
 
   sitemap: {
-    exclude: ['/labeling', '/de/labeling'],
+    exclude: ['/labeling', '/de/labeling', '/unidentified-games', '/de/unidentified-games'],
     sources: [
       '/api/__sitemap__/urls',
     ],

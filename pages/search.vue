@@ -747,6 +747,11 @@
                   </div>
                 </div>
                 <div class="p-5">
+                  <span
+                    v-if="isGameCaseProduct(product)"
+                    class="inline-flex items-center gap-1 px-2 py-0.5 mb-2 rounded text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40"
+                    data-testid="empty-case-badge"
+                  >{{ $t('product.relations.emptyCaseBadge') }}</span>
                   <h3 class="text-lg font-semibold text-slate-100 mb-2 line-clamp-2 min-h-[3.5rem]">
                     {{ productDisplayName(product) }}
                   </h3>
@@ -1042,6 +1047,7 @@ import { useUserLocation } from '~/composable/useUserLocation'
 import { useFormat } from '~/composable/useFormat'
 import { countPopulatedSubCategories, formatCategoryCount, getCategoryProductCount as getCategoryProductCountFor, normalizeCategoryCounts, resolveCategoryCount } from '~/utils/categoryCounts'
 import { resolveSearchCategoryParam } from '~/utils/searchCategoryParam'
+import { isGameCaseProduct } from '~/utils/productRelations'
 import {
   SPEC_ATTRIBUTE_KEYS,
   SPEC_RANGE_PARAMS,
@@ -2465,6 +2471,7 @@ function getTopAttributes(product: ProductDocument, limit = 4): ProductAttribute
     'old_price', 'original_price', 'currency',
     'location_id', 'seller_id', 'shop_id', 'user_id', 'item_id',
     'does_not_come_from_search_engine__teaser_attribute', 'teaser_attribute',
+    'product_kind', 'case_of',
   ])
   return product.attributes
     .filter((a: ProductAttribute) => a.key && a.value
