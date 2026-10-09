@@ -224,6 +224,7 @@ import type { IssueType, ProductMatch as GeneratedProductMatch } from '~/src/api
 import { countryFlag } from '~/utils/countryDetection'
 import type { OfferMatchExtras } from '~/utils/offerFilters'
 import { useAvailabilityCheck } from '~/composable/useAvailabilityCheck'
+import { useListingOpener } from '~/composable/useListingOpener'
 
 // the generated client predates platform/country/shipping/distanceKm; all optional so an old API still works
 type ProductMatch = GeneratedProductMatch & OfferMatchExtras

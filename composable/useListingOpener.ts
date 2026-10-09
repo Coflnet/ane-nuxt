@@ -1,3 +1,4 @@
+import { useAvailabilityCheck } from '~/composable/useAvailabilityCheck'
 import { decideOpen, isPlainLeftClick, runAvailabilityCheck } from '~/utils/listingOpen'
 
 interface OpenListingOptions {
