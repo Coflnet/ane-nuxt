@@ -68,6 +68,19 @@
               {{ listing.title }}
             </a>
             <span
+              v-if="unavailableListings.has(listing.listingId || listing.productId || '')"
+              class="block text-xs text-red-400 mt-0.5"
+              role="status"
+            >
+              {{ $t('product.soldOrRemoved', 'Already sold or removed') }}
+              <a
+                :href="listing.listingUrl ?? undefined"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="underline hover:text-red-300 ml-1"
+              >{{ $t('product.openAnyway', 'open anyway') }}</a>
+            </span>
+            <span
               v-if="showDistance && typeof listing.distanceKm === 'number'"
               class="block text-xs text-slate-500 mt-0.5"
             >
@@ -85,10 +98,10 @@
               <a
                 :href="listing.listingUrl ?? undefined"
                 target="_blank"
-                rel="noopener"
+                rel="noopener noreferrer"
                 class="inline-flex items-center gap-1 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-full transition-all hover:scale-105 shadow-lg shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 :class="{ 'pointer-events-none opacity-50': checkingAvailability.has(listing.listingId || listing.productId || '') }"
-                @click.prevent="handleViewDeal(listing)"
+                @click="handleViewDeal($event, listing)"
               >
                 <Icon
                   v-if="checkingAvailability.has(listing.listingId || listing.productId || '')"
@@ -254,7 +267,8 @@ const issueTypes: { value: IssueType, label: string }[] = [
   { value: 'Other', label: 'Other issue' },
 ]
 
-const { getMarketplaceName, checkAvailability: checkAvailabilityUtil } = useAvailabilityCheck()
+const { getMarketplaceName } = useAvailabilityCheck()
+const { openListing } = useListingOpener()
 
 function formatPrice(amount: number | undefined | null) {
   if (!amount) return 'N/A'
@@ -266,12 +280,7 @@ function formatDate(dateStr: string | undefined | null) {
   return new Date(dateStr).toLocaleDateString('de-DE', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
 }
 
-async function checkAvailability(listing: ProductMatch): Promise<boolean> {
-  const listingId = listing.listingId || listing.productId || ''
-  return checkAvailabilityUtil(listingId, listing.listingUrl)
-}
-
-async function handleViewDeal(listing: ProductMatch) {
+async function handleViewDeal(e: MouseEvent, listing: ProductMatch) {
   const listingId = listing.listingId || listing.productId || ''
 
   if (listingId) {
@@ -279,17 +288,15 @@ async function handleViewDeal(listing: ProductMatch) {
   }
 
   try {
-    const isAvailable = await checkAvailability(listing)
-
-    if (!isAvailable && listingId) {
-      unavailableListings.value.add(listingId)
-      emit('listingUnavailable', listingId)
-    }
-
-    // Always open the link, even if unavailable (user might want to verify)
-    if (listing.listingUrl) {
-      window.open(listing.listingUrl, '_blank')
-    }
+    await openListing(e, {
+      listingId,
+      url: listing.listingUrl,
+      onUnavailable: () => {
+        if (!listingId) return
+        unavailableListings.value.add(listingId)
+        emit('listingUnavailable', listingId)
+      },
+    })
   }
   finally {
     if (listingId) {

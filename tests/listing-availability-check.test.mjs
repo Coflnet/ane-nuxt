@@ -13,18 +13,14 @@ import test from 'node:test'
 // skipping the check it claimed to perform. The real listing URL is only available via
 // `listingStore.constructListingUrl(...)`, which must be computed once and reused for both
 // the availability check and the actual navigation.
-test('recent-match availability check uses the real listing URL, not a nonexistent field', async () => {
+test('recent-match click computes the real listing URL once and passes it to the shared opener', async () => {
   const source = await readFile(new URL('../components/overview/RecentMatchTable.vue', import.meta.url), 'utf8')
 
-  const fnMatch = source.match(/async function tableClicked\(auction: FilterMatch\) \{([\s\S]*?)\n\}/)
+  const fnMatch = source.match(/async function tableClicked\(e: MouseEvent, auction: FilterMatch\) \{([\s\S]*?)\n\}/)
   assert.ok(fnMatch, 'tableClicked function not found in RecentMatchTable.vue')
   const body = fnMatch[1]
 
   assert.ok(!body.includes('listingData?.url'), 'listingData.url does not exist on StoredListing')
-
-  const urlAssignment = body.match(/const url = listingStore\.constructListingUrl\(([^)]*)\)/)
-  assert.ok(urlAssignment, 'expected the listing URL to be computed via listingStore.constructListingUrl')
-
-  assert.match(body, /checkAvailability\(listingId, url\)/, 'availability check must use the computed url')
-  assert.match(body, /navigateTo\(url,/, 'navigation must reuse the same computed url')
+  assert.match(body, /const url = listingStore\.constructListingUrl\(/)
+  assert.match(body, /openListing\(e, \{[\s\S]*listingId,[\s\S]*url,/, 'availability check and navigation must use the computed url')
 })

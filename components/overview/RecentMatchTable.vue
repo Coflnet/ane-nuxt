@@ -15,7 +15,7 @@
           :key="index"
           class="border-b border-slate-700 hover:bg-slate-700/50 cursor-pointer"
           :aria-label="`Auction ${auction.listingData?.title ?? 'Unknown'}`"
-          @click="tableClicked(auction)"
+          @click="tableClicked($event, auction)"
         >
           <td class="px-4 py-3 text-sm text-white">
             <div class="flex items-center space-x-3">
@@ -28,6 +28,20 @@
               <div>
                 <p class="font-medium line-clamp-2">
                   {{ auction.listingData?.title }}
+                </p>
+                <p
+                  v-if="unavailableIds.has(auction.listingData?.id ?? '')"
+                  class="text-xs text-red-400"
+                  role="status"
+                >
+                  {{ $t('product.soldOrRemoved', 'Already sold or removed') }}
+                  <a
+                    :href="listingStore.constructListingUrl(auction.listingData, locale)"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="underline hover:text-red-300 ml-1"
+                    @click.stop
+                  >{{ $t('product.openAnyway', 'open anyway') }}</a>
                 </p>
                 <UiFooterLabel
                   v-if="'marketplace' in auction"
@@ -85,7 +99,7 @@ import { useWindowSize } from '@vueuse/core'
 import humanizeDuration from 'humanize-duration'
 import type { FilterMatch } from '~/src/api-client'
 import { useFormat } from '~/composable/useFormat'
-import { useAvailabilityCheck } from '~/composable/useAvailabilityCheck'
+import { useListingOpener } from '~/composable/useListingOpener'
 
 const { width } = useWindowSize()
 const { locale } = useI18n()
@@ -109,25 +123,22 @@ const props = defineProps({
 
 const listingStore = useListingStore()
 const filterStore = useFilterStore()
-const { checkAvailability } = useAvailabilityCheck()
+const { openListing } = useListingOpener()
 
-async function tableClicked(auction: FilterMatch) {
+const unavailableIds = ref<Set<string | number>>(new Set())
+
+async function tableClicked(e: MouseEvent, auction: FilterMatch) {
   const url = listingStore.constructListingUrl(auction.listingData, locale.value)
-
-  // Check availability before opening link
   const listingId = auction.listingData?.id
-  if (listingId) {
-    const isAvailable = await checkAvailability(listingId, url)
-    if (!isAvailable) {
-      console.warn('Listing unavailable:', listingId)
-      // Still open the link, but user is warned via console
-    }
-  }
 
-  navigateTo(url, {
-    external: true,
-    open: {
-      target: '_blank',
+  await openListing(e, {
+    listingId,
+    url,
+    onUnavailable: () => {
+      if (listingId) unavailableIds.value.add(listingId)
+    },
+    fallback: () => {
+      navigateTo(url, { external: true, open: { target: '_blank' } })
     },
   })
 }

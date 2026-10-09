@@ -3,7 +3,9 @@
     <a
       :href="auctionUrl"
       aria-label="Auction link"
-      @click.prevent="handleAuctionClick"
+      target="_blank"
+      rel="noopener noreferrer"
+      @click="handleAuctionClick"
     >
       <img
         :src="auction.listingData!.imageUrls![0] ?? ''"
@@ -32,6 +34,19 @@
   </div>
 
   <div class="p-4">
+    <p
+      v-if="unavailable"
+      class="text-xs text-red-400 mb-2"
+      role="status"
+    >
+      {{ $t('product.soldOrRemoved', 'Already sold or removed') }}
+      <a
+        :href="auctionUrl"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="underline hover:text-red-300 ml-1"
+      >{{ $t('product.openAnyway', 'open anyway') }}</a>
+    </p>
     <div class="flex justify-between">
       <a :href="auctionUrl">
         <div class="flex items-start justify-between mb-2">
@@ -75,14 +90,14 @@
 import { Icon, UiHeaderLabel } from '#components'
 import type { FilterMatch } from '~/src/api-client'
 import { useFormat } from '~/composable/useFormat'
-import { useAvailabilityCheck } from '~/composable/useAvailabilityCheck'
+import { useListingOpener } from '~/composable/useListingOpener'
 
 const { locale } = useI18n()
 const localePath = useLocalePath()
 
 const filterStore = useFilterStore()
 const listingStore = useListingStore()
-const { checkAvailability } = useAvailabilityCheck()
+const { openListing } = useListingOpener()
 
 const props = defineProps<{
   auction: FilterMatch
@@ -97,20 +112,15 @@ const auctionUrl = computed(() => {
   return url
 })
 
-async function handleAuctionClick() {
-  // Check availability before opening link
-  const listingId = props.auction.listingData?.id
-  if (listingId && auctionUrl.value) {
-    const isAvailable = await checkAvailability(listingId, auctionUrl.value)
-    if (!isAvailable) {
-      console.warn('Listing unavailable:', listingId)
-      // Still open the link, but user is warned via console
-    }
-  }
+const unavailable = ref(false)
 
-  // Open the link
-  if (auctionUrl.value) {
-    window.open(auctionUrl.value, '_blank')
-  }
+function handleAuctionClick(e: MouseEvent) {
+  return openListing(e, {
+    listingId: props.auction.listingData?.id,
+    url: auctionUrl.value,
+    onUnavailable: () => {
+      unavailable.value = true
+    },
+  })
 }
 </script>

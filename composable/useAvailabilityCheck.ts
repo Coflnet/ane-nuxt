@@ -1,4 +1,5 @@
 import type { Platform } from '~/src/api-client'
+import { AVAILABILITY_TIMEOUT_MS } from '~/utils/listingOpen'
 
 export const useAvailabilityCheck = () => {
   const platformMap: Record<string, Platform> = {
@@ -45,7 +46,7 @@ export const useAvailabilityCheck = () => {
     if (platform === 'Unknown') return true
 
     try {
-      const response = await $fetch<{ isAvailable: boolean }>(`https://ane.coflnet.com/api/Product/${platform}/${listingId}/available`)
+      const response = await $fetch<{ isAvailable: boolean }>(`https://ane.coflnet.com/api/Product/${platform}/${listingId}/available`, { timeout: AVAILABILITY_TIMEOUT_MS })
       return response.isAvailable
     }
     catch (error) {
