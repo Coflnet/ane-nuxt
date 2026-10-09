@@ -1045,6 +1045,7 @@ import type { ProductAttribute, ProductDocument, FilterBucket, SearchProductsRes
 import { useCategories } from '~/composable/useCategories'
 import { useUserLocation } from '~/composable/useUserLocation'
 import { useFormat } from '~/composable/useFormat'
+import { searchRouteQuery } from '~/utils/searchQuery'
 import { countPopulatedSubCategories, formatCategoryCount, getCategoryProductCount as getCategoryProductCountFor, normalizeCategoryCounts, resolveCategoryCount } from '~/utils/categoryCounts'
 import { resolveSearchCategoryParam } from '~/utils/searchCategoryParam'
 import { isGameCaseProduct } from '~/utils/productRelations'
@@ -2336,7 +2337,7 @@ function clearPriceFilter() {
 }
 
 function onSearch(query: string) {
-  router.push({ query: { q: query } })
+  router.push({ query: searchRouteQuery(query) })
 }
 
 function onSearchCategorySelect(slug: string) {

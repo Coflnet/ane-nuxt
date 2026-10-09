@@ -66,6 +66,7 @@
   "editFilter": "Edit Filter",
   "email": "Email",
   "endsToday": "Ends today",
+  "searchHeader": "Search",
   "featuresHeader": "Features",
   "filter": "Filter",
   "filterName": "Filter Name",
@@ -237,6 +238,8 @@
   "smartWayToFindDeals": "The smart way to find deals and make profits on online marketplaces.",
   "startFindingDeals": "Start finding deals",
   "hero": {
+    "popular": "Popular:",
+    "browseCategories": "Browse categories",
     "badge": "#1 Marketplace Monitoring Tool",
     "marketingTextNeverMissADeal": {
       "text": "Never miss a {deal} again",
@@ -247,7 +250,7 @@
     "usersJoined": "users already joined",
     "notification": {
       "title": "New Match Found!",
-      "content": "PlayStation 5 - $399"
+      "content": "PlayStation 5 - €399"
     }
   },
   "stats": {

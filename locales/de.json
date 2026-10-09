@@ -65,6 +65,7 @@
   "editFilter": "Filter bearbeiten",
   "email": "E-Mail",
   "endsToday": "Ended heute",
+  "searchHeader": "Suche",
   "featuresHeader": "Funktionen",
   "filter": "Filter",
   "filterName": "Filter Name",
@@ -287,6 +288,8 @@
   "faqHeader": "FAQ",
   "howItWorksHeader": "So funktioniert's",
   "hero": {
+    "popular": "Beliebt:",
+    "browseCategories": "Kategorien durchsuchen",
     "badge": "#1 Marktplatz-Überwachungstool",
     "marketingTextNeverMissADeal": {
       "text": "Verpasse nie wieder ein {deal}",
@@ -297,7 +300,7 @@
     "usersJoined": "Benutzer sind bereits beigetreten",
     "notification": {
       "title": "Neuer Treffer gefunden!",
-      "content": "PlayStation 5 - $399"
+      "content": "PlayStation 5 - 399 €"
     }
   },
   "stats": {

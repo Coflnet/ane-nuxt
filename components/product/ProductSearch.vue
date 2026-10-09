@@ -374,10 +374,8 @@ function handleSearch() {
     }
     return
   }
-  const q = query.value.trim()
-  if (q) {
-    emit('search', q)
-  }
+  // An empty submit is still emitted: callers send the user to the category browser
+  emit('search', query.value.trim())
 }
 
 function selectSuggestion(s: ProductSuggestion) {

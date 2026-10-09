@@ -22,6 +22,10 @@
           <div class="hidden md:block">
             <div class="flex items-center space-x-8">
               <a
+                :href="localePath('/search')"
+                class="text-gray-300 hover:text-indigo-400 transition-colors"
+              >{{ $t('searchHeader') }}</a>
+              <a
                 :href="localePath('/#features')"
                 class="text-gray-300 hover:text-indigo-400 transition-colors"
               >{{ $t('featuresHeader')
@@ -78,6 +82,10 @@
           v-if="mobileMenuOpen"
           class="md:hidden mt-4 space-y-4 text-center"
         >
+          <a
+            :href="localePath('/search')"
+            class="block text-gray-300 hover:text-indigo-400 py-2"
+          >{{ $t('searchHeader') }}</a>
           <a
             :href="localePath('/#features')"
             class="block text-gray-300 hover:text-indigo-400 py-2"

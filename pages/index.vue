@@ -30,6 +30,19 @@
                 @search="handleSearch"
                 @select-category="handleCategorySelect"
               />
+              <div class="mt-4 flex flex-wrap items-center gap-2 text-sm">
+                <span class="text-gray-400">{{ $t('hero.popular') }}</span>
+                <a
+                  v-for="term in popularSearches"
+                  :key="term"
+                  :href="localePath({ path: '/search', query: { q: term } })"
+                  class="px-3 py-1 rounded-full bg-gray-800 text-gray-200 hover:bg-gray-700 hover:text-white transition-colors"
+                >{{ term }}</a>
+              </div>
+              <a
+                :href="localePath('/search')"
+                class="inline-block mt-3 text-indigo-400 hover:text-indigo-300 underline underline-offset-4 text-sm"
+              >{{ $t('hero.browseCategories') }}</a>
             </div>
             <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
               <a
@@ -1317,6 +1330,7 @@ import { User } from 'lucide-vue-next'
 import { useIntersectionObserver } from '@vueuse/core'
 import { definePageMeta } from '#imports'
 import { useCategories } from '~/composable/useCategories'
+import { searchRouteQuery } from '~/utils/searchQuery'
 
 const localePath = useLocalePath()
 const userStore = import.meta.client ? useUserStore() : null
@@ -1354,8 +1368,10 @@ const fadeInUp = (el: HTMLElement) => {
 
 const { toUrlSlug } = useCategories()
 
+const popularSearches = ['iPhone 15', 'PlayStation 5', 'MacBook', 'Nintendo Switch', 'Fahrrad', 'Lego']
+
 const handleSearch = (query: string) => {
-  navigateTo(localePath({ path: '/search', query: { q: query } }))
+  navigateTo(localePath({ path: '/search', query: searchRouteQuery(query) }))
 }
 
 // Category picked in the typeahead: previously unhandled on the home page
