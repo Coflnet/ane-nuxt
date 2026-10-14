@@ -525,8 +525,9 @@ async function saveFlipFilter() {
 
   const filterData: Array<{ name: string, value: string }> = []
   filterData.push({ name: 'IsFlipNotification', value: 'true' })
+  if (hasSelectedCurrency.value) filterData.push({ name: 'ReferenceCurrency', value: filters.currency })
   if (filters.search) filterData.push({ name: 'SearchTerm', value: filters.search })
-  if (filters.minProfit > 0) filterData.push({ name: 'MinProfit', value: String(filters.minProfit) })
+  if (hasSelectedCurrency.value && filters.minProfit > 0) filterData.push({ name: 'MinProfit', value: String(filters.minProfit) })
   if (filters.minRefs > 0) filterData.push({ name: 'MinReferences', value: String(filters.minRefs) })
   if (filters.category) filterData.push({ name: 'ContainsKeyWord', value: JSON.stringify([filters.category]) })
 
