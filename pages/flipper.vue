@@ -46,7 +46,10 @@
               <option value="newest">
                 {{ $t('sortNewest') }}
               </option>
-              <option value="profit">
+              <option
+                value="profit"
+                :disabled="!hasSelectedCurrency"
+              >
                 {{ $t('sortProfit') }}
               </option>
               <option value="distance">
@@ -130,6 +133,33 @@
     <UiDefaultContainer class="mb-4 p-4">
       <div class="flex flex-wrap gap-3 items-end">
         <div class="flex flex-col gap-1">
+          <label class="text-xs text-gray-400">{{ $t('currency', 'Currency') }}</label>
+          <select
+            v-model="filters.currency"
+            class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-36 focus:border-blue-500 focus:outline-none"
+          >
+            <option value="EUR">
+              EUR
+            </option>
+            <option value="*">
+              {{ $t('allCurrencies', 'All currencies') }}
+            </option>
+            <option
+              v-for="currency in availableCurrencies"
+              :key="currency"
+              :value="currency"
+            >
+              {{ currency }}
+            </option>
+            <option
+              v-if="hasUnknownCurrency"
+              value="UNKNOWN"
+            >
+              {{ $t('unknownCurrency', 'Unknown currency') }}
+            </option>
+          </select>
+        </div>
+        <div class="flex flex-col gap-1">
           <label class="text-xs text-gray-400">{{ $t('search') }}</label>
           <input
             v-model="filters.search"
@@ -139,12 +169,13 @@
           >
         </div>
         <div class="flex flex-col gap-1">
-          <label class="text-xs text-gray-400">{{ $t('minProfit') }}</label>
+          <label class="text-xs text-gray-400">{{ $t('minProfit') }} ({{ filters.currency }})</label>
           <input
             v-model.number="filters.minProfit"
             type="number"
+            :disabled="!hasSelectedCurrency"
             placeholder="0"
-            class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-24 focus:border-blue-500 focus:outline-none"
+            class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-24 focus:border-blue-500 focus:outline-none disabled:opacity-50"
           >
         </div>
         <div class="flex flex-col gap-1">
@@ -152,8 +183,9 @@
           <input
             v-model.number="filters.minMarginPct"
             type="number"
+            :disabled="!hasSelectedCurrency"
             placeholder="0"
-            class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-24 focus:border-blue-500 focus:outline-none"
+            class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-24 focus:border-blue-500 focus:outline-none disabled:opacity-50"
           >
         </div>
         <div class="flex flex-col gap-1">
@@ -533,11 +565,33 @@ async function saveFlipFilter() {
 }
 
 // --- Filters (persisted to localStorage) ---
-const defaultFilters = { search: '', minProfit: 0, minMarginPct: 0, minRefs: 0, category: '', maxDistance: 0 }
+const defaultFilters = { search: '', currency: 'EUR', minProfit: 0, minMarginPct: 0, minRefs: 0, category: '', maxDistance: 0 }
 const filters = reactive(loadFilters())
+
+const legacyEuroPlatforms = new Set(['Kleinanzeigen', 'Marktplaats', 'Willhaben'])
+const currencyKeyMarker = String.fromCharCode(31) + 'currency:'
+function getFlipCurrency(item: Flip): string {
+  const currency = item.listing?.currency?.toUpperCase() ?? ''
+  return /^[A-Z]{3}$/.test(currency) ? currency : legacyEuroPlatforms.has(item.listing?.platform ?? '') ? 'EUR' : ''
+}
+
+const availableCurrencies = computed(() => [...new Set(items.value.map(getFlipCurrency).filter(currency => currency && currency !== 'EUR'))].sort())
+const hasUnknownCurrency = computed(() => items.value.some(item => !getFlipCurrency(item)))
+const hasSelectedCurrency = computed(() => !['*', 'UNKNOWN'].includes(filters.currency) && /^[A-Z]{3}$/.test(filters.currency))
+
+function hasComparableFlip(item: Flip): boolean {
+  const currency = getFlipCurrency(item)
+  if (!/^[A-Z]{3}$/.test(currency)) return false
+  if (currency === 'EUR') return item.listing?.currency?.toUpperCase() === 'EUR' || legacyEuroPlatforms.has(item.listing?.platform ?? '')
+  const sells = item.recentSells ?? []
+  return sells.length > 0 && sells.every(sell => sell.key?.endsWith(`${currencyKeyMarker}${currency}`))
+}
 
 // --- Sort & Location ---
 const sortMode = ref<'newest' | 'profit' | 'distance'>('newest')
+watch(() => filters.currency, () => {
+  if (!hasSelectedCurrency.value && sortMode.value === 'profit') sortMode.value = 'newest'
+})
 const userLocation = ref<{ lat: number, lng: number } | null>(null)
 const locationZip = ref('')
 const locationLabel = ref('')
@@ -628,7 +682,7 @@ function saveFilters() {
 }
 
 const hasActiveFilters = computed(() =>
-  filters.search !== '' || filters.minProfit > 0 || filters.minMarginPct > 0 || filters.minRefs > 0 || filters.category !== '' || filters.maxDistance > 0,
+  filters.currency !== 'EUR' || filters.search !== '' || filters.minProfit > 0 || filters.minMarginPct > 0 || filters.minRefs > 0 || filters.category !== '' || filters.maxDistance > 0,
 )
 
 function clearFilters() {
@@ -1013,9 +1067,21 @@ const filteredItems = computed(() => {
     const median = item.medianPrice ?? 0
     const marginPct = price > 0 ? ((median - price) / price) * 100 : 0
     const refs = item.recentSells?.length ?? 0
+    const currency = getFlipCurrency(item)
 
-    if (filters.minProfit > 0 && profit < filters.minProfit) return false
-    if (filters.minMarginPct > 0 && marginPct < filters.minMarginPct) return false
+    if (filters.currency === '*') {
+      // Mixed-currency feed is useful chronologically; monetary comparisons require one currency.
+    }
+    else if (filters.currency === 'UNKNOWN') {
+      if (/^[A-Z]{3}$/.test(currency)) return false
+    }
+    else if (currency !== filters.currency) return false
+
+    if (hasSelectedCurrency.value && (filters.minProfit > 0 || filters.minMarginPct > 0)) {
+      if (!hasComparableFlip(item)) return false
+      if (filters.minProfit > 0 && profit < filters.minProfit) return false
+      if (filters.minMarginPct > 0 && marginPct < filters.minMarginPct) return false
+    }
     if (filters.minRefs > 0 && refs < filters.minRefs) return false
 
     if (filters.search) {
@@ -1040,8 +1106,13 @@ const filteredItems = computed(() => {
     return true
   })
 
-  if (sortMode.value === 'profit') {
-    result = [...result].sort((left, right) => (right.potentialProfit ?? 0) - (left.potentialProfit ?? 0))
+  if (sortMode.value === 'profit' && hasSelectedCurrency.value) {
+    result = [...result].sort((left, right) => {
+      const leftValid = hasComparableFlip(left)
+      const rightValid = hasComparableFlip(right)
+      if (leftValid !== rightValid) return leftValid ? -1 : 1
+      return leftValid ? (right.potentialProfit ?? 0) - (left.potentialProfit ?? 0) : 0
+    })
   }
   else if (sortMode.value === 'distance' && userLocation.value) {
     result = [...result].sort((left, right) => {

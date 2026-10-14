@@ -20,7 +20,7 @@
 
       <!-- Profit Badge -->
       <div
-        v-if="profit > 0"
+        v-if="hasComparablePrices && profit > 0"
         class="absolute top-3 right-3 bg-green-500/90 backdrop-blur-sm text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-lg"
       >
         +{{ formattedProfit }}
@@ -88,7 +88,14 @@
         </div>
         <div class="flex justify-between items-center">
           <span class="text-gray-400 text-xs">{{ $t('product.marketValue') }}</span>
-          <span class="text-green-400 font-semibold">{{ formattedMedian }}</span>
+          <span
+            v-if="hasComparablePrices"
+            class="text-green-400 font-semibold"
+          >{{ formattedMedian }}</span>
+          <span
+            v-else
+            class="text-gray-500 text-xs"
+          >—</span>
         </div>
       </div>
 
@@ -110,7 +117,7 @@
 
       <!-- References List -->
       <div
-        v-if="showReferences && item.recentSells?.length"
+        v-if="showReferences && hasComparablePrices && item.recentSells?.length"
         class="mb-4 bg-gray-900/50 rounded p-2 max-h-40 overflow-y-auto"
       >
         <div class="text-xs font-semibold text-gray-400 mb-2 border-b border-gray-700 pb-1">
@@ -126,8 +133,8 @@
           >
             <span
               class="text-blue-400 truncate max-w-[120px]"
-              :title="sell.key ?? undefined"
-            >{{ sell.key }}</span>
+              :title="stripCurrencyKey(sell.key) || undefined"
+            >{{ stripCurrencyKey(sell.key) }}</span>
             <div class="flex items-center gap-2 shrink-0">
               <span class="text-green-400">{{ formatPrice(sell.price) }}</span>
               <span
@@ -302,6 +309,18 @@ const emit = defineEmits<{
 }>()
 
 const profit = computed(() => props.item.potentialProfit ?? 0)
+const legacyEuroPlatforms = new Set(['Kleinanzeigen', 'Marktplaats', 'Willhaben'])
+const currencyKeyMarker = String.fromCharCode(31) + 'currency:'
+const listingCurrency = computed(() => {
+  const currency = props.item.listing?.currency?.toUpperCase() ?? ''
+  return /^[A-Z]{3}$/.test(currency) ? currency : legacyEuroPlatforms.has(props.item.listing?.platform ?? '') ? 'EUR' : ''
+})
+const hasComparablePrices = computed(() => {
+  if (listingCurrency.value === 'EUR') return props.item.listing?.currency?.toUpperCase() === 'EUR' || legacyEuroPlatforms.has(props.item.listing?.platform ?? '')
+  if (!/^[A-Z]{3}$/.test(listingCurrency.value)) return false
+  const sells = props.item.recentSells ?? []
+  return sells.length > 0 && sells.every(sell => sell.key?.endsWith(`${currencyKeyMarker}${listingCurrency.value}`))
+})
 const primaryImageUrl = computed(() => props.item.listing?.imageUrls?.[0] ?? '')
 
 const showReferences = ref(false)
@@ -315,8 +334,14 @@ const reasonInvalid = ref(false)
 
 const currentSlug = computed(() => {
   const sells = props.item.recentSells
-  return sells?.[0]?.key ?? ''
+  return stripCurrencyKey(sells?.[0]?.key)
 })
+
+function stripCurrencyKey(key: string | null | undefined): string {
+  if (!key) return ''
+  const markerIndex = key.lastIndexOf(currencyKeyMarker)
+  return markerIndex >= 0 && /^[A-Z]{3}$/.test(key.slice(markerIndex + currencyKeyMarker.length)) ? key.slice(0, markerIndex) : key
+}
 
 const reportFlip = () => {
   reportId.value = ''
@@ -381,10 +406,14 @@ const copyReportId = async () => {
 }
 
 const formatPrice = (price: number | null | undefined) => {
-  return new Intl.NumberFormat('de-DE', {
-    style: 'currency',
-    currency: 'EUR',
-  }).format(price ?? 0)
+  return formatAmount(price, listingCurrency.value)
+}
+
+const formatAmount = (price: number | null | undefined, currency: string) => {
+  const amount = price ?? 0
+  return /^[A-Z]{3}$/.test(currency)
+    ? new Intl.NumberFormat(locale.value, { style: 'currency', currency }).format(amount)
+    : new Intl.NumberFormat(locale.value).format(amount)
 }
 
 function getPlatformUrl(platform: Platform | undefined, id: string): string {
@@ -429,25 +458,14 @@ const listingUrl = computed(() => {
 })
 
 const formattedProfit = computed(() => {
-  return new Intl.NumberFormat('de-DE', {
-    style: 'currency',
-    currency: 'EUR',
-  }).format(profit.value)
+  return formatAmount(profit.value, listingCurrency.value)
 })
 
 const formattedPrice = computed(() => {
-  const price = props.item.listing?.price ?? 0
-  return new Intl.NumberFormat('de-DE', {
-    style: 'currency',
-    currency: 'EUR',
-  }).format(price)
+  return formatAmount(props.item.listing?.price, listingCurrency.value)
 })
 
 const formattedMedian = computed(() => {
-  const median = props.item.medianPrice ?? 0
-  return new Intl.NumberFormat('de-DE', {
-    style: 'currency',
-    currency: 'EUR',
-  }).format(median)
+  return formatAmount(props.item.medianPrice, listingCurrency.value)
 })
 </script>
