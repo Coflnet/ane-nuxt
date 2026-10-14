@@ -416,7 +416,32 @@ const formatAmount = (price: number | null | undefined, currency: string) => {
     : new Intl.NumberFormat(locale.value).format(amount)
 }
 
-function getPlatformUrl(platform: Platform | undefined, id: string): string {
+const canonicalMarketplaceHosts: Record<string, string[]> = {
+  OLX: ['olx.pl', 'www.olx.pl'],
+  Gumtree: ['www.gumtree.com'],
+  Wallapop: ['es.wallapop.com'],
+  Blocket: ['www.blocket.se'],
+  ParuVendu: ['www.paruvendu.fr'],
+}
+
+function getCanonicalMarketplaceUrl(platform: Platform | undefined, rawUrl: string | undefined): string | null {
+  const allowedHosts = platform ? canonicalMarketplaceHosts[platform] : undefined
+  if (!allowedHosts || !rawUrl) return null
+
+  try {
+    const url = new URL(rawUrl)
+    if (url.protocol !== 'https:' || url.port || url.username || url.password || !allowedHosts.includes(url.hostname.toLowerCase())) return null
+    return url.href
+  }
+  catch {
+    return null
+  }
+}
+
+function getPlatformUrl(platform: Platform | undefined, id: string, canonicalUrl?: string): string {
+  const validatedCanonicalUrl = getCanonicalMarketplaceUrl(platform, canonicalUrl)
+  if (validatedCanonicalUrl) return validatedCanonicalUrl
+
   switch (platform) {
     case 'Kleinanzeigen':
       return `https://www.kleinanzeigen.de/s-anzeige/copy/${id}-1-1`
@@ -454,7 +479,7 @@ const listingLocation = computed(() => {
 const listingUrl = computed(() => {
   const listing = props.item.listing
   if (!listing?.id) return '#'
-  return getPlatformUrl(listing.platform, listing.id)
+  return getPlatformUrl(listing.platform, listing.id, listing.attributes?.url)
 })
 
 const formattedProfit = computed(() => {
