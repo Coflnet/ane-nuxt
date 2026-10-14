@@ -169,7 +169,7 @@
           >
         </div>
         <div class="flex flex-col gap-1">
-          <label class="text-xs text-gray-400">{{ $t('minProfit') }} ({{ filters.currency }})</label>
+          <label class="text-xs text-gray-400">{{ $t('minProfit') }}<span v-if="hasSelectedCurrency"> ({{ filters.currency }})</span></label>
           <input
             v-model.number="filters.minProfit"
             type="number"
