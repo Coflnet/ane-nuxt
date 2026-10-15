@@ -7,10 +7,17 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+  security-events: write
+
 jobs:
   container-ci:
     uses: Coflnet/.github/.github/workflows/container-ci.yml@main
     with:
+      runner: ${{ vars.ANE_LOCAL_CI == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main' && format('["ane-local-{0}-{1}"]', github.run_id, github.run_attempt) || '["ubuntu-latest"]' }}
       # auto = the promote step discovers the chart whose image.repository
       # matches this repo's image and fails closed if it can't — no
       # hand-written path to copy-paste wrong.
