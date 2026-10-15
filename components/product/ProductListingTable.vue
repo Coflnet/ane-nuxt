@@ -88,7 +88,7 @@
             </span>
           </td>
           <td class="px-6 py-4 font-bold text-slate-200">
-            {{ formatPrice(listing.price) }}
+            {{ formatPrice(listing.price, listing.currency) }}
           </td>
           <td class="px-6 py-4">
             {{ formatDate(listing.postedAt) }}
@@ -225,8 +225,9 @@ import { countryFlag } from '~/utils/countryDetection'
 import type { OfferMatchExtras } from '~/utils/offerFilters'
 import { useAvailabilityCheck } from '~/composable/useAvailabilityCheck'
 import { useListingOpener } from '~/composable/useListingOpener'
+import { useFormat } from '~/composable/useFormat'
 
-// the generated client predates platform/country/shipping/distanceKm; all optional so an old API still works
+// the generated client predates these offer fields; all optional so an old API still works
 type ProductMatch = GeneratedProductMatch & OfferMatchExtras
 
 const props = defineProps<{
@@ -270,10 +271,13 @@ const issueTypes: { value: IssueType, label: string }[] = [
 
 const { getMarketplaceName } = useAvailabilityCheck()
 const { openListing } = useListingOpener()
+const { locale } = useI18n()
+const { formatCurrency, formatNumber } = useFormat()
 
-function formatPrice(amount: number | undefined | null) {
-  if (!amount) return 'N/A'
-  return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(amount)
+function formatPrice(amount: number | undefined | null, currency: string | undefined | null) {
+  if (amount == null) return 'N/A'
+  const code = currency?.trim().toUpperCase() ?? ''
+  return /^[A-Z]{3}$/.test(code) ? formatCurrency(amount, code, locale.value) : formatNumber(amount, locale.value)
 }
 
 function formatDate(dateStr: string | undefined | null) {

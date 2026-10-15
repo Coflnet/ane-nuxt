@@ -26,6 +26,7 @@ export interface OfferFilterState {
 export interface OfferMatchExtras {
   platform?: string | null
   country?: string | null
+  currency?: string | null
   shipping?: boolean | null
   distanceKm?: number | null
 }
