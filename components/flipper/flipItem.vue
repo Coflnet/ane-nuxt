@@ -1,5 +1,5 @@
 <template>
-  <div class="w-[340px] bg-gray-800/40 rounded-xl overflow-hidden shadow-lg border border-gray-700/30 hover:border-blue-500/30 transition-all duration-300 flex flex-col">
+  <div class="w-[340px] max-w-[calc(100vw-5rem)] bg-gray-800/40 rounded-xl overflow-hidden shadow-lg border border-gray-700/30 hover:border-blue-500/30 transition-all duration-300 flex flex-col">
     <!-- Image -->
     <div class="relative h-[200px] bg-gray-900/50">
       <img
@@ -127,14 +127,23 @@
           <a
             v-for="(sell, idx) in item.recentSells"
             :key="idx"
-            :href="getSellUrl(sell)"
-            target="_blank"
-            class="flex justify-between items-center text-xs hover:bg-gray-700/50 p-1 rounded"
+            :href="getSellUrl(sell) ?? undefined"
+            :target="getSellUrl(sell) ? '_blank' : undefined"
+            rel="noopener noreferrer"
+            :title="getSellUrl(sell) ? undefined : $t('product.linkUnavailable')"
+            class="flex justify-between items-center text-xs p-1 rounded"
+            :class="getSellUrl(sell) ? 'hover:bg-gray-700/50' : 'opacity-60'"
           >
-            <span
-              class="text-blue-400 truncate max-w-[120px]"
-              :title="stripCurrencyKey(sell.key) || undefined"
-            >{{ stripCurrencyKey(sell.key) }}</span>
+            <div class="min-w-0 max-w-[120px]">
+              <span
+                class="block text-blue-400 truncate"
+                :title="stripCurrencyKey(sell.key) || undefined"
+              >{{ stripCurrencyKey(sell.key) }}</span>
+              <span
+                v-if="!getSellUrl(sell)"
+                class="text-gray-400"
+              >{{ $t('product.linkUnavailable') }}</span>
+            </div>
             <div class="flex items-center gap-2 shrink-0">
               <span class="text-green-400">{{ formatPrice(sell.price) }}</span>
               <span
@@ -148,6 +157,7 @@
 
       <div class="mt-auto">
         <a
+          v-if="listingUrl"
           :href="listingUrl"
           target="_blank"
           rel="noopener noreferrer"
@@ -156,6 +166,10 @@
         >
           {{ $t('product.viewDeal') }}
         </a>
+        <span
+          v-else
+          class="block w-full text-center bg-gray-700 text-gray-300 py-2.5 rounded-lg text-sm"
+        >{{ $t('product.linkUnavailable') }}</span>
       </div>
     </div>
 
@@ -166,7 +180,7 @@
         class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50"
         @click.self="showReportDialog = false"
       >
-        <div class="bg-gray-800 rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl border border-gray-700">
+        <div class="bg-gray-800 rounded-xl p-6 max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto w-full mx-4 shadow-2xl border border-gray-700">
           <!-- Pre-submit: report form -->
           <template v-if="!reportId">
             <div class="flex items-center gap-3 mb-4">
@@ -285,7 +299,8 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import type { Flip, SoldFor, Platform } from '~/src/api-client/types.gen'
+import { getPlatformUrl } from '~/utils/flipMarketplaceUrl'
+import type { Flip, SoldFor } from '~/src/api-client/types.gen'
 import { formatDistanceToNow } from 'date-fns'
 import { de } from 'date-fns/locale'
 import { useI18n } from 'vue-i18n'
@@ -416,56 +431,8 @@ const formatAmount = (price: number | null | undefined, currency: string) => {
     : new Intl.NumberFormat(locale.value).format(amount)
 }
 
-const canonicalMarketplaceHosts: Record<string, string[]> = {
-  OLX: ['olx.pl', 'www.olx.pl'],
-  Gumtree: ['www.gumtree.com'],
-  Wallapop: ['es.wallapop.com'],
-  Blocket: ['www.blocket.se'],
-  ParuVendu: ['www.paruvendu.fr'],
-}
-
-function getCanonicalMarketplaceUrl(platform: Platform | undefined, rawUrl: string | undefined): string | null {
-  const allowedHosts = platform ? canonicalMarketplaceHosts[platform] : undefined
-  if (!allowedHosts || !rawUrl) return null
-
-  try {
-    const url = new URL(rawUrl)
-    if (url.protocol !== 'https:' || url.port || url.username || url.password || !allowedHosts.includes(url.hostname.toLowerCase())) return null
-    return url.href
-  }
-  catch {
-    return null
-  }
-}
-
-function getPlatformUrl(platform: Platform | undefined, id: string, canonicalUrl?: string): string {
-  const validatedCanonicalUrl = getCanonicalMarketplaceUrl(platform, canonicalUrl)
-  if (validatedCanonicalUrl) return validatedCanonicalUrl
-
-  switch (platform) {
-    case 'Kleinanzeigen':
-      return `https://www.kleinanzeigen.de/s-anzeige/copy/${id}-1-1`
-    case 'Ebay':
-      return `https://ebay.de/itm/${id}`
-    case 'Facebook':
-      return `https://www.facebook.com/marketplace/item/${id}`
-    case 'Willhaben':
-      return `https://www.willhaben.at/iad/${id.replace(/^\//, '')}`
-    case 'Shpock':
-      return `https://www.shpock.com/de-de/i/${id}`
-    case 'Marktplaats':
-      return id.includes('/')
-        ? `https://www.marktplaats.nl${id}`
-        : `https://www.marktplaats.nl/v/redirect/redirect/${id}-test`
-    case 'Vinted':
-      return `https://www.vinted.de/items/${id}`
-    default:
-      return `https://ane.deals/auctions?platform=${String(platform ?? 'unknown').toLowerCase()}&id=${encodeURIComponent(id)}`
-  }
-}
-
 const getSellUrl = (sell: SoldFor) => {
-  if (!sell?.id) return '#'
+  if (!sell?.id) return null
   return getPlatformUrl(sell.platform, sell.id)
 }
 
@@ -478,7 +445,7 @@ const listingLocation = computed(() => {
 
 const listingUrl = computed(() => {
   const listing = props.item.listing
-  if (!listing?.id) return '#'
+  if (!listing?.id) return null
   return getPlatformUrl(listing.platform, listing.id, listing.attributes?.url)
 })
 
