@@ -237,6 +237,13 @@
               >
             </div>
 
+            <p
+              v-if="reportError"
+              role="alert"
+              class="text-red-400 text-sm mb-3"
+            >
+              {{ reportError }}
+            </p>
             <div class="flex gap-2">
               <button
                 class="flex-1 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors text-sm"
@@ -305,7 +312,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { de } from 'date-fns/locale'
 import { useI18n } from 'vue-i18n'
 
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 const dateFnsLocale = computed(() => locale.value === 'de' ? { locale: de } : {})
 
 const API_BASE = 'https://ane.coflnet.com'
@@ -341,6 +348,7 @@ const primaryImageUrl = computed(() => props.item.listing?.imageUrls?.[0] ?? '')
 const showReferences = ref(false)
 const showReportDialog = ref(false)
 const reportId = ref('')
+const reportError = ref('')
 const reportSubmitting = ref(false)
 const copied = ref(false)
 const suggestedSlug = ref('')
@@ -360,6 +368,7 @@ function stripCurrencyKey(key: string | null | undefined): string {
 
 const reportFlip = () => {
   reportId.value = ''
+  reportError.value = ''
   suggestedSlug.value = ''
   reportReason.value = ''
   reasonInvalid.value = false
@@ -367,12 +376,13 @@ const reportFlip = () => {
 }
 
 const submitReport = async () => {
+  reportError.value = ''
   if (reportReason.value.trim().length < 5) {
     reasonInvalid.value = true
     return
   }
   if (!userStore.token) {
-    reportId.value = 'ERROR'
+    reportError.value = t('product.reportSignInRequired')
     return
   }
   reportSubmitting.value = true
@@ -397,10 +407,11 @@ const submitReport = async () => {
         suggestedSlug: suggestedSlug.value || undefined,
       },
     })
-    reportId.value = result?.reportId ?? 'ERROR'
+    reportId.value = result?.reportId?.trim() ?? ''
+    if (!reportId.value) reportError.value = t('product.reportFailed')
   }
   catch {
-    reportId.value = 'ERROR'
+    reportError.value = t('product.reportFailed')
   }
   finally {
     reportSubmitting.value = false

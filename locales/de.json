@@ -919,6 +919,8 @@
     },
     "notifyMe": "Bei neuen Angeboten benachrichtigen",
     "loadMore": "Mehr laden...",
+    "reportSignInRequired": "Melde dich an, um eine Meldung zu senden.",
+    "reportFailed": "Die Meldung konnte nicht gesendet werden. Bitte versuche es erneut.",
     "linkUnavailable": "Link nicht verfügbar",
     "viewDeal": "Zum Angebot",
     "soldOrRemoved": "Bereits verkauft oder entfernt",
