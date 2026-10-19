@@ -1120,5 +1120,14 @@
   "labelingRightsRevoked": "Widerrufen",
   "labelingRightsUnknown": "Unbekannt",
   "labelingStatsFailed": "Zahlen konnten nicht geladen werden.",
-  "labelingMenu": "Fotos beurteilen"
+  "labelingMenu": "Fotos beurteilen",
+  "unsubscribeTitle": "Benachrichtigungen abbestellen",
+  "unsubscribeConfirm": "Möchtest du die Benachrichtigungen für diesen Filter beenden? Der Filter wird gelöscht.",
+  "unsubscribeConfirmNamed": "Möchtest du die Benachrichtigungen für deinen Filter \"{name}\" beenden? Der Filter wird gelöscht.",
+  "unsubscribeButton": "Abbestellen",
+  "unsubscribeSuccess": "Du hast die Benachrichtigungen abbestellt. Der Filter wurde gelöscht.",
+  "unsubscribeError": "Dieser Link ist abgelaufen oder konnte nicht verwendet werden. Melde dich an, um deine Filter zu verwalten.",
+  "manageFiltersLogin": "Anmelden und Filter verwalten",
+  "unsubscribeInvalidLink": "Dieser Link ist unvollständig. Bitte öffne den Link aus der Benachrichtigungs-E-Mail erneut.",
+  "editFilterLinkExpired": "Dieser Link ist abgelaufen. Melde dich an, um deinen Filter zu bearbeiten oder zu löschen."
 }
