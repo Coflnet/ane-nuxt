@@ -1,0 +1,13 @@
+{
+  "name": "ane-api-gen",
+  "private": true,
+  "type": "module",
+  "description": "Generator for ../../src/api-client. Kept out of the root package.json because the root pins @hey-api/openapi-ts 0.66.3 for the nuxt module.",
+  "scripts": {
+    "generate": "node generate.mjs"
+  },
+  "devDependencies": {
+    "@hey-api/openapi-ts": "0.92.0",
+    "typescript": "5.8.3"
+  }
+}

@@ -53,3 +53,16 @@ Check out the [deployment documentation](https://nuxt.com/docs/getting-started/d
 | Filter | Filter | Metadata for a custom search narrowing it, eg. the search term and location |
 | Premium Search | Premium Suchanfrage | A single search request to a platform that restricts searches |
 | Plan | Abo | The service tier the user is on |
+
+## Regenerating the API client
+
+`src/api-client` is generated from the deployed OpenAPI spec with `@hey-api/openapi-ts` 0.92.0
+(plus TypeScript 5.8.3; TypeScript 7 crashes the generator). The generator lives in `tools/api-gen`
+so it does not interfere with the root `@hey-api/openapi-ts` pin used by the nuxt module:
+
+```bash
+npm run generate:api
+# or against another spec: ANE_OPENAPI_INPUT=./openapi.json npm run generate:api
+```
+
+Schema names are namespaced by AneApi (`ModelsIssueType`, `ClientModelFilterMatch`, ...).

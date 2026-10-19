@@ -2,7 +2,7 @@
 
 import type { Client, Composable, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { AddFilterData, AddFilterError, AddFilterResponse, CancelSubscriptionData, CancelSubscriptionError, CancelSubscriptionResponse, CreateLinkData, CreateLinkError, CreateLinkResponse, DeleteFilterData, DeleteFilterError, DeleteFilterWithTokenData, DeleteFilterWithTokenError, DoRedirectData, DoRedirectError, GetCategoriesData, GetCategoriesError, GetCategoriesResponse, GetCountryData, GetCountryError, GetCountryResponse, GetFilterByTokenData, GetFilterByTokenError, GetFilterByTokenResponse, GetFiltersData, GetFiltersError, GetFiltersResponse, GetFlipsData, GetFlipsError, GetFlipsResponse, GetInfoData, GetInfoError, GetInfoResponse, GetLinkData, GetLinkError, GetLinkResponse, GetLocationData, GetLocationError, GetLocationResponse, GetMatchesData, GetMatchesError, GetMatchesResponse, GetMeData, GetMeError, GetMeResponse, GetOptionsData, GetOptionsError, GetOptionsResponse, GetProductData, GetProductError, GetProductMatchesData, GetProductMatchesError, GetProductMatchesResponse, GetProductResponse, GetStatsData, GetStatsError, GetStatsResponse, GetSubscriptionData, GetSubscriptionError, GetSubscriptionResponse, IsProductAvailableData, IsProductAvailableError, IsProductAvailableResponse, ListLinksData, ListLinksError, ListLinksResponse, LoginFirebaseData, LoginFirebaseError, LoginFirebaseResponse, ReportMatchData, ReportMatchError, ReportMatchResponse, ReportProductIssueData, ReportProductIssueError, SearchProductsData, SearchProductsError, SearchProductsResponse, SubscribeData, SubscribeError, SubscribeResponse, TestFilterData, TestFilterError, TestFilterResponse, UpdateMeData, UpdateMeError, UpdateMeResponse, UseLinkData, UseLinkError, GetPriceHistoryData, GetPriceHistoryError, GetPriceHistoryResponse, GetPriceStatsData, GetPriceStatsError, GetPriceStatsResponse } from './types.gen';
+import type { AddFilterData, AddFilterError, AddFilterResponse, CancelSubscriptionData, CancelSubscriptionError, CancelSubscriptionResponse, CreateLinkData, CreateLinkError, CreateLinkResponse, DaysData, DaysError, DeleteData, DeleteError, DeleteFilterData, DeleteFilterError, DeleteFilterWithTokenData, DeleteFilterWithTokenError, DeleteMeData, DeleteMeError, DiscoverData, DiscoverError, DiscoverResponse, DoRedirectData, DoRedirectError, ExistsData, ExistsError, ExistsResponse, ExportData, ExportError, GetAllCategoriesData, GetAllCategoriesError, GetAllCategoriesResponse, GetAttributesToExtractData, GetAttributesToExtractError, GetAttributesToExtractResponse, GetCategoriesWithCountsData, GetCategoriesWithCountsError, GetCategoriesWithCountsResponse, GetCategoryCountsBySlugData, GetCategoryCountsBySlugError, GetCategoryCountsBySlugResponse, GetCategoryData, GetCategoryError, GetCategoryResponse, GetCountryData, GetCountryError, GetCountryResponse, GetDiscountData, GetDiscountError, GetDiscountResponse, GetFilterByTokenData, GetFilterByTokenError, GetFilterByTokenResponse, GetFiltersData, GetFiltersError, GetFiltersResponse, GetFlipReportsData, GetFlipReportsError, GetFlipReportsResponse, GetFlipsData, GetFlipsError, GetFlipsResponse, GetInfoData, GetInfoError, GetInfoResponse, GetLinkData, GetLinkError, GetLinkResponse, GetLiveFlipsData, GetLiveFlipsError, GetLocationData, GetLocationError, GetLocationResponse, GetMatchesData, GetMatchesError, GetMatchesResponse, GetMeData, GetMeError, GetMeResponse, GetOptionsData, GetOptionsError, GetOptionsResponse, GetPartDetailsData, GetPartDetailsError, GetPartDetailsResponse, GetPartsForMachineData, GetPartsForMachineError, GetPartsForMachineResponse, GetPointsData, GetPointsError, GetPointsResponse, GetPriceHistoryData, GetPriceHistoryError, GetPriceHistoryResponse, GetPriceStatsData, GetPriceStatsError, GetPriceStatsResponse, GetProductAlternativesData, GetProductAlternativesError, GetProductAlternativesResponse, GetProductData, GetProductError, GetProductMatchesData, GetProductMatchesError, GetProductMatchesResponse, GetProductMatchFacetsData, GetProductMatchFacetsError, GetProductMatchFacetsResponse, GetProductRelationsData, GetProductRelationsError, GetProductRelationsResponse, GetProductResponse, GetRegroupRunData, GetRegroupRunError, GetRelatedProductsData, GetRelatedProductsError, GetRelatedProductsResponse, GetReportData, GetReportError, GetScopeData, GetScopeError, GetScopeResponse, GetSitemapChunkData, GetSitemapChunkDeData, GetSitemapChunkDeError, GetSitemapChunkError, GetSitemapIndexData, GetSitemapIndexDeData, GetSitemapIndexDeError, GetSitemapIndexError, GetStatsData, GetStatsError, GetStatsResponse, GetSubCategoriesData, GetSubCategoriesError, GetSubCategoriesResponse, GetSubscriptionData, GetSubscriptionError, GetSubscriptionResponse, GetSuggestionsData, GetSuggestionsError, GetSuggestionsResponse, GetTasksData, GetTasksError, GetTasksResponse, GetTopLevelCategoriesData, GetTopLevelCategoriesError, GetTopLevelCategoriesResponse, GetTrainingSamplesData, GetTrainingSamplesError, GetTrainingSamplesResponse, GetUnidentifiedGamesData, GetUnidentifiedGameSeriesData, GetUnidentifiedGameSeriesError, GetUnidentifiedGameSeriesResponse, GetUnidentifiedGamesError, GetUnidentifiedGamesResponse, IsProductAvailableData, IsProductAvailableError, IsProductAvailableResponse, LabelData, LabelError, ListData, ListError, ListingsData, ListingsError, ListLinksData, ListLinksError, ListLinksResponse, LoginFirebaseData, LoginFirebaseError, LoginFirebaseResponse, MarketplacesData, MarketplacesError, MeData, MeError, MeResponse, MovesData, MovesError, NextData, NextError, NextResponse, PhotoData, PhotoError, PreviewData, PreviewError, PreviewResponse, ReportFlipData, ReportFlipError, ReportFlipResponse, ReportMatchData, ReportMatchError, ReportMatchResponse, ReportProductIssueData, ReportProductIssueError, ResolveCategoryPathData, ResolveCategoryPathError, ResolveCategoryPathResponse, ResolveData, ResolveError, SearchPartsData, SearchPartsError, SearchPartsResponse, SearchProductsData, SearchProductsError, SearchProductsResponse, SeedData, SeedError, SeedResponse, StatsData, StatsError, StatsResponse, SubmitData, SubmitError, SubmitResponse, SubscribeData, SubscribeError, SubscribeResponse, TakedownData, TakedownError, TakedownResponse, TestFilterData, TestFilterError, TestFilterResponse, UpdateMeData, UpdateMeError, UpdateMeResponse, UseLinkData, UseLinkError } from './types.gen';
 
 export type Options<TComposable extends Composable = '$fetch', TData extends TDataShape = TDataShape, ResT = unknown, DefaultT = undefined> = Options2<TComposable, TData, ResT, DefaultT> & {
     /**
@@ -19,7 +19,6 @@ export type Options<TComposable extends Composable = '$fetch', TData extends TDa
 };
 
 export const loginFirebase = <TComposable extends Composable = '$fetch', DefaultT extends LoginFirebaseResponse = LoginFirebaseResponse>(options: Options<TComposable, LoginFirebaseData, LoginFirebaseResponse, DefaultT>) => (options.client ?? client).post<TComposable, LoginFirebaseResponse | DefaultT, LoginFirebaseError, DefaultT>({
-    security: [{ name: 'Authorization', type: 'apiKey' }],
     url: '/api/auth/firebase',
     ...options,
     headers: {
@@ -28,20 +27,100 @@ export const loginFirebase = <TComposable extends Composable = '$fetch', Default
     }
 });
 
-export const getFilters = <TComposable extends Composable = '$fetch', DefaultT extends GetFiltersResponse = GetFiltersResponse>(options: Options<TComposable, GetFiltersData, GetFiltersResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetFiltersResponse | DefaultT, GetFiltersError, DefaultT>({
-    security: [{ name: 'Authorization', type: 'apiKey' }],
-    url: '/api/filters/user',
-    ...options
+/**
+ * Get the top-level categories of the category browser.
+ * Only the configured scope (`CategoryScope:TopLevelSlugs`) is returned; nested scope nodes are surfaced as top-level entries.
+ */
+export const getTopLevelCategories = <TComposable extends Composable = '$fetch', DefaultT extends GetTopLevelCategoriesResponse = GetTopLevelCategoriesResponse>(options: Options<TComposable, GetTopLevelCategoriesData, GetTopLevelCategoriesResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetTopLevelCategoriesResponse | DefaultT, GetTopLevelCategoriesError, DefaultT>({ url: '/api/Categories/top-level', ...options });
+
+/**
+ * Get the category scope shown in the category browser and where to request more categories
+ */
+export const getScope = <TComposable extends Composable = '$fetch', DefaultT extends GetScopeResponse = GetScopeResponse>(options: Options<TComposable, GetScopeData, GetScopeResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetScopeResponse | DefaultT, GetScopeError, DefaultT>({ url: '/api/Categories/scope', ...options });
+
+/**
+ * Get all categories as a flat list with paths
+ */
+export const getAllCategories = <TComposable extends Composable = '$fetch', DefaultT extends GetAllCategoriesResponse = GetAllCategoriesResponse>(options: Options<TComposable, GetAllCategoriesData, GetAllCategoriesResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetAllCategoriesResponse | DefaultT, GetAllCategoriesError, DefaultT>({ url: '/api/Categories/all', ...options });
+
+/**
+ * Get subcategories for a given parent category slug
+ */
+export const getSubCategories = <TComposable extends Composable = '$fetch', DefaultT extends GetSubCategoriesResponse = GetSubCategoriesResponse>(options: Options<TComposable, GetSubCategoriesData, GetSubCategoriesResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetSubCategoriesResponse | DefaultT, GetSubCategoriesError, DefaultT>({ url: '/api/Categories/{parentSlug}/subcategories', ...options });
+
+/**
+ * Get category information by slug
+ */
+export const getCategory = <TComposable extends Composable = '$fetch', DefaultT extends GetCategoryResponse = GetCategoryResponse>(options: Options<TComposable, GetCategoryData, GetCategoryResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetCategoryResponse | DefaultT, GetCategoryError, DefaultT>({ url: '/api/Categories/{slug}', ...options });
+
+/**
+ * Get attribute extraction schema for a category path
+ * Useful for understanding what product attributes should be extracted for a category
+ */
+export const getAttributesToExtract = <TComposable extends Composable = '$fetch', DefaultT extends GetAttributesToExtractResponse = GetAttributesToExtractResponse>(options: Options<TComposable, GetAttributesToExtractData, GetAttributesToExtractResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetAttributesToExtractResponse | DefaultT, GetAttributesToExtractError, DefaultT>({ url: '/api/Categories/attributes', ...options });
+
+/**
+ * Resolve a category slug to its full path in the hierarchy
+ */
+export const resolveCategoryPath = <TComposable extends Composable = '$fetch', DefaultT extends ResolveCategoryPathResponse = ResolveCategoryPathResponse>(options: Options<TComposable, ResolveCategoryPathData, ResolveCategoryPathResponse, DefaultT>) => (options.client ?? client).get<TComposable, ResolveCategoryPathResponse | DefaultT, ResolveCategoryPathError, DefaultT>({ url: '/api/Categories/resolve/{slug}', ...options });
+
+/**
+ * Get category slugs with their product counts.
+ * Precomputed and cached server-side (refreshed once per day).
+ */
+export const getCategoriesWithCounts = <TComposable extends Composable = '$fetch', DefaultT extends GetCategoriesWithCountsResponse = GetCategoriesWithCountsResponse>(options: Options<TComposable, GetCategoriesWithCountsData, GetCategoriesWithCountsResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetCategoriesWithCountsResponse | DefaultT, GetCategoriesWithCountsError, DefaultT>({ url: '/api/Categories/with-counts', ...options });
+
+/**
+ * Get product counts per taxonomy slug (numeric slug -> count) for the configured category
+ * scope's top-level entries and their descendants - the same nodes shown in the category
+ * browser. Each count is computed with EXACTLY the same category query
+ * `GET /api/product/search?category=<slug>` applies for that slug (no other filters),
+ * so a slug's count already includes its whole subtree; do not add child counts on top of it.
+ * Cached server-side for 10 minutes. Nodes with zero matching products are omitted.
+ */
+export const getCategoryCountsBySlug = <TComposable extends Composable = '$fetch', DefaultT extends GetCategoryCountsBySlugResponse = GetCategoryCountsBySlugResponse>(options: Options<TComposable, GetCategoryCountsBySlugData, GetCategoryCountsBySlugResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetCategoryCountsBySlugResponse | DefaultT, GetCategoryCountsBySlugError, DefaultT>({ url: '/api/Categories/counts-by-slug', ...options });
+
+/**
+ * Get a batch of scraping tasks to run in the browser. Batch size defaults to 3 and
+ * grows with the contributor's points up to 20; batch may request
+ * fewer than the allowed maximum.
+ */
+export const getTasks = <TComposable extends Composable = '$fetch', DefaultT extends GetTasksResponse = GetTasksResponse>(options: Options<TComposable, GetTasksData, GetTasksResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetTasksResponse | DefaultT, GetTasksError, DefaultT>({ url: '/api/crowdscrape/tasks', ...options });
+
+/**
+ * Submit results for previously fetched tasks. Submissions are forwarded to the
+ * scraper for text extraction; points are credited asynchronously.
+ */
+export const submit = <TComposable extends Composable = '$fetch', DefaultT extends SubmitResponse = SubmitResponse>(options: Options<TComposable, SubmitData, SubmitResponse, DefaultT>) => (options.client ?? client).post<TComposable, SubmitResponse | DefaultT, SubmitError, DefaultT>({
+    url: '/api/crowdscrape/submit',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
-export const getOptions = <TComposable extends Composable = '$fetch', DefaultT extends GetOptionsResponse = GetOptionsResponse>(options: Options<TComposable, GetOptionsData, GetOptionsResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetOptionsResponse | DefaultT, GetOptionsError, DefaultT>({
-    security: [{ name: 'Authorization', type: 'apiKey' }],
-    url: '/api/filters/options',
-    ...options
+/**
+ * Get the contributor's current reward point balance.
+ */
+export const getPoints = <TComposable extends Composable = '$fetch', DefaultT extends GetPointsResponse = GetPointsResponse>(options: Options<TComposable, GetPointsData, GetPointsResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetPointsResponse | DefaultT, GetPointsError, DefaultT>({ url: '/api/crowdscrape/points', ...options });
+
+export const marketplaces = <TComposable extends Composable = '$fetch', DefaultT = undefined>(options: Options<TComposable, MarketplacesData, unknown, DefaultT>) => (options.client ?? client).get<TComposable, unknown | DefaultT, MarketplacesError, DefaultT>({ url: '/api/extension/marketplaces', ...options });
+
+export const discover = <TComposable extends Composable = '$fetch', DefaultT extends DiscoverResponse = DiscoverResponse>(options: Options<TComposable, DiscoverData, DiscoverResponse, DefaultT>) => (options.client ?? client).post<TComposable, DiscoverResponse | DefaultT, DiscoverError, DefaultT>({
+    url: '/api/extension/discover',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
+
+export const getFilters = <TComposable extends Composable = '$fetch', DefaultT extends GetFiltersResponse = GetFiltersResponse>(options: Options<TComposable, GetFiltersData, GetFiltersResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetFiltersResponse | DefaultT, GetFiltersError, DefaultT>({ url: '/api/filters/user', ...options });
+
+export const getOptions = <TComposable extends Composable = '$fetch', DefaultT extends GetOptionsResponse = GetOptionsResponse>(options: Options<TComposable, GetOptionsData, GetOptionsResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetOptionsResponse | DefaultT, GetOptionsError, DefaultT>({ url: '/api/filters/options', ...options });
 
 export const reportMatch = <TComposable extends Composable = '$fetch', DefaultT extends ReportMatchResponse = ReportMatchResponse>(options: Options<TComposable, ReportMatchData, ReportMatchResponse, DefaultT>) => (options.client ?? client).post<TComposable, ReportMatchResponse | DefaultT, ReportMatchError, DefaultT>({
-    security: [{ name: 'Authorization', type: 'apiKey' }],
     url: '/api/filters/report',
     ...options,
     headers: {
@@ -51,7 +130,6 @@ export const reportMatch = <TComposable extends Composable = '$fetch', DefaultT 
 });
 
 export const addFilter = <TComposable extends Composable = '$fetch', DefaultT extends AddFilterResponse = AddFilterResponse>(options: Options<TComposable, AddFilterData, AddFilterResponse, DefaultT>) => (options.client ?? client).post<TComposable, AddFilterResponse | DefaultT, AddFilterError, DefaultT>({
-    security: [{ name: 'Authorization', type: 'apiKey' }],
     url: '/api/filters',
     ...options,
     headers: {
@@ -60,26 +138,13 @@ export const addFilter = <TComposable extends Composable = '$fetch', DefaultT ex
     }
 });
 
-export const deleteFilter = <TComposable extends Composable = '$fetch', DefaultT = undefined>(options: Options<TComposable, DeleteFilterData, unknown, DefaultT>) => (options.client ?? client).delete<TComposable, unknown | DefaultT, DeleteFilterError, DefaultT>({
-    security: [{ name: 'Authorization', type: 'apiKey' }],
-    url: '/api/filters/{id}',
-    ...options
-});
+export const deleteFilter = <TComposable extends Composable = '$fetch', DefaultT = undefined>(options: Options<TComposable, DeleteFilterData, unknown, DefaultT>) => (options.client ?? client).delete<TComposable, unknown | DefaultT, DeleteFilterError, DefaultT>({ url: '/api/filters/{id}', ...options });
 
-export const deleteFilterWithToken = <TComposable extends Composable = '$fetch', DefaultT = undefined>(options: Options<TComposable, DeleteFilterWithTokenData, unknown, DefaultT>) => (options.client ?? client).delete<TComposable, unknown | DefaultT, DeleteFilterWithTokenError, DefaultT>({
-    security: [{ name: 'Authorization', type: 'apiKey' }],
-    url: '/api/filters/{id}/token/{token}',
-    ...options
-});
+export const deleteFilterWithToken = <TComposable extends Composable = '$fetch', DefaultT = undefined>(options: Options<TComposable, DeleteFilterWithTokenData, unknown, DefaultT>) => (options.client ?? client).delete<TComposable, unknown | DefaultT, DeleteFilterWithTokenError, DefaultT>({ url: '/api/filters/{id}/token/{token}', ...options });
 
-export const getFilterByToken = <TComposable extends Composable = '$fetch', DefaultT extends GetFilterByTokenResponse = GetFilterByTokenResponse>(options: Options<TComposable, GetFilterByTokenData, GetFilterByTokenResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetFilterByTokenResponse | DefaultT, GetFilterByTokenError, DefaultT>({
-    security: [{ name: 'Authorization', type: 'apiKey' }],
-    url: '/api/filters/{id}/token/{token}',
-    ...options
-});
+export const getFilterByToken = <TComposable extends Composable = '$fetch', DefaultT extends GetFilterByTokenResponse = GetFilterByTokenResponse>(options: Options<TComposable, GetFilterByTokenData, GetFilterByTokenResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetFilterByTokenResponse | DefaultT, GetFilterByTokenError, DefaultT>({ url: '/api/filters/{id}/token/{token}', ...options });
 
 export const testFilter = <TComposable extends Composable = '$fetch', DefaultT extends TestFilterResponse = TestFilterResponse>(options: Options<TComposable, TestFilterData, TestFilterResponse, DefaultT>) => (options.client ?? client).post<TComposable, TestFilterResponse | DefaultT, TestFilterError, DefaultT>({
-    security: [{ name: 'Authorization', type: 'apiKey' }],
     url: '/api/filters/test',
     ...options,
     headers: {
@@ -88,47 +153,127 @@ export const testFilter = <TComposable extends Composable = '$fetch', DefaultT e
     }
 });
 
-export const getLocation = <TComposable extends Composable = '$fetch', DefaultT extends GetLocationResponse = GetLocationResponse>(options: Options<TComposable, GetLocationData, GetLocationResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetLocationResponse | DefaultT, GetLocationError, DefaultT>({
-    security: [{ name: 'Authorization', type: 'apiKey' }],
-    url: '/api/location/{zip}',
-    ...options
-});
+export const getLocation = <TComposable extends Composable = '$fetch', DefaultT extends GetLocationResponse = GetLocationResponse>(options: Options<TComposable, GetLocationData, GetLocationResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetLocationResponse | DefaultT, GetLocationError, DefaultT>({ url: '/api/location/{zip}', ...options });
 
 /**
  * Get the iso country code of the user
  */
-export const getCountry = <TComposable extends Composable = '$fetch', DefaultT extends GetCountryResponse = GetCountryResponse>(options: Options<TComposable, GetCountryData, GetCountryResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetCountryResponse | DefaultT, GetCountryError, DefaultT>({
-    security: [{ name: 'Authorization', type: 'apiKey' }],
-    url: '/api/country',
-    ...options
+export const getCountry = <TComposable extends Composable = '$fetch', DefaultT extends GetCountryResponse = GetCountryResponse>(options: Options<TComposable, GetCountryData, GetCountryResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetCountryResponse | DefaultT, GetCountryError, DefaultT>({ url: '/api/country', ...options });
+
+export const getFlips = <TComposable extends Composable = '$fetch', DefaultT extends GetFlipsResponse = GetFlipsResponse>(options: Options<TComposable, GetFlipsData, GetFlipsResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetFlipsResponse | DefaultT, GetFlipsError, DefaultT>({ url: '/api/flips/{category}', ...options });
+
+export const getLiveFlips = <TComposable extends Composable = '$fetch', DefaultT = undefined>(options: Options<TComposable, GetLiveFlipsData, unknown, DefaultT>) => (options.client ?? client).get<TComposable, unknown | DefaultT, GetLiveFlipsError, DefaultT>({ url: '/api/flips/live/{category}', ...options });
+
+/**
+ * Submit a flip report with optional grouping correction
+ */
+export const reportFlip = <TComposable extends Composable = '$fetch', DefaultT extends ReportFlipResponse = ReportFlipResponse>(options: Options<TComposable, ReportFlipData, ReportFlipResponse, DefaultT>) => (options.client ?? client).post<TComposable, ReportFlipResponse | DefaultT, ReportFlipError, DefaultT>({
+    url: '/api/flips/report',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
-export const getFlips = <TComposable extends Composable = '$fetch', DefaultT extends GetFlipsResponse = GetFlipsResponse>(options: Options<TComposable, GetFlipsData, GetFlipsResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetFlipsResponse | DefaultT, GetFlipsError, DefaultT>({
-    security: [{ name: 'Authorization', type: 'apiKey' }],
-    url: '/api/flips/{category}',
-    ...options
+/**
+ * Retrieve flip reports (training samples). Requires authorization.
+ */
+export const getFlipReports = <TComposable extends Composable = '$fetch', DefaultT extends GetFlipReportsResponse = GetFlipReportsResponse>(options: Options<TComposable, GetFlipReportsData, GetFlipReportsResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetFlipReportsResponse | DefaultT, GetFlipReportsError, DefaultT>({ url: '/api/flips/reports', ...options });
+
+/**
+ * Get training samples: flip reports with grouping corrections for model training.
+ */
+export const getTrainingSamples = <TComposable extends Composable = '$fetch', DefaultT extends GetTrainingSamplesResponse = GetTrainingSamplesResponse>(options: Options<TComposable, GetTrainingSamplesData, GetTrainingSamplesResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetTrainingSamplesResponse | DefaultT, GetTrainingSamplesError, DefaultT>({ url: '/api/flips/training-samples', ...options });
+
+/**
+ * Whether the signed-in user may label, and their user id (to put it on the allow list).
+ */
+export const me = <TComposable extends Composable = '$fetch', DefaultT extends MeResponse = MeResponse>(options: Options<TComposable, MeData, MeResponse, DefaultT>) => (options.client ?? client).get<TComposable, MeResponse | DefaultT, MeError, DefaultT>({ url: '/api/labeling/me', ...options });
+
+/**
+ * Up to count (max 50) pairs this user has not labeled, closest to the join threshold first.
+ */
+export const next = <TComposable extends Composable = '$fetch', DefaultT extends NextResponse = NextResponse>(options: Options<TComposable, NextData, NextResponse, DefaultT>) => (options.client ?? client).get<TComposable, NextResponse | DefaultT, NextError, DefaultT>({ url: '/api/labeling/next', ...options });
+
+/**
+ * Stores the label (same_item, same_model_other_variant, different, unsure); a second call by the same user overwrites.
+ */
+export const label = <TComposable extends Composable = '$fetch', DefaultT = undefined>(options: Options<TComposable, LabelData, unknown, DefaultT>) => (options.client ?? client).post<TComposable, unknown | DefaultT, LabelError, DefaultT>({
+    url: '/api/labeling/{pairId}/label',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
-export const getMatches = <TComposable extends Composable = '$fetch', DefaultT extends GetMatchesResponse = GetMatchesResponse>(options: Options<TComposable, GetMatchesData, GetMatchesResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetMatchesResponse | DefaultT, GetMatchesError, DefaultT>({
-    security: [{ name: 'Authorization', type: 'apiKey' }],
-    url: '/api/matches',
-    ...options
+/**
+ * Counts, per-band label counts (bands, 0.05 wide from 0.60) with the implied match rate, and pending candidates per source.
+ */
+export const stats = <TComposable extends Composable = '$fetch', DefaultT extends StatsResponse = StatsResponse>(options: Options<TComposable, StatsData, StatsResponse, DefaultT>) => (options.client ?? client).get<TComposable, StatsResponse | DefaultT, StatsError, DefaultT>({ url: '/api/labeling/stats', ...options });
+
+/**
+ * JSON lines: a header object, then one labeled pair per line whose photos are both archived and exportable. With
+ * includeUnlabeled the archived photos that are in no exported pair follow, one per line.
+ */
+export const export_ = <TComposable extends Composable = '$fetch', DefaultT = undefined>(options: Options<TComposable, ExportData, unknown, DefaultT>) => (options.client ?? client).get<TComposable, unknown | DefaultT, ExportError, DefaultT>({ url: '/api/labeling/export', ...options });
+
+/**
+ * Inserts offline-scored pairs as labeling candidates (max 1000 per call). Items need listingIdA/B, platformA/B, score 0..1 and source;
+ * image urls are optional and looked up from the stored listing otherwise.
+ */
+export const seed = <TComposable extends Composable = '$fetch', DefaultT extends SeedResponse = SeedResponse>(options: Options<TComposable, SeedData, SeedResponse, DefaultT>) => (options.client ?? client).post<TComposable, SeedResponse | DefaultT, SeedError, DefaultT>({
+    url: '/api/labeling/seed',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
-export const getStats = <TComposable extends Composable = '$fetch', DefaultT extends GetStatsResponse = GetStatsResponse>(options: Options<TComposable, GetStatsData, GetStatsResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetStatsResponse | DefaultT, GetStatsError, DefaultT>({
-    security: [{ name: 'Authorization', type: 'apiKey' }],
-    url: '/api/stats',
-    ...options
-});
+/**
+ * The archived (downscaled) copy of a photo. platform is the platform name or number.
+ */
+export const photo = <TComposable extends Composable = '$fetch', DefaultT = undefined>(options: Options<TComposable, PhotoData, unknown, DefaultT>) => (options.client ?? client).get<TComposable, unknown | DefaultT, PhotoError, DefaultT>({ url: '/api/labeling/photo/{platform}/{listingId}/{imageIndex}', ...options });
 
-export const getSubscription = <TComposable extends Composable = '$fetch', DefaultT extends GetSubscriptionResponse = GetSubscriptionResponse>(options: Options<TComposable, GetSubscriptionData, GetSubscriptionResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetSubscriptionResponse | DefaultT, GetSubscriptionError, DefaultT>({
-    security: [{ name: 'Authorization', type: 'apiKey' }],
-    url: '/api/payment/subscription',
-    ...options
-});
+/**
+ * Takedown of one offer: removes its archived photos, candidate pairs and labels. Idempotent.
+ */
+export const takedown = <TComposable extends Composable = '$fetch', DefaultT extends TakedownResponse = TakedownResponse>(options: Options<TComposable, TakedownData, TakedownResponse, DefaultT>) => (options.client ?? client).delete<TComposable, TakedownResponse | DefaultT, TakedownError, DefaultT>({ url: '/api/labeling/listing/{platform}/{listingId}', ...options });
+
+export const getMatches = <TComposable extends Composable = '$fetch', DefaultT extends GetMatchesResponse = GetMatchesResponse>(options: Options<TComposable, GetMatchesData, GetMatchesResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetMatchesResponse | DefaultT, GetMatchesError, DefaultT>({ url: '/api/matches', ...options });
+
+export const getStats = <TComposable extends Composable = '$fetch', DefaultT extends GetStatsResponse = GetStatsResponse>(options: Options<TComposable, GetStatsData, GetStatsResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetStatsResponse | DefaultT, GetStatsError, DefaultT>({ url: '/api/stats', ...options });
+
+/**
+ * Checks whether a listing from the given platform has already been indexed.
+ */
+export const exists = <TComposable extends Composable = '$fetch', DefaultT extends ExistsResponse = ExistsResponse>(options: Options<TComposable, ExistsData, ExistsResponse, DefaultT>) => (options.client ?? client).get<TComposable, ExistsResponse | DefaultT, ExistsError, DefaultT>({ url: '/api/listing/exists', ...options });
+
+/**
+ * Finds parts. class (default gear) picks the part class and its keys: gears take teeth (1..400), bearings and generic parts partKey
+ * (a designation like 6203-2RS or a part number). Either a free text (q, at most 200 characters: "gear 42 teeth ~35 mm", "Zahnrad 42 Zähne Bohrung 8 mm", "Teile-Nr. 1619P08924",
+ * "Zahnrad für Bosch GSR 12V", "Kugellager 6203-2RS") or explicit values; explicit values win. Sizes match within tolerance (relative, default 8 %, floor 1.5 mm); a size
+ * the page does not know never excludes it. Reverse search by a broken gear: teethObserved intact teeth over arcDegrees degrees, or pitchMm
+ * with outerDiameterMm, estimate the original count (Coflnet.Ane.Services.PartSearchResponse.Estimate) and search its range ranked by closeness, module and bore. One of key,
+ * estimate, part number or machine is required. Pages reached over a same-part edge are marked `same_part_confirmed` or `same_part_candidate`.
+ */
+export const searchParts = <TComposable extends Composable = '$fetch', DefaultT extends SearchPartsResponse = SearchPartsResponse>(options: Options<TComposable, SearchPartsData, SearchPartsResponse, DefaultT>) => (options.client ?? client).get<TComposable, SearchPartsResponse | DefaultT, SearchPartsError, DefaultT>({ url: '/api/parts/search', ...options });
+
+/**
+ * The parts listed for a machine ("Bosch GSR 12V"), plus parts listed for other machines that the same-part edges say are the same part (marked candidate or confirmed).
+ */
+export const getPartsForMachine = <TComposable extends Composable = '$fetch', DefaultT extends GetPartsForMachineResponse = GetPartsForMachineResponse>(options: Options<TComposable, GetPartsForMachineData, GetPartsForMachineResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetPartsForMachineResponse | DefaultT, GetPartsForMachineError, DefaultT>({ url: '/api/parts/for-machine', ...options });
+
+/**
+ * Everything the index knows about one part page: each value with its source (text, image, photo, text+image, derived, product, vote) and confidence, the review rows that explain an unknown value, what it fits and its same-part edges.
+ */
+export const getPartDetails = <TComposable extends Composable = '$fetch', DefaultT extends GetPartDetailsResponse = GetPartDetailsResponse>(options: Options<TComposable, GetPartDetailsData, GetPartDetailsResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetPartDetailsResponse | DefaultT, GetPartDetailsError, DefaultT>({ url: '/api/parts/{id}', ...options });
+
+export const getSubscription = <TComposable extends Composable = '$fetch', DefaultT extends GetSubscriptionResponse = GetSubscriptionResponse>(options: Options<TComposable, GetSubscriptionData, GetSubscriptionResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetSubscriptionResponse | DefaultT, GetSubscriptionError, DefaultT>({ url: '/api/payment/subscription', ...options });
 
 export const subscribe = <TComposable extends Composable = '$fetch', DefaultT extends SubscribeResponse = SubscribeResponse>(options: Options<TComposable, SubscribeData, SubscribeResponse, DefaultT>) => (options.client ?? client).post<TComposable, SubscribeResponse | DefaultT, SubscribeError, DefaultT>({
-    security: [{ name: 'Authorization', type: 'apiKey' }],
     url: '/api/payment/subscription',
     ...options,
     headers: {
@@ -137,36 +282,89 @@ export const subscribe = <TComposable extends Composable = '$fetch', DefaultT ex
     }
 });
 
-export const cancelSubscription = <TComposable extends Composable = '$fetch', DefaultT extends CancelSubscriptionResponse = CancelSubscriptionResponse>(options: Options<TComposable, CancelSubscriptionData, CancelSubscriptionResponse, DefaultT>) => (options.client ?? client).delete<TComposable, CancelSubscriptionResponse | DefaultT, CancelSubscriptionError, DefaultT>({
-    security: [{ name: 'Authorization', type: 'apiKey' }],
-    url: '/api/payment/subscription/{id}',
-    ...options
-});
+export const getDiscount = <TComposable extends Composable = '$fetch', DefaultT extends GetDiscountResponse = GetDiscountResponse>(options: Options<TComposable, GetDiscountData, GetDiscountResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetDiscountResponse | DefaultT, GetDiscountError, DefaultT>({ url: '/api/payment/discount/{code}', ...options });
+
+export const cancelSubscription = <TComposable extends Composable = '$fetch', DefaultT extends CancelSubscriptionResponse = CancelSubscriptionResponse>(options: Options<TComposable, CancelSubscriptionData, CancelSubscriptionResponse, DefaultT>) => (options.client ?? client).delete<TComposable, CancelSubscriptionResponse | DefaultT, CancelSubscriptionError, DefaultT>({ url: '/api/payment/subscription/{id}', ...options });
 
 /**
  * Get detailed information about a specific product
  */
-export const getProduct = <TComposable extends Composable = '$fetch', DefaultT extends GetProductResponse = GetProductResponse>(options: Options<TComposable, GetProductData, GetProductResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetProductResponse | DefaultT, GetProductError, DefaultT>({
-    security: [{ name: 'Authorization', type: 'apiKey' }],
-    url: '/api/Product/{id}',
-    ...options
-});
+export const getProduct = <TComposable extends Composable = '$fetch', DefaultT extends GetProductResponse = GetProductResponse>(options: Options<TComposable, GetProductData, GetProductResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetProductResponse | DefaultT, GetProductError, DefaultT>({ url: '/api/Product/{id}', ...options });
 
 /**
- * Get all listing matches for a specific product
- * Shows all available second-hand listings for price comparison
+ * Get related products with the same name but different attributes
+ * Optionally filter by distance from a ZIP code
  */
-export const getProductMatches = <TComposable extends Composable = '$fetch', DefaultT extends GetProductMatchesResponse = GetProductMatchesResponse>(options: Options<TComposable, GetProductMatchesData, GetProductMatchesResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetProductMatchesResponse | DefaultT, GetProductMatchesError, DefaultT>({
-    security: [{ name: 'Authorization', type: 'apiKey' }],
-    url: '/api/Product/{id}/matches',
-    ...options
-});
+export const getRelatedProducts = <TComposable extends Composable = '$fetch', DefaultT extends GetRelatedProductsResponse = GetRelatedProductsResponse>(options: Options<TComposable, GetRelatedProductsData, GetRelatedProductsResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetRelatedProductsResponse | DefaultT, GetRelatedProductsError, DefaultT>({ url: '/api/Product/{id}/related', ...options });
 
 /**
- * Report an issue with a product (wrong categorization, incorrect info, etc.)
+ * Get up to a few alternative products that currently have active offers, for a product page that
+ * has none (a product should never be a dead end). Ranked: same brand/model in another variant
+ * (storage/colour/size/condition), then sibling models from the known-products catalog (e.g. iPhone
+ * 14 Pro for iPhone 14), then same brand within the same most specific category (closest price
+ * first), then the same most specific category or its parent (most offers first). Every returned
+ * product is verified to currently have at least one active offer; the current product, redirecting
+ * products and legacy junk are never suggested. Empty when nothing qualifies.
+ */
+export const getProductAlternatives = <TComposable extends Composable = '$fetch', DefaultT extends GetProductAlternativesResponse = GetProductAlternativesResponse>(options: Options<TComposable, GetProductAlternativesData, GetProductAlternativesResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetProductAlternativesResponse | DefaultT, GetProductAlternativesError, DefaultT>({ url: '/api/Product/{id}/alternatives', ...options });
+
+/**
+ * Get the listing matches for a specific product
+ * Shows the available second-hand listings for price comparison. All filters combine with AND
+ * and are applied before the limit.
+ */
+export const getProductMatches = <TComposable extends Composable = '$fetch', DefaultT extends GetProductMatchesResponse = GetProductMatchesResponse>(options: Options<TComposable, GetProductMatchesData, GetProductMatchesResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetProductMatchesResponse | DefaultT, GetProductMatchesError, DefaultT>({ url: '/api/Product/{id}/matches', ...options });
+
+/**
+ * Counts over the active offers of a product without any filter, to build the filter controls
+ */
+export const getProductMatchFacets = <TComposable extends Composable = '$fetch', DefaultT extends GetProductMatchFacetsResponse = GetProductMatchFacetsResponse>(options: Options<TComposable, GetProductMatchFacetsData, GetProductMatchFacetsResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetProductMatchFacetsResponse | DefaultT, GetProductMatchFacetsError, DefaultT>({ url: '/api/Product/{id}/matches/facets', ...options });
+
+export const isProductAvailable = <TComposable extends Composable = '$fetch', DefaultT extends IsProductAvailableResponse = IsProductAvailableResponse>(options: Options<TComposable, IsProductAvailableData, IsProductAvailableResponse, DefaultT>) => (options.client ?? client).get<TComposable, IsProductAvailableResponse | DefaultT, IsProductAvailableError, DefaultT>({ url: '/api/Product/{platform}/{id}/available', ...options });
+
+/**
+ * Search for products by name, with optional category and attribute filters
+ */
+export const searchProducts = <TComposable extends Composable = '$fetch', DefaultT extends SearchProductsResponse = SearchProductsResponse>(options: Options<TComposable, SearchProductsData, SearchProductsResponse, DefaultT>) => (options.client ?? client).get<TComposable, SearchProductsResponse | DefaultT, SearchProductsError, DefaultT>({ url: '/api/Product/search', ...options });
+
+/**
+ * Get daily price history for a product
+ * Returns historical price data points across all listings for the product
+ */
+export const getPriceHistory = <TComposable extends Composable = '$fetch', DefaultT extends GetPriceHistoryResponse = GetPriceHistoryResponse>(options: Options<TComposable, GetPriceHistoryData, GetPriceHistoryResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetPriceHistoryResponse | DefaultT, GetPriceHistoryError, DefaultT>({ url: '/api/Product/{id}/price-history', ...options });
+
+/**
+ * Get price statistics aggregated from historical data
+ * Includes average, median, min, max prices and trend analysis
+ */
+export const getPriceStats = <TComposable extends Composable = '$fetch', DefaultT extends GetPriceStatsResponse = GetPriceStatsResponse>(options: Options<TComposable, GetPriceStatsData, GetPriceStatsResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetPriceStatsResponse | DefaultT, GetPriceStatsError, DefaultT>({ url: '/api/Product/{id}/price-stats', ...options });
+
+/**
+ * Get typeahead search suggestions based on product names and categories.
+ */
+export const getSuggestions = <TComposable extends Composable = '$fetch', DefaultT extends GetSuggestionsResponse = GetSuggestionsResponse>(options: Options<TComposable, GetSuggestionsData, GetSuggestionsResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetSuggestionsResponse | DefaultT, GetSuggestionsError, DefaultT>({ url: '/api/Product/suggest', ...options });
+
+/**
+ * Localized names, case page link(s) and other language editions of a product. Related pages are not merged variants. Sections that cannot be read
+ * (tables not created yet) are empty instead of failing the request.
+ */
+export const getProductRelations = <TComposable extends Composable = '$fetch', DefaultT extends GetProductRelationsResponse = GetProductRelationsResponse>(options: Options<TComposable, GetProductRelationsData, GetProductRelationsResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetProductRelationsResponse | DefaultT, GetProductRelationsError, DefaultT>({ url: '/api/product/{id}/relations', ...options });
+
+/**
+ * Series of not identified game listings with their listing count, per platform. Review tool: signed in and on the labeler allow list
+ * (`LABELING:ADMIN_USER_IDS` / `LABELING:ADMIN_EMAILS`), like the labeling endpoints.
+ */
+export const getUnidentifiedGameSeries = <TComposable extends Composable = '$fetch', DefaultT extends GetUnidentifiedGameSeriesResponse = GetUnidentifiedGameSeriesResponse>(options: Options<TComposable, GetUnidentifiedGameSeriesData, GetUnidentifiedGameSeriesResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetUnidentifiedGameSeriesResponse | DefaultT, GetUnidentifiedGameSeriesError, DefaultT>({ url: '/api/product/unidentified-games/series', ...options });
+
+/**
+ * The not identified listings of one series of a platform, newest page first by listing; same protection as the series list.
+ */
+export const getUnidentifiedGames = <TComposable extends Composable = '$fetch', DefaultT extends GetUnidentifiedGamesResponse = GetUnidentifiedGamesResponse>(options: Options<TComposable, GetUnidentifiedGamesData, GetUnidentifiedGamesResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetUnidentifiedGamesResponse | DefaultT, GetUnidentifiedGamesError, DefaultT>({ url: '/api/product/unidentified-games', ...options });
+
+/**
+ * Report an issue with a product (wrong match, same product as another, or a generic issue). Max 30 reports per user and hour.
  */
 export const reportProductIssue = <TComposable extends Composable = '$fetch', DefaultT = undefined>(options: Options<TComposable, ReportProductIssueData, unknown, DefaultT>) => (options.client ?? client).post<TComposable, unknown | DefaultT, ReportProductIssueError, DefaultT>({
-    security: [{ name: 'Authorization', type: 'apiKey' }],
     url: '/api/Product/{id}/report',
     ...options,
     headers: {
@@ -175,81 +373,88 @@ export const reportProductIssue = <TComposable extends Composable = '$fetch', De
     }
 });
 
-export const isProductAvailable = <TComposable extends Composable = '$fetch', DefaultT extends IsProductAvailableResponse = IsProductAvailableResponse>(options: Options<TComposable, IsProductAvailableData, IsProductAvailableResponse, DefaultT>) => (options.client ?? client).get<TComposable, IsProductAvailableResponse | DefaultT, IsProductAvailableError, DefaultT>({
-    security: [{ name: 'Authorization', type: 'apiKey' }],
-    url: '/api/Product/{platform}/{id}/available',
-    ...options
+export const doRedirect = <TComposable extends Composable = '$fetch', DefaultT = undefined>(options: Options<TComposable, DoRedirectData, unknown, DefaultT>) => (options.client ?? client).get<TComposable, unknown | DefaultT, DoRedirectError, DefaultT>({ url: '/api/redirect', ...options });
+
+export const preview = <TComposable extends Composable = '$fetch', DefaultT extends PreviewResponse = PreviewResponse>(options: Options<TComposable, PreviewData, PreviewResponse, DefaultT>) => (options.client ?? client).post<TComposable, PreviewResponse | DefaultT, PreviewError, DefaultT>({
+    url: '/api/reference-listings/preview',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
+
+export const getInfo = <TComposable extends Composable = '$fetch', DefaultT extends GetInfoResponse = GetInfoResponse>(options: Options<TComposable, GetInfoData, GetInfoResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetInfoResponse | DefaultT, GetInfoError, DefaultT>({ url: '/api/referral/info', ...options });
+
+export const createLink = <TComposable extends Composable = '$fetch', DefaultT extends CreateLinkResponse = CreateLinkResponse>(options: Options<TComposable, CreateLinkData, CreateLinkResponse, DefaultT>) => (options.client ?? client).post<TComposable, CreateLinkResponse | DefaultT, CreateLinkError, DefaultT>({ url: '/api/referral/link', ...options });
+
+export const listLinks = <TComposable extends Composable = '$fetch', DefaultT extends ListLinksResponse = ListLinksResponse>(options: Options<TComposable, ListLinksData, ListLinksResponse, DefaultT>) => (options.client ?? client).get<TComposable, ListLinksResponse | DefaultT, ListLinksError, DefaultT>({ url: '/api/referral/links', ...options });
+
+export const getLink = <TComposable extends Composable = '$fetch', DefaultT extends GetLinkResponse = GetLinkResponse>(options: Options<TComposable, GetLinkData, GetLinkResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetLinkResponse | DefaultT, GetLinkError, DefaultT>({ url: '/api/referral/link/{id}', ...options });
+
+export const useLink = <TComposable extends Composable = '$fetch', DefaultT = undefined>(options: Options<TComposable, UseLinkData, unknown, DefaultT>) => (options.client ?? client).post<TComposable, unknown | DefaultT, UseLinkError, DefaultT>({ url: '/api/referral/use', ...options });
 
 /**
- * Get list of available product categories
+ * Sitemap index for default (en) locale.
  */
-export const getCategories = <TComposable extends Composable = '$fetch', DefaultT extends GetCategoriesResponse = GetCategoriesResponse>(options: Options<TComposable, GetCategoriesData, GetCategoriesResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetCategoriesResponse | DefaultT, GetCategoriesError, DefaultT>({
-    security: [{ name: 'Authorization', type: 'apiKey' }],
-    url: '/api/Product/categories',
-    ...options
-});
+export const getSitemapIndex = <TComposable extends Composable = '$fetch', DefaultT = undefined>(options: Options<TComposable, GetSitemapIndexData, unknown, DefaultT>) => (options.client ?? client).get<TComposable, unknown | DefaultT, GetSitemapIndexError, DefaultT>({ url: '/api/sitemap-products.xml', ...options });
 
 /**
- * Search for products by name
+ * Sitemap index for German locale.
  */
-export const searchProducts = <TComposable extends Composable = '$fetch', DefaultT extends SearchProductsResponse = SearchProductsResponse>(options: Options<TComposable, SearchProductsData, SearchProductsResponse, DefaultT>) => (options.client ?? client).get<TComposable, SearchProductsResponse | DefaultT, SearchProductsError, DefaultT>({
-    security: [{ name: 'Authorization', type: 'apiKey' }],
-    url: '/api/Product/search',
-    ...options
-});
-
-export const doRedirect = <TComposable extends Composable = '$fetch', DefaultT = undefined>(options: Options<TComposable, DoRedirectData, unknown, DefaultT>) => (options.client ?? client).get<TComposable, unknown | DefaultT, DoRedirectError, DefaultT>({
-    security: [{ name: 'Authorization', type: 'apiKey' }],
-    url: '/api/redirect',
-    ...options
-});
-
-export const getInfo = <TComposable extends Composable = '$fetch', DefaultT extends GetInfoResponse = GetInfoResponse>(options: Options<TComposable, GetInfoData, GetInfoResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetInfoResponse | DefaultT, GetInfoError, DefaultT>({
-    security: [{ name: 'Authorization', type: 'apiKey' }],
-    url: '/api/referral/info',
-    ...options
-});
-
-export const createLink = <TComposable extends Composable = '$fetch', DefaultT extends CreateLinkResponse = CreateLinkResponse>(options: Options<TComposable, CreateLinkData, CreateLinkResponse, DefaultT>) => (options.client ?? client).post<TComposable, CreateLinkResponse | DefaultT, CreateLinkError, DefaultT>({
-    security: [{ name: 'Authorization', type: 'apiKey' }],
-    url: '/api/referral/link',
-    ...options
-});
-
-export const listLinks = <TComposable extends Composable = '$fetch', DefaultT extends ListLinksResponse = ListLinksResponse>(options: Options<TComposable, ListLinksData, ListLinksResponse, DefaultT>) => (options.client ?? client).get<TComposable, ListLinksResponse | DefaultT, ListLinksError, DefaultT>({
-    security: [{ name: 'Authorization', type: 'apiKey' }],
-    url: '/api/referral/links',
-    ...options
-});
-
-export const getLink = <TComposable extends Composable = '$fetch', DefaultT extends GetLinkResponse = GetLinkResponse>(options: Options<TComposable, GetLinkData, GetLinkResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetLinkResponse | DefaultT, GetLinkError, DefaultT>({
-    security: [{ name: 'Authorization', type: 'apiKey' }],
-    url: '/api/referral/link/{id}',
-    ...options
-});
-
-export const useLink = <TComposable extends Composable = '$fetch', DefaultT = undefined>(options: Options<TComposable, UseLinkData, unknown, DefaultT>) => (options.client ?? client).post<TComposable, unknown | DefaultT, UseLinkError, DefaultT>({
-    security: [{ name: 'Authorization', type: 'apiKey' }],
-    url: '/api/referral/use',
-    ...options
-});
+export const getSitemapIndexDe = <TComposable extends Composable = '$fetch', DefaultT = undefined>(options: Options<TComposable, GetSitemapIndexDeData, unknown, DefaultT>) => (options.client ?? client).get<TComposable, unknown | DefaultT, GetSitemapIndexDeError, DefaultT>({ url: '/api/sitemap-de-products.xml', ...options });
 
 /**
- * Get current user information.
+ * Default (en) locale sitemap chunk.
  */
-export const getMe = <TComposable extends Composable = '$fetch', DefaultT extends GetMeResponse = GetMeResponse>(options: Options<TComposable, GetMeData, GetMeResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetMeResponse | DefaultT, GetMeError, DefaultT>({
-    security: [{ name: 'Authorization', type: 'apiKey' }],
-    url: '/api/user/me',
-    ...options
-});
+export const getSitemapChunk = <TComposable extends Composable = '$fetch', DefaultT = undefined>(options: Options<TComposable, GetSitemapChunkData, unknown, DefaultT>) => (options.client ?? client).get<TComposable, unknown | DefaultT, GetSitemapChunkError, DefaultT>({ url: '/api/sitemap-products-{index}.xml', ...options });
 
 /**
- * Update user information, allows changing name, email and locale.
+ * German locale sitemap chunk.
  */
-export const updateMe = <TComposable extends Composable = '$fetch', DefaultT extends UpdateMeResponse = UpdateMeResponse>(options: Options<TComposable, UpdateMeData, UpdateMeResponse, DefaultT>) => (options.client ?? client).post<TComposable, UpdateMeResponse | DefaultT, UpdateMeError, DefaultT>({
-    security: [{ name: 'Authorization', type: 'apiKey' }],
-    url: '/api/user/me',
+export const getSitemapChunkDe = <TComposable extends Composable = '$fetch', DefaultT = undefined>(options: Options<TComposable, GetSitemapChunkDeData, unknown, DefaultT>) => (options.client ?? client).get<TComposable, unknown | DefaultT, GetSitemapChunkDeError, DefaultT>({ url: '/api/sitemap-de-products-{index}.xml', ...options });
+
+/**
+ * The days that have rows and how many rows were written per day (and per shard).
+ */
+export const days = <TComposable extends Composable = '$fetch', DefaultT = undefined>(options: Options<TComposable, DaysData, unknown, DefaultT>) => (options.client ?? client).get<TComposable, unknown | DefaultT, DaysError, DefaultT>({ url: '/api/training/days', ...options });
+
+/**
+ * One page of one partition as NDJSON, one Coflnet.Ane.TrainingListings.TrainingListing per line. `X-Next-Cursor` is set when more rows follow
+ * (pass it as `cursor`), absent when the partition is finished. The rows are streamed, not buffered.
+ */
+export const listings = <TComposable extends Composable = '$fetch', DefaultT = undefined>(options: Options<TComposable, ListingsData, unknown, DefaultT>) => (options.client ?? client).get<TComposable, unknown | DefaultT, ListingsError, DefaultT>({ url: '/api/training/listings', ...options });
+
+/**
+ * Removes one listing from every day (takedown request). `platform` is the platform name, for example `Kleinanzeigen`.
+ */
+export const delete_ = <TComposable extends Composable = '$fetch', DefaultT = undefined>(options: Options<TComposable, DeleteData, unknown, DefaultT>) => (options.client ?? client).delete<TComposable, unknown | DefaultT, DeleteError, DefaultT>({ url: '/api/training/listings/{platform}/{listingId}', ...options });
+
+/**
+ * All modes (dryrun/apply) recorded for a run id.
+ */
+export const getRegroupRun = <TComposable extends Composable = '$fetch', DefaultT = undefined>(options: Options<TComposable, GetRegroupRunData, unknown, DefaultT>) => (options.client ?? client).get<TComposable, unknown | DefaultT, GetRegroupRunError, DefaultT>({ url: '/api/training/regroup/{runId}', ...options });
+
+/**
+ * Persisted decisions of a run, paged. `limit` 1..500 (default 100); pass `nextPageState` back as `pageState`.
+ */
+export const moves = <TComposable extends Composable = '$fetch', DefaultT = undefined>(options: Options<TComposable, MovesData, unknown, DefaultT>) => (options.client ?? client).get<TComposable, unknown | DefaultT, MovesError, DefaultT>({ url: '/api/training/regroup/{runId}/moves', ...options });
+
+/**
+ * Reports newest first. `since` is an ISO timestamp, `status` one of pending/approved/rejected/fixed (default all), `limit` 1..500 (default 100).
+ */
+export const list = <TComposable extends Composable = '$fetch', DefaultT = undefined>(options: Options<TComposable, ListData, unknown, DefaultT>) => (options.client ?? client).get<TComposable, unknown | DefaultT, ListError, DefaultT>({ url: '/api/training/reports', ...options });
+
+/**
+ * The full report plus `resolvedNow` (product/listing info looked up at read time, marked as such, with the product's current listing count).
+ */
+export const getReport = <TComposable extends Composable = '$fetch', DefaultT = undefined>(options: Options<TComposable, GetReportData, unknown, DefaultT>) => (options.client ?? client).get<TComposable, unknown | DefaultT, GetReportError, DefaultT>({ url: '/api/training/reports/{reportId}', ...options });
+
+/**
+ * Sets Status (approved|rejected|fixed), Resolution, ResolutionRef and ResolvedAt (now, UTC).
+ */
+export const resolve = <TComposable extends Composable = '$fetch', DefaultT = undefined>(options: Options<TComposable, ResolveData, unknown, DefaultT>) => (options.client ?? client).post<TComposable, unknown | DefaultT, ResolveError, DefaultT>({
+    url: '/api/training/reports/{reportId}/resolution',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -258,19 +463,29 @@ export const updateMe = <TComposable extends Composable = '$fetch', DefaultT ext
 });
 
 /**
- * Get daily price history for a product
+ * Deletes the ANE data this service controls. It anonymizes the ANE profile fields
+ * (name/email/locale; AuthService exposes no hard-delete for the shared cross-service
+ * authentication identity) and deletes all saved filters/listeners (which also
+ * removes the user's stored FCM push token, carried in `ListingListener.Target`) and all
+ * match history and counters. It does not claim to erase the shared Coflnet identity or data held by other
+ * services. Idempotent: calling this repeatedly never throws - a missing user record is
+ * treated as already-deleted, and the Cassandra partition deletes are no-ops once empty.
  */
-export const getPriceHistory = <TComposable extends Composable = '$fetch', DefaultT extends GetPriceHistoryResponse = GetPriceHistoryResponse>(options: Options<TComposable, GetPriceHistoryData, GetPriceHistoryResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetPriceHistoryResponse | DefaultT, GetPriceHistoryError, DefaultT>({
-    security: [{ name: 'Authorization', type: 'apiKey' }],
-    url: '/api/Product/{id}/price-history',
-    ...options
-});
+export const deleteMe = <TComposable extends Composable = '$fetch', DefaultT = undefined>(options: Options<TComposable, DeleteMeData, unknown, DefaultT>) => (options.client ?? client).delete<TComposable, unknown | DefaultT, DeleteMeError, DefaultT>({ url: '/api/user/me', ...options });
 
 /**
- * Get price statistics aggregated from historical data
+ * Get current user information.
  */
-export const getPriceStats = <TComposable extends Composable = '$fetch', DefaultT extends GetPriceStatsResponse = GetPriceStatsResponse>(options: Options<TComposable, GetPriceStatsData, GetPriceStatsResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetPriceStatsResponse | DefaultT, GetPriceStatsError, DefaultT>({
-    security: [{ name: 'Authorization', type: 'apiKey' }],
-    url: '/api/Product/{id}/price-stats',
-    ...options
+export const getMe = <TComposable extends Composable = '$fetch', DefaultT extends GetMeResponse = GetMeResponse>(options: Options<TComposable, GetMeData, GetMeResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetMeResponse | DefaultT, GetMeError, DefaultT>({ url: '/api/user/me', ...options });
+
+/**
+ * Update user information, allows changing name, email and locale.
+ */
+export const updateMe = <TComposable extends Composable = '$fetch', DefaultT extends UpdateMeResponse = UpdateMeResponse>(options: Options<TComposable, UpdateMeData, UpdateMeResponse, DefaultT>) => (options.client ?? client).post<TComposable, UpdateMeResponse | DefaultT, UpdateMeError, DefaultT>({
+    url: '/api/user/me',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });

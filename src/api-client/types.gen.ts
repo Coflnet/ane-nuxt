@@ -4,18 +4,209 @@ export type ClientOptions = {
     baseURL: 'https://ane.coflnet.com' | (string & {});
 };
 
-export type ActiveSubscription = {
+export type ClientModelFilterInfo = {
+    name?: string | null;
+    value?: string | null;
+};
+
+export type ClientModelFilterMatch = {
+    listenerId?: number | null;
+    listingData?: ClientModelStoredListing;
+    matchedAt?: string | null;
+};
+
+export type ClientModelFilterOptions = {
+    filterType?: ClientModelFilterType;
+    options?: Array<ClientModelStringStringKeyValuePair> | null;
+};
+
+export type ClientModelFilterType = 'Options' | 'NumberRange' | 'Text' | 'Date' | 'Radius' | 'Bool' | 'MultiSelect';
+
+export type ClientModelListingListener = {
+    targetType?: ClientModelTargetType;
+    state?: ClientModelSearchState;
+    userId?: string | null;
+    id?: number | null;
+    filters?: Array<ClientModelFilterInfo> | null;
+    target?: string | null;
+    name?: string | null;
+    matchCount?: number | null;
+};
+
+export type ClientModelMatchStats = {
+    totalMatches?: number | null;
+    activeSearchesLeft?: number | null;
+    totalActiveSearches?: number | null;
+    listenerCount?: number | null;
+    listenerLimit?: number | null;
+    activeRefillAmount?: number | null;
+    searchesUsedMonthly?: number | null;
+    searchesAvailableMonthly?: number | null;
+};
+
+export type ClientModelPlatform = 'Unknown' | 'Ebay' | 'Kleinanzeigen' | 'Marktplaats' | 'Willhaben' | 'Shpock' | 'MarktDe' | 'Vinted' | 'Facebook' | 'Poshmark' | 'Mercari' | 'Depop' | 'Mobile' | 'AutoScout24' | 'WirKaufenDeinAuto' | 'AutoDe' | 'Gebrauchtwagen12' | 'Craigslist' | 'OfferUp' | 'OLX' | 'Quoka' | 'Gumtree' | 'Kijiji' | 'Carousell' | 'Carvana' | 'Autotrader' | 'CarsGuide' | 'Nextdoor' | 'Lebecoin' | 'Wallapop';
+
+export type ClientModelPriceKind = 'Unknown' | 'BuyItemNow' | 'Auction' | 'Negotiatable' | 'IncludesTax';
+
+export type ClientModelSearchState = 'None' | 'Disabled' | 'DisabledError';
+
+export type ClientModelStoredListing = {
+    platform?: ClientModelPlatform;
+    priceKind?: ClientModelPriceKind;
     id?: string | null;
-    product?: string | null;
+    title?: string | null;
+    descriptionShort?: string | null;
+    description?: string | null;
+    category?: string | null;
+    street?: string | null;
+    locality?: string | null;
+    region?: string | null;
+    country?: string | null;
+    imageUrls?: Array<string> | null;
+    price?: number | null;
+    currency?: string | null;
+    contact?: string | null;
+    userId?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
+    shipping?: string | null;
+    returnPolicy?: string | null;
+    attributes?: {
+        [key: string]: string;
+    } | null;
+    foundAt?: string | null;
+    createdAt?: string | null;
+    soldBefore?: string | null;
+    commercial?: boolean | null;
+    priceKindList?: Array<ClientModelPriceKind> | null;
+};
+
+export type ClientModelStringStringKeyValuePair = {
+    key?: string | null;
+    value?: string | null;
+};
+
+export type ClientModelTargetType = 'Unknown' | 'FireBase' | 'DiscordWebhook' | 'Email' | 'WhatsApp';
+
+export type CoflnetAuthTokenContainer = {
+    authToken?: string | null;
+};
+
+export type CoflnetAuthUser = {
+    id?: string;
+    name?: string | null;
+    email?: string | null;
+    locale?: string | null;
+    authProviderId?: string | null;
     createdAt?: string;
-    endsAt?: string | null;
+    lastSeenAt?: string;
 };
 
-export type AvailabilityResult = {
+export type ControllersCrowdScrapeControllerPointsResponse = {
+    points?: number;
+    maxBatch?: number;
+};
+
+/**
+ * Response of M:Coflnet.Ane.Controllers.ListingExistenceController.Exists(Coflnet.Ane.Platform,System.String,System.Threading.CancellationToken).
+ */
+export type ControllersListingExistsResponse = {
+    /**
+     * Whether the listing is already known
+     */
+    exists?: boolean;
+};
+
+export type ControllersProductControllerAvailabilityResult = {
     isAvailable?: boolean;
+    /**
+     * "stored", "live" or "unchecked" (assumed online, nothing could be verified).
+     */
+    source?: string | null;
 };
 
-export type DetailedLocation = {
+export type CrowdCrowdScrapeSubmission = {
+    taskId?: string | null;
+    url?: string | null;
+    platform?: Platform;
+    html?: string | null;
+    text?: string | null;
+    capturedAtMs?: number;
+};
+
+export type CrowdCrowdScrapeSubmitResult = {
+    accepted?: number;
+    rejected?: number;
+    pointsQueued?: number;
+};
+
+export type CrowdCrowdScrapeTask = {
+    id?: string | null;
+    url?: string | null;
+    xpath?: string | null;
+    platform?: Platform;
+    reward?: number;
+    kind?: string | null;
+};
+
+export type ExtensionDiscoveredListing = {
+    id?: string | null;
+    platform?: Platform;
+    url?: string | null;
+    title?: string | null;
+    price?: number | null;
+    currency?: string | null;
+    imageUrls?: Array<string> | null;
+};
+
+export type ExtensionDiscoveryResponse = {
+    listing?: ExtensionDiscoveredListing;
+    stored?: boolean;
+    queued?: boolean;
+    productId?: string | null;
+    estimate?: ExtensionPriceEstimate;
+    similarListings?: Array<ModelsProductMatch> | null;
+    saleStatus?: ListingSaleEvidence;
+    saleReferences?: Array<ExtensionSaleReference> | null;
+    productCandidates?: Array<unknown> | null;
+};
+
+export type ExtensionListingRequest = {
+    url: string;
+    title: string;
+    description?: string | null;
+    price?: number | null;
+    currency?: string | null;
+    imageUrls?: Array<string> | null;
+    imageUrl?: string | null;
+    availability?: string | null;
+    condition?: string | null;
+    createdAt?: string | null;
+    locale?: string | null;
+    productId?: string | null;
+};
+
+export type ExtensionPriceEstimate = {
+    value?: number;
+    currency?: string | null;
+    source?: string | null;
+    sampleCount?: number;
+};
+
+export type ExtensionSaleReference = {
+    listingId?: string | null;
+    platform?: Platform;
+    url?: string | null;
+    title?: string | null;
+    price?: number;
+    currency?: string | null;
+    status?: string | null;
+    evidence?: string | null;
+    observedAt?: string;
+    ageBasis?: string | null;
+};
+
+export type FilterControllerDetailedLocation = {
     lat?: number;
     lon?: number;
     name?: string | null;
@@ -25,24 +216,6 @@ export type DetailedLocation = {
     country?: string | null;
 };
 
-export type FilterInfo = {
-    name?: string | null;
-    value?: string | null;
-};
-
-export type FilterMatch = {
-    listenerId?: number | null;
-    listingData?: StoredListing;
-    matchedAt?: string | null;
-};
-
-export type FilterOptions = {
-    filterType?: FilterType;
-    options?: Array<StringStringKeyValuePair> | null;
-};
-
-export type FilterType = 'Options' | 'NumberRange' | 'Text' | 'Date' | 'Radius' | 'Bool' | 'MultiSelect';
-
 export type Flip = {
     category?: string | null;
     listing?: Listing;
@@ -51,25 +224,40 @@ export type Flip = {
     potentialProfit?: number | null;
     serializedSells?: string | null;
     foundAt?: string | null;
-    recentSells?: Array<SoldFor> | null;
+    recentSells?: Array<FlipSale> | null;
 };
 
-export type InviteLink = {
-    userId?: string;
-    id?: string;
-    name?: string | null;
-    text?: string | null;
+export type FlipReport = {
+    reportId?: string | null;
     createdAt?: string;
-    expiresAt?: string;
-    usageCount?: number;
+    reportedBy?: string | null;
+    listingId?: string | null;
+    listingTitle?: string | null;
+    platform?: string | null;
+    category?: string | null;
+    price?: number | null;
+    listingJson?: string | null;
+    profit?: number | null;
+    medianPrice?: number | null;
+    recentSellsJson?: string | null;
+    reason?: string | null;
+    currentSlug?: string | null;
+    suggestedSlug?: string | null;
+    productSeoId?: string | null;
+    productName?: string | null;
+    productBrand?: string | null;
+    productModel?: string | null;
+    productCategory?: string | null;
+    productListingCount?: number | null;
+    productMedianPrice?: number | null;
+    contextJson?: string | null;
+    resolvedAt?: string | null;
+    resolution?: string | null;
+    resolutionRef?: string | null;
+    status?: string | null;
 };
 
-/**
- * Types of issues that can be reported
- */
-export type IssueType = 'WrongCategory' | 'Duplicate' | 'WrongListing' | 'IncorrectInformation' | 'Spam' | 'Other';
-
-export type Listing = {
+export type FlipReportListing = {
     priceKind?: PriceKind;
     platform?: Platform;
     id?: string | null;
@@ -97,35 +285,181 @@ export type Listing = {
     createdAt?: string | null;
     soldBefore?: string | null;
     commercial?: boolean | null;
+    seoId?: string | null;
+    categories?: Array<string> | null;
 };
 
-export type ListingListener = {
-    targetType?: TargetType;
-    state?: SearchState;
+export type FlipReportRequest = {
+    listing?: FlipReportListing;
+    profit?: number | null;
+    medianPrice?: number | null;
+    recentSells?: Array<unknown> | null;
+    reason?: string | null;
+    currentSlug?: string | null;
+    suggestedSlug?: string | null;
+};
+
+export type FlipReportResponse = {
+    reportId?: string | null;
+};
+
+export type FlipSale = {
+    key?: string | null;
+    price?: number | null;
+    date?: string | null;
+    id?: string | null;
+    platform?: Platform;
+    sellerId?: string | null;
+};
+
+export type LabelingArchiveStats = {
+    photos?: number;
+    photosLast24h?: number;
+    byHost?: {
+        [key: string]: number;
+    } | null;
+    labeledPairsExportable?: number;
+    labeledPairsWaiting?: number;
+};
+
+/**
+ * Labels of one similarity band. Coflnet.Ane.Labeling.BandStats.MatchRate is match / (match + noMatch + otherVariant), null without decided labels.
+ */
+export type LabelingBandStats = {
+    band?: string | null;
+    from?: number;
+    to?: number;
+    total?: number;
+    match?: number;
+    noMatch?: number;
+    otherVariant?: number;
+    unsure?: number;
+    matchRate?: number | null;
+};
+
+export type LabelingLabelingControllerLabelRequest = {
+    label?: string | null;
+};
+
+export type LabelingLabelingControllerMeResponse = {
+    canLabel?: boolean;
     userId?: string | null;
-    id?: number | null;
-    filters?: Array<FilterInfo> | null;
-    target?: string | null;
-    name?: string | null;
-    matchCount?: number | null;
 };
 
-export type MatchStats = {
-    totalMatches?: number | null;
-    activeSearchesLeft?: number | null;
-    totalActiveSearches?: number | null;
-    listenerCount?: number | null;
-    listenerLimit?: number | null;
-    activeRefillAmount?: number | null;
-    searchesUsedMonthly?: number | null;
-    searchesAvailableMonthly?: number | null;
+export type LabelingLabelingStats = {
+    candidates?: number;
+    labeled?: number;
+    byLabel?: {
+        [key: string]: number;
+    } | null;
+    excludedByRights?: number;
+    rights?: Array<LabelingRightsEntry> | null;
+    archive?: LabelingArchiveStats;
+    bands?: Array<LabelingBandStats> | null;
+    pendingBySource?: {
+        [key: string]: number;
+    } | null;
 };
 
-export type Platform = 'Unknown' | 'Ebay' | 'Kleinanzeigen' | 'Marktplaats' | 'Willhaben' | 'Shpock' | 'MarktDe' | 'Vinted' | 'Facebook' | 'Poshmark' | 'Mercari' | 'Depop' | 'Mobile' | 'AutoScout24' | 'WirKaufenDeinAuto' | 'AutoDe' | 'Gebrauchtwagen12' | 'Craigslist' | 'OfferUp' | 'OLX' | 'Quoka' | 'Gumtree' | 'Kijiji' | 'Carousell' | 'Carvana' | 'Autotrader' | 'CarsGuide' | 'Nextdoor' | 'Lebecoin' | 'Wallapop';
+export type LabelingNextPair = {
+    pairId?: string | null;
+    similarity?: number;
+    secondBest?: number | null;
+    decision?: string | null;
+    groupKey?: string | null;
+    clusterSeoId?: string | null;
+    textSeoId?: string | null;
+    createdAt?: string;
+    a?: LabelingPairSide;
+    b?: LabelingPairSide;
+};
 
-export type PriceKind = 'Unknown' | 'BuyItemNow' | 'Auction' | 'Negotiatable' | 'IncludesTax';
+export type LabelingPairSide = {
+    platform?: string | null;
+    listingId?: string | null;
+    imageUrl?: string | null;
+    listingUrl?: string | null;
+    imageIndex?: number;
+    archivedImageUrl?: string | null;
+};
 
-export type ProblemDetails = {
+export type LabelingRightsEntry = {
+    host?: string | null;
+    platform?: string | null;
+    status?: string | null;
+    checkedAt?: string | null;
+    evidence?: Array<string> | null;
+};
+
+export type LabelingSeedItem = {
+    listingIdA?: string | null;
+    listingIdB?: string | null;
+    platformA?: string | null;
+    platformB?: string | null;
+    score?: number;
+    source?: string | null;
+    /**
+     * Optional; looked up from the stored listing when missing.
+     */
+    imageUrlA?: string | null;
+    imageUrlB?: string | null;
+};
+
+export type LabelingSeedResult = {
+    inserted?: number;
+    duplicates?: number;
+    rejected?: Array<string> | null;
+};
+
+export type LabelingTakedownResult = {
+    photos?: number;
+    candidates?: number;
+    labels?: number;
+};
+
+export type Listing = {
+    id?: string | null;
+    title?: string | null;
+    descriptionShort?: string | null;
+    description?: string | null;
+    category?: string | null;
+    street?: string | null;
+    locality?: string | null;
+    region?: string | null;
+    country?: string | null;
+    imageUrls?: Array<string> | null;
+    price?: number | null;
+    currency?: string | null;
+    contact?: string | null;
+    userId?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
+    shipping?: string | null;
+    returnPolicy?: string | null;
+    priceKind?: PriceKind;
+    attributes?: {
+        [key: string]: string;
+    } | null;
+    foundAt?: string;
+    createdAt?: string | null;
+    soldBefore?: string | null;
+    commercial?: boolean | null;
+    platform?: Platform;
+    seoId?: string | null;
+    categories?: Array<string> | null;
+};
+
+export type ListingSaleEvidence = {
+    status?: string | null;
+    evidence?: string | null;
+    ageBasis?: string | null;
+    checkedAt?: string;
+    lastAvailableAt?: string | null;
+    firstUnavailableAt?: string | null;
+    soldObservedAt?: string | null;
+};
+
+export type MicrosoftAspNetCoreMvcProblemDetails = {
     type?: string | null;
     title?: string | null;
     status?: number | null;
@@ -134,58 +468,139 @@ export type ProblemDetails = {
     [key: string]: unknown | string | null | string | null | number | null | string | null | string | null | undefined;
 };
 
-export type Product = {
+/**
+ * Public-facing view of an Coflnet.Ane.Models.InviteLink, returned from the referral endpoints
+ * instead of the storage model. Deliberately omits Coflnet.Ane.Models.InviteLink.UserId (the
+ * inviter) so that a link can be shared, and its id looked up via GET /api/referral/link/{id},
+ * without exposing who owns it.
+ */
+export type ModelsInviteLinkResponse = {
+    id?: string;
+    name?: string | null;
+    text?: string | null;
+    createdAt?: string;
+    expiresAt?: string;
+    usageCount?: number;
+};
+
+/**
+ * Types of issues that can be reported
+ */
+export type ModelsIssueType = 'WrongCategory' | 'Duplicate' | 'WrongListing' | 'IncorrectInformation' | 'Spam' | 'Other' | 'WrongMatch' | 'SameProductAs';
+
+/**
+ * An alternative product suggested for a product page that has no active offers - same shape as
+ * Coflnet.Ane.Models.Product (and, like every alternative, guaranteed to itself have at least one active
+ * offer), plus a machine-readable reason for why it was suggested.
+ */
+export type ModelsProductAlternative = {
+    /**
+     * Unique product identifier (SEO ID)
+     */
     id?: string | null;
+    /**
+     * Product name/title
+     */
     name?: string | null;
+    /**
+     * Primary product category
+     */
     category?: string | null;
+    /**
+     * All categories this product belongs to
+     */
     categories?: Array<string> | null;
+    /**
+     * Product brand (if applicable)
+     */
     brand?: string | null;
+    /**
+     * Product model number or identifier
+     */
     model?: string | null;
+    /**
+     * Product description
+     */
     description?: string | null;
+    /**
+     * Product condition (new, like_new, good, used, broken)
+     */
     condition?: string | null;
+    /**
+     * URL to product image
+     */
     imageUrl?: string | null;
+    /**
+     * Number of active listings for this product
+     */
     listingCount?: number;
-    attributes?: { [key: string]: string } | null;
+    /**
+     * Product attributes (e.g., storage_size, ram_size, color)
+     */
+    attributes?: {
+        [key: string]: string;
+    } | null;
+    /**
+     * Lowest price across all listings
+     */
     minPrice?: number | null;
+    /**
+     * Highest price across all listings
+     */
     maxPrice?: number | null;
+    /**
+     * Average price across all listings
+     */
     avgPrice?: number | null;
+    /**
+     * When this product was first created
+     */
     createdAt?: string;
+    /**
+     * Last time this product data was updated
+     */
     updatedAt?: string;
-};
-
-export type ProductAttribute = {
-    key?: string | null;
-    value?: string | null;
-};
-
-export type ProductDocument = {
-    seoId?: string | null;
-    categories?: Array<string> | null;
-    name?: string | null;
-    normalizedName?: string | null;
-    brand?: string | null;
-    model?: string | null;
-    identifierType?: string | null;
-    condition?: string | null;
-    averagePrice?: number | null;
-    medianPrice?: number | null;
-    minPrice?: number | null;
-    maxPrice?: number | null;
-    listingCount?: number | null;
-    createdAt?: string;
-    lastUpdated?: string;
-    attributes?: Array<ProductAttribute> | null;
-    sampleTitles?: Array<string> | null;
-    imageUrl?: string | null;
-    canonicalSeoId?: string | null;
-    relatedSeoIds?: Array<string> | null;
+    /**
+     * Id of the verified known-products catalog entry this product's brand/model (or name) matches;
+     * null when nothing in the catalog matches (including when the catalog is disabled or empty).
+     */
+    knownProductId?: string | null;
+    /**
+     * Verified allowed values per attribute key for Coflnet.Ane.Models.Product.KnownProductId's catalog entry (e.g.
+     * storage_size -> ["128GB", "256GB", "512GB"]); null when Coflnet.Ane.Models.Product.KnownProductId is null. A
+     * key present with an empty list means the key is allowed but its value is not verified/limited.
+     */
+    possibleAttributes?: {
+        [key: string]: Array<string>;
+    } | null;
+    /**
+     * True when this product currently has at least one active listing. Coflnet.Ane.Models.Product.ListingCount
+     * alone cannot answer this - it counts listings that went inactive up to 30 days ago too - so a
+     * product can show a non-zero listing count while having zero active offers. The frontend uses this
+     * to decide whether to load `GET /api/product/{id}/alternatives` for a product page without
+     * re-requesting the matches endpoint.
+     */
+    hasActiveOffers?: boolean;
+    /**
+     * True when this is a catch-all page (`nike-clothing-unspecific`, ...): a collection of offers that
+     * could not be assigned to a specific product. Such pages are excluded from search, suggestions, related,
+     * alternatives, category counts and sitemaps; the page should show a hint and be marked noindex.
+     */
+    isCatchAll?: boolean;
+    /**
+     * Why this product was suggested: `same_model` (same brand/model, other variant),
+     * `sibling_model` (a sibling model from the known-products catalog, e.g. iPhone 14 Pro for
+     * iPhone 14), `same_brand_category` (same brand within the same most specific category), or
+     * `same_category` (same most specific category, or its parent).
+     */
+    reason?: string | null;
 };
 
 /**
  * Report for invalid categorization or other product issues
  */
-export type ProductIssueReport = {
-    type?: IssueType;
+export type ModelsProductIssueReport = {
+    type?: ModelsIssueType;
     /**
      * Additional details about the issue
      */
@@ -194,6 +609,14 @@ export type ProductIssueReport = {
      * Suggested correction (optional)
      */
     suggestion?: string | null;
+    /**
+     * Listing the report is about (required for Coflnet.Ane.Models.IssueType.WrongMatch)
+     */
+    listingId?: string | null;
+    /**
+     * The other product (required for Coflnet.Ane.Models.IssueType.SameProductAs)
+     */
+    otherProductId?: string | null;
     /**
      * User ID who reported the issue (if authenticated)
      */
@@ -207,7 +630,7 @@ export type ProductIssueReport = {
 /**
  * Represents a listing matched to a product
  */
-export type ProductMatch = {
+export type ModelsProductMatch = {
     /**
      * Listing ID from kleinanzeigen.de
      */
@@ -224,6 +647,10 @@ export type ProductMatch = {
      * Listing price
      */
     price?: number;
+    /**
+     * Stored listing currency; null when unknown. Amounts are not converted.
+     */
+    currency?: string | null;
     /**
      * Listing location/city
      */
@@ -248,37 +675,91 @@ export type ProductMatch = {
      * Confidence score of the product match (0-1)
      */
     matchScore?: number;
+    /**
+     * Platform the offer is listed on (name of the Platform enum, e.g. "Vinted")
+     */
+    platform?: string | null;
+    /**
+     * ISO 3166-1 alpha-2 country code of the offer, null when unknown
+     */
+    country?: string | null;
+    /**
+     * Whether the offer can be shipped, null when the platform gives no information
+     */
+    shipping?: boolean | null;
+    /**
+     * Distance in km to the requested position, only set when a position was given and the offer has coordinates
+     */
+    distanceKm?: number | null;
 };
 
-export type ReferralInfo = {
+export type ModelsReferralInfo = {
     invitedCount?: number;
 };
 
-export type ResultReport = {
-    match?: FilterMatch;
-    message?: string | null;
-    /**
-     * Optional contact option, default to email
-     */
-    contact?: string | null;
+export type OpenSearchClientGeoLocation = {
+    latitude?: number;
+    longitude?: number;
 };
 
-export type FilterBucket = {
+export type OpensearchProductAttribute = {
+    key?: string | null;
     value?: string | null;
-    count?: number;
 };
 
-export type SearchProductsResult = {
-    products?: Array<ProductDocument> | null;
+export type OpensearchProductDocument = {
+    seoId?: string | null;
     categories?: Array<string> | null;
-    total?: number;
-    attributesWithValues?: { [key: string]: Array<string> } | null;
-    categoryBuckets?: Array<FilterBucket> | null;
-    conditionBuckets?: Array<FilterBucket> | null;
-    attributeBuckets?: { [key: string]: Array<FilterBucket> } | null;
-    priceMin?: number | null;
-    priceMax?: number | null;
+    name?: string | null;
+    normalizedName?: string | null;
+    brand?: string | null;
+    model?: string | null;
+    identifierType?: string | null;
+    condition?: string | null;
+    averagePrice?: number | null;
+    medianPrice?: number | null;
+    minPrice?: number | null;
+    maxPrice?: number | null;
+    listingCount?: number | null;
+    offersFound?: number | null;
+    createdAt?: string;
+    lastUpdated?: string;
+    attributes?: Array<OpensearchProductAttribute> | null;
+    sampleTitles?: Array<string> | null;
+    imageUrl?: string | null;
+    locations?: Array<OpenSearchClientGeoLocation> | null;
+    countries?: Array<string> | null;
+    canonicalSeoId?: string | null;
+    relatedSeoIds?: Array<string> | null;
 };
+
+export type PaymentControllerActiveSubscription = {
+    id?: string | null;
+    product?: string | null;
+    createdAt?: string;
+    endsAt?: string | null;
+};
+
+export type PaymentControllerDiscountInfo = {
+    code?: string | null;
+    discountPercent?: number;
+    amount?: number;
+    amountType?: string | null;
+    name?: string | null;
+    isSubscriptionOnly?: boolean;
+    duration?: string | null;
+};
+
+export type PaymentControllerSubscriptionRequest = {
+    planSlug?: string | null;
+    redirectSuccess?: string | null;
+    redirectCancel?: string | null;
+    discountCode?: string | null;
+};
+
+export type Platform = 'Unknown' | 'Ebay' | 'Kleinanzeigen' | 'Marktplaats' | 'Willhaben' | 'Shpock' | 'MarktDe' | 'Vinted' | 'Facebook' | 'Poshmark' | 'Mercari' | 'Depop' | 'Mobile' | 'AutoScout24' | 'WirKaufenDeinAuto' | 'AutoDe' | 'Gebrauchtwagen12' | 'Craigslist' | 'OfferUp' | 'OLX' | 'Quoka' | 'Gumtree' | 'Kijiji' | 'Carousell' | 'Carvana' | 'Autotrader' | 'CarsGuide' | 'Nextdoor' | 'Lebecoin' | 'Wallapop' | 'Subito' | 'Milanuncios' | 'Allegro' | 'AllegroLokalnie' | 'Ricardo' | 'Tutti' | 'Anibis' | 'Tradera' | 'Blocket' | 'Finn' | 'Tori' | 'DBA' | 'TwoDehands' | 'Bazos' | 'Sbazar' | 'Adverts' | 'DoneDeal' | 'ParuVendu' | 'Rakuten' | 'Catawiki' | 'Cardmarket' | 'Delcampe' | 'Vendora' | 'Jofogas' | 'Njuskalo';
+
+export type PriceKind = 'Unknown' | 'BuyItemNow' | 'Auction' | 'Negotiatable' | 'IncludesTax';
 
 export type PricePoint = {
     productSeoId?: string | null;
@@ -290,90 +771,534 @@ export type PricePoint = {
     sampleCount?: number;
 };
 
-export type PriceHistoryStats = {
-    dataPoints?: number;
+export type Product = {
+    id?: string | null;
+    category?: Array<string> | null;
+    name?: string | null;
+    normalizedName?: string | null;
+    brand?: string | null;
+    model?: string | null;
+    identifierType?: string | null;
+    identifierValue?: string | null;
+    condition?: string | null;
     averagePrice?: number;
     medianPrice?: number;
     minPrice?: number;
     maxPrice?: number;
-    currentPrice?: number;
-    daysOfData?: number;
-    oldestDate?: string;
-    newestDate?: string;
-    trendPercent?: number;
-};
-
-export type SearchState = 'None' | 'Disabled' | 'DisabledError';
-
-export type SoldFor = {
-    platform?: Platform;
-    key?: string | null;
-    price?: number | null;
-    date?: string | null;
-    id?: string | null;
-};
-
-export type StoredListing = {
-    platform?: Platform;
-    priceKind?: PriceKind;
-    id?: string | null;
-    title?: string | null;
-    descriptionShort?: string | null;
-    description?: string | null;
-    category?: string | null;
-    street?: string | null;
-    locality?: string | null;
-    region?: string | null;
-    country?: string | null;
-    imageUrls?: Array<string> | null;
-    price?: number | null;
-    currency?: string | null;
-    contact?: string | null;
-    userId?: string | null;
-    latitude?: number | null;
-    longitude?: number | null;
-    shipping?: string | null;
-    returnPolicy?: string | null;
+    estimatedValue?: number | null;
+    soldCount?: number | null;
+    listingCount?: number;
+    offersFound?: number;
+    createdAt?: string;
+    lastUpdated?: string;
+    sampleTitles?: Array<string> | null;
+    imageUrl?: string | null;
     attributes?: {
         [key: string]: string;
     } | null;
-    foundAt?: string | null;
-    createdAt?: string | null;
-    soldBefore?: string | null;
-    commercial?: boolean | null;
-    priceKindList?: Array<PriceKind> | null;
+    localizedNames?: {
+        [key: string]: string;
+    } | null;
+    canonicalSeoId?: string | null;
+    relatedSeoIds?: Array<string> | null;
 };
 
-export type StringStringKeyValuePair = {
-    key?: string | null;
-    value?: string | null;
-};
-
-export type SubscriptionRequest = {
-    planSlug?: string | null;
-    redirectSuccess?: string | null;
-    redirectCancel?: string | null;
-    discountCode?: string | null;
-};
-
-export type TargetType = 'Unknown' | 'FireBase' | 'DiscordWebhook' | 'Email' | 'WhatsApp';
-
-export type TokenContainer = {
-    authToken?: string | null;
-};
-
-export type User = {
-    id?: string;
-    name?: string | null;
-    email?: string | null;
+export type ReferenceListingsReferenceListingPreviewRequest = {
+    url?: string | null;
     locale?: string | null;
-    authProviderId?: string | null;
-    createdAt?: string;
-    lastSeenAt?: string;
+    selectedSelector?: string | null;
+    additionalSelectors?: Array<string> | null;
+};
+
+export type ReferenceListingsReferenceListingPreviewResponse = {
+    url?: string | null;
+    host?: string | null;
+    marketplace?: string | null;
+    listing?: ReferenceListingsReferenceListingSummary;
+    priceCandidates?: Array<ReferenceListingsReferencePriceCandidate> | null;
+    previewElements?: Array<ReferenceListingsReferencePreviewElement> | null;
+    selectedReference?: ReferenceListingsReferencePriceCandidate;
+    requiresReferencePriceSelection?: boolean;
+    suggestedFilter?: ReferenceListingsReferenceListingSuggestedFilter;
+    screenshotPngBase64?: string | null;
+    viewportWidth?: number;
+    viewportHeight?: number;
+    fullPageHeight?: number;
+    sandboxHtml?: string | null;
+    renderedNodes?: Array<ReferenceListingsRenderedNode> | null;
+    primarySelectorXPath?: string | null;
+};
+
+export type ReferenceListingsReferenceListingSuggestedFilter = {
+    searchTerm?: string | null;
+    marketplace?: string | null;
+    minPrice?: number;
+    maxPrice?: number | null;
+    referenceUrl?: string | null;
+    referenceTitle?: string | null;
+    referenceMarketplace?: string | null;
+    referencePrice?: number | null;
+    referenceCurrency?: string | null;
+    referenceSelector?: string | null;
+};
+
+export type ReferenceListingsReferenceListingSummary = {
+    title?: string | null;
+    description?: string | null;
+    imageUrls?: Array<string> | null;
+    productSearchQuery?: string | null;
+};
+
+export type ReferenceListingsReferencePreviewElement = {
+    id?: string | null;
+    selector?: string | null;
+    role?: string | null;
+    text?: string | null;
+    price?: number | null;
+    currency?: string | null;
+    confidence?: number;
+    isReferenceCandidate?: boolean;
+    isAutoSelected?: boolean;
+};
+
+export type ReferenceListingsReferencePriceCandidate = {
+    selector?: string | null;
+    text?: string | null;
+    price?: number;
+    currency?: string | null;
+    confidence?: number;
+    source?: string | null;
+    isAutoSelected?: boolean;
+};
+
+export type ReferenceListingsRenderedNode = {
+    xPath?: string | null;
+    css?: string | null;
+    role?: string | null;
+    text?: string | null;
+    x?: number;
+    y?: number;
+    width?: number;
+    height?: number;
+    price?: number | null;
+    currency?: string | null;
+    confidence?: number;
+};
+
+export type ResultReport = {
+    match?: ClientModelFilterMatch;
+    message?: string | null;
+    /**
+     * Optional contact option, default to email
+     */
+    contact?: string | null;
+};
+
+/**
+ * Response of `GET /api/Categories/scope`.
+ */
+export type ServicesCategoryScopeResponse = {
+    slugs?: Array<string> | null;
+    contactUrl?: string | null;
+};
+
+/**
+ * Everything the index knows about one part page (`GET /api/parts/{id}`): every value with its source and confidence, the review rows, what it fits and its same-part edges.
+ */
+export type ServicesPartDetails = {
+    id?: string | null;
+    partClass?: string | null;
+    partKey?: string | null;
+    measurements?: Array<ServicesPartMeasurementView> | null;
+    fits?: Array<ServicesPartFitView> | null;
+    samePart?: Array<ServicesPartEdgeView> | null;
+};
+
+export type ServicesPartEdgeView = {
+    id?: string | null;
+    name?: string | null;
+    kind?: string | null;
+    status?: string | null;
+    confidence?: number;
+    evidence?: string | null;
+};
+
+/**
+ * The tooth count estimated from a broken gear or a measured diameter, and the range that was searched.
+ */
+export type ServicesPartEstimateView = {
+    teeth?: number;
+    min?: number;
+    max?: number;
+    method?: string | null;
+    evidence?: string | null;
+};
+
+export type ServicesPartFitView = {
+    machine?: string | null;
+    machineKey?: string | null;
+    source?: string | null;
+    confidence?: number;
+    evidence?: string | null;
+};
+
+/**
+ * One part page in a search result.
+ */
+export type ServicesPartHit = {
+    id?: string | null;
+    name?: string | null;
+    imageUrl?: string | null;
+    minPrice?: number | null;
+    listingCount?: number;
+    partClass?: string | null;
+    /**
+     * The primary key value of the page (tooth count, designation, part number key), null when unknown.
+     */
+    partKey?: string | null;
+    /**
+     * Exact tooth count, null when unknown.
+     */
+    teeth?: number | null;
+    keyConfidence?: number;
+    outerDiameterMm?: number | null;
+    boreMm?: number | null;
+    innerDiameterMm?: number | null;
+    widthMm?: number | null;
+    module?: number | null;
+    material?: string | null;
+    partNumber?: string | null;
+    /**
+     * Machine keys the part is listed for.
+     */
+    fits?: Array<string> | null;
+    /**
+     * 1 = everything asked for matches exactly; measures the page does not know earn less.
+     */
+    score?: number;
+    /**
+     * `direct`, `same_part_confirmed` (labelled part number or identical triple) or `same_part_candidate` (measured signature only, may be the same part).
+     */
+    via?: string | null;
+    viaConfidence?: number | null;
+    viaEvidence?: string | null;
+    /**
+     * The direct hit this page was reached from, for same-part hits.
+     */
+    viaFrom?: string | null;
+};
+
+export type ServicesPartMeasurementView = {
+    key?: string | null;
+    /**
+     * text, image, photo, text+image, derived, product, vote or review (the stored reason why a value is unknown).
+     */
+    source?: string | null;
+    /**
+     * `platform:id` of the listing the value was read from, empty for page level rows.
+     */
+    listing?: string | null;
+    value?: string | null;
+    numeric?: number | null;
+    unit?: string | null;
+    confidence?: number;
+    evidence?: string | null;
+};
+
+/**
+ * How the query was understood (`GET /api/parts/search`), so the UI can show and correct it.
+ */
+export type ServicesPartQueryView = {
+    partClass?: string | null;
+    /**
+     * The exact primary key value asked for (a bearing designation, a generic part number key); for gears see Coflnet.Ane.Services.PartQueryView.Teeth.
+     */
+    partKey?: string | null;
+    teeth?: number | null;
+    /**
+     * The tooth range of a reverse search (Coflnet.Ane.Services.PartSearchResponse.Estimate).
+     */
+    teethMin?: number | null;
+    teethMax?: number | null;
+    outerDiameterMm?: number | null;
+    boreMm?: number | null;
+    innerDiameterMm?: number | null;
+    module?: number | null;
+    widthMm?: number | null;
+    partNumber?: string | null;
+    machine?: string | null;
+    /**
+     * Relative tolerance on the approximate measures (0.08 = 8 %, with a 1.5 mm floor).
+     */
+    tolerance?: number;
+};
+
+export type ServicesPartSearchResponse = {
+    query?: ServicesPartQueryView;
+    estimate?: ServicesPartEstimateView;
+    items?: Array<ServicesPartHit> | null;
+};
+
+/**
+ * Price history statistics response DTO
+ */
+export type ServicesPriceHistoryStats = {
+    /**
+     * Total number of individual listings in the history
+     */
+    dataPoints?: number;
+    /**
+     * Average price across all historical data points
+     */
+    averagePrice?: number;
+    /**
+     * Median price across all historical data points
+     */
+    medianPrice?: number;
+    /**
+     * Minimum price found in the history period
+     */
+    minPrice?: number;
+    /**
+     * Maximum price found in the history period
+     */
+    maxPrice?: number;
+    /**
+     * Most recent median price
+     */
+    currentPrice?: number;
+    /**
+     * Number of days with data
+     */
+    daysOfData?: number;
+    /**
+     * Oldest date in the history
+     */
+    oldestDate?: string;
+    /**
+     * Most recent date in the history
+     */
+    newestDate?: string;
+    /**
+     * Price trend as percentage change from oldest to newest price
+     */
+    trendPercent?: number;
+};
+
+/**
+ * Another language edition of the same game on the same platform (a related page, not the same group).
+ */
+export type ServicesProductEdition = {
+    id?: string | null;
+    name?: string | null;
+    /**
+     * Edition language (en, de, fr, it, nl, es) when known.
+     */
+    language?: string | null;
+};
+
+export type ServicesProductMatchFacets = {
+    total?: number;
+    platforms?: {
+        [key: string]: number;
+    } | null;
+    countries?: {
+        [key: string]: number;
+    } | null;
+    withCoordinates?: number;
+    shippable?: number;
+};
+
+/**
+ * A product page referenced from another page: its id and name.
+ */
+export type ServicesProductPageRef = {
+    id?: string | null;
+    name?: string | null;
+};
+
+/**
+ * Localized names and related pages of a product (`GET /api/product/{id}/relations`).
+ */
+export type ServicesProductRelations = {
+    /**
+     * Language code to the product's name in that language. Empty when none is known.
+     */
+    localizedNames?: {
+        [key: string]: string;
+    } | null;
+    /**
+     * `game_case` for a page that sells only the empty case or box of a game, otherwise null.
+     */
+    productKind?: string | null;
+    caseOf?: ServicesProductPageRef;
+    /**
+     * For a game page: its live empty case pages.
+     */
+    casePages?: Array<ServicesProductPageRef> | null;
+    /**
+     * Other language editions of the same game on the same platform.
+     */
+    editions?: Array<ServicesProductEdition> | null;
+};
+
+/**
+ * One facet value with its product count. SampleImageUrl is additive: for the visual facet
+ * keys (see Coflnet.Ane.Services.FacetSampleImages.VisualFacetKeys) the image of the best product with that value
+ * under the current query and filters; omitted from the JSON when there is none.
+ */
+export type ServicesProductServiceFilterBucket = {
+    value?: string | null;
+    count?: number;
+    sampleImageUrl?: string | null;
+};
+
+/**
+ * Minimal, response-friendly view of a matched Coflnet.Ane.KnownProducts.KnownProduct.
+ */
+export type ServicesProductServiceKnownProductSummary = {
+    id?: string | null;
+    name?: string | null;
+    brand?: string | null;
+    model?: string | null;
+};
+
+/**
+ * How the backend understood the query, so the UI can explain implicit behaviour
+ * ("sorted by lowest price because you searched for cheap").
+ */
+export type ServicesProductServiceSearchInterpretation = {
+    /**
+     * The cleaned query that was matched (price words removed).
+     */
+    query?: string | null;
+    /**
+     * The sort that was applied; null means the default (relevance for text, newest for browsing).
+     */
+    appliedSort?: string | null;
+    /**
+     * True when AppliedSort came from the query ("cheap") rather than the sortBy parameter.
+     */
+    sortImplied?: boolean;
+    /**
+     * Max price taken from the query ("unter 200€") when no maxPrice parameter was given.
+     */
+    impliedMaxPrice?: number | null;
+    /**
+     * Product types recognized in the query (e.g. "phone", "pullover").
+     */
+    productTypes?: Array<string> | null;
+    /**
+     * Attribute constraints recognized in the query beyond product type (e.g. `os`=`android`,
+     * `os_version`=`14` from "android 14 phones"); null when none were recognized.
+     */
+    attributeFilters?: {
+        [key: string]: string;
+    } | null;
+    knownProduct?: ServicesProductServiceKnownProductSummary;
+    /**
+     * True when KnownProduct matched but its primary query returned zero hits, so the
+     * wildcard/parsing query was used instead (the hard fallback requirement). Always false when
+     * KnownProduct is null.
+     */
+    knownProductFallback?: boolean;
+    /**
+     * Same content as AttributeFilters (kept for older clients): the structured filters taken
+     * from the query, applied as strict attribute constraints. `os` is the family ("Android", "iOS");
+     * `os_version_supports` means the device runs N (highest official version at least N, launch version at most N or unknown), `os_version_min` highest official version at least N.
+     * A product without the attribute never matches, so such a query can legitimately be empty.
+     */
+    impliedAttributes?: {
+        [key: string]: string;
+    } | null;
+    /**
+     * The text typed for ImpliedAttributes ("android 15+"), so the UI can remove it from the query.
+     */
+    impliedAttributesPhrase?: string | null;
+};
+
+export type ServicesProductServiceSearchProductsResult = {
+    products?: Array<OpensearchProductDocument> | null;
+    categories?: Array<string> | null;
+    total?: number;
+    attributesWithValues?: {
+        [key: string]: Array<string>;
+    } | null;
+    categoryBuckets?: Array<ServicesProductServiceFilterBucket> | null;
+    conditionBuckets?: Array<ServicesProductServiceFilterBucket> | null;
+    attributeBuckets?: {
+        [key: string]: Array<ServicesProductServiceFilterBucket>;
+    } | null;
+    priceMin?: number | null;
+    priceMax?: number | null;
+    interpretation?: ServicesProductServiceSearchInterpretation;
+};
+
+export type ServicesProductServiceSearchSuggestion = {
+    text?: string | null;
+    type?: string | null;
+    seoId?: string | null;
+    imageUrl?: string | null;
+    category?: string | null;
+    minPrice?: number | null;
+};
+
+/**
+ * One not identified game listing for review (no seller data, no location).
+ */
+export type ServicesUnidentifiedGameListing = {
+    platform?: string | null;
+    series?: string | null;
+    /**
+     * Marketplace name (name of the Platform enum).
+     */
+    listingPlatform?: string | null;
+    listingId?: string | null;
+    listingUrl?: string | null;
+    title?: string | null;
+    price?: number;
+    currency?: string | null;
+    imageUrl?: string | null;
+    foundAt?: string;
+    /**
+     * What was tried to identify the game: description, title or photo.
+     */
+    identifyStage?: string | null;
+    evidence?: string | null;
+};
+
+export type ServicesUnidentifiedGameSeriesCount = {
+    platform?: string | null;
+    series?: string | null;
+    count?: number;
+};
+
+export type ServicesUnidentifiedGamesPage = {
+    items?: Array<ServicesUnidentifiedGameListing> | null;
+    /**
+     * Pass back as `pagingState` for the next page; null on the last page.
+     */
+    nextPagingState?: string | null;
+};
+
+export type TrainingReportsControllerResolutionRequest = {
+    status?: string | null;
+    resolution?: string | null;
+    resolutionRef?: string | null;
+};
+
+export type UnifiedCategory = {
+    slug?: string | null;
+    label?: string | null;
+    attributeExtractionPrompt?: string | null;
+    subCategories?: Array<UnifiedCategory> | null;
+    attributes?: {
+        [key: string]: string;
+    } | null;
 };
 
 export type LoginFirebaseData = {
-    body: TokenContainer;
+    body: CoflnetAuthTokenContainer;
     path?: never;
     query?: never;
     url: '/api/auth/firebase';
@@ -418,10 +1343,782 @@ export type LoginFirebaseResponses = {
     /**
      * OK
      */
-    200: TokenContainer;
+    200: CoflnetAuthTokenContainer;
 };
 
 export type LoginFirebaseResponse = LoginFirebaseResponses[keyof LoginFirebaseResponses];
+
+export type GetTopLevelCategoriesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Label language: `de` (default) or `en`. Untranslated categories keep their German label.
+         */
+        lang?: string;
+    };
+    url: '/api/Categories/top-level';
+};
+
+export type GetTopLevelCategoriesErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetTopLevelCategoriesError = GetTopLevelCategoriesErrors[keyof GetTopLevelCategoriesErrors];
+
+export type GetTopLevelCategoriesResponses = {
+    /**
+     * OK
+     */
+    200: Array<UnifiedCategory>;
+};
+
+export type GetTopLevelCategoriesResponse = GetTopLevelCategoriesResponses[keyof GetTopLevelCategoriesResponses];
+
+export type GetScopeData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/Categories/scope';
+};
+
+export type GetScopeErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetScopeError = GetScopeErrors[keyof GetScopeErrors];
+
+export type GetScopeResponses = {
+    /**
+     * OK
+     */
+    200: ServicesCategoryScopeResponse;
+};
+
+export type GetScopeResponse = GetScopeResponses[keyof GetScopeResponses];
+
+export type GetAllCategoriesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Label language: `de` (default) or `en`. Untranslated categories keep their German label.
+         */
+        lang?: string;
+    };
+    url: '/api/Categories/all';
+};
+
+export type GetAllCategoriesErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetAllCategoriesError = GetAllCategoriesErrors[keyof GetAllCategoriesErrors];
+
+export type GetAllCategoriesResponses = {
+    /**
+     * OK
+     */
+    200: Array<unknown>;
+};
+
+export type GetAllCategoriesResponse = GetAllCategoriesResponses[keyof GetAllCategoriesResponses];
+
+export type GetSubCategoriesData = {
+    body?: never;
+    path: {
+        /**
+         * The parent category slug (e.g., "elektronik")
+         */
+        parentSlug: string;
+    };
+    query?: {
+        /**
+         * Label language: `de` (default) or `en`. Untranslated categories keep their German label.
+         */
+        lang?: string;
+    };
+    url: '/api/Categories/{parentSlug}/subcategories';
+};
+
+export type GetSubCategoriesErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetSubCategoriesError = GetSubCategoriesErrors[keyof GetSubCategoriesErrors];
+
+export type GetSubCategoriesResponses = {
+    /**
+     * OK
+     */
+    200: Array<UnifiedCategory>;
+};
+
+export type GetSubCategoriesResponse = GetSubCategoriesResponses[keyof GetSubCategoriesResponses];
+
+export type GetCategoryData = {
+    body?: never;
+    path: {
+        /**
+         * Category slug (e.g., "notebooks", "elektronik")
+         */
+        slug: string;
+    };
+    query?: {
+        /**
+         * Label language: `de` (default) or `en`. Untranslated categories keep their German label.
+         */
+        lang?: string;
+    };
+    url: '/api/Categories/{slug}';
+};
+
+export type GetCategoryErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Not Found
+     */
+    404: MicrosoftAspNetCoreMvcProblemDetails;
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetCategoryError = GetCategoryErrors[keyof GetCategoryErrors];
+
+export type GetCategoryResponses = {
+    /**
+     * OK
+     */
+    200: UnifiedCategory;
+};
+
+export type GetCategoryResponse = GetCategoryResponses[keyof GetCategoryResponses];
+
+export type GetAttributesToExtractData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Category path as comma-separated slugs (e.g., "elektronik,notebooks")
+         */
+        path?: string;
+    };
+    url: '/api/Categories/attributes';
+};
+
+export type GetAttributesToExtractErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Not Found
+     */
+    404: MicrosoftAspNetCoreMvcProblemDetails;
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetAttributesToExtractError = GetAttributesToExtractErrors[keyof GetAttributesToExtractErrors];
+
+export type GetAttributesToExtractResponses = {
+    /**
+     * OK
+     */
+    200: {
+        [key: string]: string;
+    };
+};
+
+export type GetAttributesToExtractResponse = GetAttributesToExtractResponses[keyof GetAttributesToExtractResponses];
+
+export type ResolveCategoryPathData = {
+    body?: never;
+    path: {
+        /**
+         * The category slug to resolve (e.g., "notebooks")
+         */
+        slug: string;
+    };
+    query?: never;
+    url: '/api/Categories/resolve/{slug}';
+};
+
+export type ResolveCategoryPathErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Not Found
+     */
+    404: MicrosoftAspNetCoreMvcProblemDetails;
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type ResolveCategoryPathError = ResolveCategoryPathErrors[keyof ResolveCategoryPathErrors];
+
+export type ResolveCategoryPathResponses = {
+    /**
+     * OK
+     */
+    200: Array<string>;
+};
+
+export type ResolveCategoryPathResponse = ResolveCategoryPathResponses[keyof ResolveCategoryPathResponses];
+
+export type GetCategoriesWithCountsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/Categories/with-counts';
+};
+
+export type GetCategoriesWithCountsErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetCategoriesWithCountsError = GetCategoriesWithCountsErrors[keyof GetCategoriesWithCountsErrors];
+
+export type GetCategoriesWithCountsResponses = {
+    /**
+     * OK
+     */
+    200: {
+        [key: string]: number;
+    };
+};
+
+export type GetCategoriesWithCountsResponse = GetCategoriesWithCountsResponses[keyof GetCategoriesWithCountsResponses];
+
+export type GetCategoryCountsBySlugData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/Categories/counts-by-slug';
+};
+
+export type GetCategoryCountsBySlugErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetCategoryCountsBySlugError = GetCategoryCountsBySlugErrors[keyof GetCategoryCountsBySlugErrors];
+
+export type GetCategoryCountsBySlugResponses = {
+    /**
+     * OK
+     */
+    200: {
+        [key: string]: number;
+    };
+};
+
+export type GetCategoryCountsBySlugResponse = GetCategoryCountsBySlugResponses[keyof GetCategoryCountsBySlugResponses];
+
+export type GetTasksData = {
+    body?: never;
+    path?: never;
+    query?: {
+        batch?: number;
+    };
+    url: '/api/crowdscrape/tasks';
+};
+
+export type GetTasksErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetTasksError = GetTasksErrors[keyof GetTasksErrors];
+
+export type GetTasksResponses = {
+    /**
+     * OK
+     */
+    200: Array<CrowdCrowdScrapeTask>;
+};
+
+export type GetTasksResponse = GetTasksResponses[keyof GetTasksResponses];
+
+export type SubmitData = {
+    body?: Array<CrowdCrowdScrapeSubmission>;
+    path?: never;
+    query?: never;
+    url: '/api/crowdscrape/submit';
+};
+
+export type SubmitErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type SubmitError = SubmitErrors[keyof SubmitErrors];
+
+export type SubmitResponses = {
+    /**
+     * OK
+     */
+    200: CrowdCrowdScrapeSubmitResult;
+};
+
+export type SubmitResponse = SubmitResponses[keyof SubmitResponses];
+
+export type GetPointsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/crowdscrape/points';
+};
+
+export type GetPointsErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetPointsError = GetPointsErrors[keyof GetPointsErrors];
+
+export type GetPointsResponses = {
+    /**
+     * OK
+     */
+    200: ControllersCrowdScrapeControllerPointsResponse;
+};
+
+export type GetPointsResponse = GetPointsResponses[keyof GetPointsResponses];
+
+export type MarketplacesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/extension/marketplaces';
+};
+
+export type MarketplacesErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type MarketplacesError = MarketplacesErrors[keyof MarketplacesErrors];
+
+export type MarketplacesResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type DiscoverData = {
+    body?: ExtensionListingRequest;
+    path?: never;
+    query?: never;
+    url: '/api/extension/discover';
+};
+
+export type DiscoverErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type DiscoverError = DiscoverErrors[keyof DiscoverErrors];
+
+export type DiscoverResponses = {
+    /**
+     * OK
+     */
+    200: ExtensionDiscoveryResponse;
+};
+
+export type DiscoverResponse = DiscoverResponses[keyof DiscoverResponses];
 
 export type GetFiltersData = {
     body?: never;
@@ -469,7 +2166,7 @@ export type GetFiltersResponses = {
     /**
      * OK
      */
-    200: Array<ListingListener>;
+    200: Array<ClientModelListingListener>;
 };
 
 export type GetFiltersResponse = GetFiltersResponses[keyof GetFiltersResponses];
@@ -521,7 +2218,7 @@ export type GetOptionsResponses = {
      * OK
      */
     200: {
-        [key: string]: FilterOptions;
+        [key: string]: ClientModelFilterOptions;
     };
 };
 
@@ -579,7 +2276,7 @@ export type ReportMatchResponses = {
 export type ReportMatchResponse = ReportMatchResponses[keyof ReportMatchResponses];
 
 export type AddFilterData = {
-    body?: ListingListener;
+    body?: ClientModelListingListener;
     path?: never;
     query?: never;
     url: '/api/filters';
@@ -624,7 +2321,7 @@ export type AddFilterResponses = {
     /**
      * OK
      */
-    200: ListingListener;
+    200: ClientModelListingListener;
 };
 
 export type AddFilterResponse = AddFilterResponses[keyof AddFilterResponses];
@@ -781,13 +2478,13 @@ export type GetFilterByTokenResponses = {
     /**
      * OK
      */
-    200: ListingListener;
+    200: ClientModelListingListener;
 };
 
 export type GetFilterByTokenResponse = GetFilterByTokenResponses[keyof GetFilterByTokenResponses];
 
 export type TestFilterData = {
-    body?: ListingListener;
+    body?: ClientModelListingListener;
     path?: never;
     query?: never;
     url: '/api/filters/test';
@@ -832,7 +2529,7 @@ export type TestFilterResponses = {
     /**
      * OK
      */
-    200: Array<StoredListing>;
+    200: Array<ClientModelStoredListing>;
 };
 
 export type TestFilterResponse = TestFilterResponses[keyof TestFilterResponses];
@@ -885,7 +2582,7 @@ export type GetLocationResponses = {
     /**
      * OK
      */
-    200: DetailedLocation;
+    200: FilterControllerDetailedLocation;
 };
 
 export type GetLocationResponse = GetLocationResponses[keyof GetLocationResponses];
@@ -996,6 +2693,644 @@ export type GetFlipsResponses = {
 
 export type GetFlipsResponse = GetFlipsResponses[keyof GetFlipsResponses];
 
+export type GetLiveFlipsData = {
+    body?: never;
+    path: {
+        category: string;
+    };
+    query?: never;
+    url: '/api/flips/live/{category}';
+};
+
+export type GetLiveFlipsErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetLiveFlipsError = GetLiveFlipsErrors[keyof GetLiveFlipsErrors];
+
+export type GetLiveFlipsResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type ReportFlipData = {
+    body?: FlipReportRequest;
+    path?: never;
+    query?: never;
+    url: '/api/flips/report';
+};
+
+export type ReportFlipErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Unauthorized
+     */
+    401: MicrosoftAspNetCoreMvcProblemDetails;
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type ReportFlipError = ReportFlipErrors[keyof ReportFlipErrors];
+
+export type ReportFlipResponses = {
+    /**
+     * OK
+     */
+    200: FlipReportResponse;
+};
+
+export type ReportFlipResponse = ReportFlipResponses[keyof ReportFlipResponses];
+
+export type GetFlipReportsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        status?: string;
+        limit?: number;
+    };
+    url: '/api/flips/reports';
+};
+
+export type GetFlipReportsErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Unauthorized
+     */
+    401: MicrosoftAspNetCoreMvcProblemDetails;
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetFlipReportsError = GetFlipReportsErrors[keyof GetFlipReportsErrors];
+
+export type GetFlipReportsResponses = {
+    /**
+     * OK
+     */
+    200: Array<FlipReport>;
+};
+
+export type GetFlipReportsResponse = GetFlipReportsResponses[keyof GetFlipReportsResponses];
+
+export type GetTrainingSamplesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        limit?: number;
+    };
+    url: '/api/flips/training-samples';
+};
+
+export type GetTrainingSamplesErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Unauthorized
+     */
+    401: MicrosoftAspNetCoreMvcProblemDetails;
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetTrainingSamplesError = GetTrainingSamplesErrors[keyof GetTrainingSamplesErrors];
+
+export type GetTrainingSamplesResponses = {
+    /**
+     * OK
+     */
+    200: Array<FlipReport>;
+};
+
+export type GetTrainingSamplesResponse = GetTrainingSamplesResponses[keyof GetTrainingSamplesResponses];
+
+export type MeData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/labeling/me';
+};
+
+export type MeErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type MeError = MeErrors[keyof MeErrors];
+
+export type MeResponses = {
+    /**
+     * OK
+     */
+    200: LabelingLabelingControllerMeResponse;
+};
+
+export type MeResponse = MeResponses[keyof MeResponses];
+
+export type NextData = {
+    body?: never;
+    path?: never;
+    query?: {
+        count?: number;
+        groupKey?: string;
+    };
+    url: '/api/labeling/next';
+};
+
+export type NextErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type NextError = NextErrors[keyof NextErrors];
+
+export type NextResponses = {
+    /**
+     * OK
+     */
+    200: Array<LabelingNextPair>;
+};
+
+export type NextResponse = NextResponses[keyof NextResponses];
+
+export type LabelData = {
+    body?: LabelingLabelingControllerLabelRequest;
+    path: {
+        pairId: string;
+    };
+    query?: never;
+    url: '/api/labeling/{pairId}/label';
+};
+
+export type LabelErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type LabelError = LabelErrors[keyof LabelErrors];
+
+export type LabelResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type StatsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/labeling/stats';
+};
+
+export type StatsErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type StatsError = StatsErrors[keyof StatsErrors];
+
+export type StatsResponses = {
+    /**
+     * OK
+     */
+    200: LabelingLabelingStats;
+};
+
+export type StatsResponse = StatsResponses[keyof StatsResponses];
+
+export type ExportData = {
+    body?: never;
+    path?: never;
+    query?: {
+        includeUnlabeled?: boolean;
+        format?: string;
+    };
+    url: '/api/labeling/export';
+};
+
+export type ExportErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type ExportError = ExportErrors[keyof ExportErrors];
+
+export type ExportResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type SeedData = {
+    body?: Array<LabelingSeedItem>;
+    path?: never;
+    query?: never;
+    url: '/api/labeling/seed';
+};
+
+export type SeedErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type SeedError = SeedErrors[keyof SeedErrors];
+
+export type SeedResponses = {
+    /**
+     * OK
+     */
+    200: LabelingSeedResult;
+};
+
+export type SeedResponse = SeedResponses[keyof SeedResponses];
+
+export type PhotoData = {
+    body?: never;
+    path: {
+        platform: string;
+        listingId: string;
+        imageIndex: number;
+    };
+    query?: never;
+    url: '/api/labeling/photo/{platform}/{listingId}/{imageIndex}';
+};
+
+export type PhotoErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type PhotoError = PhotoErrors[keyof PhotoErrors];
+
+export type PhotoResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type TakedownData = {
+    body?: never;
+    path: {
+        platform: string;
+        listingId: string;
+    };
+    query?: never;
+    url: '/api/labeling/listing/{platform}/{listingId}';
+};
+
+export type TakedownErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type TakedownError = TakedownErrors[keyof TakedownErrors];
+
+export type TakedownResponses = {
+    /**
+     * OK
+     */
+    200: LabelingTakedownResult;
+};
+
+export type TakedownResponse = TakedownResponses[keyof TakedownResponses];
+
 export type GetMatchesData = {
     body?: never;
     path?: never;
@@ -1046,7 +3381,7 @@ export type GetMatchesResponses = {
     /**
      * OK
      */
-    200: Array<FilterMatch>;
+    200: Array<ClientModelFilterMatch>;
 };
 
 export type GetMatchesResponse = GetMatchesResponses[keyof GetMatchesResponses];
@@ -1097,10 +3432,249 @@ export type GetStatsResponses = {
     /**
      * OK
      */
-    200: MatchStats;
+    200: ClientModelMatchStats;
 };
 
 export type GetStatsResponse = GetStatsResponses[keyof GetStatsResponses];
+
+export type ExistsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Platform name or numeric value, e.g. `Kleinanzeigen` or `2`
+         */
+        platform?: Platform;
+        /**
+         * The platform's own listing id as produced by the scraper
+         */
+        id?: string;
+    };
+    url: '/api/listing/exists';
+};
+
+export type ExistsErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type ExistsError = ExistsErrors[keyof ExistsErrors];
+
+export type ExistsResponses = {
+    /**
+     * OK
+     */
+    200: ControllersListingExistsResponse;
+};
+
+export type ExistsResponse = ExistsResponses[keyof ExistsResponses];
+
+export type SearchPartsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        q?: string;
+        class?: string;
+        teeth?: number;
+        part_key?: string;
+        teeth_observed?: number;
+        arc_degrees?: number;
+        pitch_mm?: number;
+        outerDiameterMm?: number;
+        boreMm?: number;
+        innerDiameterMm?: number;
+        module?: number;
+        widthMm?: number;
+        partNumber?: string;
+        machine?: string;
+        tolerance?: number;
+        limit?: number;
+    };
+    url: '/api/parts/search';
+};
+
+export type SearchPartsErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type SearchPartsError = SearchPartsErrors[keyof SearchPartsErrors];
+
+export type SearchPartsResponses = {
+    /**
+     * OK
+     */
+    200: ServicesPartSearchResponse;
+};
+
+export type SearchPartsResponse = SearchPartsResponses[keyof SearchPartsResponses];
+
+export type GetPartsForMachineData = {
+    body?: never;
+    path?: never;
+    query?: {
+        machine?: string;
+        limit?: number;
+    };
+    url: '/api/parts/for-machine';
+};
+
+export type GetPartsForMachineErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetPartsForMachineError = GetPartsForMachineErrors[keyof GetPartsForMachineErrors];
+
+export type GetPartsForMachineResponses = {
+    /**
+     * OK
+     */
+    200: ServicesPartSearchResponse;
+};
+
+export type GetPartsForMachineResponse = GetPartsForMachineResponses[keyof GetPartsForMachineResponses];
+
+export type GetPartDetailsData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/parts/{id}';
+};
+
+export type GetPartDetailsErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Not Found
+     */
+    404: MicrosoftAspNetCoreMvcProblemDetails;
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetPartDetailsError = GetPartDetailsErrors[keyof GetPartDetailsErrors];
+
+export type GetPartDetailsResponses = {
+    /**
+     * OK
+     */
+    200: ServicesPartDetails;
+};
+
+export type GetPartDetailsResponse = GetPartDetailsResponses[keyof GetPartDetailsResponses];
 
 export type GetSubscriptionData = {
     body?: never;
@@ -1148,13 +3722,13 @@ export type GetSubscriptionResponses = {
     /**
      * OK
      */
-    200: Array<ActiveSubscription>;
+    200: Array<PaymentControllerActiveSubscription>;
 };
 
 export type GetSubscriptionResponse = GetSubscriptionResponses[keyof GetSubscriptionResponses];
 
 export type SubscribeData = {
-    body?: SubscriptionRequest;
+    body?: PaymentControllerSubscriptionRequest;
     path?: never;
     query?: never;
     url: '/api/payment/subscription';
@@ -1203,6 +3777,59 @@ export type SubscribeResponses = {
 };
 
 export type SubscribeResponse = SubscribeResponses[keyof SubscribeResponses];
+
+export type GetDiscountData = {
+    body?: never;
+    path: {
+        code: string;
+    };
+    query?: never;
+    url: '/api/payment/discount/{code}';
+};
+
+export type GetDiscountErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetDiscountError = GetDiscountErrors[keyof GetDiscountErrors];
+
+export type GetDiscountResponses = {
+    /**
+     * OK
+     */
+    200: PaymentControllerDiscountInfo;
+};
+
+export type GetDiscountResponse = GetDiscountResponses[keyof GetDiscountResponses];
 
 export type CancelSubscriptionData = {
     body?: never;
@@ -1286,7 +3913,7 @@ export type GetProductErrors = {
     /**
      * Not Found
      */
-    404: ProblemDetails;
+    404: MicrosoftAspNetCoreMvcProblemDetails;
     /**
      * Internal Server Error
      */
@@ -1317,6 +3944,132 @@ export type GetProductResponses = {
 
 export type GetProductResponse = GetProductResponses[keyof GetProductResponses];
 
+export type GetRelatedProductsData = {
+    body?: never;
+    path: {
+        /**
+         * Product ID
+         */
+        id: string;
+    };
+    query?: {
+        /**
+         * ZIP code for distance filtering (optional)
+         */
+        zip?: string;
+        /**
+         * Maximum distance in kilometers (optional)
+         */
+        maxDistance?: number;
+    };
+    url: '/api/Product/{id}/related';
+};
+
+export type GetRelatedProductsErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetRelatedProductsError = GetRelatedProductsErrors[keyof GetRelatedProductsErrors];
+
+export type GetRelatedProductsResponses = {
+    /**
+     * OK
+     */
+    200: Array<Product>;
+};
+
+export type GetRelatedProductsResponse = GetRelatedProductsResponses[keyof GetRelatedProductsResponses];
+
+export type GetProductAlternativesData = {
+    body?: never;
+    path: {
+        /**
+         * Product ID
+         */
+        id: string;
+    };
+    query?: {
+        /**
+         * Maximum number of alternatives to return (1-3, default 3)
+         */
+        limit?: number;
+    };
+    url: '/api/Product/{id}/alternatives';
+};
+
+export type GetProductAlternativesErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetProductAlternativesError = GetProductAlternativesErrors[keyof GetProductAlternativesErrors];
+
+export type GetProductAlternativesResponses = {
+    /**
+     * OK
+     */
+    200: Array<ModelsProductAlternative>;
+};
+
+export type GetProductAlternativesResponse = GetProductAlternativesResponses[keyof GetProductAlternativesResponses];
+
 export type GetProductMatchesData = {
     body?: never;
     path: {
@@ -1334,6 +4087,38 @@ export type GetProductMatchesData = {
          * Number of items to return (default: 50, max: 100)
          */
         limit?: number;
+        /**
+         * Optional ZIP code, resolved to a position (400 when it cannot be resolved)
+         */
+        zip?: string;
+        /**
+         * Optional latitude
+         */
+        lat?: number;
+        /**
+         * Optional longitude
+         */
+        lon?: number;
+        /**
+         * Optional maximum distance in km around the position (offers without coordinates are excluded)
+         */
+        maxDistance?: number;
+        /**
+         * Optional comma separated platform names, e.g. Vinted,Kleinanzeigen (unknown names give 400)
+         */
+        platforms?: string;
+        /**
+         * Optional comma separated ISO 3166-1 alpha-2 codes; EU expands to the EU member states
+         */
+        countries?: string;
+        /**
+         * Only offers that are not known to be pickup-only (unknown shipping stays in)
+         */
+        shippingOnly?: boolean;
+        /**
+         * ISO country code used for the zip lookup (default DE)
+         */
+        zipCountry?: string;
     };
     url: '/api/Product/{id}/matches';
 };
@@ -1355,7 +4140,7 @@ export type GetProductMatchesErrors = {
     /**
      * Not Found
      */
-    404: ProblemDetails;
+    404: MicrosoftAspNetCoreMvcProblemDetails;
     /**
      * Internal Server Error
      */
@@ -1381,16 +4166,13 @@ export type GetProductMatchesResponses = {
     /**
      * OK
      */
-    200: Array<ProductMatch>;
+    200: Array<ModelsProductMatch>;
 };
 
 export type GetProductMatchesResponse = GetProductMatchesResponses[keyof GetProductMatchesResponses];
 
-export type ReportProductIssueData = {
-    /**
-     * Issue report details
-     */
-    body?: ProductIssueReport;
+export type GetProductMatchFacetsData = {
+    body?: never;
     path: {
         /**
          * Product ID
@@ -1398,10 +4180,10 @@ export type ReportProductIssueData = {
         id: string;
     };
     query?: never;
-    url: '/api/Product/{id}/report';
+    url: '/api/Product/{id}/matches/facets';
 };
 
-export type ReportProductIssueErrors = {
+export type GetProductMatchFacetsErrors = {
     /**
      * Bad Request
      */
@@ -1415,14 +4197,6 @@ export type ReportProductIssueErrors = {
          */
         message?: string;
     };
-    /**
-     * Unauthorized
-     */
-    401: ProblemDetails;
-    /**
-     * Not Found
-     */
-    404: ProblemDetails;
     /**
      * Internal Server Error
      */
@@ -1442,14 +4216,16 @@ export type ReportProductIssueErrors = {
     };
 };
 
-export type ReportProductIssueError = ReportProductIssueErrors[keyof ReportProductIssueErrors];
+export type GetProductMatchFacetsError = GetProductMatchFacetsErrors[keyof GetProductMatchFacetsErrors];
 
-export type ReportProductIssueResponses = {
+export type GetProductMatchFacetsResponses = {
     /**
      * OK
      */
-    200: unknown;
+    200: ServicesProductMatchFacets;
 };
+
+export type GetProductMatchFacetsResponse = GetProductMatchFacetsResponses[keyof GetProductMatchFacetsResponses];
 
 export type IsProductAvailableData = {
     body?: never;
@@ -1500,61 +4276,10 @@ export type IsProductAvailableResponses = {
     /**
      * OK
      */
-    200: AvailabilityResult;
+    200: ControllersProductControllerAvailabilityResult;
 };
 
 export type IsProductAvailableResponse = IsProductAvailableResponses[keyof IsProductAvailableResponses];
-
-export type GetCategoriesData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/Product/categories';
-};
-
-export type GetCategoriesErrors = {
-    /**
-     * Bad Request
-     */
-    400: {
-        /**
-         * Human readable id for this kind of error
-         */
-        slug?: string;
-        /**
-         * More info about the error, may sometimes be sufficient to display to user
-         */
-        message?: string;
-    };
-    /**
-     * Internal Server Error
-     */
-    500: {
-        /**
-         * Human readable id for this kind of error
-         */
-        slug?: string;
-        /**
-         * Unknown error occured
-         */
-        message?: string;
-        /**
-         * Id for the error report with this id
-         */
-        trace?: string;
-    };
-};
-
-export type GetCategoriesError = GetCategoriesErrors[keyof GetCategoriesErrors];
-
-export type GetCategoriesResponses = {
-    /**
-     * OK
-     */
-    200: Array<string>;
-};
-
-export type GetCategoriesResponse = GetCategoriesResponses[keyof GetCategoriesResponses];
 
 export type SearchProductsData = {
     body?: never;
@@ -1569,11 +4294,11 @@ export type SearchProductsData = {
          */
         category?: string;
         /**
-         * Optional condition filter
+         * Optional condition filter (new, like_new, used, etc.)
          */
         condition?: string;
         /**
-         * Attribute filters as key:value pairs
+         * Optional attribute filters as key:value pairs (e.g. attributes=color:black)
          */
         attributes?: Array<string>;
         /**
@@ -1585,7 +4310,7 @@ export type SearchProductsData = {
          */
         maxPrice?: number;
         /**
-         * Sort order: relevance, price_asc, price_desc, newest, oldest, distance
+         * Sort order: relevance, price_asc, price_desc, newest, oldest, distance (default: relevance for text queries, newest for browsing; price_asc when the query asks for cheap items, e.g. "günstiges handy")
          */
         sortBy?: string;
         /**
@@ -1600,6 +4325,7 @@ export type SearchProductsData = {
          * Maximum distance in km (requires lat/lon)
          */
         maxDistanceKm?: number;
+        country?: string;
         offset?: number;
         /**
          * Maximum results (default 20)
@@ -1608,52 +4334,6 @@ export type SearchProductsData = {
     };
     url: '/api/Product/search';
 };
-
-export type GetPriceHistoryData = {
-    body?: never;
-    path: {
-        id: string;
-    };
-    query?: {
-        days?: number;
-    };
-    url: '/api/Product/{id}/price-history';
-};
-
-export type GetPriceHistoryErrors = {
-    404: unknown;
-};
-
-export type GetPriceHistoryError = GetPriceHistoryErrors[keyof GetPriceHistoryErrors];
-
-export type GetPriceHistoryResponses = {
-    200: Array<PricePoint>;
-};
-
-export type GetPriceHistoryResponse = GetPriceHistoryResponses[keyof GetPriceHistoryResponses];
-
-export type GetPriceStatsData = {
-    body?: never;
-    path: {
-        id: string;
-    };
-    query?: {
-        days?: number;
-    };
-    url: '/api/Product/{id}/price-stats';
-};
-
-export type GetPriceStatsErrors = {
-    404: unknown;
-};
-
-export type GetPriceStatsError = GetPriceStatsErrors[keyof GetPriceStatsErrors];
-
-export type GetPriceStatsResponses = {
-    200: PriceHistoryStats;
-};
-
-export type GetPriceStatsResponse = GetPriceStatsResponses[keyof GetPriceStatsResponses];
 
 export type SearchProductsErrors = {
     /**
@@ -1694,10 +4374,443 @@ export type SearchProductsResponses = {
     /**
      * OK
      */
-    200: SearchProductsResult;
+    200: ServicesProductServiceSearchProductsResult;
 };
 
 export type SearchProductsResponse = SearchProductsResponses[keyof SearchProductsResponses];
+
+export type GetPriceHistoryData = {
+    body?: never;
+    path: {
+        /**
+         * Product ID (SEO ID)
+         */
+        id: string;
+    };
+    query?: {
+        /**
+         * Number of days of history to retrieve (default 90, max 365)
+         */
+        days?: number;
+    };
+    url: '/api/Product/{id}/price-history';
+};
+
+export type GetPriceHistoryErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Not Found
+     */
+    404: MicrosoftAspNetCoreMvcProblemDetails;
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetPriceHistoryError = GetPriceHistoryErrors[keyof GetPriceHistoryErrors];
+
+export type GetPriceHistoryResponses = {
+    /**
+     * OK
+     */
+    200: Array<PricePoint>;
+};
+
+export type GetPriceHistoryResponse = GetPriceHistoryResponses[keyof GetPriceHistoryResponses];
+
+export type GetPriceStatsData = {
+    body?: never;
+    path: {
+        /**
+         * Product ID (SEO ID)
+         */
+        id: string;
+    };
+    query?: {
+        /**
+         * Number of days of history to analyze (default 90, max 365)
+         */
+        days?: number;
+    };
+    url: '/api/Product/{id}/price-stats';
+};
+
+export type GetPriceStatsErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Not Found
+     */
+    404: MicrosoftAspNetCoreMvcProblemDetails;
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetPriceStatsError = GetPriceStatsErrors[keyof GetPriceStatsErrors];
+
+export type GetPriceStatsResponses = {
+    /**
+     * OK
+     */
+    200: ServicesPriceHistoryStats;
+};
+
+export type GetPriceStatsResponse = GetPriceStatsResponses[keyof GetPriceStatsResponses];
+
+export type GetSuggestionsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Search prefix (minimum 2 characters)
+         */
+        q?: string;
+        /**
+         * Maximum number of suggestions to return (default 8, max 20)
+         */
+        limit?: number;
+    };
+    url: '/api/Product/suggest';
+};
+
+export type GetSuggestionsErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetSuggestionsError = GetSuggestionsErrors[keyof GetSuggestionsErrors];
+
+export type GetSuggestionsResponses = {
+    /**
+     * OK
+     */
+    200: Array<ServicesProductServiceSearchSuggestion>;
+};
+
+export type GetSuggestionsResponse = GetSuggestionsResponses[keyof GetSuggestionsResponses];
+
+export type GetProductRelationsData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/product/{id}/relations';
+};
+
+export type GetProductRelationsErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Not Found
+     */
+    404: MicrosoftAspNetCoreMvcProblemDetails;
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetProductRelationsError = GetProductRelationsErrors[keyof GetProductRelationsErrors];
+
+export type GetProductRelationsResponses = {
+    /**
+     * OK
+     */
+    200: ServicesProductRelations;
+};
+
+export type GetProductRelationsResponse = GetProductRelationsResponses[keyof GetProductRelationsResponses];
+
+export type GetUnidentifiedGameSeriesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        platform?: string;
+    };
+    url: '/api/product/unidentified-games/series';
+};
+
+export type GetUnidentifiedGameSeriesErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Forbidden
+     */
+    403: MicrosoftAspNetCoreMvcProblemDetails;
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetUnidentifiedGameSeriesError = GetUnidentifiedGameSeriesErrors[keyof GetUnidentifiedGameSeriesErrors];
+
+export type GetUnidentifiedGameSeriesResponses = {
+    /**
+     * OK
+     */
+    200: Array<ServicesUnidentifiedGameSeriesCount>;
+};
+
+export type GetUnidentifiedGameSeriesResponse = GetUnidentifiedGameSeriesResponses[keyof GetUnidentifiedGameSeriesResponses];
+
+export type GetUnidentifiedGamesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        platform?: string;
+        series?: string;
+        limit?: number;
+        pagingState?: string;
+    };
+    url: '/api/product/unidentified-games';
+};
+
+export type GetUnidentifiedGamesErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Forbidden
+     */
+    403: MicrosoftAspNetCoreMvcProblemDetails;
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetUnidentifiedGamesError = GetUnidentifiedGamesErrors[keyof GetUnidentifiedGamesErrors];
+
+export type GetUnidentifiedGamesResponses = {
+    /**
+     * OK
+     */
+    200: ServicesUnidentifiedGamesPage;
+};
+
+export type GetUnidentifiedGamesResponse = GetUnidentifiedGamesResponses[keyof GetUnidentifiedGamesResponses];
+
+export type ReportProductIssueData = {
+    /**
+     * Issue report details
+     */
+    body?: ModelsProductIssueReport;
+    path: {
+        /**
+         * Product ID
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/api/Product/{id}/report';
+};
+
+export type ReportProductIssueErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Unauthorized
+     */
+    401: MicrosoftAspNetCoreMvcProblemDetails;
+    /**
+     * Not Found
+     */
+    404: MicrosoftAspNetCoreMvcProblemDetails;
+    /**
+     * Too Many Requests
+     */
+    429: MicrosoftAspNetCoreMvcProblemDetails;
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type ReportProductIssueError = ReportProductIssueErrors[keyof ReportProductIssueErrors];
+
+export type ReportProductIssueResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
 
 export type DoRedirectData = {
     body?: never;
@@ -1750,6 +4863,61 @@ export type DoRedirectResponses = {
     200: unknown;
 };
 
+export type PreviewData = {
+    body?: ReferenceListingsReferenceListingPreviewRequest;
+    path?: never;
+    query?: never;
+    url: '/api/reference-listings/preview';
+};
+
+export type PreviewErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+    /**
+     * Bad Gateway
+     */
+    502: unknown;
+};
+
+export type PreviewError = PreviewErrors[keyof PreviewErrors];
+
+export type PreviewResponses = {
+    /**
+     * OK
+     */
+    200: ReferenceListingsReferenceListingPreviewResponse;
+};
+
+export type PreviewResponse = PreviewResponses[keyof PreviewResponses];
+
 export type GetInfoData = {
     body?: never;
     path?: never;
@@ -1796,7 +4964,7 @@ export type GetInfoResponses = {
     /**
      * OK
      */
-    200: ReferralInfo;
+    200: ModelsReferralInfo;
 };
 
 export type GetInfoResponse = GetInfoResponses[keyof GetInfoResponses];
@@ -1850,7 +5018,7 @@ export type CreateLinkResponses = {
     /**
      * OK
      */
-    200: InviteLink;
+    200: ModelsInviteLinkResponse;
 };
 
 export type CreateLinkResponse = CreateLinkResponses[keyof CreateLinkResponses];
@@ -1901,7 +5069,7 @@ export type ListLinksResponses = {
     /**
      * OK
      */
-    200: Array<InviteLink>;
+    200: Array<ModelsInviteLinkResponse>;
 };
 
 export type ListLinksResponse = ListLinksResponses[keyof ListLinksResponses];
@@ -1954,7 +5122,7 @@ export type GetLinkResponses = {
     /**
      * OK
      */
-    200: InviteLink;
+    200: ModelsInviteLinkResponse;
 };
 
 export type GetLinkResponse = GetLinkResponses[keyof GetLinkResponses];
@@ -2010,6 +5178,670 @@ export type UseLinkResponses = {
     200: unknown;
 };
 
+export type GetSitemapIndexData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/sitemap-products.xml';
+};
+
+export type GetSitemapIndexErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetSitemapIndexError = GetSitemapIndexErrors[keyof GetSitemapIndexErrors];
+
+export type GetSitemapIndexResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type GetSitemapIndexDeData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/sitemap-de-products.xml';
+};
+
+export type GetSitemapIndexDeErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetSitemapIndexDeError = GetSitemapIndexDeErrors[keyof GetSitemapIndexDeErrors];
+
+export type GetSitemapIndexDeResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type GetSitemapChunkData = {
+    body?: never;
+    path: {
+        index: number;
+    };
+    query?: never;
+    url: '/api/sitemap-products-{index}.xml';
+};
+
+export type GetSitemapChunkErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetSitemapChunkError = GetSitemapChunkErrors[keyof GetSitemapChunkErrors];
+
+export type GetSitemapChunkResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type GetSitemapChunkDeData = {
+    body?: never;
+    path: {
+        index: number;
+    };
+    query?: never;
+    url: '/api/sitemap-de-products-{index}.xml';
+};
+
+export type GetSitemapChunkDeErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetSitemapChunkDeError = GetSitemapChunkDeErrors[keyof GetSitemapChunkDeErrors];
+
+export type GetSitemapChunkDeResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type DaysData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/training/days';
+};
+
+export type DaysErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type DaysError = DaysErrors[keyof DaysErrors];
+
+export type DaysResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type ListingsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        day?: string;
+        shard?: number;
+        cursor?: string;
+        limit?: number;
+    };
+    url: '/api/training/listings';
+};
+
+export type ListingsErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type ListingsError = ListingsErrors[keyof ListingsErrors];
+
+export type ListingsResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type DeleteData = {
+    body?: never;
+    path: {
+        platform: string;
+        listingId: string;
+    };
+    query?: never;
+    url: '/api/training/listings/{platform}/{listingId}';
+};
+
+export type DeleteErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type DeleteError = DeleteErrors[keyof DeleteErrors];
+
+export type DeleteResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type GetRegroupRunData = {
+    body?: never;
+    path: {
+        runId: string;
+    };
+    query?: never;
+    url: '/api/training/regroup/{runId}';
+};
+
+export type GetRegroupRunErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetRegroupRunError = GetRegroupRunErrors[keyof GetRegroupRunErrors];
+
+export type GetRegroupRunResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type MovesData = {
+    body?: never;
+    path: {
+        runId: string;
+    };
+    query?: {
+        limit?: number;
+        pageState?: string;
+    };
+    url: '/api/training/regroup/{runId}/moves';
+};
+
+export type MovesErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type MovesError = MovesErrors[keyof MovesErrors];
+
+export type MovesResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type ListData = {
+    body?: never;
+    path?: never;
+    query?: {
+        since?: string;
+        status?: string;
+        limit?: number;
+    };
+    url: '/api/training/reports';
+};
+
+export type ListErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type ListError = ListErrors[keyof ListErrors];
+
+export type ListResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type GetReportData = {
+    body?: never;
+    path: {
+        reportId: string;
+    };
+    query?: never;
+    url: '/api/training/reports/{reportId}';
+};
+
+export type GetReportErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetReportError = GetReportErrors[keyof GetReportErrors];
+
+export type GetReportResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type ResolveData = {
+    body?: TrainingReportsControllerResolutionRequest;
+    path: {
+        reportId: string;
+    };
+    query?: never;
+    url: '/api/training/reports/{reportId}/resolution';
+};
+
+export type ResolveErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type ResolveError = ResolveErrors[keyof ResolveErrors];
+
+export type ResolveResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type DeleteMeData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/user/me';
+};
+
+export type DeleteMeErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type DeleteMeError = DeleteMeErrors[keyof DeleteMeErrors];
+
+export type DeleteMeResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type GetMeData = {
     body?: never;
     path?: never;
@@ -2056,13 +5888,13 @@ export type GetMeResponses = {
     /**
      * OK
      */
-    200: User;
+    200: CoflnetAuthUser;
 };
 
 export type GetMeResponse = GetMeResponses[keyof GetMeResponses];
 
 export type UpdateMeData = {
-    body?: User;
+    body?: CoflnetAuthUser;
     path?: never;
     query?: never;
     url: '/api/user/me';
@@ -2085,7 +5917,7 @@ export type UpdateMeErrors = {
     /**
      * Not Found
      */
-    404: ProblemDetails;
+    404: MicrosoftAspNetCoreMvcProblemDetails;
     /**
      * Internal Server Error
      */
@@ -2111,7 +5943,7 @@ export type UpdateMeResponses = {
     /**
      * OK
      */
-    200: User;
+    200: CoflnetAuthUser;
 };
 
 export type UpdateMeResponse = UpdateMeResponses[keyof UpdateMeResponses];
