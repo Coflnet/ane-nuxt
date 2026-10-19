@@ -196,14 +196,19 @@
             >
               <div class="aspect-[4/3] bg-slate-900 rounded-lg overflow-hidden flex items-center justify-center">
                 <img
-                  v-if="!imageFailed[side.key] && side.data.imageUrl"
-                  :src="side.data.imageUrl"
+                  v-if="photoSrc[side.key]"
+                  :src="photoSrc[side.key]"
                   :alt="`${$t(side.title)}: ${side.data.platform}`"
                   referrerpolicy="no-referrer"
                   class="w-full h-full object-contain"
                   :data-testid="`labeling-photo-${side.key}`"
-                  @error="imageFailed[side.key] = true"
+                  @error="onPhotoError(side.key)"
                 >
+                <div
+                  v-else-if="photoLoading[side.key]"
+                  class="size-full animate-pulse bg-slate-800"
+                  :data-testid="`labeling-photo-loading-${side.key}`"
+                />
                 <div
                   v-else
                   class="text-sm text-slate-400 text-center px-4"
@@ -300,6 +305,15 @@
             >
               {{ $t('labelingUndo') }} (Z)
             </button>
+            <button
+              type="button"
+              class="bg-slate-800 text-slate-200 hover:bg-slate-700 px-3 py-2 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-400"
+              :disabled="remainingCount < 2"
+              data-testid="labeling-skip"
+              @click="skipCurrent"
+            >
+              {{ $t('labelingSkip') }} (S)
+            </button>
             <p
               class="text-slate-400"
               data-testid="labeling-session"
@@ -327,7 +341,7 @@ import LabelingStatsPanel from '~/components/labeling/StatsPanel.vue'
 import { labelingErrorStatus, useLabelingApi } from '~/composables/useLabelingApi'
 import type { LabelingStats } from '~/composables/useLabelingApi'
 import { useUserStore } from '~/stores/user'
-import { answer, BATCH_SIZE, createQueueState, enqueue, needsRefill, rollback, undo, upcoming } from '~/utils/labelingQueue'
+import { answer, BATCH_SIZE, createQueueState, enqueue, needsRefill, remaining, rollback, skip, undo, upcoming } from '~/utils/labelingQueue'
 import type { LabelAnswer, LabelingQueueState } from '~/utils/labelingQueue'
 import { createLabelSender } from '~/utils/labelingSender'
 import { shortcutFor } from '~/utils/labelingShortcuts'
@@ -359,6 +373,10 @@ const stats = ref<LabelingStats | null>(null)
 const statsFailed = ref(false)
 const sessionCount = ref(0)
 const imageFailed = reactive<Record<string, boolean>>({ a: false, b: false })
+// What each side's <img> shows: the archived copy (as object URL) when there is one, else the marketplace hotlink.
+const photoSrc = reactive<Record<string, string>>({ a: '', b: '' })
+const photoLoading = reactive<Record<string, boolean>>({ a: false, b: false })
+const archivedBlobs = new Map<string, Promise<string>>()
 
 const showScore = ref(false)
 const scoreLoaded = ref(false)
@@ -455,6 +473,14 @@ function submit(label: LabelAnswer) {
   if (needsRefill(state.value)) loadBatch()
 }
 
+const remainingCount = computed(() => remaining(state.value))
+
+// Defers the pair without a label (not the same as "unsure", which is saved as an answer).
+function skipCurrent() {
+  state.value = skip(state.value)
+  if (needsRefill(state.value)) loadBatch()
+}
+
 function undoLast() {
   const result = undo(state.value)
   if (!result.restored) return
@@ -495,6 +521,7 @@ function onKeydown(event: KeyboardEvent) {
   if (!action) return
   event.preventDefault()
   if (action.type === 'undo') undoLast()
+  else if (action.type === 'skip') skipCurrent()
   else submit(action.label)
 }
 
@@ -503,13 +530,74 @@ watch(() => upcoming(state.value)?.pairId, () => {
   const next = upcoming(state.value)
   if (!next || import.meta.server) return
   for (const side of [next.a, next.b]) {
-    if (side.imageUrl) new Image().src = side.imageUrl
+    if (side.archivedImageUrl) archivedObjectUrl(side.archivedImageUrl).catch(() => {})
+    else if (side.imageUrl) new Image().src = side.imageUrl
   }
 })
 
-watch(() => current.value?.pairId, () => {
-  imageFailed.a = false
-  imageFailed.b = false
+function archivedObjectUrl(archivedUrl: string): Promise<string> {
+  let cached = archivedBlobs.get(archivedUrl)
+  if (!cached) {
+    cached = api.photo(archivedUrl).then(blob => URL.createObjectURL(blob))
+    cached.catch(() => archivedBlobs.delete(archivedUrl))
+    archivedBlobs.set(archivedUrl, cached)
+  }
+  return cached
+}
+
+function pruneArchived() {
+  const keep = new Set<string>()
+  for (const pair of [state.value.current, upcoming(state.value)]) {
+    for (const side of [pair?.a, pair?.b]) if (side?.archivedImageUrl) keep.add(side.archivedImageUrl)
+  }
+  for (const [url, promise] of archivedBlobs) {
+    if (keep.has(url)) continue
+    archivedBlobs.delete(url)
+    promise.then(objectUrl => URL.revokeObjectURL(objectUrl)).catch(() => {})
+  }
+}
+
+async function resolvePhoto(key: 'a' | 'b', pairId: string) {
+  const side = current.value?.[key]
+  imageFailed[key] = false
+  photoSrc[key] = ''
+  if (!side) return
+  if (side.archivedImageUrl) {
+    photoLoading[key] = true
+    try {
+      const objectUrl = await archivedObjectUrl(side.archivedImageUrl)
+      if (current.value?.pairId !== pairId) return
+      photoSrc[key] = objectUrl
+      return
+    }
+    catch {
+      // fall back to the marketplace image below
+    }
+    finally {
+      if (current.value?.pairId === pairId) photoLoading[key] = false
+    }
+    if (current.value?.pairId !== pairId) return
+  }
+  if (side.imageUrl) photoSrc[key] = side.imageUrl
+  else imageFailed[key] = true
+}
+
+// A broken archived copy falls back to the hotlink; a broken hotlink shows "Image unavailable".
+function onPhotoError(key: 'a' | 'b') {
+  const side = current.value?.[key]
+  if (side?.archivedImageUrl && side.imageUrl && photoSrc[key] !== side.imageUrl) {
+    photoSrc[key] = side.imageUrl
+    return
+  }
+  photoSrc[key] = ''
+  imageFailed[key] = true
+}
+
+watch(() => current.value?.pairId, (pairId) => {
+  if (!pairId || import.meta.server) return
+  resolvePhoto('a', pairId)
+  resolvePhoto('b', pairId)
+  pruneArchived()
 })
 
 watch(showScore, (value) => {
@@ -550,5 +638,7 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   if (import.meta.client) window.removeEventListener('keydown', onKeydown)
+  for (const promise of archivedBlobs.values()) promise.then(objectUrl => URL.revokeObjectURL(objectUrl)).catch(() => {})
+  archivedBlobs.clear()
 })
 </script>

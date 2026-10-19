@@ -1,6 +1,6 @@
 import type { LabelAnswer } from './labelingQueue'
 
-export type LabelingShortcut = { type: 'answer', label: LabelAnswer } | { type: 'undo' }
+export type LabelingShortcut = { type: 'answer', label: LabelAnswer } | { type: 'undo' } | { type: 'skip' }
 
 export const ANSWER_KEYS: Record<string, LabelAnswer> = {
   1: 'same_item',
@@ -30,6 +30,7 @@ export function shortcutFor(event: ShortcutEventLike): LabelingShortcut | null {
   if (event.ctrlKey || event.metaKey || event.altKey || event.repeat) return null
   if (isTextTarget(event.target)) return null
   if (event.key === 'z' || event.key === 'Z' || event.key === 'Backspace') return { type: 'undo' }
+  if (event.key === 's' || event.key === 'S') return { type: 'skip' }
   const label = ANSWER_KEYS[event.key]
   return label ? { type: 'answer', label } : null
 }

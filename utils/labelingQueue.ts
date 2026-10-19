@@ -4,6 +4,8 @@ export interface LabelingSide {
   platform: string
   listingId: string
   imageUrl: string
+  /** Archived copy behind the bearer-protected photo endpoint; preferred over the marketplace hotlink. */
+  archivedImageUrl?: string | null
   listingUrl: string
 }
 
@@ -84,6 +86,15 @@ export function answer(state: LabelingQueueState, label: LabelAnswer): { state: 
       history: [...state.history, answered].slice(-HISTORY_LIMIT),
     },
   }
+}
+
+/**
+ * Defers the visible pair without answering it: it moves to the back of the queue and nothing is
+ * recorded or sent (unlike "unsure", which is a real answer).
+ */
+export function skip(state: LabelingQueueState): LabelingQueueState {
+  if (!state.current || state.queue.length === 0) return state
+  return { ...state, current: state.queue[0], queue: [...state.queue.slice(1), state.current] }
 }
 
 /** Brings the last answered pair back; the pair that was on screen goes to the front of the queue. */

@@ -36,7 +36,17 @@ export function useLabelingApi() {
     })
   }
 
+  /** Fetches an archived photo (needs the bearer, so it cannot be used as an <img src> directly). */
+  function photo(url: string): Promise<Blob> {
+    const absolute = /^https?:\/\//.test(url) ? url : `${useApiBaseUrl()}${url}`
+    return $fetch<Blob>(absolute, {
+      responseType: 'blob',
+      headers: { Authorization: `Bearer ${userStore.token}` },
+    })
+  }
+
   return {
+    photo,
     me: () => request<LabelingMe>('/me'),
     next: (count: number, groupKey: string) => request<LabelingPair[]>('/next', { query: { count, groupKey } }),
     label: async (pairId: string, label: LabelAnswer): Promise<void> => {

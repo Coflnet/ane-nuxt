@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { answer, createQueueState, enqueue, needsRefill, remaining, rollback, undo, upcoming } from '../utils/labelingQueue.ts'
+import { answer, createQueueState, enqueue, needsRefill, remaining, rollback, skip, undo, upcoming } from '../utils/labelingQueue.ts'
 import { shortcutFor } from '../utils/labelingShortcuts.ts'
 import { createLabelSender } from '../utils/labelingSender.ts'
 
@@ -158,4 +158,19 @@ test('labeling strings exist in both locales and contain no bare plural separato
     assert.ok(!en[k].replaceAll('{\'|\'}', '').includes('|'), `${k} en has bare pipe`)
     assert.ok(!de[k].replaceAll('{\'|\'}', '').includes('|'), `${k} de has bare pipe`)
   }
+})
+
+test('skip defers the pair to the back without recording an answer', async () => {
+  const { skip } = await import('../utils/labelingQueue.ts')
+  const s = enqueue(createQueueState(), pairs(1, 3))
+  const skipped = skip(s)
+  assert.equal(skipped.current.pairId, 'p2')
+  assert.deepEqual(skipped.queue.map(p => p.pairId), ['p3', 'p1'])
+  assert.equal(skipped.history.length, 0)
+})
+
+test('skip with a single pair is a no-op and s maps to skip', () => {
+  const s = enqueue(createQueueState(), pairs(1, 1))
+  assert.equal(skip(s), s)
+  assert.deepEqual(shortcutFor({ key: 's' }), { type: 'skip' })
 })
