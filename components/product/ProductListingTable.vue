@@ -168,6 +168,65 @@
           </p>
 
           <div class="space-y-2 mb-4">
+            <button
+              type="button"
+              class="w-full flex items-center gap-3 p-3 rounded-lg text-left hover:bg-slate-700/50 transition-colors disabled:opacity-50"
+              data-testid="report-wrong-match"
+              :disabled="submittingReport"
+              @click="submitReport('WrongMatch')"
+            >
+              <Icon
+                name="tabler:unlink"
+                class="w-4 h-4 text-slate-300"
+              />
+              <span class="text-slate-200">Wrong product match</span>
+              <span class="text-slate-500 text-xs ml-auto">This listing does not belong to this product</span>
+            </button>
+            <div
+              class="p-3 rounded-lg"
+              :class="{ 'bg-slate-700': sameProductOpen }"
+            >
+              <button
+                type="button"
+                class="w-full flex items-center gap-3 text-left"
+                data-testid="report-same-product"
+                @click="sameProductOpen = !sameProductOpen"
+              >
+                <Icon
+                  name="tabler:link"
+                  class="w-4 h-4 text-slate-300"
+                />
+                <span class="text-slate-200">Same product as...</span>
+              </button>
+              <div
+                v-if="sameProductOpen"
+                class="mt-3 flex gap-2"
+              >
+                <input
+                  v-model="otherProductInput"
+                  type="text"
+                  class="flex-1 min-w-0 bg-slate-900 border border-slate-600 rounded-lg p-2 text-white placeholder-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Paste an ane.deals product link or id"
+                  data-testid="report-other-product"
+                  @keydown.enter.prevent="submitReport('SameProductAs')"
+                >
+                <button
+                  type="button"
+                  class="px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+                  data-testid="report-same-product-confirm"
+                  :disabled="!otherProductId || submittingReport"
+                  @click="submitReport('SameProductAs')"
+                >
+                  Confirm
+                </button>
+              </div>
+              <p
+                v-if="sameProductOpen && otherProductInput.trim() && !otherProductId"
+                class="mt-2 text-xs text-amber-400"
+              >
+                That does not look like an ane.deals product link or id.
+              </p>
+            </div>
             <label
               v-for="issue in issueTypes"
               :key="issue.value"
@@ -192,9 +251,19 @@
               v-model="reportDescription"
               class="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white placeholder-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               rows="3"
+              maxlength="500"
               placeholder="Provide more details about the issue..."
             />
           </div>
+
+          <p
+            v-if="reportError"
+            class="mb-4 text-sm text-red-400"
+            role="alert"
+            data-testid="report-error"
+          >
+            {{ reportError }}
+          </p>
 
           <div class="flex gap-3 justify-end">
             <button
@@ -206,7 +275,7 @@
             <button
               class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
               :disabled="!selectedIssueType || submittingReport"
-              @click="submitReport"
+              @click="submitReport()"
             >
               <span v-if="submittingReport">Submitting...</span>
               <span v-else>Submit Report</span>
@@ -220,6 +289,10 @@
 
 <script setup lang="ts">
 import { reportProductIssue } from '~/src/api-client'
+import { useUserStore } from '~/stores/user'
+import { labelingErrorStatus } from '~/composables/useLabelingApi'
+import { buildReportBody, extractProductId, reportErrorMessage } from '~/utils/productReport'
+import type { ReportType } from '~/utils/productReport'
 import type { IssueType, ProductMatch as GeneratedProductMatch } from '~/src/api-client/types.gen'
 import { countryFlag } from '~/utils/countryDetection'
 import type { OfferMatchExtras } from '~/utils/offerFilters'
@@ -259,11 +332,18 @@ const selectedListing = ref<ProductMatch | null>(null)
 const selectedIssueType = ref<IssueType | null>(null)
 const reportDescription = ref('')
 const submittingReport = ref(false)
+const reportError = ref('')
+const sameProductOpen = ref(false)
+const otherProductInput = ref('')
+const otherProductId = computed(() => extractProductId(otherProductInput.value))
+const userStore = useUserStore()
+const route = useRoute()
+const localePath = useLocalePath()
 
 const issueTypes: { value: IssueType, label: string }[] = [
   { value: 'WrongCategory', label: 'Wrong category' },
   { value: 'Duplicate', label: 'Duplicate listing' },
-  { value: 'WrongListing', label: 'Wrong product match' },
+  { value: 'WrongListing', label: 'Wrong listing' },
   { value: 'IncorrectInformation', label: 'Incorrect information' },
   { value: 'Spam', label: 'Spam or scam' },
   { value: 'Other', label: 'Other issue' },
@@ -311,9 +391,17 @@ async function handleViewDeal(e: MouseEvent, listing: ProductMatch) {
 }
 
 function openReportDialog(listing: ProductMatch) {
+  // Reports need an account: send visitors to the login instead of firing an unauthenticated request.
+  if (!userStore.isLoggedIn || !userStore.token) {
+    navigateTo(localePath({ path: '/login', query: { redirectTo: route.fullPath } }))
+    return
+  }
   selectedListing.value = listing
   selectedIssueType.value = null
   reportDescription.value = ''
+  reportError.value = ''
+  sameProductOpen.value = false
+  otherProductInput.value = ''
   showReportDialog.value = true
 }
 
@@ -322,28 +410,45 @@ function closeReportDialog() {
   selectedListing.value = null
   selectedIssueType.value = null
   reportDescription.value = ''
+  reportError.value = ''
+  sameProductOpen.value = false
+  otherProductInput.value = ''
 }
 
-async function submitReport() {
-  if (!selectedIssueType.value || !props.productId) return
+async function submitReport(quickType?: ReportType) {
+  const type: ReportType | null = quickType ?? selectedIssueType.value
+  if (!type || !props.productId || submittingReport.value) return
+  if (!userStore.token) {
+    navigateTo(localePath({ path: '/login', query: { redirectTo: route.fullPath } }))
+    return
+  }
+  if (type === 'SameProductAs' && !otherProductId.value) return
 
   submittingReport.value = true
+  reportError.value = ''
 
   try {
+    const listingId = selectedListing.value?.listingId?.toString()
     await reportProductIssue({
       path: { id: props.productId },
-      body: {
-        type: selectedIssueType.value,
-        description: reportDescription.value || undefined,
-        suggestion: selectedListing.value?.listingId?.toString(),
-      },
+      body: buildReportBody({
+        type,
+        listingId,
+        productId: props.productId,
+        otherProductId: otherProductId.value,
+        comment: reportDescription.value,
+        suggestion: type === 'WrongMatch' || type === 'SameProductAs' ? undefined : listingId,
+      }),
+      headers: { Authorization: `Bearer ${userStore.token}` },
     })
 
-    // Show success feedback (could use notivue here)
     closeReportDialog()
   }
   catch (error) {
     console.error('Failed to submit report:', error)
+    const status = labelingErrorStatus(error)
+    reportError.value = reportErrorMessage(status)
+    if (status === 401) navigateTo(localePath({ path: '/login', query: { redirectTo: route.fullPath } }))
   }
   finally {
     submittingReport.value = false
