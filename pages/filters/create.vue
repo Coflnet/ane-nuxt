@@ -71,7 +71,7 @@
 import lodash from 'lodash'
 import { getMessaging, getToken } from 'firebase/messaging'
 import { useFirebaseApp } from 'vuefire'
-import type { FilterMatch, ListingListener } from '~/src/api-client'
+import type { ClientModelFilterMatch as FilterMatch, ClientModelListingListener as ListingListener } from '~/src/api-client'
 import type { Filter, TargetType } from '~/types/FilterType'
 import { constructOptionsFromString, detectLocationNA, filterFreeMarketplaces, marketplaces, usMarketplaces, valididateAllMarketplace } from '~/constants/CreateFilterConstants'
 import { parseFilterPrefillQuery } from '~/utils/filterPrefill'

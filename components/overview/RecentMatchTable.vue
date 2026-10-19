@@ -36,7 +36,7 @@
                 >
                   {{ $t('product.soldOrRemoved', 'Already sold or removed') }}
                   <a
-                    :href="listingStore.constructListingUrl(auction.listingData, locale)"
+                    :href="listingStore.constructListingUrl(auction.listingData, locale) ?? undefined"
                     target="_blank"
                     rel="noopener noreferrer"
                     class="underline hover:text-red-300 ml-1"
@@ -97,7 +97,7 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core'
 import humanizeDuration from 'humanize-duration'
-import type { FilterMatch } from '~/src/api-client'
+import type { ClientModelFilterMatch as FilterMatch } from '~/src/api-client'
 import { useFormat } from '~/composable/useFormat'
 import { useListingOpener } from '~/composable/useListingOpener'
 

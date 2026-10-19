@@ -392,8 +392,8 @@ const suggestedGroup = computed(() => {
 
 const sides = computed(() => current.value
   ? [
-      { key: 'a', title: 'labelingPhotoA', data: current.value.a },
-      { key: 'b', title: 'labelingPhotoB', data: current.value.b },
+      { key: 'a' as const, title: 'labelingPhotoA', data: current.value.a },
+      { key: 'b' as const, title: 'labelingPhotoB', data: current.value.b },
     ]
   : [])
 

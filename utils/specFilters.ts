@@ -25,7 +25,7 @@ export function parseBucketNumber(value: string | null | undefined): number | nu
   if (!value) return null
   const match = /^(\d+(?:[.,]\d+)?)\s?(?:"|''|zoll|inch(?:es)?)?$/i.exec(value.trim())
   if (!match) return null
-  const parsed = Number(match[1].replace(',', '.'))
+  const parsed = Number((match[1] ?? '').replace(',', '.'))
   return Number.isFinite(parsed) ? parsed : null
 }
 

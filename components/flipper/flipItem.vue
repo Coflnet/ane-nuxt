@@ -307,7 +307,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { getPlatformUrl } from '~/utils/flipMarketplaceUrl'
-import type { Flip, SoldFor } from '~/src/api-client/types.gen'
+import type { Flip, FlipSale as SoldFor } from '~/src/api-client/types.gen'
 import { formatDistanceToNow } from 'date-fns'
 import { de } from 'date-fns/locale'
 import { useI18n } from 'vue-i18n'

@@ -1,4 +1,7 @@
-import type { Platform } from '../src/api-client/types.gen'
+import type { Platform as GeneratedPlatform } from '../src/api-client/types.gen'
+
+/** The generated enum lags behind marketplaces the API already sends (Blocket). */
+type Platform = GeneratedPlatform | 'Blocket'
 
 const canonicalMarketplaceHosts: Record<string, string[]> = {
   OLX: ['olx.pl', 'www.olx.pl'],

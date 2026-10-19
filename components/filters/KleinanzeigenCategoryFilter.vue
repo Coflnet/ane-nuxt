@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang='ts'>
-import type { StringStringKeyValuePair } from '~/src/api-client'
+import type { ClientModelStringStringKeyValuePair as StringStringKeyValuePair } from '~/src/api-client'
 
 const props = defineProps({
   filter: {

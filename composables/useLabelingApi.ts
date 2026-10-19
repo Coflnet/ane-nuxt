@@ -28,12 +28,12 @@ export function useLabelingApi() {
   const userStore = useUserStore()
 
   function request<T>(path: string, options: { method?: 'GET' | 'POST', query?: Record<string, string | number>, body?: unknown } = {}): Promise<T> {
-    return $fetch<T>(`${useApiBaseUrl()}/api/labeling${path}`, {
+    return $fetch(`${useApiBaseUrl()}/api/labeling${path}`, {
       method: options.method ?? 'GET',
       query: options.query,
       body: options.body as Record<string, unknown> | undefined,
       headers: { Authorization: `Bearer ${userStore.token}` },
-    })
+    }) as Promise<T>
   }
 
   /** Fetches an archived photo (needs the bearer, so it cannot be used as an <img src> directly). */

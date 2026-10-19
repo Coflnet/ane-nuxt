@@ -15,14 +15,15 @@ export interface ShortcutEventLike {
   metaKey?: boolean
   altKey?: boolean
   repeat?: boolean
-  target?: { tagName?: string, isContentEditable?: boolean } | null
+  target?: EventTarget | { tagName?: string, isContentEditable?: boolean } | null
 }
 
 const TEXT_TARGETS = new Set(['INPUT', 'TEXTAREA', 'SELECT'])
 
 export function isTextTarget(target: ShortcutEventLike['target']): boolean {
   if (!target) return false
-  return !!target.isContentEditable || TEXT_TARGETS.has((target.tagName ?? '').toUpperCase())
+  const element = target as { tagName?: string, isContentEditable?: boolean }
+  return !!element.isContentEditable || TEXT_TARGETS.has((element.tagName ?? '').toUpperCase())
 }
 
 /** Maps a key press to a labeling action; null while typing in a field or with modifier keys. */

@@ -292,8 +292,7 @@ import { reportProductIssue } from '~/src/api-client'
 import { useUserStore } from '~/stores/user'
 import { labelingErrorStatus } from '~/composables/useLabelingApi'
 import { buildReportBody, extractProductId, reportErrorMessage } from '~/utils/productReport'
-import type { ReportType } from '~/utils/productReport'
-import type { IssueType, ProductMatch as GeneratedProductMatch } from '~/src/api-client/types.gen'
+import type { ModelsIssueType, ModelsProductMatch as GeneratedProductMatch } from '~/src/api-client/types.gen'
 import { countryFlag } from '~/utils/countryDetection'
 import type { OfferMatchExtras } from '~/utils/offerFilters'
 import { useAvailabilityCheck } from '~/composable/useAvailabilityCheck'
@@ -329,7 +328,7 @@ const checkingAvailability = ref<Set<number | string>>(new Set())
 // Report dialog state
 const showReportDialog = ref(false)
 const selectedListing = ref<ProductMatch | null>(null)
-const selectedIssueType = ref<IssueType | null>(null)
+const selectedIssueType = ref<ModelsIssueType | null>(null)
 const reportDescription = ref('')
 const submittingReport = ref(false)
 const reportError = ref('')
@@ -340,7 +339,7 @@ const userStore = useUserStore()
 const route = useRoute()
 const localePath = useLocalePath()
 
-const issueTypes: { value: IssueType, label: string }[] = [
+const issueTypes: { value: ModelsIssueType, label: string }[] = [
   { value: 'WrongCategory', label: 'Wrong category' },
   { value: 'Duplicate', label: 'Duplicate listing' },
   { value: 'WrongListing', label: 'Wrong listing' },
@@ -415,8 +414,8 @@ function closeReportDialog() {
   otherProductInput.value = ''
 }
 
-async function submitReport(quickType?: ReportType) {
-  const type: ReportType | null = quickType ?? selectedIssueType.value
+async function submitReport(quickType?: ModelsIssueType) {
+  const type: ModelsIssueType | null = quickType ?? selectedIssueType.value
   if (!type || !props.productId || submittingReport.value) return
   if (!userStore.token) {
     navigateTo(localePath({ path: '/login', query: { redirectTo: route.fullPath } }))

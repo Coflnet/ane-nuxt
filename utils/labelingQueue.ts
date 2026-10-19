@@ -94,7 +94,7 @@ export function answer(state: LabelingQueueState, label: LabelAnswer): { state: 
  */
 export function skip(state: LabelingQueueState): LabelingQueueState {
   if (!state.current || state.queue.length === 0) return state
-  return { ...state, current: state.queue[0], queue: [...state.queue.slice(1), state.current] }
+  return { ...state, current: state.queue[0] ?? null, queue: [...state.queue.slice(1), state.current] }
 }
 
 /** Brings the last answered pair back; the pair that was on screen goes to the front of the queue. */

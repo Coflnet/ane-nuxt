@@ -88,7 +88,7 @@
 
 <script setup lang="ts">
 import { Icon, UiHeaderLabel } from '#components'
-import type { FilterMatch } from '~/src/api-client'
+import type { ClientModelFilterMatch as FilterMatch } from '~/src/api-client'
 import { useFormat } from '~/composable/useFormat'
 import { useListingOpener } from '~/composable/useListingOpener'
 

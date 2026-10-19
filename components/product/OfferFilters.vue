@@ -371,7 +371,7 @@ function onCountrySelect(event: Event) {
   if (changed !== props.state) emit('change', changed)
 }
 
-function closePanels(focusTrigger = false) {
+function closePanels(focusTrigger: boolean | Event = false) {
   const hadNearby = nearbyOpen.value
   const hadMore = moreOpen.value
   nearbyOpen.value = false

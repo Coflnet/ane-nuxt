@@ -439,7 +439,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import { client as apiClient } from '~/src/api-client/client.gen'
-import { getFlips, getSubscription, type ActiveSubscription, type Flip } from '~/src/api-client'
+import { getFlips, getSubscription, type PaymentControllerActiveSubscription as ActiveSubscription, type Flip } from '~/src/api-client'
 
 type FeedTier = 'free' | 'collector' | 'flipper'
 type LiveFlipMessage = {

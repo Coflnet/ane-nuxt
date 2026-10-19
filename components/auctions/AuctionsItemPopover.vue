@@ -68,7 +68,7 @@
 
 <script setup lang="ts">
 import { Popover, PopoverButton, PopoverPanel, Disclosure, DisclosureButton } from '@headlessui/vue'
-import type { FilterMatch } from '~/src/api-client'
+import type { ClientModelFilterMatch as FilterMatch } from '~/src/api-client'
 
 const { t } = useI18n()
 

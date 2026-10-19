@@ -26,7 +26,7 @@
 import { ref, onMounted } from 'vue'
 import { useInfiniteScroll } from '@vueuse/core'
 import { useListingStore } from '@/stores/listing'
-import type { FilterMatch } from '~/src/api-client'
+import type { ClientModelFilterMatch as FilterMatch } from '~/src/api-client'
 
 const { t } = useI18n()
 const localePath = useLocalePath()

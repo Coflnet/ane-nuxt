@@ -37,7 +37,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useIsWebView } from '~/composable/useIsWebView'
-import type { FilterMatch } from '~/src/api-client'
+import type { ClientModelFilterMatch as FilterMatch } from '~/src/api-client'
 
 import type { TopFilter } from '~/types/FilterType'
 

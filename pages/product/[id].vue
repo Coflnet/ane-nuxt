@@ -722,7 +722,7 @@
 
 <script setup lang="ts">
 import { getProduct, reportProductIssue, getPriceHistory, getPriceStats } from '~/src/api-client'
-import type { IssueType, Product, ProductMatch, PricePoint, PriceHistoryStats } from '~/src/api-client/types.gen'
+import type { ModelsIssueType as IssueType, ModelsProductMatch as ProductMatch, PricePoint, ServicesPriceHistoryStats as PriceHistoryStats } from '~/src/api-client/types.gen'
 import ProductListingTable from '~/components/product/ProductListingTable.vue'
 import ProductOfferFilters from '~/components/product/OfferFilters.vue'
 import { useI18n } from 'vue-i18n'
@@ -835,7 +835,7 @@ const nameSubtitle = computed(() =>
   isCasePage.value ? null : localizedSubtitle(relations.value?.localizedNames, locale.value, product.value?.name))
 
 // Secondary, non-SEO data — always fetched on the client after mount.
-const relatedProducts = ref<Product[]>([])
+const relatedProducts = ref<ProductWithOffers[]>([])
 const matches = ref<(ProductMatch & OfferMatchExtras)[]>([])
 const unavailableCount = ref(0)
 const imageErrorCount = ref(0)
@@ -1371,7 +1371,7 @@ onMounted(async () => {
   })
   const [, relatedRes, facetsRes] = await Promise.all([
     loadMatches(),
-    $fetch<Product[]>(buildRelatedProductsUrl(productId)).catch(() => []),
+    $fetch<ProductWithOffers[]>(buildRelatedProductsUrl(productId)).catch(() => []),
     // 404 on an older API: the filter then hides the counts
     $fetch<unknown>(buildFacetsUrl(productId)).catch(() => null),
   ])

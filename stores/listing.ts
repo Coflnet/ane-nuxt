@@ -1,4 +1,4 @@
-import { getMatches, type FilterMatch, type Platform, type StoredListing } from '~/src/api-client'
+import { getMatches, type ClientModelFilterMatch as FilterMatch, type Platform, type ClientModelStoredListing as StoredListing } from '~/src/api-client'
 
 export const useListingStore = defineStore('listing', () => {
   const userStore = useUserStore()

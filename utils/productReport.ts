@@ -1,7 +1,7 @@
-import type { IssueType, ProductIssueReport } from '~/src/api-client/types.gen'
+import type { ModelsIssueType, ModelsProductIssueReport } from '~/src/api-client/types.gen'
 
-/** Report types the generated client does not know yet (WrongMatch, SameProductAs). */
-export type ReportType = IssueType | 'WrongMatch' | 'SameProductAs'
+/** The request body also carries the product id the report is about; the generated type has no field for it. */
+export type ProductReportBody = ModelsProductIssueReport & { productId?: string }
 
 export const MAX_REPORT_COMMENT = 500
 
@@ -34,7 +34,7 @@ export function extractProductId(input: string): string | null {
 }
 
 export interface ReportBodyInput {
-  type: ReportType
+  type: ModelsIssueType
   listingId?: string | null
   productId?: string | null
   otherProductId?: string | null
@@ -43,9 +43,9 @@ export interface ReportBodyInput {
 }
 
 /** Builds the JSON body; the comment is sent as `description`, trimmed and capped. */
-export function buildReportBody(input: ReportBodyInput): ProductIssueReport & Record<string, unknown> {
+export function buildReportBody(input: ReportBodyInput): ProductReportBody {
   const description = input.comment?.trim().slice(0, MAX_REPORT_COMMENT) || undefined
-  const body: ProductIssueReport & Record<string, unknown> = { type: input.type as IssueType, description }
+  const body: ProductReportBody = { type: input.type, description }
   if (input.suggestion) body.suggestion = input.suggestion
   if (input.listingId) body.listingId = input.listingId
   if (input.productId) body.productId = input.productId

@@ -1041,7 +1041,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { searchProducts } from '~/src/api-client'
-import type { ProductAttribute, ProductDocument, FilterBucket, SearchProductsResponse } from '~/src/api-client/types.gen'
+import type { OpensearchProductAttribute as ProductAttribute, OpensearchProductDocument as ProductDocument, ServicesProductServiceFilterBucket as FilterBucket, SearchProductsResponse } from '~/src/api-client/types.gen'
 import { useCategories } from '~/composable/useCategories'
 import { useUserLocation } from '~/composable/useUserLocation'
 import { useFormat } from '~/composable/useFormat'

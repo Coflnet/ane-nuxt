@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { getFilters, addFilter, getOptions, testFilter as callTestFilter } from '~/src/api-client'
-import type { ListingListener, FilterOptions, StoredListing } from '~/src/api-client'
+import type { ClientModelListingListener as ListingListener, ClientModelFilterOptions as FilterOptions, ClientModelStoredListing as StoredListing } from '~/src/api-client'
 
 type NamedOption = {
   name: string

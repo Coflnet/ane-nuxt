@@ -11,11 +11,18 @@
 import type { Product } from '~/src/api-client/types.gen'
 
 /**
- * `Product` extended with the `hasActiveOffers` flag the API added to
- * `GET /api/Product/{seoId}` — not yet present in the generated client (see
- * utils/productApiUrl.ts for why the generated client can lag production).
+ * Runtime shape of `GET /api/Product/{seoId}`. The OpenAPI document currently describes this
+ * endpoint with the wrong schema (`Product` resolves to the Coflnet.Ane core document type in
+ * AneApi's ProductController, while ProductService returns Coflnet.Ane.Models.Product), so the
+ * generated `Product` lacks `categories`, `description`, `avgPrice` and `hasActiveOffers` and
+ * has `category` as an array. Keep this extension until AneApi documents the right type.
  */
-export interface ProductWithOffers extends Product {
+export interface ProductWithOffers extends Omit<Product, 'category'> {
+  /** Primary category (a single string at runtime). */
+  category?: string | null
+  categories?: string[] | null
+  description?: string | null
+  avgPrice?: number | null
   hasActiveOffers?: boolean | null
   /** True for catch-all pages (offers that could not be assigned to a specific product). */
   isCatchAll?: boolean | null
