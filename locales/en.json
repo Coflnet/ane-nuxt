@@ -1120,5 +1120,14 @@
   "labelingRightsRevoked": "Revoked",
   "labelingRightsUnknown": "Unknown",
   "labelingStatsFailed": "Numbers could not be loaded.",
-  "labelingMenu": "Photo labeling"
+  "labelingMenu": "Photo labeling",
+  "unsubscribeTitle": "Unsubscribe from notifications",
+  "unsubscribeConfirm": "Do you want to stop the notifications for this filter? The filter will be deleted.",
+  "unsubscribeConfirmNamed": "Do you want to stop the notifications for your filter \"{name}\"? The filter will be deleted.",
+  "unsubscribeButton": "Unsubscribe",
+  "unsubscribeSuccess": "You are unsubscribed. The filter was deleted and you will not get notifications for it anymore.",
+  "unsubscribeError": "This link has expired or could not be used. Log in to manage your filters.",
+  "manageFiltersLogin": "Log in to manage your filters",
+  "unsubscribeInvalidLink": "This link is incomplete. Please open the link from the notification e-mail again.",
+  "editFilterLinkExpired": "This link has expired. Log in to edit or delete your filter."
 }

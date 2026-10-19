@@ -13,7 +13,7 @@ async function walk(dir) {
   for (const e of entries) {
     const full = path.join(dir, e.name)
     if (e.isDirectory()) files.push(...await walk(full))
-    else if (/\.(vue|ts)$/.test(e.name)) files.push(full)
+    else if (/\.(?:vue|ts)$/.test(e.name)) files.push(full)
   }
   return files
 }
