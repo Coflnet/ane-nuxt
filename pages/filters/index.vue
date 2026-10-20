@@ -49,6 +49,7 @@
 
 <script setup lang="ts">
 import type { FilterFace } from '~/types/FilterType'
+import { isDisabledByError, isPausedForInactivity, parseSearchState } from '~/utils/filterState'
 
 const { t } = useI18n()
 const filterStore = useFilterStore()
@@ -84,7 +85,9 @@ const filters = computed(() => {
       name: i.name ?? '',
       marketplace: filtersHolder.IncludePlatforms ?? '',
       keywords: filtersHolder.keywords,
-      active: true,
+      active: parseSearchState(i.state).length === 0,
+      pausedForInactivity: isPausedForInactivity(i.state),
+      disabledByError: isDisabledByError(i.state),
       priceRange: filtersHolder.priceRange,
       location: filtersHolder.radius,
       isFlipNotification: i.filters?.some(f => f.name === 'IsFlipNotification') ?? false,

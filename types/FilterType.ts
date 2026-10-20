@@ -15,6 +15,9 @@ export interface FilterFace {
   priceRange: string
   location: string
   active: boolean
+  /** paused because the user had no website activity for 30 days */
+  pausedForInactivity: boolean
+  disabledByError: boolean
   matchCount: number
   isFlipNotification?: boolean
 }

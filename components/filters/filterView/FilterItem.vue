@@ -7,6 +7,26 @@
     >
       {{ $t('flipNotification') }}
     </span>
+    <div
+      v-if="filter.pausedForInactivity"
+      class="flex flex-col gap-2 mb-3 p-2 rounded border border-amber-500/30 bg-amber-500/10"
+    >
+      <span class="text-xs font-medium text-amber-400">{{ $t('filterPausedInactive') }}</span>
+      <UiButton
+        primary
+        class="self-start text-sm"
+        :proccessing="reactivating"
+        @on-click="reactivate"
+      >
+        {{ $t('reactivateFilter') }}
+      </UiButton>
+    </div>
+    <span
+      v-if="filter.disabledByError"
+      class="inline-block text-xs font-medium px-2 py-0.5 rounded bg-red-600/20 text-red-400 border border-red-500/30 mb-2"
+    >
+      {{ $t('filterDisabledError') }}
+    </span>
     <a
       aria-label="Edit Filter"
       :href="editHref"
@@ -24,10 +44,27 @@
 <script setup lang="ts">
 import type { FilterFace } from '~/types/FilterType'
 
+const { t } = useI18n()
 const localePath = useLocalePath()
 const filterStore = useFilterStore()
 
 const props = defineProps<{ filter: FilterFace }>()
+
+const reactivating = ref(false)
+
+async function reactivate() {
+  reactivating.value = true
+  try {
+    await filterStore.reactivateFilter(props.filter.id)
+    push.success(t('filterReactivated'))
+  }
+  catch {
+    push.error(t('filterReactivateFailed'))
+  }
+  finally {
+    reactivating.value = false
+  }
+}
 
 const editHref = computed(() => localePath(`/filters/create?id=${filterStore.getSimplifiedFilters[props.filter.id ?? '']![1]}`))
 </script>

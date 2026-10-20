@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { getFilters, addFilter, getOptions, testFilter as callTestFilter } from '~/src/api-client'
 import type { ClientModelListingListener as ListingListener, ClientModelFilterOptions as FilterOptions, ClientModelStoredListing as StoredListing } from '~/src/api-client'
+import { withoutInactivityPause } from '~/utils/filterState'
 
 type NamedOption = {
   name: string
@@ -68,6 +69,17 @@ export const useFilterStore = defineStore('filter', () => {
     }
   }
 
+  /** Saves a filter paused for inactivity with the pause cleared, other state flags are kept */
+  async function reactivateFilter(id: number) {
+    const filter = filters.value.find(f => f.id === id)
+    if (!filter)
+      return
+    // the generated state type predates the inactivity flag, the API accepts the flag names
+    const state = withoutInactivityPause(filter.state) as ListingListener['state']
+    await saveFilter({ ...filter, state })
+    await loadFilters()
+  }
+
   async function testFilter(filter: ListingListener): Promise<StoredListing[] | null> {
     try {
       if (!userStore.token) {
@@ -121,6 +133,7 @@ export const useFilterStore = defineStore('filter', () => {
 
     loadFilters,
     saveFilter,
+    reactivateFilter,
     testFilter,
     loadFilterOptions,
   }
