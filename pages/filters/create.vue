@@ -172,11 +172,8 @@ const radiusError = ref(false)
 function applyPrefillFromQuery() {
   if (!isNewFilter.value) return
 
-  const prefill = parseFilterPrefillQuery(route.query)
-  if (prefill.searchValue !== undefined) filter.value.searchValue = prefill.searchValue
-  if (prefill.minPrice !== undefined) filter.value.minPrice = prefill.minPrice
-  if (prefill.maxPrice !== undefined) filter.value.maxPrice = prefill.maxPrice
-  if (prefill.condition !== undefined) filter.value.condition = prefill.condition
+  const prefill = parseFilterPrefillQuery(route.query, [...marketplaces, ...usMarketplaces].map(m => m.value))
+  Object.assign(filter.value, prefill)
 }
 
 async function loadEditParam() {

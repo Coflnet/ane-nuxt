@@ -23,6 +23,20 @@
       </UiButton>
     </div>
 
+    <a
+      href="/downloads/ane-extension-install.html"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="mt-3 block text-sm text-indigo-300 hover:text-indigo-200"
+    >
+      {{ $t('referenceExtensionHelp') }}
+    </a>
+    <p
+      v-if="model?.referenceSelector && !preview"
+      class="mt-3 text-sm text-amber-300"
+    >
+      {{ $t('referenceBrowserSelectionHelp') }}
+    </p>
     <p
       v-if="error"
       class="mt-3 text-sm text-rose-300 break-words"
@@ -191,6 +205,22 @@
           </div>
         </div>
 
+        <div
+          v-if="!preview.screenshotPngBase64"
+          class="flex flex-wrap gap-2 mb-3"
+        >
+          <button
+            v-for="candidate in preview.priceCandidates"
+            :key="candidate.selector"
+            type="button"
+            class="rounded border border-slate-600 p-2 text-sm text-slate-100"
+            :aria-pressed="selectedReference?.selector === candidate.selector"
+            @click="applySelection(candidate.selector, null, $event.shiftKey || $event.ctrlKey || $event.metaKey)"
+          >
+            {{ candidate.text }} · {{ formatPrice(candidate.price, candidate.currency) }}
+          </button>
+        </div>
+
         <!-- Screenshot mode -->
         <div
           v-if="mode === 'screenshot' && preview.screenshotPngBase64"
@@ -228,7 +258,7 @@
         </div>
 
         <p
-          v-else-if="mode === 'screenshot' && !preview.screenshotPngBase64"
+          v-else-if="mode === 'screenshot' && !preview.screenshotPngBase64 && !preview.priceCandidates.length"
           class="text-sm text-slate-400"
         >
           {{ $t('noReferencePriceCandidates') }}
@@ -355,10 +385,6 @@ const summedCurrency = computed(() => selectedReference.value?.currency || 'EUR'
 const summedPrice = computed(() => {
   if (!selectedReference.value || !preview.value)
     return 0
-  // The backend returns a candidate with source='summed' whose .price is already the total;
-  // don't add the per-extra prices a second time in that case.
-  if (selectedReference.value.source === 'summed')
-    return Math.round(selectedReference.value.price * 100) / 100
   let total = selectedReference.value.price
   for (const sel of additionalSelectors.value) {
     const candidate = preview.value.priceCandidates.find(c => c.selector === sel)
@@ -414,7 +440,7 @@ onBeforeUnmount(() => {
 
 function onIframeMessage(ev: MessageEvent) {
   const data = ev.data as { type?: string, xpath?: string, shiftKey?: boolean, ctrlKey?: boolean, metaKey?: boolean, longPress?: boolean }
-  if (!data || data.type !== 'ane-pick' || !data.xpath)
+  if (ev.source !== sandboxIframe.value?.contentWindow || !data || data.type !== 'ane-pick' || !data.xpath)
     return
   const node = preview.value?.renderedNodes.find(n => n.xpath === data.xpath)
   const xpath = data.xpath
@@ -422,20 +448,19 @@ function onIframeMessage(ev: MessageEvent) {
   applySelection(xpath, node ?? null, extra)
 }
 
-async function loadPreview(extraSelectors?: string[]) {
-  if (!canPreview.value && !extraSelectors)
+async function loadPreview() {
+  if (!canPreview.value)
     return
   if (!url.value.trim())
     return
 
   loading.value = true
   error.value = ''
-  const isInitial = !extraSelectors
-  if (isInitial) {
-    preview.value = null
-    selectedReference.value = null
-    additionalSelectors.value = []
-  }
+  const savedSelector = model.value?.referenceUrl === url.value.trim() ? model.value.referenceSelector : undefined
+  const savedExtras = savedSelector ? model.value?.referenceAdditionalSelectors ?? [] : []
+  preview.value = null
+  selectedReference.value = null
+  additionalSelectors.value = []
 
   try {
     const baseUrl = apiClient.getConfig().baseURL ?? 'https://ane.coflnet.com'
@@ -445,17 +470,18 @@ async function loadPreview(extraSelectors?: string[]) {
       body: {
         url: url.value.trim(),
         locale: locale.value === 'de' ? 'de-DE' : 'en-US',
-        selectedSelector: selectedReference.value?.selector,
-        additionalSelectors: extraSelectors ?? additionalSelectors.value,
+        selectedSelector: savedSelector,
+        additionalSelectors: savedExtras,
       },
     })
     preview.value = result
     url.value = result.url
-    if (result.selectedReference)
-      selectedReference.value = result.selectedReference
-    // If extras were applied, push the freshly summed total into the form's max price.
-    if (!isInitial && additionalSelectors.value.length > 0)
-      applySelectedReference(false)
+    if (result.selectedReference) {
+      selectedReference.value = result.priceCandidates.find(c => c.selector === result.selectedReference?.selector) ?? result.selectedReference
+      additionalSelectors.value = savedExtras
+    }
+    if (savedSelector && !result.selectedReference)
+      error.value = t('referenceSelectionUnavailable')
   }
   catch (e: unknown) {
     console.error('Reference listing preview failed', e)
@@ -492,6 +518,7 @@ function overlayStyle(node: ReferenceRenderedNode): Record<string, string> {
 }
 
 function handleNodeClick(ev: MouseEvent, node: ReferenceRenderedNode) {
+  if (longPressFired.delete(node.xpath)) return
   const extra = ev.shiftKey || ev.ctrlKey || ev.metaKey
   applySelection(node.xpath, node, extra)
 }
@@ -502,6 +529,8 @@ function onTouchStart(_ev: TouchEvent, node: ReferenceRenderedNode) {
     longPressFired.add(node.xpath)
     applySelection(node.xpath, node, true)
   }, LONG_PRESS_MS)
+  const previous = longPressTimers.get(node.xpath)
+  if (previous) clearTimeout(previous)
   longPressTimers.set(node.xpath, timer)
 }
 
@@ -511,21 +540,18 @@ function onTouchEnd(_ev: TouchEvent, node: ReferenceRenderedNode) {
     clearTimeout(timer)
     longPressTimers.delete(node.xpath)
   }
-  if (!longPressFired.has(node.xpath))
-    applySelection(node.xpath, node, false)
-  longPressFired.delete(node.xpath)
 }
 
 function applySelection(selector: string, node: ReferenceRenderedNode | null, extra: boolean) {
   if (extra) {
-    // Don't add the same selector as primary or an existing extra.
-    if (selectedReference.value?.selector === selector)
-      return
-    if (additionalSelectors.value.includes(selector))
+    const candidate = preview.value?.priceCandidates.find(c => c.selector === selector)
+    const currency = candidate?.currency ?? node?.currency
+    if (!selectedReference.value || selectedReference.value.selector === selector
+      || additionalSelectors.value.includes(selector) || currency !== selectedReference.value.currency
+      || (candidate?.price ?? node?.price) == null)
       return
     additionalSelectors.value = [...additionalSelectors.value, selector]
-    // Re-fetch so backend sums prices server-side.
-    void loadPreview(additionalSelectors.value)
+    applySelectedReference(false)
     return
   }
 
@@ -549,9 +575,7 @@ function applySelection(selector: string, node: ReferenceRenderedNode | null, ex
     // Node has no price — ignore primary selection.
     return
   }
-  // Re-fetch when extras exist so the backend recomputes the summed total.
-  if (additionalSelectors.value.length > 0)
-    void loadPreview(additionalSelectors.value)
+  additionalSelectors.value = []
   // Apply the picked price to the form's max-price immediately, no toast.
   applySelectedReference(false)
 }
@@ -570,12 +594,12 @@ function extraLabel(selector: string) {
 
 function removeExtra(idx: number) {
   additionalSelectors.value = additionalSelectors.value.filter((_, i) => i !== idx)
-  if (additionalSelectors.value.length > 0)
-    void loadPreview(additionalSelectors.value)
+  applySelectedReference(false)
 }
 
 function clearExtras() {
   additionalSelectors.value = []
+  applySelectedReference(false)
 }
 
 function applySearchOnly() {

@@ -439,7 +439,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import { client as apiClient } from '~/src/api-client/client.gen'
-import { getFlips, getSubscription, type PaymentControllerActiveSubscription as ActiveSubscription, type Flip } from '~/src/api-client'
+import { addFilter, getFlips, getSubscription, type PaymentControllerActiveSubscription as ActiveSubscription, type Flip, type ClientModelTargetType } from '~/src/api-client'
 
 type FeedTier = 'free' | 'collector' | 'flipper'
 type LiveFlipMessage = {
@@ -522,6 +522,10 @@ const filterNotifyTarget = ref('')
 
 async function saveFlipFilter() {
   if (!filterName.value.trim()) return
+  if (!userStore.token) {
+    await navigateTo(localePath('/login') + '?redirectTo=' + encodeURIComponent(route.fullPath))
+    return
+  }
 
   const filterData: Array<{ name: string, value: string }> = []
   filterData.push({ name: 'IsFlipNotification', value: 'true' })
@@ -531,7 +535,7 @@ async function saveFlipFilter() {
   if (filters.minRefs > 0) filterData.push({ name: 'MinReferences', value: String(filters.minRefs) })
   if (filters.category) filterData.push({ name: 'ContainsKeyWord', value: JSON.stringify([filters.category]) })
 
-  const targetTypeMap: Record<string, string> = {
+  const targetTypeMap: Record<string, ClientModelTargetType> = {
     firebase: 'FireBase',
     discord: 'DiscordWebhook',
     email: 'Email',
@@ -543,8 +547,8 @@ async function saveFlipFilter() {
   else if (filterNotifyType.value !== 'none') target = filterNotifyTarget.value
 
   try {
-    await $fetch('/api/filters', {
-      method: 'POST',
+    await addFilter({
+      composable: '$fetch',
       headers: { Authorization: `Bearer ${userStore.token}` },
       body: {
         userId: userStore.user?.id ?? '',
@@ -712,12 +716,12 @@ function saveBookmarks() {
 }
 
 function isBookmarked(flip: Flip): boolean {
-  return bookmarkedFlips.value.some(bookmark => bookmark.listing?.id === flip.listing?.id)
+  return bookmarkedFlips.value.some(bookmark => getFlipKey(bookmark) === getFlipKey(flip))
 }
 
 function toggleBookmark(flip: Flip) {
   if (isBookmarked(flip)) {
-    bookmarkedFlips.value = bookmarkedFlips.value.filter(bookmark => bookmark.listing?.id !== flip.listing?.id)
+    bookmarkedFlips.value = bookmarkedFlips.value.filter(bookmark => getFlipKey(bookmark) !== getFlipKey(flip))
   }
   else {
     bookmarkedFlips.value = [...bookmarkedFlips.value, JSON.parse(JSON.stringify(flip))]
@@ -736,7 +740,7 @@ function confirmDeleteBookmark(flip: Flip) {
 }
 
 function removeBookmark(flip: Flip) {
-  bookmarkedFlips.value = bookmarkedFlips.value.filter(bookmark => bookmark.listing?.id !== flip.listing?.id)
+  bookmarkedFlips.value = bookmarkedFlips.value.filter(bookmark => getFlipKey(bookmark) !== getFlipKey(flip))
   saveBookmarks()
   deleteTarget.value = null
 }
@@ -781,7 +785,7 @@ function getFlipTimestamp(flip: Flip): number {
 }
 
 function getFlipKey(flip: Flip): string {
-  return flip.listing?.id ?? `${getFlipTimestamp(flip)}:${flip.listing?.title ?? ''}:${flip.listing?.price ?? ''}`
+  return flip.listing?.id ? `${flip.listing.platform}:${flip.listing.id}` : `${getFlipTimestamp(flip)}:${flip.listing?.title ?? ''}:${flip.listing?.price ?? ''}`
 }
 
 function sortByFoundAt(flips: Flip[]): Flip[] {

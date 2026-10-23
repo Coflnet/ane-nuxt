@@ -40,3 +40,20 @@ test('takes the first value when a param repeats, matching Vue Router LocationQu
 test('ignores unknown params and returns an empty prefill for an empty query', () => {
   assert.deepEqual(parseFilterPrefillQuery({}), {})
 })
+
+test('browser-selected reference survives the extension create-alert link', () => {
+  const query = Object.fromEntries(new URLSearchParams({ searchValue: 'Camera', referenceUrl: 'https://www.vinted.de/items/123-camera', referenceTitle: 'Camera', referenceSelector: "//*[@id='price']", referenceAdditionalSelectors: "//*[@id='shipping']", referencePrice: '105.50', referenceCurrency: 'eur' }))
+  assert.deepEqual(parseFilterPrefillQuery(query), { searchValue: 'Camera', referenceUrl: query.referenceUrl, referenceTitle: 'Camera', referenceSelector: query.referenceSelector, referenceAdditionalSelectors: [query.referenceAdditionalSelectors], referencePrice: 105.5, referenceCurrency: 'EUR', maxPrice: 106 })
+})
+
+test('invalid reference links cannot inject an executable URL or incomplete reference', () => {
+  const fields = { referenceSelector: "//*[@id='price']", referencePrice: '105', referenceCurrency: 'EUR' }
+  for (const referenceUrl of ['javascript:alert(1)', 'https://user:pass@example.com', 'https://example.com:8443/'])
+    assert.deepEqual(parseFilterPrefillQuery({ ...fields, referenceUrl }), {})
+  assert.deepEqual(parseFilterPrefillQuery({ referenceUrl: 'https://example.com', referencePrice: '100' }), {})
+})
+
+test('supported marketplace names are normalized and unknown ones ignored', () => {
+  assert.equal(parseFilterPrefillQuery({ marketplace: 'ebay' }, ['Ebay', 'Kleinanzeigen']).marketplace, 'Ebay')
+  assert.deepEqual(parseFilterPrefillQuery({ marketplace: 'invented' }), {})
+})

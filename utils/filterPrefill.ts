@@ -16,6 +16,13 @@ export interface FilterPrefillQuery {
   minPrice?: FilterPrefillQueryValue
   maxPrice?: FilterPrefillQueryValue
   condition?: FilterPrefillQueryValue
+  marketplace?: FilterPrefillQueryValue
+  referenceUrl?: FilterPrefillQueryValue
+  referenceTitle?: FilterPrefillQueryValue
+  referenceSelector?: FilterPrefillQueryValue
+  referencePrice?: FilterPrefillQueryValue
+  referenceAdditionalSelectors?: FilterPrefillQueryValue
+  referenceCurrency?: FilterPrefillQueryValue
 }
 
 export interface FilterPrefill {
@@ -23,6 +30,13 @@ export interface FilterPrefill {
   minPrice?: number
   maxPrice?: number
   condition?: string
+  marketplace?: string
+  referenceUrl?: string
+  referenceTitle?: string
+  referenceSelector?: string
+  referencePrice?: number
+  referenceAdditionalSelectors?: string[]
+  referenceCurrency?: string
 }
 
 /**
@@ -50,7 +64,7 @@ function parseClampedPrice(value: FilterPrefillQueryValue): number | undefined {
  * rather than surfaced as errors — the fields stay editable and simply keep the form's
  * own defaults for anything that doesn't parse.
  */
-export function parseFilterPrefillQuery(query: FilterPrefillQuery): FilterPrefill {
+export function parseFilterPrefillQuery(query: FilterPrefillQuery, supportedMarketplaces: string[] = []): FilterPrefill {
   const result: FilterPrefill = {}
 
   const searchValue = firstString(query.searchValue)?.trim()
@@ -68,6 +82,32 @@ export function parseFilterPrefillQuery(query: FilterPrefillQuery): FilterPrefil
 
   const condition = firstString(query.condition)?.trim().toLowerCase()
   if (condition && VALID_CONDITIONS.has(condition)) result.condition = condition
+
+  const marketplace = firstString(query.marketplace)?.toLowerCase()
+  const supportedMarket = supportedMarketplaces.find(value => value.toLowerCase() === marketplace)
+  if (supportedMarket) result.marketplace = supportedMarket
+
+  const referenceUrl = firstString(query.referenceUrl)
+  const referenceSelector = firstString(query.referenceSelector)
+  const referencePrice = parseClampedPrice(query.referencePrice)
+  const referenceCurrency = firstString(query.referenceCurrency)?.toUpperCase()
+  try {
+    const url = new URL(referenceUrl ?? '')
+    if (url.protocol === 'https:' && !url.username && !url.password && !url.port && url.href.length <= 2048
+      && referenceSelector?.startsWith('/') && referenceSelector.length <= 2048
+      && referencePrice !== undefined && referencePrice > 0 && /^[A-Z]{3}$/.test(referenceCurrency ?? '')) {
+      result.referenceUrl = url.href
+      result.referenceSelector = referenceSelector
+      result.referencePrice = referencePrice
+      result.referenceCurrency = referenceCurrency
+      result.referenceTitle = firstString(query.referenceTitle)?.slice(0, 300) ?? ''
+      const extras = firstString(query.referenceAdditionalSelectors)?.split('\n').filter(Boolean) ?? []
+      if (extras.length <= 11 && extras.every(s => s.startsWith('/') && s.length <= 2048))
+        result.referenceAdditionalSelectors = [...new Set(extras)].filter(s => s !== referenceSelector)
+      result.maxPrice = Math.ceil(referencePrice)
+    }
+  }
+  catch { /* An invalid reference leaves the editable search and price prefill intact. */ }
 
   return result
 }
