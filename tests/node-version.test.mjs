@@ -19,6 +19,7 @@ test('repository runtime declarations target Node.js 26', async () => {
   assert.equal(packageMetadata.engines.node, '>=26 <27')
   assert.equal(packageMetadata.engines.npm, '>=11 <12')
   assert.equal(packageMetadata.packageManager, 'npm@11.5.2')
-  assert.deepEqual(dockerImages, ['26-slim', '26-slim'])
+  assert.deepEqual(dockerImages, ['26-slim'])
+  assert.match(dockerfile, /^FROM gcr\.io\/distroless\/nodejs26-debian13:nonroot$/m)
   assert.match(readme, /Node\.js 26 and npm 11/)
 })

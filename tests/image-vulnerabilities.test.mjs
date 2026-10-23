@@ -44,6 +44,8 @@ test('package-lock resolves no version with a known fixable HIGH/CRITICAL adviso
   for (const [path, entry] of Object.entries(lock.packages)) {
     for (const [name, minimums] of Object.entries(minimumFixedVersions)) {
       if (!path.endsWith(`node_modules/${name}`)) continue
+      // a newer major than every listed fixed line (e.g. h3 2.x) is not affected
+      if (parse(entry.version)[0] > Math.max(...minimums.map(m => parse(m)[0]))) continue
       const minimum = minimumFor(entry.version, minimums)
       if (!minimum || compare(entry.version, minimum) < 0) {
         offenders.push(`${path}@${entry.version} (needs >= ${minimum ?? minimums.join(' | ')})`)

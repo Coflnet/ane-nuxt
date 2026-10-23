@@ -25,15 +25,18 @@ RUN set -eu; \
 	mkdir -p /app; \
 	cp -R .output /app/.output
 
-FROM node:26-slim
-# upgrade so fixed Debian packages (openssl) land before the node tag is rebuilt
-RUN apt-get update \
-	&& apt-get upgrade -y --no-install-recommends \
-	&& rm -rf /var/lib/apt/lists/* \
-	# npm is only needed in the build stage; its bundled packages are the only other scan findings
-	&& rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
+# Distroless, glibc, non-root (uid/gid 65532). No shell, no package manager, no apt layer.
+# The prebuilt @img/sharp-linux-x64 bundles libvips, so @nuxt/image's ipx works here.
+FROM gcr.io/distroless/nodejs26-debian13:nonroot
 WORKDIR /app
 
-COPY --from=build /app/.output ./.output
+COPY --from=build --chown=65532:65532 /app/.output ./.output
 
-CMD ["node", ".output/server/index.mjs"]
+# tells node's http clients to honour HTTP(S)_PROXY / NO_PROXY from the pod env
+ENV NODE_USE_ENV_PROXY=1
+ENV NODE_ENV=production
+
+USER 65532:65532
+EXPOSE 3000
+# the distroless entrypoint is `node`
+CMD [".output/server/index.mjs"]

@@ -52,7 +52,10 @@ export default defineNuxtConfig({
   ],
 
   ssr: true,
-  devtools: { enabled: true },
+
+  // inline: its `nuxt/app` imports must resolve through Nuxt's build aliases, not Node
+  build: { transpile: ['@hey-api/client-nuxt'] },
+  devtools: { enabled: false },
 
   css: [
     'notivue/notification.css',
@@ -161,9 +164,12 @@ export default defineNuxtConfig({
   }),
 
   icon: {
+    // Bundle the used collections into the server build (from the installed
+    // @iconify-json/* packages) so SSR never fetches icons from the internet.
     serverBundle: {
-      remote: 'jsdelivr',
+      collections: ['tabler', 'mdi', 'lucide', 'svg-spinners'],
     },
+    fallbackToApi: false,
   },
 
   notivue: {
