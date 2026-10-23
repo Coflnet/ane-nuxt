@@ -19,8 +19,10 @@
       </UiTooltipHover>
     </div>
     <Listbox
-      v-model="selectedItems"
+      :model-value="selectedItems"
+      by="value"
       multiple
+      @update:model-value="updateSelection"
     >
       <ListboxButton
         :aria-label="labelAria ?? 'Multi Select Dropdown'"
@@ -45,7 +47,6 @@
           :value="item"
           class="flex items-center px-4 py-2 cursor-pointer hover:bg-slate-700 focus:bg-slate-700 focus:outline-none"
           :class="{ 'bg-slate-700': isSelected(item) }"
-          @click="toggleSelection(item)"
         >
           <div class="flex items-center justify-center w-5 h-5 mr-3 rounded-full border border-slate-400 bg-slate-900">
             <div
@@ -80,7 +81,7 @@ import { UiHeaderLabel } from '#components'
 import type { Options } from '~/constants/CreateFilterConstants'
 
 const { t } = useI18n()
-const model = defineModel<Options[]>()
+const selectedItems = defineModel<Options[]>({ default: () => [] })
 const props = defineProps<{
   options: Options[]
   overrideValue?: string
@@ -89,25 +90,13 @@ const props = defineProps<{
   labelAria?: string
 }>()
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: Options[]): void
-}>()
-
 const isOpen = ref(false)
-const selectedItems = ref<Options[]>([])
-
-watch(() => model, () => {
-  selectedItems.value = model.value!
-}, { deep: true })
 
 // create the string that is displayed on the button eq. Kleinanzeigen, AutoScout24
 const selectedLabels = computed(() => {
   if (selectedItems.value.length === 0) return ''
-  const rawSelectedItems = selectedItems.value.map(item => toRaw(item)) // Convert Proxies to raw objects
   const selected = props.options
-    .filter(option => rawSelectedItems.some(selectedItem =>
-      selectedItem.value === option.value && selectedItem.label === option.label, // Compare all relevant properties
-    ))
+    .filter(option => selectedItems.value.some(item => item.value === option.value))
     .map(option => t(option.label))
 
   if (selected.length <= 3) {
@@ -117,24 +106,17 @@ const selectedLabels = computed(() => {
   return `${selected.slice(0, 3).join(', ')} +${selected.length - 3}`
 })
 
-const isSelected = (value: Options): boolean => {
-  return selectedItems.value.includes(value)
-}
+const isSelected = (value: Options): boolean => selectedItems.value.some(item => item.value === value.value)
 
-// Toggle selection of an item
-const toggleSelection = (value: Options) => {
-  // deselect all other options when the overrideValue is selected
-  if (value.value === props.overrideValue) {
-    selectedItems.value = [value]
-    emit('update:modelValue', [...selectedItems.value])
-    return
-  }
-  if (selectedItems.value.map(item => item.value).includes(props.overrideValue ?? ''))
-    selectedItems.value = [value]
-  emit('update:modelValue', [...selectedItems.value])
+function updateSelection(items: Options[]) {
+  const override = items.find(item => item.value === props.overrideValue)
+  selectedItems.value = override && !selectedItems.value.some(item => item.value === props.overrideValue)
+    ? [override]
+    : items.filter(item => item.value !== props.overrideValue)
 }
 
 onMounted(() => {
-  toggleSelection(props.options![0]!)
+  if (selectedItems.value.length === 0 && props.options[0])
+    selectedItems.value = [props.options[0]]
 })
 </script>

@@ -36,26 +36,19 @@ const hasBasicPlan = useUserStore().currentPlan?.product == 'basic' || !useUserS
 const premiumMarkets = ref(false)
 const model = defineModel<Filter>()
 
-const resolvedMarketplaceOptions = ref<Options[]>(detectLocationNA() ? usMarketplaces : marketplaces)
-
-const selectedMarketplaces = ref<Options[]>([])
-
-watch(() => model.value!.marketplace, () => {
-  selectedMarketplaces.value = []
-  model.value?.marketplace.split(',').map((condidtionName) => {
-    const item = resolvedMarketplaceOptions.value.find(m => m.value == condidtionName)
-    if (item)
-      selectedMarketplaces.value.push(item)
-  })
+const resolvedMarketplaceOptions = computed(() => {
+  const regionalOptions = detectLocationNA() ? usMarketplaces : marketplaces
+  return [...regionalOptions, ...[...marketplaces, ...usMarketplaces].filter(option =>
+    model.value!.marketplace.split(',').includes(option.value)
+    && !regionalOptions.some(regional => regional.value === option.value),
+  )]
 })
 
-// constuct the string send to backend here instead of in handleFilters()
-watch(selectedMarketplaces, () => {
-  if (selectedMarketplaces.value.map(item => item.value).includes('all')) {
-    model.value!.marketplace = 'all'
-    return
-  }
-  model.value!.marketplace = selectedMarketplaces.value.map(i => i.value).join(',')
+const selectedMarketplaces = computed({
+  get: () => resolvedMarketplaceOptions.value.filter(option => model.value!.marketplace.split(',').includes(option.value)),
+  set: (items: Options[]) => {
+    model.value!.marketplace = items.map(item => item.value).join(',')
+  },
 })
 
 watch(selectedMarketplaces, (_) => {
