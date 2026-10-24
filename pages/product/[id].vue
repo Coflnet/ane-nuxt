@@ -822,6 +822,11 @@ const { data: coreData, loading } = useRaceableAsyncData(
 )
 
 const product = computed<ProductWithOffers | null>(() => coreData.value?.product ?? null)
+watch(() => product.value?.id, (id) => {
+  if (import.meta.client && id && id !== productId) {
+    void router.replace(localePath({ path: `/product/${encodeURIComponent(id)}`, query: route.query, hash: route.hash }))
+  }
+}, { immediate: true })
 const priceHistory = computed<PricePoint[]>(() => coreData.value?.priceHistory ?? [])
 const priceStats = computed<PriceHistoryStats | null>(() => coreData.value?.priceStats ?? null)
 
