@@ -23,6 +23,16 @@
         @search="onSearch"
         @select-category="onSearchCategorySelect"
       />
+      <NuxtLink
+        :to="localePath('/parts')"
+        class="mt-4 inline-flex items-center gap-2 text-sm text-cyan-300 hover:text-cyan-200"
+      >
+        <Icon
+          name="tabler:settings"
+          class="h-4 w-4"
+        />
+        {{ $t('parts.title') }} →
+      </NuxtLink>
     </div>
 
     <!-- Results Section (if searching) -->
@@ -333,7 +343,7 @@
               </div>
             </div>
             <div
-              v-else
+              v-else-if="loading"
               class="space-y-3 animate-pulse"
             >
               <div class="flex items-center gap-2">
@@ -342,6 +352,28 @@
                 <div class="flex-1 h-8 bg-slate-700/50 rounded-lg" />
               </div>
               <div class="h-6 bg-slate-700/30 rounded-full" />
+            </div>
+            <div
+              v-else
+              class="space-y-3 text-sm text-slate-400"
+              role="status"
+            >
+              <p>{{ $t('no_priced_results', 'No priced results are available for this search.') }}</p>
+              <div class="flex flex-wrap gap-3">
+                <button
+                  v-if="selectedMinPrice !== undefined || selectedMaxPrice !== undefined"
+                  class="text-blue-400 hover:text-blue-300"
+                  @click="clearPriceFilter"
+                >
+                  {{ $t('clear_price_filter', 'Clear price filter') }}
+                </button>
+                <button
+                  class="text-blue-400 hover:text-blue-300"
+                  @click="performSearch()"
+                >
+                  {{ $t('retry', 'Retry') }}
+                </button>
+              </div>
             </div>
           </div>
 
@@ -1136,7 +1168,7 @@ const attributeBuckets = ref<Record<string, FilterBucket[]>>({})
 
 // Price range state
 const priceRangeMin = ref<number>(0)
-const priceRangeMax = ref<number>(1000)
+const priceRangeMax = ref<number>(0)
 const priceFilterMin = ref<number>(0)
 const priceFilterMax = ref<number>(1000)
 const priceSliderStep = computed(() => {
@@ -2115,6 +2147,10 @@ function applySearchResponse(response: SearchProductsResponse, append: boolean) 
         batteryFilterMax.value = selectedBatteryMax.value ?? batteryRangeMax.value
       }
     }
+
+    // A completed search without priced hits must not retain a previous search's range.
+    priceRangeMin.value = 0
+    priceRangeMax.value = 0
 
     // Update price range from aggregation
     // Backend always returns the global price range (not narrowed by price filter)

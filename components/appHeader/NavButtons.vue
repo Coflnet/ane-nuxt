@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center space-x-4">
+  <div class="flex flex-wrap items-center justify-end gap-x-4 gap-y-2">
     <UiLinkButton
       aria-label="Home Navigation Button"
       :white="true"
@@ -14,6 +14,13 @@
       :to="localePath('/search')"
     >
       {{ $t('appHeaderSearch') }}
+    </UiLinkButton>
+
+    <UiLinkButton
+      :white="true"
+      :to="localePath('/parts')"
+    >
+      {{ $t('parts.nav') }}
     </UiLinkButton>
 
     <UiLinkButton

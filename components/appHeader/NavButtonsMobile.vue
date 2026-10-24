@@ -66,6 +66,28 @@
 
           <UiTextButton
             class="justify-start"
+            @on-click="navigateAndClose('/search')"
+          >
+            <Icon
+              name="lucide:search"
+              class="w-5 h-5 mr-2"
+            />
+            {{ $t('appHeaderSearch') }}
+          </UiTextButton>
+
+          <UiTextButton
+            class="justify-start"
+            @on-click="navigateAndClose('/parts')"
+          >
+            <Icon
+              name="lucide:cog"
+              class="w-5 h-5 mr-2"
+            />
+            {{ $t('parts.nav') }}
+          </UiTextButton>
+
+          <UiTextButton
+            class="justify-start"
             @on-click="navigateAndClose('/filters')"
           >
             <Icon
@@ -108,14 +130,14 @@
 </template>
 
 <script setup lang="ts">
-const { locale: _locale, locales: _locales } = useI18n()
 const userStore = useUserStore()
 const router = useRouter()
+const localePath = useLocalePath()
 
 const emit = defineEmits(['navigate'])
 
 const navigateAndClose = (path: string) => {
-  router.push(path)
+  router.push(localePath(path))
   emit('navigate')
 }
 </script>
