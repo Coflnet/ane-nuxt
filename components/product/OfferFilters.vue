@@ -257,6 +257,20 @@
       </button>
     </div>
     <p
+      v-if="shownZipError && !nearbyOpen"
+      class="text-xs text-red-400"
+      role="alert"
+    >
+      {{ shownZipError }}
+      <button
+        type="button"
+        class="underline ml-2"
+        @click="emit('change', state)"
+      >
+        {{ $t('retry') }}
+      </button>
+    </p>
+    <p
       v-if="loading"
       class="text-xs text-slate-500"
       role="status"

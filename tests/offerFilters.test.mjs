@@ -167,3 +167,13 @@ test('more filters count ignores what a quick action already shows', () => {
   assert.equal(moreFilterCount({ ...emptyOfferFilter(), countries: ['NL'], platforms: ['Vinted'] }, 'AT'), 2)
   assert.equal(moreFilterCount({ ...emptyOfferFilter(), countries: ['AT'], platforms: ['Vinted'] }, 'AT'), 1)
 })
+
+test('offer filters preserve the independent history window', () => {
+  const state = parseOfferFilterQuery({ countries: 'DE', zip: '00000', zip_country: 'AT', max_distance: '50' })
+  const query = buildOfferFilterQuery(state, { history_days: '7', countries: 'DE' })
+  assert.equal(query.history_days, '7')
+  assert.equal(query.zip, '00000')
+  assert.equal(query.zip_country, 'AT')
+  assert.equal(parseOfferFilterQuery({ ...query, history_days: '365' }).zip, '00000')
+  assert.equal(buildMatchesParams(state).days, undefined)
+})

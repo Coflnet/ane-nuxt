@@ -318,21 +318,70 @@
 
       <!-- Price History Chart -->
       <div
-        v-if="priceHistory.length"
         class="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-xl mb-8"
       >
         <div class="p-6 border-b border-slate-800">
           <h2 class="text-2xl font-bold text-white">
             {{ $t('product.priceHistoryTitle') }}
           </h2>
-          <p class="text-sm text-slate-400 mt-1">
+          <label class="block text-sm text-slate-300 mt-3">
+            {{ $t('product.historyWindow') }}
+            <select
+              :value="historyDays"
+              class="ml-2 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2"
+              data-testid="history-window"
+              @change="setHistoryDays(($event.target as HTMLSelectElement).value)"
+            >
+              <option
+                v-for="days in HISTORY_WINDOWS"
+                :key="days"
+                :value="days"
+              >
+                {{ $t('product.historyWindowDays', { days }) }}
+              </option>
+            </select>
+          </label>
+          <p
+            v-if="historyLoading"
+            class="text-sm text-slate-400 mt-3"
+            role="status"
+          >
+            {{ $t('product.historyLoading') }}
+          </p>
+          <div
+            v-else-if="historyError"
+            class="text-sm text-red-400 mt-3"
+            role="alert"
+          >
+            {{ $t('product.historyError') }}
+            <button
+              type="button"
+              class="underline ml-2"
+              @click="refreshHistory()"
+            >
+              {{ $t('retry') }}
+            </button>
+          </div>
+          <p
+            v-else-if="!priceHistory.length"
+            class="text-sm text-slate-400 mt-3"
+          >
+            {{ $t('product.historyEmpty') }}
+          </p>
+          <p
+            v-if="priceHistory.length"
+            class="text-sm text-slate-400 mt-1"
+          >
             {{ $t('product.priceHistoryDays', { days: priceHistory.length }) }}
           </p>
-          <p class="text-sm text-slate-400 mt-2">
+          <p
+            v-if="priceHistory.length"
+            class="text-sm text-slate-400 mt-2"
+          >
             {{ formatDate(priceHistory[0]?.date) }} – {{ formatDate(priceHistory.at(-1)?.date) }}
           </p>
           <p
-            v-if="priceStats && priceStats.dataPoints"
+            v-if="priceHistory.length && priceStats && priceStats.dataPoints"
             class="text-white mt-3"
           >
             {{ $t('product.historicalMedian') }}: ~{{ formatRecordedPrice(priceStats.medianPrice || 0) }}
@@ -342,7 +391,7 @@
             {{ $t('product.historyAskingContext') }}
           </p>
           <p
-            v-if="!recordedCurrency"
+            v-if="priceHistory.length && !recordedCurrency"
             class="text-sm text-slate-400 mt-2"
           >
             {{ $t('product.historyCurrencyUnknown') }}
@@ -749,7 +798,7 @@ import { useUserStore } from '~/stores/user'
 import { useOfferCountry } from '~/composable/useOfferCountry'
 import { buildProductResourceUrl } from '~/utils/productApiUrl'
 import { buildNotifyFilterUrl } from '~/utils/notifyFilterUrl'
-import { formatHistoryPrice, historyCurrency, historyTimeFraction } from '~/utils/priceHistory'
+import { formatHistoryPrice, historyCurrency, historyTimeFraction, HISTORY_WINDOWS, parseHistoryDays } from '~/utils/priceHistory'
 import {
   caseOfId,
   caseTitle,
@@ -823,19 +872,13 @@ function buildAlternativesUrl(id: string): string {
 const { data: coreData, loading } = useRaceableAsyncData(
   `product-${productId}`,
   async () => {
-    const [productRes, histRes, statsRes] = await Promise.all([
-      getProduct({ path: { id: productId } }),
-      getPriceHistory({ path: { id: productId }, query: { days: 90 } }).catch(() => []),
-      getPriceStats({ path: { id: productId }, query: { days: 90 } }).catch(() => null),
-    ])
+    const productRes = await getProduct({ path: { id: productId } })
     const product = productRes as ProductWithOffers
     const alternatives = shouldLoadAlternatives(product.hasActiveOffers, null)
       ? await $fetch<ProductAlternative[]>(buildAlternativesUrl(productId)).catch(() => [])
       : []
     return {
       product,
-      priceHistory: (histRes as PricePoint[]) || [],
-      priceStats: (statsRes as PriceHistoryStats | null) ?? null,
       alternatives,
     }
   },
@@ -847,8 +890,26 @@ watch(() => product.value?.id, (id) => {
     void router.replace(localePath({ path: `/product/${encodeURIComponent(id)}`, query: route.query, hash: route.hash }))
   }
 }, { immediate: true })
-const priceHistory = computed<(PricePoint & { currency?: string | null })[]>(() => coreData.value?.priceHistory ?? [])
-const priceStats = computed<PriceHistoryStats | null>(() => coreData.value?.priceStats ?? null)
+const historyDays = computed(() => parseHistoryDays(route.query.history_days))
+function setHistoryDays(value: string) {
+  void router.replace({ query: { ...route.query, history_days: String(parseHistoryDays(value)) }, hash: route.hash })
+}
+const { data: historyData, loading: historyLoading, error: historyError, refresh: refreshHistory } = useRaceableAsyncData(
+  `product-history-${productId}`,
+  async () => {
+    const days = historyDays.value
+    const [history, stats] = await Promise.all([
+      getPriceHistory({ path: { id: productId }, query: { days } }),
+      getPriceStats({ path: { id: productId }, query: { days } }),
+    ])
+    return { days, history: history as PricePoint[], stats: stats as PriceHistoryStats }
+  },
+  { watch: [historyDays] },
+)
+// Keep the chart and summary bound to the same completed window, including navigation races.
+const currentHistory = computed(() => !historyLoading.value && !historyError.value && historyData.value?.days === historyDays.value ? historyData.value : null)
+const priceHistory = computed<(PricePoint & { currency?: string | null })[]>(() => currentHistory.value?.history ?? [])
+const priceStats = computed<PriceHistoryStats | null>(() => currentHistory.value?.stats ?? null)
 const recordedCurrency = computed(() => historyCurrency(priceHistory.value))
 const formatRecordedPrice = (amount: number) => formatHistoryPrice(amount, recordedCurrency.value, locale.value)
 
@@ -1311,17 +1372,17 @@ function buildFacetsUrl(id: string): string {
 }
 
 function onOfferFilterChange(next: OfferFilterState) {
-  router.replace({ query: buildOfferFilterQuery(next, route.query) })
+  const query = buildOfferFilterQuery(next, route.query)
+  if (zipError.value && JSON.stringify(query) === JSON.stringify(buildOfferFilterQuery(offerFilter.value, route.query))) void loadMatches()
+  else void router.replace({ query })
 }
 
 // Client-side reload of the offers on every filter change. A newer request supersedes an older one.
 let matchesSeq = 0
-let revertingZip = false
 async function loadMatches() {
   const seq = ++matchesSeq
   matchesLoading.value = true
-  if (!revertingZip) zipError.value = ''
-  revertingZip = false
+  zipError.value = ''
   try {
     const result = await $fetch<(ProductMatch & OfferMatchExtras)[]>(buildMatchesUrl(productId))
     if (seq !== matchesSeq) return
@@ -1331,10 +1392,9 @@ async function loadMatches() {
     if (seq !== matchesSeq) return
     const status = (error as { statusCode?: number, status?: number })?.statusCode ?? (error as { status?: number })?.status
     if (status === 400 && offerFilter.value.zip) {
-      // unresolvable zip: show the message next to the input and drop the zip from the URL
+      // Preserve the requested location: resolving it must never silently broaden the search.
+      matches.value = []
       zipError.value = extractApiErrorMessage(error, t('product.filters.zipInvalid'))
-      revertingZip = true
-      onOfferFilterChange({ ...offerFilter.value, zip: '', zipCountry: '', maxDistance: undefined })
       return
     }
     matches.value = []

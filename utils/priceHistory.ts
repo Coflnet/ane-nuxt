@@ -1,3 +1,9 @@
+export const HISTORY_WINDOWS = [7, 30, 90, 365] as const
+
+export function parseHistoryDays(value: unknown): number {
+  return typeof value === 'string' && HISTORY_WINDOWS.some(days => String(days) === value) ? Number(value) : 90
+}
+
 type Snapshot = { date?: string, currency?: string | null }
 
 export function historyCurrency(history: Snapshot[]): string | null {

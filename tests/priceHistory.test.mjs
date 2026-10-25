@@ -19,3 +19,11 @@ test('oldest is left, newest is right, and missing days are not compressed', () 
   assert.equal(historyTimeFraction(history, 2), 1)
   assert.equal(historyTimeFraction(history.slice(0, 1), 0), 0.5)
 })
+
+test('URL history windows accept only supported whole-day selections', async () => {
+  const { parseHistoryDays, HISTORY_WINDOWS } = await import('../utils/priceHistory.ts')
+  for (const days of HISTORY_WINDOWS) assert.equal(parseHistoryDays(String(days)), days)
+  for (const value of [undefined, null, '', '0', '366', '7.0', '7days', ['7', '30']]) {
+    assert.equal(parseHistoryDays(value), 90)
+  }
+})
