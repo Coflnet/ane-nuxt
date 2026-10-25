@@ -83,7 +83,7 @@
               v-for="field in identityFields"
               :key="field"
               class="text-sm text-slate-300"
-            >{{ t(`parts.fields.${field}`) }}
+            >{{ t(field === 'part_key' && form.class === 'carburetor' ? 'parts.fields.carburetorDesignation' : `parts.fields.${field}`) }}
               <input
                 v-model="form[field]"
                 type="text"
@@ -375,7 +375,7 @@ let photoVersion = 0
 const inferredFields = new Map<PartField | 'class', string>()
 const dirty = computed(() => photoDirty.value || JSON.stringify(partSearchParams(form)) !== submitted.value)
 const toothed = computed(() => ['', 'gear', 'sprocket', 'pulley'].includes(form.class))
-const identityFields = computed<PartField[]>(() => form.class === 'bearing' ? ['part_key', 'partNumber', 'machine'] : ['partNumber', 'machine'])
+const identityFields = computed<PartField[]>(() => ['bearing', 'carburetor'].includes(form.class) ? ['part_key', 'partNumber', 'machine'] : ['partNumber', 'machine'])
 const measurementFields = computed<PartField[]>(() => [
   ...(toothed.value ? form.mode === 'fragment' ? ['teeth_observed', 'arc_degrees'] : ['teeth'] : []),
   'outerDiameterMm', form.class === 'bearing' ? 'innerDiameterMm' : 'boreMm', 'widthMm',

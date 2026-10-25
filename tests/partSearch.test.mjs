@@ -46,10 +46,21 @@ test('Vue numeric inputs serialize numbers without losing a search or fragment m
   assert.equal(partSearchParams(form).arc_degrees, '120')
 })
 
-
 test('generic parts retain the displayed bore measurement while bearing searches omit it', () => {
   const generic = partSearchParams(partFormFromQuery({ class: 'generic', partNumber: 'SYNTHETIC-1', boreMm: '8.5' }))
   assert.equal(generic.boreMm, '8.5')
   const bearing = partSearchParams(partFormFromQuery({ class: 'bearing', part_key: '6203-2RS', boreMm: '8.5' }))
   assert.ok(!('boreMm' in bearing))
+})
+
+test('carburetor designation survives editable shared URL parsing and serialization', () => {
+  const form = partFormFromQuery({ class: 'carburetor', part_key: 'Bing 1/20/38', teeth: '42', module: '1' })
+  const query = partSearchParams(form)
+  assert.equal(query.class, 'carburetor')
+  assert.equal(query.part_key, 'Bing 1/20/38')
+  assert.ok(!('teeth' in query))
+  assert.ok(!('module' in query))
+  assert.deepEqual(partSearchParams(partFormFromQuery(Object.fromEntries(new URLSearchParams(query)))), query)
+  form.part_key = 'Bing 1/20/40'
+  assert.equal(partSearchParams(form).part_key, 'Bing 1/20/40')
 })

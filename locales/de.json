@@ -1172,6 +1172,7 @@
     "classes": {
       "gear": "Zahnrad",
       "bearing": "Kugellager",
+      "carburetor": "Vergaser",
       "sprocket": "Kettenrad",
       "pulley": "Riemenscheibe",
       "generic": "Anderes Ersatzteil"
@@ -1180,6 +1181,7 @@
       "partNumber": "Teile- / OEM-Nummer",
       "machine": "Maschine oder Modell",
       "part_key": "Lagerbezeichnung",
+      "carburetorDesignation": "Vergaserbezeichnung",
       "teeth": "Zähnezahl",
       "outerDiameterMm": "Außendurchmesser (mm)",
       "boreMm": "Bohrung / Wellenloch (mm)",

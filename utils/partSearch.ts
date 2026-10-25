@@ -1,4 +1,4 @@
-export const partClasses = ['gear', 'bearing', 'sprocket', 'pulley', 'generic'] as const
+export const partClasses = ['gear', 'bearing', 'carburetor', 'sprocket', 'pulley', 'generic'] as const
 export const partFields = ['q', 'partNumber', 'machine', 'part_key', 'teeth', 'outerDiameterMm', 'boreMm', 'innerDiameterMm', 'module', 'widthMm', 'teeth_observed', 'arc_degrees', 'pitch_mm', 'tolerance', 'toleranceMm'] as const
 export type PartField = typeof partFields[number]
 export type PartForm = Record<PartField, string> & { class: string, mode: string }
@@ -23,7 +23,7 @@ export function partSearchParams(form: PartForm): Record<string, string> {
     if (['teeth', 'module', 'teeth_observed', 'arc_degrees', 'pitch_mm'].includes(key) && !toothed) continue
     if (key === 'boreMm' && form.class === 'bearing') continue
     if (key === 'innerDiameterMm' && form.class !== 'bearing') continue
-    if (key === 'part_key' && form.class !== 'bearing') continue
+    if (key === 'part_key' && !['bearing', 'carburetor'].includes(form.class)) continue
     if (['teeth_observed', 'arc_degrees'].includes(key) && form.mode !== 'fragment') continue
     if (key === 'teeth' && form.mode === 'fragment') continue
     const value = String(form[key] ?? '').trim()

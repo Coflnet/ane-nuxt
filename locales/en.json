@@ -1172,6 +1172,7 @@
     "classes": {
       "gear": "Gear",
       "bearing": "Bearing",
+      "carburetor": "Carburetor",
       "sprocket": "Sprocket",
       "pulley": "Pulley",
       "generic": "Other spare part"
@@ -1180,6 +1181,7 @@
       "partNumber": "Part / OEM number",
       "machine": "Machine or model",
       "part_key": "Bearing designation",
+      "carburetorDesignation": "Carburetor designation",
       "teeth": "Number of teeth",
       "outerDiameterMm": "Outer diameter (mm)",
       "boreMm": "Bore / shaft hole (mm)",
