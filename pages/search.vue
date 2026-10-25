@@ -223,6 +223,16 @@
           class="lg:col-span-1 space-y-4 min-w-0 overflow-hidden"
           :class="isFilterPanelOpen ? 'block' : 'hidden lg:block'"
         >
+          <label class="flex items-start gap-3 rounded-xl border border-slate-700/50 bg-slate-800/50 p-5 text-sm text-slate-300">
+            <input
+              type="checkbox"
+              :checked="includePartOffers"
+              class="mt-0.5 accent-cyan-400"
+              data-testid="include-part-offers"
+              @change="toggleFilter('includePartOffers', 'true')"
+            >
+            {{ $t('includePartOffers') }}
+          </label>
           <!-- Category Filter -->
           <div
             v-if="availableCategoryBuckets.length > 0"
@@ -1099,6 +1109,7 @@ const { topLevelCategories, loadingCategories, fetchTopLevelCategories, fetchSub
 
 // URL-derived state
 const searchQuery = computed(() => (route.query.q as string) || '')
+const includePartOffers = computed(() => route.query.includePartOffers === 'true')
 const selectedCategory = computed(() => (route.query.category as string) || '')
 const selectedCondition = computed(() => (route.query.condition as string) || '')
 const selectedMinPrice = computed(() => route.query.price_min ? Number(route.query.price_min) : undefined)
@@ -1117,7 +1128,8 @@ const activeAttributeFilters = computed(() => {
 
 const hasActiveFilters = computed(
   () =>
-    !!selectedCategory.value
+    includePartOffers.value
+    || !!selectedCategory.value
     || !!selectedCondition.value
     || selectedMinPrice.value !== undefined
     || selectedMaxPrice.value !== undefined
@@ -1219,16 +1231,17 @@ const interpretation = ref<SearchInterpretation | null>(null)
 const isSearchMode = computed(() => routeHasSearchQuery(route.query))
 
 function routeHasSearchQuery(query: typeof route.query): boolean {
-  return !!(query.q || query.category || query.condition
+  return !!(query.includePartOffers === 'true' || query.q || query.category || query.condition
     || query.price_min || query.price_max || query.sort || query.max_distance
     || query.zip || query.country
     || Object.keys(query).some(k => k.startsWith('attr_')))
 }
 
 // Track previous query params to detect server-side filter changes that need a re-fetch
-const prevQuery = reactive({ q: '' as string | undefined, category: '' as string | undefined, condition: '' as string | undefined, price_min: '' as string | undefined, price_max: '' as string | undefined, attrs: '' as string | undefined, sort: '' as string | undefined, max_distance: '' as string | undefined })
+const prevQuery = reactive({ includePartOffers: false, q: '' as string | undefined, category: '' as string | undefined, condition: '' as string | undefined, price_min: '' as string | undefined, price_max: '' as string | undefined, attrs: '' as string | undefined, sort: '' as string | undefined, max_distance: '' as string | undefined })
 
 function syncPrevQuery() {
+  prevQuery.includePartOffers = includePartOffers.value
   prevQuery.q = route.query.q ? String(route.query.q) : ''
   prevQuery.category = route.query.category ? String(route.query.category) : ''
   prevQuery.condition = route.query.condition ? String(route.query.condition) : ''
@@ -1953,6 +1966,7 @@ function localizeAttrValue(attrKey: string, value: string): string {
 function buildSearchParams(offset = 0) {
   const params: Record<string, string | number | string[]> = { offset, limit: PAGE_SIZE }
   if (searchQuery.value) params.query = searchQuery.value
+  if (includePartOffers.value) params.includePartOffers = 'true'
   // Category values: the API only matches the German taxonomy label, so send that
   // when it's known (see resolveSearchCategoryParam), falling back to the numeric/API
   // slug otherwise.
@@ -2193,7 +2207,7 @@ function queryWithoutKeys(...keys: string[]): Record<string, string> {
   return query
 }
 
-function toggleFilter(type: 'category' | 'condition', value: string) {
+function toggleFilter(type: 'category' | 'condition' | 'includePartOffers', value: string) {
   if (route.query[type] === value) {
     router.push({ query: queryWithoutKeys(type) })
     return
@@ -2373,19 +2387,16 @@ function clearPriceFilter() {
 }
 
 function onSearch(query: string) {
-  router.push({ query: searchRouteQuery(query) })
+  router.push({ query: searchRouteQuery(query, includePartOffers.value) })
 }
 
 function onSearchCategorySelect(slug: string) {
-  router.push({ query: { category: toUrlSlug(slug) || slug } })
+  router.push({ query: { ...searchRouteQuery('', includePartOffers.value), category: toUrlSlug(slug) || slug } })
 }
 
 // Watch route query changes and trigger search
 watch(() => route.query, () => {
-  const hasQuery = route.query.q || route.query.category || route.query.condition
-    || route.query.price_min || route.query.price_max || route.query.sort || route.query.max_distance
-    || route.query.zip || route.query.country
-    || Object.keys(route.query).some(k => k.startsWith('attr_'))
+  const hasQuery = routeHasSearchQuery(route.query)
   if (hasQuery) {
     // Detect if server-side filter params changed (search, category, condition, price, sort, distance, or attributes)
     const currentQ = route.query.q ? String(route.query.q) : ''
@@ -2404,12 +2415,13 @@ watch(() => route.query, () => {
       .map(([k, v]) => `${k}=${v}`)
       .join('&')
 
-    const queryChanged = currentQ !== prevQuery.q || currentCategory !== prevQuery.category || currentCondition !== prevQuery.condition || currentPriceMin !== prevQuery.price_min || currentPriceMax !== prevQuery.price_max || currentAttrs !== prevQuery.attrs || currentSort !== prevQuery.sort || currentMaxDistance !== prevQuery.max_distance
+    const queryChanged = includePartOffers.value !== prevQuery.includePartOffers || currentQ !== prevQuery.q || currentCategory !== prevQuery.category || currentCondition !== prevQuery.condition || currentPriceMin !== prevQuery.price_min || currentPriceMax !== prevQuery.price_max || currentAttrs !== prevQuery.attrs || currentSort !== prevQuery.sort || currentMaxDistance !== prevQuery.max_distance
 
     if (queryChanged || !hasSearched.value) {
       performSearch()
     }
 
+    prevQuery.includePartOffers = includePartOffers.value
     prevQuery.price_min = currentPriceMin
     prevQuery.price_max = currentPriceMax
     prevQuery.attrs = currentAttrs

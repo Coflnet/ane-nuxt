@@ -20,6 +20,12 @@
       {{ t('parts.subtitle') }}
     </p>
 
+    <NuxtLink
+      :to="localePath({ path: '/search', query: searchRouteQuery(form.q || form.partNumber || form.machine, true) })"
+      class="mt-4 inline-block text-sm text-cyan-300 hover:text-cyan-200"
+      data-testid="parts-individual-offers"
+    >{{ t('parts.findIndividualOffers') }} →</NuxtLink>
+
     <form
       class="mt-8 grid gap-6 lg:grid-cols-3"
       @submit.prevent="search"
@@ -330,7 +336,7 @@
           {{ t('parts.noResultsHint') }}
         </p>
         <NuxtLink
-          :to="localePath({ path: '/search', query: { q: form.q || form.machine || form.partNumber } })"
+          :to="localePath({ path: '/search', query: searchRouteQuery(form.q || form.partNumber || form.machine, true) })"
           class="mt-4 inline-block text-blue-300"
         >{{ t('parts.tryCatalog') }} →</NuxtLink>
       </div>
@@ -340,6 +346,7 @@
 
 <script setup lang="ts">
 import { partClasses, partFormFromQuery, partSearchParams, type PartField, type PartHit, type PartResults, type GearPhotoEstimate } from '~/utils/partSearch'
+import { searchRouteQuery } from '~/utils/searchQuery'
 import { useFormat } from '~/composable/useFormat'
 
 const { t, locale } = useI18n()

@@ -23,7 +23,7 @@ test('ProductSearch emits search for an empty submit and both pages route it wit
   const index = await readFile(new URL('../pages/index.vue', import.meta.url), 'utf8')
   assert.match(index, /query: searchRouteQuery\(query\)/)
   const search = await readFile(new URL('../pages/search.vue', import.meta.url), 'utf8')
-  assert.match(search, /router\.push\(\{ query: searchRouteQuery\(query\) \}\)/)
+  assert.match(search, /router\.push\(\{ query: searchRouteQuery\(query, includePartOffers\.value\) \}\)/)
 })
 
 test('landing nav links to search first, header nav on mobile too', async () => {
