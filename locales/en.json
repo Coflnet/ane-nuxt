@@ -844,6 +844,17 @@
   "attr_console_name": "Console",
   "attr_game_name": "Game Name",
   "attr_publisher": "Publisher",
+  "attr_series": "Series",
+  "attr_cover_variant": "Cover variant",
+  "attr_issue_number": "Issue number",
+  "attr_binding": "Binding",
+  "attr_edition": "Edition",
+  "attr_language": "Language",
+  "attr_publication_year": "Publication year",
+  "findFilterValue": "Find {name}",
+  "filterValuesFailed": "Could not load options. Your selection is saved.",
+  "noMatchingFilterValues": "No matching options. Try another search.",
+  "refineFilterValues": "Showing the most common options. Type to find more specific values.",
   "attr_controllers": "Controllers",
   "attr_manufacturer": "Manufacturer",
   "color_black": "Black",
@@ -890,7 +901,7 @@
     "averagePrice": "Average Price",
     "priceRange": "Price Range",
     "available": "Available",
-    "trend": "Trend",
+    "trend": "Daily median change",
     "availableOffers": "Available Offers",
     "filters": {
       "groupLabel": "Filter offers",
@@ -988,7 +999,7 @@
       "disclaimer": "All data shown on this page is aggregated automatically. Prices, product attributes and condition ratings are extracted using machine learning and may occasionally be inaccurate. Always verify details on the seller's original listing before purchasing. If you notice incorrect information, use the report button to help us improve."
     },
     "priceHistoryTitle": "Price History",
-    "priceHistoryDays": "{days} days of price data"
+    "priceHistoryDays": "{days} daily snapshots · line: daily median · band: minimum–maximum"
   },
   "attr_mileage": "Mileage",
   "attr_year": "Year",

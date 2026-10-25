@@ -378,27 +378,17 @@
           </div>
 
           <!-- Attribute Filters -->
-          <div
+          <FiltersAttributeFilter
             v-for="(buckets, attrKey) in availableAttributeBuckets"
             :key="attrKey"
-            class="bg-slate-800/50 p-5 rounded-xl border border-slate-700/50"
-          >
-            <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-3">
-              {{ localizeAttrKey(attrKey) }}
-            </h3>
-            <div class="flex flex-wrap gap-2 max-h-44 overflow-y-auto">
-              <button
-                v-for="(bucket, index) in buckets.slice(0, 15)"
-                :key="bucket.value ?? `${attrKey}-${index}`"
-                class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors min-w-0 max-w-full sm:max-w-[220px]"
-                :class="activeAttributeFilters[attrKey] === bucket.value ? 'bg-purple-500/20 text-purple-400 font-medium' : 'text-slate-400 hover:bg-slate-700/50 hover:text-slate-200'"
-                @click="toggleAttributeFilter(attrKey, bucket.value!)"
-              >
-                <span class="truncate">{{ localizeAttrValue(attrKey, bucket.value!) }}</span>
-                <span class="text-xs opacity-60 ml-1 flex-shrink-0">({{ bucket.count }})</span>
-              </button>
-            </div>
-          </div>
+            :title="localizeAttrKey(attrKey)"
+            :buckets="buckets"
+            :selected="activeAttributeFilters[attrKey]"
+            :scope="facetSearchScope"
+            :format-value="value => localizeAttrValue(attrKey, value)"
+            :load-values="value => loadAttributeValues(attrKey, value)"
+            @select="value => toggleAttributeFilter(attrKey, value)"
+          />
 
           <!-- Operating system -->
           <div
@@ -1078,6 +1068,7 @@ import { useCategories } from '~/composable/useCategories'
 import { useUserLocation } from '~/composable/useUserLocation'
 import { useFormat } from '~/composable/useFormat'
 import { searchRouteQuery } from '~/utils/searchQuery'
+import { facetSearchParams } from '~/utils/facetSearch'
 import { countPopulatedSubCategories, formatCategoryCount, getCategoryProductCount as getCategoryProductCountFor, normalizeCategoryCounts, resolveCategoryCount } from '~/utils/categoryCounts'
 import { resolveSearchCategoryParam } from '~/utils/searchCategoryParam'
 import { isGameCaseProduct } from '~/utils/productRelations'
@@ -1349,20 +1340,15 @@ const availableAttributeBuckets = computed(() => {
     if (rangeFilterAttrs.has(key.toLowerCase())) continue // Skip range attributes, they get their own UI
     if (SPEC_ATTRIBUTE_KEYS.has(key.toLowerCase())) continue // Spec attributes have dedicated controls
 
-    if (attrFilters[key]) {
-      // If this attribute is already selected, show only that value
-      result[key] = buckets.filter(b => b.value === attrFilters[key])
-    }
-    else {
-      // Use server-side aggregation counts directly (covers all matching docs, not just page)
-      const available = buckets
-        .filter(b => b.value && (b.count ?? 0) > 0)
-        .sort((a, b) => (b.count || 0) - (a.count || 0))
+    const available = buckets
+      .filter(b => b.value && ((b.count ?? 0) > 0 || b.value === attrFilters[key]))
+      .sort((a, b) => (b.count || 0) - (a.count || 0))
+    if (available.length > 0) result[key] = available
+  }
 
-      if (available.length > 0) {
-        result[key] = available
-      }
-    }
+  for (const [key, value] of Object.entries(attrFilters)) {
+    if (key === 'condition' || rangeFilterAttrs.has(key.toLowerCase()) || SPEC_ATTRIBUTE_KEYS.has(key.toLowerCase())) continue
+    if (!result[key]) result[key] = [{ value }]
   }
 
   return result
@@ -1864,6 +1850,13 @@ const attrKeyTranslationMap: Record<string, string> = {
   'game name': 'attr_game_name',
   'game_name': 'attr_game_name',
   'publisher': 'attr_publisher',
+  'series': 'attr_series',
+  'issue_number': 'attr_issue_number',
+  'cover_variant': 'attr_cover_variant',
+  'binding': 'attr_binding',
+  'edition': 'attr_edition',
+  'language': 'attr_language',
+  'publication_year': 'attr_publication_year',
   'controllers': 'attr_controllers',
   'manufactureaddress': 'attr_manufacturer',
   'manufacturertradename': 'attr_manufacturer',
@@ -1990,6 +1983,13 @@ function buildSearchParams(offset = 0) {
     params.attributes = attrArray
   }
   return params
+}
+
+const facetSearchScope = computed(() => JSON.stringify(buildSearchParams()))
+
+async function loadAttributeValues(key: string, value: string): Promise<FilterBucket[]> {
+  const response = await searchProducts({ query: facetSearchParams(buildSearchParams(), key, value) })
+  return response?.attributeBuckets?.[key] ?? []
 }
 
 // Client-only: SSR'd first page is handled by the raceable composable below.

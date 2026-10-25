@@ -844,6 +844,17 @@
   "attr_console_name": "Konsole",
   "attr_game_name": "Spielname",
   "attr_publisher": "Herausgeber",
+  "attr_series": "Serie",
+  "attr_cover_variant": "Cover-Variante",
+  "attr_issue_number": "Heftnummer",
+  "attr_binding": "Einband",
+  "attr_edition": "Ausgabe",
+  "attr_language": "Sprache",
+  "attr_publication_year": "Erscheinungsjahr",
+  "findFilterValue": "{name} suchen",
+  "filterValuesFailed": "Optionen konnten nicht geladen werden. Deine Auswahl bleibt erhalten.",
+  "noMatchingFilterValues": "Keine passenden Optionen. Versuche einen anderen Suchbegriff.",
+  "refineFilterValues": "Die häufigsten Optionen. Suche gezielter, um weitere Werte zu finden.",
   "attr_controllers": "Controller",
   "attr_manufacturer": "Hersteller",
   "color_black": "Schwarz",
@@ -890,7 +901,7 @@
     "averagePrice": "Durchschnittspreis",
     "priceRange": "Preisspanne",
     "available": "Verfügbar",
-    "trend": "Trend",
+    "trend": "Änderung des Tagesmedians",
     "availableOffers": "Verfügbare Angebote",
     "filters": {
       "groupLabel": "Angebote filtern",
@@ -988,7 +999,7 @@
       "disclaimer": "Alle Daten auf dieser Seite werden automatisch aggregiert. Preise, Produkteigenschaften und Zustandsbewertungen werden mittels maschinellem Lernen extrahiert und können gelegentlich ungenau sein. Überprüfe die Details immer im Originalangebot des Verkäufers, bevor du kaufst. Falls du falsche Informationen bemerkst, nutze bitte die Melden-Funktion, um uns zu helfen."
     },
     "priceHistoryTitle": "Preisverlauf",
-    "priceHistoryDays": "{days} Tage Preisdaten"
+    "priceHistoryDays": "{days} Tagesstände · Linie: Tagesmedian · Band: Minimum–Maximum"
   },
   "attr_mileage": "Kilometerstand",
   "attr_year": "Baujahr",
