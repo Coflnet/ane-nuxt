@@ -81,6 +81,15 @@
           class="text-danger text-xs mt-2"
         >
           {{ error }}
+          <button
+            v-if="pendingFile"
+            type="button"
+            class="underline ml-2"
+            :disabled="preparing || !hasCollectorPlan"
+            @click="prepareImage(pendingFile)"
+          >
+            {{ $t('retry') }}
+          </button>
         </p>
         <p
           v-else-if="preparing"
@@ -128,21 +137,26 @@ const thumbBase64 = ref<string>('')
 const thumbMime = ref<string>('image/jpeg')
 const preparing = ref(false)
 const error = ref<string>('')
+const pendingFile = shallowRef<File | null>(null)
+let preparation: AbortController | undefined
 
 const hasEmbedding = computed(() => embedding.value.length > 0)
 
 // Load existing value (edit mode)
 function loadFromValue(raw: string) {
-  if (!raw) return
+  if (raw === serializedPayload()) return // Parent echoes must not cancel an in-flight replacement.
+  cancelPreparation()
+  if (!raw) {
+    resetImage()
+    return
+  }
   try {
     const p = JSON.parse(raw) as Payload
     threshold.value = p.threshold ?? 0.7
     embedding.value = p.emb ?? []
     thumbBase64.value = p.thumb ?? ''
     thumbMime.value = p.thumbMime ?? 'image/jpeg'
-    if (thumbBase64.value) {
-      thumbDataUrl.value = `data:${thumbMime.value};base64,${thumbBase64.value}`
-    }
+    thumbDataUrl.value = thumbBase64.value ? `data:${thumbMime.value};base64,${thumbBase64.value}` : ''
   }
   catch (e) {
     console.warn('VisualSimilarityFilter: failed to parse value', e)
@@ -151,49 +165,69 @@ function loadFromValue(raw: string) {
 
 watch(() => props.modelValue, loadFromValue, { immediate: true })
 
-function emitPayload() {
-  if (!hasEmbedding.value) {
-    emit('update:modelValue', '')
-    return
-  }
+function serializedPayload() {
+  if (!hasEmbedding.value) return ''
   const payload: Payload = {
     threshold: threshold.value,
     emb: embedding.value,
     thumb: thumbBase64.value,
     thumbMime: thumbMime.value,
   }
-  emit('update:modelValue', JSON.stringify(payload))
+  return JSON.stringify(payload)
+}
+
+function emitPayload() {
+  emit('update:modelValue', serializedPayload())
 }
 
 watch(threshold, emitPayload)
 
-function clear() {
+function cancelPreparation() {
+  preparation?.abort()
+  preparation = undefined
+  preparing.value = false
+  pendingFile.value = null
+  error.value = ''
+}
+
+onBeforeUnmount(cancelPreparation)
+
+function resetImage() {
   thumbDataUrl.value = ''
   thumbBase64.value = ''
   embedding.value = []
-  error.value = ''
+}
+
+function clear() {
+  cancelPreparation()
+  resetImage()
   emit('update:modelValue', '')
 }
 
 async function onFileSelected(ev: Event) {
-  error.value = ''
   const input = ev.target as HTMLInputElement
   const file = input.files?.[0]
   if (!file) return
+  input.value = ''
 
+  await prepareImage(file)
+}
+
+async function prepareImage(file: File) {
   if (!hasCollectorPlan.value) {
     error.value = useI18n().t('visualSimilarity.collectorRequired')
-    input.value = ''
     return
   }
 
+  cancelPreparation()
+  const current = new AbortController()
+  preparation = current
+  pendingFile.value = file
   try {
     preparing.value = true
     // Resize/compress to ~256x256 JPEG to keep payload small
     const compressed = await compressImage(file, 256, 0.85)
-    thumbDataUrl.value = compressed.dataUrl
-    thumbBase64.value = compressed.base64
-    thumbMime.value = 'image/jpeg'
+    if (preparation !== current) return
 
     // Ask backend to embed it (single CLIP call, stored on the filter)
     const apiToken = userStore.token ? `Bearer ${userStore.token}` : ''
@@ -201,33 +235,40 @@ async function onFileSelected(ev: Event) {
       'https://ane.coflnet.com/api/filters/visual-similarity/prepare',
       {
         method: 'POST',
+        signal: current.signal,
         headers: apiToken ? { Authorization: apiToken } : {},
         body: {
-          imageBase64: thumbBase64.value,
+          imageBase64: compressed.base64,
           imageMime: 'image/jpeg',
           threshold: threshold.value,
         },
       },
     )
+    if (preparation !== current) return
     // C# property naming: PascalCase → camelCase serialization → emb/thumb
     const emb = (res as { emb?: number[], embedding?: number[] }).emb
       ?? (res as { emb?: number[], embedding?: number[] }).embedding
     if (!emb || emb.length === 0) throw new Error('No embedding returned')
+    thumbDataUrl.value = compressed.dataUrl
+    thumbBase64.value = compressed.base64
+    thumbMime.value = 'image/jpeg'
     embedding.value = emb
+    pendingFile.value = null
     emitPayload()
   }
   catch (e: unknown) {
+    if (preparation !== current) return
     console.error('VisualSimilarity prepare failed', e)
     const msg = (e as { data?: { error?: string }, message?: string })?.data?.error
       ?? (e as { message?: string })?.message
       ?? 'Failed to prepare image'
     error.value = msg
-    embedding.value = []
-    emit('update:modelValue', '')
   }
   finally {
-    preparing.value = false
-    input.value = ''
+    if (preparation === current) {
+      preparation = undefined
+      preparing.value = false
+    }
   }
 }
 

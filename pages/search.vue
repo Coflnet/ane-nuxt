@@ -1355,7 +1355,7 @@ const availableAttributeBuckets = computed(() => {
     if (SPEC_ATTRIBUTE_KEYS.has(key.toLowerCase())) continue // Spec attributes have dedicated controls
 
     const available = buckets
-      .filter(b => b.value && ((b.count ?? 0) > 0 || attrFilters[key]?.includes(b.value!)))
+      .filter(b => b.value && (b.count == null || b.count > 0 || attrFilters[key]?.includes(b.value!)))
       .sort((a, b) => (b.count || 0) - (a.count || 0))
     if (available.length > 0) result[key] = available
   }
