@@ -23,7 +23,7 @@
         v-if="hasComparablePrices && profit > 0"
         class="absolute top-3 right-3 bg-green-500/90 backdrop-blur-sm text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-lg"
       >
-        +{{ formattedProfit }}
+        {{ $t('product.referenceGap') }}: +{{ formattedProfit }}
       </div>
     </div>
 
@@ -87,7 +87,7 @@
           <span class="text-white font-bold text-lg">{{ formattedPrice }}</span>
         </div>
         <div class="flex justify-between items-center">
-          <span class="text-gray-400 text-xs">{{ $t('product.marketValue') }}</span>
+          <span class="text-gray-400 text-xs">{{ $t('product.referenceMedian') }}</span>
           <span
             v-if="hasComparablePrices"
             class="text-green-400 font-semibold"
@@ -98,6 +98,10 @@
           >—</span>
         </div>
       </div>
+
+      <p class="text-xs text-gray-400 mb-4">
+        {{ $t('product.referenceContext') }}
+      </p>
 
       <!-- Category & Location -->
       <div class="flex items-center gap-2 mb-4 text-xs text-gray-400 flex-wrap">

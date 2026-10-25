@@ -27,3 +27,19 @@ test('URL history windows accept only supported whole-day selections', async () 
     assert.equal(parseHistoryDays(value), 90)
   }
 })
+
+test('only known currency cohorts are plotted, chosen by availability and preserved explicit criteria', async () => {
+  const { chooseHistoryCurrency, historyCurrencies, parseHistoryCurrency, selectHistoryCurrency } = await import('../utils/priceHistory.ts')
+  const history = [{ date: '2026-10-20', currency: null, medianPrice: 1000 }, { date: '2026-10-21', currency: 'EUR', medianPrice: 100 }, { date: '2026-10-22', currency: 'GBP', medianPrice: 80 }, { date: '2026-10-23', currency: 'GBP', medianPrice: 90 }]
+  assert.deepEqual(historyCurrencies(history), ['GBP', 'EUR'])
+  assert.equal(chooseHistoryCurrency(history), 'GBP', 'default to the recorded currency with the most daily history')
+  assert.equal(chooseHistoryCurrency(history, 'EUR'), 'EUR', 'a known available product currency is the editable preference')
+  assert.equal(chooseHistoryCurrency(history, 'USD'), 'GBP')
+  assert.equal(chooseHistoryCurrency([{ currency: null }]), null)
+  assert.deepEqual(selectHistoryCurrency(history, 'EUR').map(p => p.medianPrice), [100])
+  assert.deepEqual(selectHistoryCurrency(history, 'USD'), [], 'an explicit unavailable URL choice must not broaden to another currency')
+  assert.deepEqual(selectHistoryCurrency(history, null), [], 'unknown is not a shared currency certificate')
+  assert.equal(history[0].currency, null)
+  assert.equal(parseHistoryCurrency(' eur '), 'EUR')
+  for (const value of ['Euro', '', ['EUR'], null]) assert.equal(parseHistoryCurrency(value), null)
+})

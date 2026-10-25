@@ -50,7 +50,7 @@
                 value="profit"
                 :disabled="!hasSelectedCurrency"
               >
-                {{ $t('sortProfit') }}
+                {{ $t('product.sortReferenceGap') }}
               </option>
               <option value="distance">
                 {{ $t('sortDistance') }}
@@ -169,7 +169,7 @@
           >
         </div>
         <div class="flex flex-col gap-1">
-          <label class="text-xs text-gray-400">{{ $t('minProfit') }}<span v-if="hasSelectedCurrency"> ({{ filters.currency }})</span></label>
+          <label class="text-xs text-gray-400">{{ $t('product.minReferenceGap') }}<span v-if="hasSelectedCurrency"> ({{ filters.currency }})</span></label>
           <input
             v-model.number="filters.minProfit"
             type="number"
@@ -179,7 +179,7 @@
           >
         </div>
         <div class="flex flex-col gap-1">
-          <label class="text-xs text-gray-400">{{ $t('minMarginPct') }}</label>
+          <label class="text-xs text-gray-400">{{ $t('product.minReferenceGapPercent') }}</label>
           <input
             v-model.number="filters.minMarginPct"
             type="number"

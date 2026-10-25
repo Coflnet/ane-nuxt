@@ -341,6 +341,26 @@
               </option>
             </select>
           </label>
+          <label class="block text-sm text-slate-300 mt-3">
+            {{ $t('product.historyCurrency') }}
+            <select
+              :value="selectedHistoryCurrency"
+              :disabled="!historyCurrencyOptions.length"
+              class="ml-2 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2"
+              data-testid="history-currency"
+              @change="setHistoryCurrency(($event.target as HTMLSelectElement).value)"
+            >
+              <option
+                v-if="!historyCurrencyOptions.length"
+                value=""
+              >{{ $t('unknownCurrency') }}</option>
+              <option
+                v-for="currency in historyCurrencyOptions"
+                :key="currency"
+                :value="currency"
+              >{{ currency }}</option>
+            </select>
+          </label>
           <p
             v-if="historyLoading"
             class="text-sm text-slate-400 mt-3"
@@ -363,10 +383,16 @@
             </button>
           </div>
           <p
-            v-else-if="!priceHistory.length"
+            v-else-if="!rawPriceHistory.length"
             class="text-sm text-slate-400 mt-3"
           >
             {{ $t('product.historyEmpty') }}
+          </p>
+          <p
+            v-else-if="!priceHistory.length"
+            class="text-sm text-slate-400 mt-3"
+          >
+            {{ $t('product.historyNoComparableCurrency') }}
           </p>
           <p
             v-if="priceHistory.length"
@@ -381,7 +407,7 @@
             {{ formatDate(priceHistory[0]?.date) }} – {{ formatDate(priceHistory.at(-1)?.date) }}
           </p>
           <p
-            v-if="priceHistory.length && priceStats && priceStats.dataPoints"
+            v-if="priceHistory.length && priceStats?.medianPrice != null && priceStats.dataPoints"
             class="text-white mt-3"
           >
             {{ $t('product.historicalMedian') }}: ~{{ formatRecordedPrice(priceStats.medianPrice || 0) }}
@@ -391,10 +417,10 @@
             {{ $t('product.historyAskingContext') }}
           </p>
           <p
-            v-if="priceHistory.length && !recordedCurrency"
+            v-if="excludedHistoryRows"
             class="text-sm text-slate-400 mt-2"
           >
-            {{ $t('product.historyCurrencyUnknown') }}
+            {{ $t('product.historyExcludedCurrencies', { count: excludedHistoryRows }) }}
           </p>
         </div>
         <div
@@ -798,7 +824,7 @@ import { useUserStore } from '~/stores/user'
 import { useOfferCountry } from '~/composable/useOfferCountry'
 import { buildProductResourceUrl } from '~/utils/productApiUrl'
 import { buildNotifyFilterUrl } from '~/utils/notifyFilterUrl'
-import { formatHistoryPrice, historyCurrency, historyTimeFraction, HISTORY_WINDOWS, parseHistoryDays } from '~/utils/priceHistory'
+import { formatHistoryPrice, historyCurrencies, chooseHistoryCurrency, selectHistoryCurrency, parseHistoryCurrency, historyTimeFraction, HISTORY_WINDOWS, parseHistoryDays } from '~/utils/priceHistory'
 import {
   caseOfId,
   caseTitle,
@@ -894,23 +920,35 @@ const historyDays = computed(() => parseHistoryDays(route.query.history_days))
 function setHistoryDays(value: string) {
   void router.replace({ query: { ...route.query, history_days: String(parseHistoryDays(value)) }, hash: route.hash })
 }
+const requestedHistoryCurrency = computed(() => parseHistoryCurrency(route.query.history_currency))
+function setHistoryCurrency(value: string) {
+  void router.replace({ query: { ...route.query, history_currency: value }, hash: route.hash })
+}
 const { data: historyData, loading: historyLoading, error: historyError, refresh: refreshHistory } = useRaceableAsyncData(
   `product-history-${productId}`,
   async () => {
     const days = historyDays.value
-    const [history, stats] = await Promise.all([
-      getPriceHistory({ path: { id: productId }, query: { days } }),
-      getPriceStats({ path: { id: productId }, query: { days } }),
-    ])
-    return { days, history: history as PricePoint[], stats: stats as PriceHistoryStats }
+    const requestedCurrency = requestedHistoryCurrency.value
+    const history = await getPriceHistory({ path: { id: productId }, query: { days } }) as PricePoint[]
+    const currency = requestedCurrency ?? chooseHistoryCurrency(history, (product.value as (ProductWithOffers & { currency?: string }) | null)?.currency)
+    const statsQuery = { days, ...(currency ? { currency } : {}) }
+    const stats = await getPriceStats({ path: { id: productId }, query: statsQuery })
+    return { days, requestedCurrency, currency, history, stats: stats as PriceHistoryStats }
   },
-  { watch: [historyDays] },
+  { watch: [historyDays, requestedHistoryCurrency] },
 )
 // Keep the chart and summary bound to the same completed window, including navigation races.
-const currentHistory = computed(() => !historyLoading.value && !historyError.value && historyData.value?.days === historyDays.value ? historyData.value : null)
-const priceHistory = computed<(PricePoint & { currency?: string | null })[]>(() => currentHistory.value?.history ?? [])
-const priceStats = computed<PriceHistoryStats | null>(() => currentHistory.value?.stats ?? null)
-const recordedCurrency = computed(() => historyCurrency(priceHistory.value))
+const currentHistory = computed(() => !historyLoading.value && !historyError.value && historyData.value?.days === historyDays.value && historyData.value?.requestedCurrency === requestedHistoryCurrency.value ? historyData.value : null)
+const rawPriceHistory = computed(() => currentHistory.value?.history ?? [])
+const recordedCurrency = computed(() => currentHistory.value?.currency ?? null)
+const priceHistory = computed(() => selectHistoryCurrency(rawPriceHistory.value, recordedCurrency.value))
+const historyCurrencyOptions = computed(() => [...new Set([requestedHistoryCurrency.value, ...historyCurrencies(historyData.value?.history ?? [])].filter((code): code is string => !!code))])
+const selectedHistoryCurrency = computed(() => requestedHistoryCurrency.value ?? historyData.value?.currency ?? '')
+const excludedHistoryRows = computed(() => rawPriceHistory.value.length - priceHistory.value.length)
+const priceStats = computed<PriceHistoryStats | null>(() => {
+  const stats = currentHistory.value?.stats
+  return recordedCurrency.value && stats?.currency === recordedCurrency.value ? stats : null
+})
 const formatRecordedPrice = (amount: number) => formatHistoryPrice(amount, recordedCurrency.value, locale.value)
 
 // Localized names, case page link and other language editions. The endpoint exists only on a deployed

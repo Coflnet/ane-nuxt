@@ -762,6 +762,8 @@ export type Platform = 'Unknown' | 'Ebay' | 'Kleinanzeigen' | 'Marktplaats' | 'W
 export type PriceKind = 'Unknown' | 'BuyItemNow' | 'Auction' | 'Negotiatable' | 'IncludesTax';
 
 export type PricePoint = {
+    /** Explicit recorded currency; null for unverified legacy snapshots. */
+    currency?: string | null;
     productSeoId?: string | null;
     date?: string;
     averagePrice?: number;
@@ -1043,30 +1045,34 @@ export type ServicesPartSearchResponse = {
  * Price history statistics response DTO
  */
 export type ServicesPriceHistoryStats = {
+    /** Explicit common recorded currency; null when prices cannot be safely aggregated. */
+    currency?: string | null;
+    /** Estimated from daily aggregates, never an exact pooled listing median. */
+    medianIsApproximate?: boolean;
     /**
-     * Total number of individual listings in the history
+     * Total daily listing samples; the same listing may recur across days
      */
     dataPoints?: number;
     /**
-     * Average price across all historical data points
+     * Sample-weighted mean of selected same-currency daily means; null when incomparable
      */
-    averagePrice?: number;
+    averagePrice?: number | null;
     /**
-     * Median price across all historical data points
+     * Sample-weighted estimate from same-currency daily medians; not a pooled listing median
      */
-    medianPrice?: number;
+    medianPrice?: number | null;
     /**
      * Minimum price found in the history period
      */
-    minPrice?: number;
+    minPrice?: number | null;
     /**
      * Maximum price found in the history period
      */
-    maxPrice?: number;
+    maxPrice?: number | null;
     /**
      * Most recent median price
      */
-    currentPrice?: number;
+    currentPrice?: number | null;
     /**
      * Number of days with data
      */
@@ -1082,7 +1088,7 @@ export type ServicesPriceHistoryStats = {
     /**
      * Price trend as percentage change from oldest to newest price
      */
-    trendPercent?: number;
+    trendPercent?: number | null;
 };
 
 /**
@@ -4392,6 +4398,8 @@ export type GetPriceHistoryData = {
          * Number of days of history to retrieve (default 90, max 365)
          */
         days?: number;
+        /** Exact recorded currency; legacy unknown rows are excluded when selected. */
+        currency?: string;
     };
     url: '/api/Product/{id}/price-history';
 };
@@ -4457,6 +4465,8 @@ export type GetPriceStatsData = {
          * Number of days of history to analyze (default 90, max 365)
          */
         days?: number;
+        /** Exact recorded currency; legacy unknown rows are excluded when selected. */
+        currency?: string;
     };
     url: '/api/Product/{id}/price-stats';
 };
