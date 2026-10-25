@@ -781,6 +781,8 @@
   "removeBookmarkConfirm": "\"{title}\" aus Lesezeichen entfernen?",
   "cancel": "Abbrechen",
   "delete": "Löschen",
+  "includeIndividualOffers": "Einzelangebote einbeziehen",
+  "includeIndividualOffersHint": "Auch einzelne Comics, Schallplatten, LEGO und Ersatzteile mit weniger Vergleichsangeboten finden.",
   "includePartOffers": "Einzelne Teileangebote einbeziehen",
   "clearAllFilters": "Alle Filter zurücksetzen",
   "found": "gefunden",

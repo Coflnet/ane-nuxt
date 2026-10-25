@@ -226,12 +226,15 @@
           <label class="flex items-start gap-3 rounded-xl border border-slate-700/50 bg-slate-800/50 p-5 text-sm text-slate-300">
             <input
               type="checkbox"
-              :checked="includePartOffers"
+              :checked="includeIndividualOffers || includePartOffers"
               class="mt-0.5 accent-cyan-400"
-              data-testid="include-part-offers"
-              @change="toggleFilter('includePartOffers', 'true')"
+              data-testid="include-individual-offers"
+              @change="toggleIndividualOffers"
             >
-            {{ $t('includePartOffers') }}
+            <span>
+              {{ $t(includePartOffers && !includeIndividualOffers ? 'includePartOffers' : 'includeIndividualOffers') }}
+              <span v-if="!includePartOffers || includeIndividualOffers" class="block mt-1 text-xs text-slate-400">{{ $t('includeIndividualOffersHint') }}</span>
+            </span>
           </label>
           <!-- Category Filter -->
           <div
@@ -868,6 +871,15 @@
             </p>
             <div class="flex flex-wrap justify-center gap-2">
               <button
+                v-if="!includeIndividualOffers"
+                type="button"
+                class="px-3 py-1.5 rounded-full text-sm bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/20"
+                data-testid="include-individual-offers-recovery"
+                @click="includeIndividualOffersInSearch"
+              >
+                {{ $t('includeIndividualOffers') }}
+              </button>
+              <button
                 v-if="hasActiveFilters"
                 type="button"
                 class="px-3 py-1.5 rounded-full text-sm bg-red-500/10 text-red-300 border border-red-500/30 hover:bg-red-500/20 transition-colors"
@@ -1110,6 +1122,7 @@ const { topLevelCategories, loadingCategories, fetchTopLevelCategories, fetchSub
 // URL-derived state
 const searchQuery = computed(() => (route.query.q as string) || '')
 const includePartOffers = computed(() => route.query.includePartOffers === 'true')
+const includeIndividualOffers = computed(() => route.query.includeIndividualOffers === 'true')
 const selectedCategory = computed(() => (route.query.category as string) || '')
 const selectedCondition = computed(() => (route.query.condition as string) || '')
 const selectedMinPrice = computed(() => route.query.price_min ? Number(route.query.price_min) : undefined)
@@ -1129,7 +1142,7 @@ const activeAttributeFilters = computed(() => {
 
 const hasActiveFilters = computed(
   () =>
-    includePartOffers.value
+    includePartOffers.value || includeIndividualOffers.value
     || !!selectedCategory.value
     || !!selectedCondition.value
     || selectedMinPrice.value !== undefined
@@ -1232,16 +1245,17 @@ const interpretation = ref<SearchInterpretation | null>(null)
 const isSearchMode = computed(() => routeHasSearchQuery(route.query))
 
 function routeHasSearchQuery(query: typeof route.query): boolean {
-  return !!(query.includePartOffers === 'true' || query.q || query.category || query.condition
+  return !!(query.includeIndividualOffers === 'true' || query.includePartOffers === 'true' || query.q || query.category || query.condition
     || query.price_min || query.price_max || query.sort || query.max_distance
     || query.zip || query.country
     || Object.keys(query).some(k => k.startsWith('attr_')))
 }
 
 // Track previous query params to detect server-side filter changes that need a re-fetch
-const prevQuery = reactive({ includePartOffers: false, q: '' as string | undefined, category: '' as string | undefined, condition: '' as string | undefined, price_min: '' as string | undefined, price_max: '' as string | undefined, attrs: '' as string | undefined, sort: '' as string | undefined, max_distance: '' as string | undefined })
+const prevQuery = reactive({ includeIndividualOffers: false, includePartOffers: false, q: '' as string | undefined, category: '' as string | undefined, condition: '' as string | undefined, price_min: '' as string | undefined, price_max: '' as string | undefined, attrs: '' as string | undefined, sort: '' as string | undefined, max_distance: '' as string | undefined })
 
 function syncPrevQuery() {
+  prevQuery.includeIndividualOffers = includeIndividualOffers.value
   prevQuery.includePartOffers = includePartOffers.value
   prevQuery.q = route.query.q ? String(route.query.q) : ''
   prevQuery.category = route.query.category ? String(route.query.category) : ''
@@ -1972,6 +1986,7 @@ function buildSearchParams(offset = 0) {
   const params: Record<string, string | number | string[]> = { offset, limit: PAGE_SIZE }
   if (searchQuery.value) params.query = searchQuery.value
   if (includePartOffers.value) params.includePartOffers = 'true'
+  if (includeIndividualOffers.value) params.includeIndividualOffers = 'true'
   // Category values: the API only matches the German taxonomy label, so send that
   // when it's known (see resolveSearchCategoryParam), falling back to the numeric/API
   // slug otherwise.
@@ -2212,6 +2227,16 @@ function queryWithoutKeys(...keys: string[]): Record<string, string | string[]> 
   return query
 }
 
+function includeIndividualOffersInSearch() {
+  router.push({ query: { ...queryWithoutKeys('includePartOffers'), includeIndividualOffers: 'true' } })
+}
+
+function toggleIndividualOffers() {
+  const query = queryWithoutKeys('includePartOffers', 'includeIndividualOffers')
+  if (!includeIndividualOffers.value && !includePartOffers.value) query.includeIndividualOffers = 'true'
+  router.push({ query })
+}
+
 function toggleFilter(type: 'category' | 'condition' | 'includePartOffers', value: string) {
   if (route.query[type] === value) {
     router.push({ query: queryWithoutKeys(type) })
@@ -2384,11 +2409,11 @@ function clearPriceFilter() {
 }
 
 function onSearch(query: string) {
-  router.push({ query: searchRouteQuery(query, includePartOffers.value) })
+  router.push({ query: searchRouteQuery(query, includePartOffers.value, includeIndividualOffers.value) })
 }
 
 function onSearchCategorySelect(slug: string) {
-  router.push({ query: { ...searchRouteQuery('', includePartOffers.value), category: toUrlSlug(slug) || slug } })
+  router.push({ query: { ...searchRouteQuery('', includePartOffers.value, includeIndividualOffers.value), category: toUrlSlug(slug) || slug } })
 }
 
 // Watch route query changes and trigger search
@@ -2412,12 +2437,13 @@ watch(() => route.query, () => {
       .map(([k, v]) => `${k}=${JSON.stringify(v)}`)
       .join('&')
 
-    const queryChanged = includePartOffers.value !== prevQuery.includePartOffers || currentQ !== prevQuery.q || currentCategory !== prevQuery.category || currentCondition !== prevQuery.condition || currentPriceMin !== prevQuery.price_min || currentPriceMax !== prevQuery.price_max || currentAttrs !== prevQuery.attrs || currentSort !== prevQuery.sort || currentMaxDistance !== prevQuery.max_distance
+    const queryChanged = includeIndividualOffers.value !== prevQuery.includeIndividualOffers || includePartOffers.value !== prevQuery.includePartOffers || currentQ !== prevQuery.q || currentCategory !== prevQuery.category || currentCondition !== prevQuery.condition || currentPriceMin !== prevQuery.price_min || currentPriceMax !== prevQuery.price_max || currentAttrs !== prevQuery.attrs || currentSort !== prevQuery.sort || currentMaxDistance !== prevQuery.max_distance
 
     if (queryChanged || !hasSearched.value) {
       performSearch()
     }
 
+    prevQuery.includeIndividualOffers = includeIndividualOffers.value
     prevQuery.includePartOffers = includePartOffers.value
     prevQuery.price_min = currentPriceMin
     prevQuery.price_max = currentPriceMax

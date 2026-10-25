@@ -4295,6 +4295,8 @@ export type SearchProductsData = {
          * Search query
          */
         query?: string;
+        /** Include active identified individual collectible and part offers. */
+        includeIndividualOffers?: boolean;
         /**
          * Optional category filter
          */

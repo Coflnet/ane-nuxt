@@ -671,9 +671,24 @@
           </div>
         </div>
 
-        <div class="p-4 bg-slate-800/30 text-center">
-          <button class="text-blue-400 hover:text-blue-300 text-sm font-medium">
-            {{ $t('product.loadMore') }}
+        <div
+          v-if="matchesHasMore || matchesError || matchesLoading"
+          class="p-4 bg-slate-800/30 text-center"
+        >
+          <p
+            v-if="matchesError"
+            role="alert"
+            class="text-sm text-red-300 mb-2"
+          >
+            {{ $t('searchFailed') }}
+          </p>
+          <button
+            class="text-blue-400 hover:text-blue-300 text-sm font-medium disabled:opacity-50"
+            data-testid="load-more-offers"
+            :disabled="matchesLoading"
+            @click="loadMatches(matchesError !== 'initial')"
+          >
+            {{ matchesLoading ? $t('loading') : matchesError ? $t('retry') : $t('product.loadMore') }}
           </button>
         </div>
       </div>
@@ -879,6 +894,9 @@ const offerFilterNearby = computed(() => activeQuickAction(offerFilter.value, my
 const offerFacets = ref<OfferFacets | null>(null)
 const matchesLoading = ref(false)
 const matchesLoaded = ref(false)
+const matchesBefore = ref<string>()
+const matchesHasMore = ref(false)
+const matchesError = ref<'initial' | 'more' | null>(null)
 const zipError = ref('')
 
 const similarSearchHref = computed(() =>
@@ -1401,8 +1419,8 @@ function buildRelatedProductsUrl(id: string): string {
   })
 }
 
-function buildMatchesUrl(id: string): string {
-  return buildProductResourceUrl(API_BASE, id, 'matches', buildMatchesParams(offerFilter.value))
+function buildMatchesUrl(id: string, before?: string): string {
+  return buildProductResourceUrl(API_BASE, id, 'matches', { ...buildMatchesParams(offerFilter.value), limit: 50, before })
 }
 
 function buildFacetsUrl(id: string): string {
@@ -1417,25 +1435,39 @@ function onOfferFilterChange(next: OfferFilterState) {
 
 // Client-side reload of the offers on every filter change. A newer request supersedes an older one.
 let matchesSeq = 0
-async function loadMatches() {
+async function loadMatches(append = false) {
+  if (append && (matchesLoading.value || !matchesBefore.value || !matchesHasMore.value)) return
+  const before = append ? matchesBefore.value : undefined
+  if (!append) {
+    matchesBefore.value = undefined
+    matchesHasMore.value = false
+  }
+  matchesError.value = null
   const seq = ++matchesSeq
   matchesLoading.value = true
   zipError.value = ''
   try {
-    const result = await $fetch<(ProductMatch & OfferMatchExtras)[]>(buildMatchesUrl(productId))
+    const result = await $fetch<(ProductMatch & OfferMatchExtras)[]>(buildMatchesUrl(productId, before))
     if (seq !== matchesSeq) return
-    matches.value = result
+    const seen = new Set(matches.value.map(m => `${m.platform}:${m.listingId}`))
+    matches.value = append ? [...matches.value, ...result.filter(m => !seen.has(`${m.platform}:${m.listingId}`))] : result
+    const nextBefore = result.at(-1)?.postedAt
+    // A short nonempty page can hit the API's bounded scan; keep walking until an empty page.
+    matchesHasMore.value = !!nextBefore && nextBefore !== before
+    matchesBefore.value = nextBefore || undefined
   }
   catch (error) {
     if (seq !== matchesSeq) return
     const status = (error as { statusCode?: number, status?: number })?.statusCode ?? (error as { status?: number })?.status
     if (status === 400 && offerFilter.value.zip) {
       // Preserve the requested location: resolving it must never silently broaden the search.
-      matches.value = []
+      if (!append) matches.value = []
+      else matchesError.value = 'more'
       zipError.value = extractApiErrorMessage(error, t('product.filters.zipInvalid'))
       return
     }
-    matches.value = []
+    if (!append) matches.value = []
+    matchesError.value = append ? 'more' : 'initial'
   }
   finally {
     if (seq === matchesSeq) {

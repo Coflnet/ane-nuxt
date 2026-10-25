@@ -781,6 +781,8 @@
   "removeBookmarkConfirm": "Remove \"{title}\" from bookmarks?",
   "cancel": "Cancel",
   "delete": "Delete",
+  "includeIndividualOffers": "Include individual offers",
+  "includeIndividualOffersHint": "Also find individual comics, records, LEGO and spare parts with fewer comparable offers.",
   "includePartOffers": "Include individual part offers",
   "clearAllFilters": "Clear All Filters",
   "found": "found",

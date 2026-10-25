@@ -14,7 +14,9 @@ export interface ProductResourceUrlParams {
   lat?: number
   lon?: number
   maxDistance?: number
-  /** `alternatives` only: caps the number of suggestions (API default/max is 3). */
+  /** ISO timestamp cursor for older product matches. */
+  before?: string
+  /** Page size; alternatives max3, matches max100. */
   limit?: number
   /** `matches` only: ISO code used to resolve `zip` (API default DE). */
   zipCountry?: string
@@ -33,6 +35,7 @@ function buildQueryString(params: ProductResourceUrlParams): string {
   if (params.lon) search.append('lon', params.lon.toString())
   if (params.maxDistance) search.append('maxDistance', params.maxDistance.toString())
   if (params.limit) search.append('limit', params.limit.toString())
+  if (params.before) search.append('before', params.before)
   if (params.zipCountry) search.append('zipCountry', params.zipCountry)
   if (params.platforms) search.append('platforms', params.platforms)
   if (params.countries) search.append('countries', params.countries)

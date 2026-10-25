@@ -4,6 +4,7 @@ import { stripTypeScriptTypes } from 'node:module'
 import test from 'node:test'
 import { computed, effectScope, nextTick, reactive, ref, watch } from 'vue'
 import { searchRouteQuery } from '../utils/searchQuery.ts'
+import { attributeValues } from '../utils/facetSearch.ts'
 import { partFormFromQuery } from '../utils/partSearch.ts'
 
 const source = await readFile(new URL('../pages/search.vue', import.meta.url), 'utf8')
@@ -13,7 +14,7 @@ function searchState(query) {
   const route = reactive({ query })
   const requests = []
   const state = {
-    route, computed, watch, searchRouteQuery, toUrlSlug: slug => slug, PAGE_SIZE: 24, prevQuery: {},
+    route, computed, watch, searchRouteQuery, attributeValues, toUrlSlug: slug => slug, PAGE_SIZE: 24, prevQuery: {},
     router: { push({ query }) { route.query = query } },
     buildSpecApiFilters: () => [], manualLoading: ref(false), searchError: ref(false),
     interpretation: ref(null), allProducts: ref([]), hasSearched: ref(true), totalResults: ref(0),
@@ -24,10 +25,11 @@ function searchState(query) {
   const code = [
     source.match(/const searchQuery = computed[^\n]*/)[0],
     source.match(/const includePartOffers = computed[^\n]*/)[0],
-    ...['routeHasSearchQuery', 'syncPrevQuery', 'buildSearchParams', 'queryWithoutKeys', 'toggleFilter', 'clearAllFilters', 'onSearch', 'onSearchCategorySelect'].map(functionSource),
+    source.match(/const includeIndividualOffers = computed[^\n]*/)[0],
+    ...['routeHasSearchQuery', 'syncPrevQuery', 'buildSearchParams', 'queryWithoutKeys', 'includeIndividualOffersInSearch', 'toggleIndividualOffers', 'toggleFilter', 'clearAllFilters', 'onSearch', 'onSearchCategorySelect'].map(functionSource),
     'let searchSeq = 0; function performSearch() { requests.push(buildSearchParams()) }; syncPrevQuery()',
     source.match(/\/\/ Watch route query changes and trigger search\n(watch\([\s\S]*?\n\}\))/)[1],
-    'return { includePartOffers, toggleFilter, clearAllFilters, onSearch, onSearchCategorySelect, buildSearchParams }',
+    'return { includePartOffers, includeIndividualOffers, includeIndividualOffersInSearch, toggleIndividualOffers, toggleFilter, clearAllFilters, onSearch, onSearchCategorySelect, buildSearchParams }',
   ].join('\n')
   const scope = effectScope()
   const bindings = scope.run(() => new Function('state', 'requests', `with (state) { ${stripTypeScriptTypes(`function setup() { ${code} }`)}; return setup() }`)(state, requests))
@@ -98,4 +100,41 @@ test('parts catalogue links carry editable form text and explicitly include indi
   assert.equal(query(form, searchRouteQuery).q, 'Traktor')
   form.machine = ''
   assert.deepEqual(query(form, searchRouteQuery), { includePartOffers: 'true' })
+})
+
+test('individual-offer recovery preserves all URL criteria, sharing, history and explicit legacy choice', async () => {
+  const criteria = { q: 'Der Rote Korsar', category: 'ane-comics', condition: 'used', price_min: '5', price_max: '50', sort: 'price_asc', country: 'DE', zip: '10115', max_distance: '20', attr_series: ['Der Rote Korsar', 'Tintin'], attr_language: 'German' }
+  const state = searchState(criteria)
+  try {
+    state.toggleIndividualOffers()
+    await nextTick()
+    assert.deepEqual(state.route.query, { ...criteria, includeIndividualOffers: 'true' })
+    assert.equal(state.requests.at(-1).includeIndividualOffers, 'true')
+    const shared = structuredClone({ ...state.route.query, attr_series: [...state.route.query.attr_series] })
+    state.route.query = criteria
+    await nextTick()
+    assert.equal(state.requests.at(-1).includeIndividualOffers, undefined)
+    state.route.query = shared
+    await nextTick()
+    assert.equal(state.requests.at(-1).includeIndividualOffers, 'true')
+    state.toggleIndividualOffers()
+    await nextTick()
+    assert.deepEqual(state.route.query, criteria)
+    state.route.query = { ...criteria, includePartOffers: 'true' }
+    await nextTick()
+    state.toggleIndividualOffers()
+    await nextTick()
+    assert.deepEqual(state.route.query, criteria, 'one visible switch disables legacy opt-in too')
+    state.route.query = { ...criteria, includePartOffers: 'true' }
+    await nextTick()
+    state.includeIndividualOffersInSearch()
+    await nextTick()
+    assert.deepEqual(state.route.query, { ...criteria, includeIndividualOffers: 'true' }, 'legacy empty-state recovery explicitly upgrades scope')
+    for (const value of ['false', '1', ['true']]) {
+      state.route.query = { ...criteria, includeIndividualOffers: value }
+      await nextTick()
+      assert.equal(state.requests.at(-1).includeIndividualOffers, undefined)
+    }
+  }
+  finally { state.stop() }
 })
