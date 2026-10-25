@@ -1082,6 +1082,9 @@ function formatDate(dateStr: string | undefined) {
 }
 
 const attrKeyTranslationMap: Record<string, string> = {
+  carburetor_designation: 'attr_carburetor_designation',
+  compatibility_brands: 'attr_compatibility_brands',
+  compatibility_source: 'attr_compatibility_source',
   color: 'attr_color',
   size: 'attr_size',
   brand: 'attr_brand',
@@ -1127,6 +1130,7 @@ const attrKeyTranslationMap: Record<string, string> = {
 }
 
 const attrValueTranslationMap: Record<string, Record<string, string>> = {
+  compatibility_source: { seller_title_unverified: 'seller_title_unverified' },
   color: {
     Black: 'color_black',
     White: 'color_white',
