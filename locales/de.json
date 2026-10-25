@@ -1004,6 +1004,10 @@
       "disclaimer": "Alle Daten auf dieser Seite werden automatisch aggregiert. Preise, Produkteigenschaften und Zustandsbewertungen werden mittels maschinellem Lernen extrahiert und können gelegentlich ungenau sein. Überprüfe die Details immer im Originalangebot des Verkäufers, bevor du kaufst. Falls du falsche Informationen bemerkst, nutze bitte die Melden-Funktion, um uns zu helfen."
     },
     "priceHistoryTitle": "Preisverlauf",
+    "historicalMedian": "Geschätzter historischer Median der Angebotspreise",
+    "historySamples": "{count} tägliche Inseratstichproben",
+    "historyAskingContext": "Dies sind Angebotspreise, keine abgeschlossenen Verkäufe. Ein Inserat kann an mehreren Tagen enthalten sein; diese Referenz bestätigt weder ein einzelnes Angebot noch einen Wiederverkaufsgewinn.",
+    "historyCurrencyUnknown": "Bei einigen Tagesständen wurde keine Währung erfasst. Die Werte erscheinen ohne Währungssymbol und eignen sich nicht für währungsbereinigte Vergleiche.",
     "priceHistoryDays": "{days} Tagesstände · Linie: Tagesmedian · Band: Minimum–Maximum"
   },
   "attr_mileage": "Kilometerstand",

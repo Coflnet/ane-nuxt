@@ -1004,6 +1004,10 @@
       "disclaimer": "All data shown on this page is aggregated automatically. Prices, product attributes and condition ratings are extracted using machine learning and may occasionally be inaccurate. Always verify details on the seller's original listing before purchasing. If you notice incorrect information, use the report button to help us improve."
     },
     "priceHistoryTitle": "Price History",
+    "historicalMedian": "Approximate historical asking-price median",
+    "historySamples": "{count} daily listing samples",
+    "historyAskingContext": "These are asking prices, not completed sales. A listing may appear in several daily snapshots; this reference does not verify an individual offer or predict resale profit.",
+    "historyCurrencyUnknown": "Some snapshots have no recorded currency. Values are shown without a currency symbol and cannot be used for currency-adjusted comparisons.",
     "priceHistoryDays": "{days} daily snapshots · line: daily median · band: minimum–maximum"
   },
   "attr_mileage": "Mileage",

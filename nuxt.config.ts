@@ -52,9 +52,6 @@ export default defineNuxtConfig({
   ],
 
   ssr: true,
-
-  // inline: its `nuxt/app` imports must resolve through Nuxt's build aliases, not Node
-  build: { transpile: ['@hey-api/client-nuxt'] },
   devtools: { enabled: false },
 
   css: [
@@ -83,6 +80,9 @@ export default defineNuxtConfig({
       ssrFetchTimeoutMs: 2500,
     },
   },
+
+  // inline: its `nuxt/app` imports must resolve through Nuxt's build aliases, not Node
+  build: { transpile: ['@hey-api/client-nuxt'] },
 
   routeRules: {
     '/': { prerender: prerenderMarketingRoutes },

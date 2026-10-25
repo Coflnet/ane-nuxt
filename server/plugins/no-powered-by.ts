@@ -3,7 +3,7 @@
 export default defineNitroPlugin((nitroApp) => {
   nitroApp.hooks.hook('render:response', (response) => {
     for (const name of Object.keys(response.headers ?? {})) {
-      if (name.toLowerCase() === 'x-powered-by') delete response.headers[name]
+      if (name.toLowerCase() === 'x-powered-by') Reflect.deleteProperty(response.headers, name)
     }
   })
   nitroApp.hooks.hook('beforeResponse', (event) => {

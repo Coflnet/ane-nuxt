@@ -218,7 +218,7 @@
               </div>
             </div>
             <div
-              v-if="priceStats && priceStats.trendPercent !== undefined"
+              v-if="recordedCurrency && priceStats && priceStats.daysOfData > 1"
               class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50"
             >
               <div class="text-slate-500 text-xs uppercase font-bold mb-1">
@@ -318,7 +318,7 @@
 
       <!-- Price History Chart -->
       <div
-        v-if="priceHistory.length > 1"
+        v-if="priceHistory.length"
         class="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-xl mb-8"
       >
         <div class="p-6 border-b border-slate-800">
@@ -328,8 +328,30 @@
           <p class="text-sm text-slate-400 mt-1">
             {{ $t('product.priceHistoryDays', { days: priceHistory.length }) }}
           </p>
+          <p class="text-sm text-slate-400 mt-2">
+            {{ formatDate(priceHistory[0]?.date) }} – {{ formatDate(priceHistory.at(-1)?.date) }}
+          </p>
+          <p
+            v-if="priceStats && priceStats.dataPoints"
+            class="text-white mt-3"
+          >
+            {{ $t('product.historicalMedian') }}: ~{{ formatRecordedPrice(priceStats.medianPrice || 0) }}
+            <span class="text-sm text-slate-400"> · {{ $t('product.historySamples', { count: priceStats.dataPoints }) }}</span>
+          </p>
+          <p class="text-sm text-slate-400 mt-2">
+            {{ $t('product.historyAskingContext') }}
+          </p>
+          <p
+            v-if="!recordedCurrency"
+            class="text-sm text-slate-400 mt-2"
+          >
+            {{ $t('product.historyCurrencyUnknown') }}
+          </p>
         </div>
-        <div class="p-6">
+        <div
+          v-if="priceHistory.length > 1"
+          class="p-6"
+        >
           <div class="relative h-64">
             <svg
               class="w-full h-full"
@@ -391,16 +413,13 @@
             </svg>
             <!-- Y-axis labels -->
             <div class="absolute top-0 left-0 h-full flex flex-col justify-between py-2 text-xs text-slate-500 pointer-events-none">
-              <span>{{ formatPrice(chartMaxPrice) }}</span>
-              <span>{{ formatPrice((chartMaxPrice + chartMinPrice) / 2) }}</span>
-              <span>{{ formatPrice(chartMinPrice) }}</span>
+              <span>{{ formatRecordedPrice(chartMaxPrice) }}</span>
+              <span>{{ formatRecordedPrice((chartMaxPrice + chartMinPrice) / 2) }}</span>
+              <span>{{ formatRecordedPrice(chartMinPrice) }}</span>
             </div>
             <!-- X-axis labels -->
             <div class="absolute bottom-0 left-12 right-4 flex justify-between text-xs text-slate-500 pointer-events-none">
               <span>{{ formatDate(priceHistory[0]?.date) }}</span>
-              <span v-if="priceHistory.length > 2">
-                {{ formatDate(priceHistory[Math.floor(priceHistory.length / 2)]?.date) }}
-              </span>
               <span>{{ formatDate(priceHistory[priceHistory.length - 1]?.date) }}</span>
             </div>
           </div>
@@ -730,6 +749,7 @@ import { useUserStore } from '~/stores/user'
 import { useOfferCountry } from '~/composable/useOfferCountry'
 import { buildProductResourceUrl } from '~/utils/productApiUrl'
 import { buildNotifyFilterUrl } from '~/utils/notifyFilterUrl'
+import { formatHistoryPrice, historyCurrency, historyTimeFraction } from '~/utils/priceHistory'
 import {
   caseOfId,
   caseTitle,
@@ -827,8 +847,10 @@ watch(() => product.value?.id, (id) => {
     void router.replace(localePath({ path: `/product/${encodeURIComponent(id)}`, query: route.query, hash: route.hash }))
   }
 }, { immediate: true })
-const priceHistory = computed<PricePoint[]>(() => coreData.value?.priceHistory ?? [])
+const priceHistory = computed<(PricePoint & { currency?: string | null })[]>(() => coreData.value?.priceHistory ?? [])
 const priceStats = computed<PriceHistoryStats | null>(() => coreData.value?.priceStats ?? null)
+const recordedCurrency = computed(() => historyCurrency(priceHistory.value))
+const formatRecordedPrice = (amount: number) => formatHistoryPrice(amount, recordedCurrency.value, locale.value)
 
 // Localized names, case page link and other language editions. The endpoint exists only on a deployed
 // API of this version: a 404 or any error simply leaves the section out. The case marker itself
@@ -1027,10 +1049,7 @@ function priceToY(price: number) {
 }
 
 function indexToX(index: number) {
-  const count = priceHistory.value.length
-  if (count <= 1) return chartPadding + chartInnerWidth / 2
-  // Reverse the x-position to show past (left) to now (right)
-  return chartPadding + ((count - 1 - index) / (count - 1)) * chartInnerWidth
+  return chartPadding + historyTimeFraction(priceHistory.value, index) * chartInnerWidth
 }
 
 const medianLinePath = computed(() => {
