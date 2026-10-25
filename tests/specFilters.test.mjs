@@ -69,3 +69,11 @@ test('removing the implied filter strips exactly its phrase from the query', () 
   assert.equal(removeImpliedPhrase('nokia', 'android'), 'nokia')
   assert.equal(removeImpliedPhrase('nokia', null), 'nokia')
 })
+
+test('numeric spec changes preserve repeated generic attribute choices', () => {
+  const query = { q: 'iphone', attr_storage: ['128GB', '256GB'], attr_color: ['Black', 'Blue'] }
+  const next = withRangeParams(query, 'release_year', { min: 2020 }, { min: 2015, max: 2026 })
+  assert.deepEqual(next.attr_storage, ['128GB', '256GB'])
+  assert.deepEqual(next.attr_color, ['Black', 'Blue'])
+  assert.equal(next.attr_release_year_min, '2020')
+})

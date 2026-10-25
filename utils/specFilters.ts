@@ -64,11 +64,11 @@ export function buildSpecApiFilters(query: Record<string, unknown>): string[] {
 
 /** Updates a `<name>_min`/`<name>_max` pair in a query: values equal to the bounds (or empty) are removed. */
 export function withRangeParams(
-  query: Record<string, string>,
+  query: Record<string, string | string[]>,
   name: string,
   range: { min?: number | null, max?: number | null },
   bounds: { min: number, max: number } | null,
-): Record<string, string> {
+): Record<string, string | string[]> {
   const minKey = `attr_${name}_min`
   const maxKey = `attr_${name}_max`
   const result = Object.fromEntries(Object.entries(query).filter(([key]) => key !== minKey && key !== maxKey))

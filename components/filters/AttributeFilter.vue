@@ -3,6 +3,9 @@
     <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-3">
       {{ title }}
     </h3>
+    <p class="text-xs text-slate-400 mb-3">
+      {{ $t('filterMatchAny') }}
+    </p>
     <input
       v-model="query"
       type="search"
@@ -20,8 +23,8 @@
         :key="bucket.value!"
         type="button"
         class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors min-w-0 max-w-full sm:max-w-[220px]"
-        :class="selected === bucket.value ? 'bg-purple-500/20 text-purple-400 font-medium' : 'text-slate-400 hover:bg-slate-700/50 hover:text-slate-200'"
-        :aria-pressed="selected === bucket.value"
+        :class="selected.includes(bucket.value!) ? 'bg-purple-500/20 text-purple-400 font-medium' : 'text-slate-400 hover:bg-slate-700/50 hover:text-slate-200'"
+        :aria-pressed="selected.includes(bucket.value!)"
         @click="$emit('select', bucket.value!)"
       >
         <span class="truncate">{{ formatValue(bucket.value!) }}</span>
@@ -75,7 +78,7 @@ import type { ServicesProductServiceFilterBucket as FilterBucket } from '~/src/a
 const props = defineProps<{
   title: string
   buckets: FilterBucket[]
-  selected?: string
+  selected: string[]
   scope: string
   formatValue: (value: string) => string
   loadValues: (query: string) => Promise<FilterBucket[]>
@@ -89,16 +92,14 @@ const error = ref(false)
 const options = computed(() => found.value ?? props.buckets)
 const visibleBuckets = computed<FilterBucket[]>(() => {
   const values = options.value.filter(b => b.value)
-  if (props.selected && !values.some(b => b.value === props.selected))
-    return [{ value: props.selected }, ...values]
-  return values
+  return [...props.selected.filter(value => !values.some(b => b.value === value)).map(value => ({ value })), ...values]
 })
 let request = 0
 let timer: ReturnType<typeof setTimeout> | undefined
 
 async function load() {
   const value = query.value.trim()
-  if (!value) return
+  if (!value && !props.selected.length) return
   const current = ++request
   loading.value = true
   error.value = false
@@ -114,14 +115,16 @@ async function load() {
   }
 }
 
-watch([query, () => props.scope], () => {
+function scheduleDiscovery() {
   ++request
   clearTimeout(timer)
   found.value = null
   error.value = false
-  loading.value = !!query.value.trim()
+  loading.value = !!query.value.trim() || props.selected.length > 0
   if (loading.value) timer = setTimeout(load, 300)
-})
+}
+watch([query, () => props.scope], scheduleDiscovery)
+onMounted(scheduleDiscovery)
 onBeforeUnmount(() => {
   ++request
   clearTimeout(timer)

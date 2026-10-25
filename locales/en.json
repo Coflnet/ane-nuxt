@@ -1,4 +1,6 @@
 {
+  "filterValueOr": "or",
+  "filterMatchAny": "Match any selected value; other filters still apply.",
   "XActiveFilters": "{amount} Custom Searches",
   "XMinuteDelay": "{amount} minute delay",
   "noExtraDelay": "No extra delay",

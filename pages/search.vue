@@ -168,7 +168,7 @@
           :key="key"
           class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-purple-500/20 text-purple-400 text-xs border border-purple-500/30"
         >
-          {{ localizeAttrKey(String(key)) }}: {{ localizeAttrValue(String(key), value) }}
+          {{ localizeAttrKey(String(key)) }}: {{ value.map(entry => localizeAttrValue(String(key), entry)).join(` ${$t('filterValueOr')} `) }}
           <button
             class="ml-1 hover:text-white"
             @click="removeAttributeFilter(String(key))"
@@ -393,7 +393,7 @@
             :key="attrKey"
             :title="localizeAttrKey(attrKey)"
             :buckets="buckets"
-            :selected="activeAttributeFilters[attrKey]"
+            :selected="activeAttributeFilters[attrKey] ?? []"
             :scope="facetSearchScope"
             :format-value="value => localizeAttrValue(attrKey, value)"
             :load-values="value => loadAttributeValues(attrKey, value)"
@@ -1078,7 +1078,7 @@ import { useCategories } from '~/composable/useCategories'
 import { useUserLocation } from '~/composable/useUserLocation'
 import { useFormat } from '~/composable/useFormat'
 import { searchRouteQuery } from '~/utils/searchQuery'
-import { facetSearchParams } from '~/utils/facetSearch'
+import { attributeValues, toggleAttributeValue, facetSearchParams } from '~/utils/facetSearch'
 import { countPopulatedSubCategories, formatCategoryCount, getCategoryProductCount as getCategoryProductCountFor, normalizeCategoryCounts, resolveCategoryCount } from '~/utils/categoryCounts'
 import { resolveSearchCategoryParam } from '~/utils/searchCategoryParam'
 import { isGameCaseProduct } from '~/utils/productRelations'
@@ -1117,10 +1117,11 @@ const selectedMaxPrice = computed(() => route.query.price_max ? Number(route.que
 const selectedSort = computed(() => (route.query.sort as string) || '')
 const selectedMaxDistance = computed(() => route.query.max_distance ? Number(route.query.max_distance) : undefined)
 const activeAttributeFilters = computed(() => {
-  const filters: Record<string, string> = {}
+  const filters: Record<string, string[]> = {}
   for (const [key, value] of Object.entries(route.query)) {
-    if (key.startsWith('attr_') && typeof value === 'string' && !(SPEC_RANGE_PARAMS as readonly string[]).includes(key)) {
-      filters[key.slice(5)] = value
+    if (key.startsWith('attr_') && !(SPEC_RANGE_PARAMS as readonly string[]).includes(key)) {
+      const values = attributeValues(value)
+      if (values.length) filters[key.slice(5)] = values
     }
   }
   return filters
@@ -1252,7 +1253,7 @@ function syncPrevQuery() {
   prevQuery.attrs = Object.entries(route.query)
     .filter(([k]) => k.startsWith('attr_'))
     .sort(([a], [b]) => a.localeCompare(b))
-    .map(([k, v]) => `${k}=${v}`)
+    .map(([k, v]) => `${k}=${JSON.stringify(v)}`)
     .join('&')
 }
 
@@ -1354,14 +1355,14 @@ const availableAttributeBuckets = computed(() => {
     if (SPEC_ATTRIBUTE_KEYS.has(key.toLowerCase())) continue // Spec attributes have dedicated controls
 
     const available = buckets
-      .filter(b => b.value && ((b.count ?? 0) > 0 || b.value === attrFilters[key]))
+      .filter(b => b.value && ((b.count ?? 0) > 0 || attrFilters[key]?.includes(b.value!)))
       .sort((a, b) => (b.count || 0) - (a.count || 0))
     if (available.length > 0) result[key] = available
   }
 
   for (const [key, value] of Object.entries(attrFilters)) {
     if (key === 'condition' || rangeFilterAttrs.has(key.toLowerCase()) || SPEC_ATTRIBUTE_KEYS.has(key.toLowerCase())) continue
-    if (!result[key]) result[key] = [{ value }]
+    if (!result[key]) result[key] = value.map(entry => ({ value: entry }))
   }
 
   return result
@@ -1991,7 +1992,7 @@ function buildSearchParams(offset = 0) {
   const attrFilters = activeAttributeFilters.value
   const attrArray: string[] = []
   for (const [k, v] of Object.entries(attrFilters)) {
-    attrArray.push(`${k}:${v}`)
+    for (const value of v) attrArray.push(`${k}:${value}`)
   }
   // Battery range filter
   if (selectedBatteryMin.value !== undefined) attrArray.push(`battery_min:${selectedBatteryMin.value}`)
@@ -2198,13 +2199,13 @@ function loadMore() {
   performSearch(true)
 }
 
-function queryWithoutKeys(...keys: string[]): Record<string, string> {
+function queryWithoutKeys(...keys: string[]): Record<string, string | string[]> {
   const excluded = new Set(keys)
-  const query: Record<string, string> = {}
+  const query: Record<string, string | string[]> = {}
 
   for (const [key, value] of Object.entries(route.query)) {
-    if (!excluded.has(key) && typeof value === 'string') {
-      query[key] = value
+    if (!excluded.has(key) && (typeof value === 'string' || Array.isArray(value))) {
+      query[key] = typeof value === 'string' ? value : attributeValues(value)
     }
   }
 
@@ -2227,15 +2228,7 @@ function clearFilter(type: string) {
 }
 
 function toggleAttributeFilter(key: string, value: string) {
-  const paramKey = `attr_${key}`
-  if (route.query[paramKey] === value) {
-    router.push({ query: queryWithoutKeys(paramKey) })
-    return
-  }
-
-  const query = queryWithoutKeys()
-  query[paramKey] = value
-  router.push({ query })
+  router.push({ query: toggleAttributeValue(queryWithoutKeys(), key, value) })
 }
 
 function removeAttributeFilter(key: string) {
@@ -2416,7 +2409,7 @@ watch(() => route.query, () => {
     const currentAttrs = Object.entries(route.query)
       .filter(([k]) => k.startsWith('attr_'))
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([k, v]) => `${k}=${v}`)
+      .map(([k, v]) => `${k}=${JSON.stringify(v)}`)
       .join('&')
 
     const queryChanged = includePartOffers.value !== prevQuery.includePartOffers || currentQ !== prevQuery.q || currentCategory !== prevQuery.category || currentCondition !== prevQuery.condition || currentPriceMin !== prevQuery.price_min || currentPriceMax !== prevQuery.price_max || currentAttrs !== prevQuery.attrs || currentSort !== prevQuery.sort || currentMaxDistance !== prevQuery.max_distance

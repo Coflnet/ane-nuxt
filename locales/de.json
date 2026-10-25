@@ -1,4 +1,6 @@
 {
+  "filterValueOr": "oder",
+  "filterMatchAny": "Mindestens einen gewählten Wert erfüllen; andere Filter gelten weiterhin.",
   "XActiveFilters": "{amount} benutzerdefinierte Suchanfragen",
   "XMinuteDelay": "{amount} Minuten Verzögerung",
   "noExtraDelay": "Keine zusätzliche Verzögerung",
