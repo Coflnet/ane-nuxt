@@ -1,3 +1,5 @@
+export type ReviewMode = 'blind' | 'diagnostic'
+
 export type LabelAnswer = 'same_item' | 'same_model_other_variant' | 'different' | 'unsure'
 
 export interface LabelingSide {

@@ -1,5 +1,5 @@
 import { useApiBaseUrl } from '~/utils/apiBaseUrl'
-import type { LabelAnswer, LabelingPair } from '~/utils/labelingQueue'
+import type { LabelAnswer, LabelingPair, ReviewMode } from '~/utils/labelingQueue'
 import { useUserStore } from '~/stores/user'
 
 export interface LabelingMe {
@@ -49,8 +49,8 @@ export function useLabelingApi() {
     photo,
     me: () => request<LabelingMe>('/me'),
     next: (count: number, groupKey: string) => request<LabelingPair[]>('/next', { query: { count, groupKey } }),
-    label: async (pairId: string, label: LabelAnswer): Promise<void> => {
-      await request<unknown>(`/${encodeURIComponent(pairId)}/label`, { method: 'POST', body: { label } })
+    label: async (pairId: string, label: LabelAnswer, reviewMode?: ReviewMode): Promise<void> => {
+      await request<unknown>(`/${encodeURIComponent(pairId)}/label`, { method: 'POST', body: { label, ...(reviewMode ? { reviewMode } : {}) } })
     },
     stats: () => request<LabelingStats>('/stats'),
   }

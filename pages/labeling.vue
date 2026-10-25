@@ -76,7 +76,26 @@
           {{ $t('labelingRule') }}
         </p>
 
+        <button
+          type="button"
+          class="text-sm text-indigo-300 underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-400"
+          data-testid="labeling-diagnostics-toggle"
+          :aria-expanded="showDiagnostics"
+          @click="toggleDiagnostics"
+        >
+          {{ $t(showDiagnostics ? 'labelingHideDiagnostics' : 'labelingShowDiagnostics') }}
+        </button>
+        <p
+          v-if="current"
+          role="status"
+          class="text-sm text-slate-300"
+          data-testid="labeling-review-mode"
+        >
+          {{ $t(currentReview.diagnostic ? 'labelingDiagnosticReview' : 'labelingBlindReview') }}
+        </p>
+
         <form
+          v-if="showDiagnostics || activeFilter"
           class="flex flex-wrap items-end gap-2"
           @submit.prevent="applyFilter"
         >
@@ -109,7 +128,7 @@
             {{ $t('labelingFilterClear') }}
           </button>
           <button
-            v-if="suggestedGroup"
+            v-if="showDiagnostics && suggestedGroup"
             type="button"
             class="text-sm text-indigo-300 hover:text-indigo-200 underline px-1 py-2 max-w-full break-words text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-400"
             data-testid="labeling-suggest-group"
@@ -198,7 +217,7 @@
                 <img
                   v-if="photoSrc[side.key]"
                   :src="photoSrc[side.key]"
-                  :alt="`${$t(side.title)}: ${side.data.platform}`"
+                  :alt="$t(side.title)"
                   referrerpolicy="no-referrer"
                   class="w-full h-full object-contain"
                   :data-testid="`labeling-photo-${side.key}`"
@@ -225,10 +244,10 @@
               </div>
               <figcaption class="flex items-center justify-between gap-3 mt-2 text-sm">
                 <span class="text-slate-200 min-w-0 truncate">
-                  <span class="text-slate-400">{{ $t(side.title) }}:</span>
-                  {{ side.data.platform }}
+                  {{ $t(side.title) }}<template v-if="showDiagnostics">: {{ side.data.platform }}</template>
                 </span>
                 <a
+                  v-if="showDiagnostics"
                   :href="side.data.listingUrl"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -238,38 +257,43 @@
             </figure>
           </div>
 
-          <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-sm">
+          <div
+            v-if="showDiagnostics"
+            class="text-sm text-slate-300 bg-slate-800 rounded-lg px-3 py-2"
+          >
             <p
               v-if="current.groupKey"
-              class="text-slate-300 min-w-0 break-words"
               data-testid="labeling-group"
+              class="break-words"
             >
-              <span class="text-slate-400">{{ $t('labelingGroup') }}:</span>
-              {{ current.groupKey }}
+              {{ $t('labelingGroup') }}: {{ current.groupKey }}
             </p>
-            <label class="flex items-center gap-2 text-slate-300 cursor-pointer">
-              <input
-                v-model="showScore"
-                type="checkbox"
-                class="size-4 accent-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-400"
-                data-testid="labeling-show-score"
-              >
-              {{ $t('labelingShowScore') }}
-            </label>
+            <p data-testid="labeling-score">
+              {{ $t('labelingSimilarity') }}: {{ formatScore(current.similarity) }}
+              <template v-if="current.secondBest != null">
+                | {{ $t('labelingSecondBest') }}: {{ formatScore(current.secondBest) }}
+              </template>
+              <template v-if="current.decision">
+                | {{ $t('labelingDecision') }}: {{ current.decision }}
+              </template>
+            </p>
           </div>
           <p
-            v-if="showScore"
-            class="text-sm text-slate-300 bg-slate-800 rounded-lg px-3 py-2"
-            data-testid="labeling-score"
+            v-if="currentReview.label"
+            class="text-sm text-slate-300"
+            data-testid="labeling-previous-answer"
           >
-            {{ $t('labelingSimilarity') }}: {{ formatScore(current.similarity) }}
-            <template v-if="current.secondBest != null">
-              | {{ $t('labelingSecondBest') }}: {{ formatScore(current.secondBest) }}
-            </template>
-            <template v-if="current.decision">
-              | {{ $t('labelingDecision') }}: {{ current.decision }}
-            </template>
+            {{ $t('labelingPreviousAnswer') }}: {{ $t(answerOptions.find(option => option.label === currentReview.label)!.text) }}
           </p>
+          <button
+            v-if="currentReview.failed && currentReview.label"
+            type="button"
+            class="bg-indigo-600 text-white px-4 py-2 rounded-lg"
+            data-testid="labeling-retry"
+            @click="submit(currentReview.label)"
+          >
+            {{ $t('labelingRetry') }}
+          </button>
 
           <div
             role="group"
@@ -355,7 +379,6 @@ const localePath = useLocalePath()
 const userStore = useUserStore()
 const api = useLabelingApi()
 
-const SCORE_KEY = 'ane-labeling-show-score'
 const STATS_EVERY = 5
 
 const access = ref<'checking' | 'signedOut' | 'notEnabled' | 'ready'>('checking')
@@ -378,8 +401,21 @@ const photoSrc = reactive<Record<string, string>>({ a: '', b: '' })
 const photoLoading = reactive<Record<string, boolean>>({ a: false, b: false })
 const archivedBlobs = new Map<string, Promise<string>>()
 
-const showScore = ref(false)
-const scoreLoaded = ref(false)
+const showDiagnostics = ref(false)
+// Exposure belongs to this pair review, including undo/retry; it is never a global preference.
+const reviews = reactive(new Map<string, { diagnostic: boolean, label?: LabelAnswer, failed?: boolean, attempt: number }>())
+const currentReview = computed(() => reviewFor(current.value?.pairId))
+
+function reviewFor(pairId?: string) {
+  if (!pairId) return { diagnostic: false, attempt: 0 }
+  if (!reviews.has(pairId)) reviews.set(pairId, { diagnostic: false, attempt: 0 })
+  return reviews.get(pairId)!
+}
+
+function toggleDiagnostics() {
+  showDiagnostics.value = !showDiagnostics.value
+  if (showDiagnostics.value && current.value) currentReview.value.diagnostic = true
+}
 const filterInput = ref('')
 const activeFilter = ref('')
 
@@ -404,7 +440,7 @@ const answerOptions: { key: string, label: LabelAnswer, text: string, hint?: str
   { key: '4', label: 'unsure', text: 'labelingUnsure' },
 ]
 
-const sender = createLabelSender((pairId, label) => api.label(pairId, label))
+const sender = createLabelSender((pairId, label, reviewMode) => api.label(pairId, label, reviewMode))
 
 function formatScore(value?: number | null) {
   return typeof value === 'number' ? value.toFixed(3) : '-'
@@ -455,15 +491,23 @@ async function reload() {
 }
 
 function submit(label: LabelAnswer) {
+  if (!current.value) return
+  const review = currentReview.value
+  review.label = label
+  review.failed = false
+  const attempt = ++review.attempt
+  const reviewMode = review.diagnostic ? 'diagnostic' : 'blind'
   const result = answer(state.value, label)
   if (!result.answered) return
   state.value = result.state
   saveFailed.value = false
   sessionCount.value++
   const pairId = result.answered.pair.pairId
-  sender(pairId, label).then(() => {
+  sender(pairId, label, reviewMode).then(() => {
     if (sessionCount.value % STATS_EVERY === 0) loadStats()
   }).catch(() => {
+    if (review.attempt !== attempt) return
+    review.failed = true
     const rolled = rollback(state.value, pairId)
     if (!rolled.restored) return
     state.value = rolled.state
@@ -594,32 +638,17 @@ function onPhotoError(key: 'a' | 'b') {
 }
 
 watch(() => current.value?.pairId, (pairId) => {
-  if (!pairId || import.meta.server) return
+  showDiagnostics.value = false
+  if (!pairId) return
+  if (activeFilter.value) reviewFor(pairId).diagnostic = true
+  if (import.meta.server) return
   resolvePhoto('a', pairId)
   resolvePhoto('b', pairId)
   pruneArchived()
 })
 
-watch(showScore, (value) => {
-  if (!scoreLoaded.value) return
-  try {
-    localStorage.setItem(SCORE_KEY, value ? '1' : '0')
-  }
-  catch {
-    // remembering is a convenience only
-  }
-})
-
 onMounted(async () => {
   window.addEventListener('keydown', onKeydown)
-  try {
-    showScore.value = localStorage.getItem(SCORE_KEY) === '1'
-  }
-  catch {
-    // storage may be blocked
-  }
-  scoreLoaded.value = true
-
   if (!userStore.isLoggedIn || !userStore.token) {
     access.value = 'signedOut'
     return
