@@ -73,7 +73,7 @@ import { getMessaging, getToken } from 'firebase/messaging'
 import { useFirebaseApp } from 'vuefire'
 import type { ClientModelFilterMatch as FilterMatch, ClientModelListingListener as ListingListener } from '~/src/api-client'
 import type { Filter, TargetType } from '~/types/FilterType'
-import { constructOptionsFromString, detectLocationNA, filterFreeMarketplaces, marketplaces, usMarketplaces, valididateAllMarketplace } from '~/constants/CreateFilterConstants'
+import { filterFreeMarketplaces, marketplaces } from '~/constants/CreateFilterConstants'
 import { parseFilterPrefillQuery } from '~/utils/filterPrefill'
 
 const { debounce } = lodash
@@ -172,7 +172,7 @@ const radiusError = ref(false)
 function applyPrefillFromQuery() {
   if (!isNewFilter.value) return
 
-  const prefill = parseFilterPrefillQuery(route.query, [...marketplaces, ...usMarketplaces].map(m => m.value))
+  const prefill = parseFilterPrefillQuery(route.query, marketplaces.map(m => m.value))
   Object.assign(filter.value, prefill)
 }
 
@@ -226,16 +226,8 @@ async function loadEditParam() {
           break
         }
         case 'IncludePlatforms': {
-          // construct the selected marketplaces from the string to test if it is all marketplaces selected
-          console.log(item.value)
-          const constuctedArray = constructOptionsFromString(item.value ?? '')
-          if (valididateAllMarketplace(constuctedArray)) {
-            filter.value.marketplace = 'all'
-            console.log ('break')
-            break
-          }
+          // A saved explicit list stays explicit as the advertised sources change.
           filter.value.marketplace = item.value ?? ''
-          console.log(filter.value.marketplace, ' hi')
           break
         }
         case 'CommercialSeller':
@@ -389,9 +381,7 @@ async function handleFilters(): Promise<{ name: string, value: string | number |
     filters.push({ name: 'IncludePlatforms', value: rawFilter.marketplace })
   }
   else {
-    // input marketplace depending on location
-    const isUs = detectLocationNA()
-    const marketplacesArray = filterFreeMarketplaces(isUs ? usMarketplaces : marketplaces)
+    const marketplacesArray = filterFreeMarketplaces(marketplaces)
     filters.push({ name: 'IncludePlatforms', value: marketplacesArray.map(m => m.value).join(',') })
   }
 
@@ -429,8 +419,7 @@ async function handleFilters(): Promise<{ name: string, value: string | number |
     filters.push({ name: 'ReferenceMarketplace', value: rawFilter.referenceMarketplace })
   if (rawFilter.referencePrice)
     filters.push({ name: 'ReferencePrice', value: String(rawFilter.referencePrice) })
-  if (rawFilter.referenceCurrency)
-    filters.push({ name: 'ReferenceCurrency', value: rawFilter.referenceCurrency })
+  filters.push({ name: 'ReferenceCurrency', value: rawFilter.referenceCurrency || 'EUR' })
   if (rawFilter.referenceSelector)
     filters.push({ name: 'ReferenceSelector', value: rawFilter.referenceSelector })
   if (rawFilter.referenceAdditionalSelectors && rawFilter.referenceAdditionalSelectors.length > 0)

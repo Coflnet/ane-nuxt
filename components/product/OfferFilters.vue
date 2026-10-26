@@ -281,6 +281,7 @@
 </template>
 
 <script setup lang="ts">
+import { activeMarketplaces } from '~/constants/CreateFilterConstants'
 import { useI18n } from 'vue-i18n'
 import { useUserLocation } from '~/composable/useUserLocation'
 import { countryFlag, countryName } from '~/utils/countryDetection'
@@ -316,7 +317,7 @@ const emit = defineEmits<{
 const { locale, t } = useI18n()
 const { readLastPosition, requestBrowserPosition } = useUserLocation()
 
-const FALLBACK_PLATFORMS = ['Vinted', 'Kleinanzeigen', 'Ebay', 'Willhaben', 'Marktplaats']
+const FALLBACK_PLATFORMS = activeMarketplaces.map(option => option.value)
 const COMMON_COUNTRIES = ['DE', 'AT', 'CH', 'NL', 'BE', 'FR', 'IT', 'ES', 'PL']
 
 const nearbyOpen = ref(false)

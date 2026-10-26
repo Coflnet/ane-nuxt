@@ -1345,6 +1345,7 @@ const attrValueTranslationMap: Record<string, Record<string, string>> = {
   product_kind: {
     hand_tool: 'product_kind_hand_tool',
     power_tool: 'product_kind_power_tool',
+    furniture_offer: 'product_kind_furniture_offer',
   },
   compatibility_source: { seller_title_unverified: 'seller_title_unverified' },
   color: {
@@ -1446,9 +1447,10 @@ function localizeAttrValue(attrKey: string, value: string): string {
     return formatMileageRange(value)
   }
   const valueMap = attrValueTranslationMap[attrKey.toLowerCase()]
-  if (valueMap && valueMap[value]) {
-    const translated = t(valueMap[value], value)
-    return translated !== valueMap[value] ? translated : value
+  const valueKey = attrKey.toLowerCase() === 'color' ? value.charAt(0).toUpperCase() + value.slice(1).toLowerCase() : value
+  if (valueMap && valueMap[valueKey]) {
+    const translated = t(valueMap[valueKey], value)
+    return translated !== valueMap[valueKey] ? translated : value
   }
   return value
 }

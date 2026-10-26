@@ -785,7 +785,7 @@
   "cancel": "Cancel",
   "delete": "Delete",
   "includeIndividualOffers": "Include individual offers",
-  "includeIndividualOffersHint": "Also find individual comics, records, LEGO and spare parts with fewer comparable offers.",
+  "includeIndividualOffersHint": "Also include individual listings for comics, records, LEGO, books, furniture and spare parts.",
   "includePartOffers": "Include individual part offers",
   "clearAllFilters": "Clear All Filters",
   "found": "found",
@@ -837,6 +837,8 @@
   "tool_dust_extractor": "Dust extractor",
   "tool_drill_driver": "Drill driver",
   "package_scope_unspecified": "Not specified",
+  "product_kind_furniture_offer": "Furniture listing",
+  "attr_dimensions": "Dimensions",
   "product_kind_hand_tool": "Hand tool",
   "product_kind_power_tool": "Power tool",
   "attr_brand": "Brand",
@@ -1282,5 +1284,8 @@
     "photoBusy": "Photo analysis is busy. Wait a moment and retry; your measurements are preserved.",
     "photoError": "The photo could not be analysed. Retry or enter the measurements manually.",
     "discardDraft": "Leave this page and discard your unsubmitted part search changes?"
-  }
+  },
+  "budgetCurrency": "Budget currency",
+  "budgetCurrencyNote": "This budget only matches offers in {currency}. Amounts are not converted between currencies.",
+  "budgetReferenceCurrencyNote": "The currency follows your reference price. Remove the reference to change it."
 }

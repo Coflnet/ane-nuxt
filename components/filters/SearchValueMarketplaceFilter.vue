@@ -29,20 +29,19 @@
 <script setup lang="ts">
 import type { Filter } from '~/types/FilterType'
 import type { Options } from '~/constants/CreateFilterConstants'
-import { marketplaces, usMarketplaces, frequency, detectLocationNA } from '~/constants/CreateFilterConstants'
+import { marketplaces, frequency } from '~/constants/CreateFilterConstants'
 
 const hasBasicPlan = useUserStore().currentPlan?.product == 'basic' || !useUserStore().currentPlan?.product
 
 const premiumMarkets = ref(false)
 const model = defineModel<Filter>()
 
-const resolvedMarketplaceOptions = computed(() => {
-  const regionalOptions = detectLocationNA() ? usMarketplaces : marketplaces
-  return [...regionalOptions, ...[...marketplaces, ...usMarketplaces].filter(option =>
-    model.value!.marketplace.split(',').includes(option.value)
-    && !regionalOptions.some(regional => regional.value === option.value),
-  )]
-})
+const resolvedMarketplaceOptions = computed<Options[]>(() => [
+  ...marketplaces,
+  // Preserve saved explicit selections even if a source is no longer advertised.
+  ...model.value!.marketplace.split(',').filter(value => value && !marketplaces.some(option => option.value === value))
+    .map(value => ({ value, label: value })),
+])
 
 const selectedMarketplaces = computed({
   get: () => resolvedMarketplaceOptions.value.filter(option => model.value!.marketplace.split(',').includes(option.value)),

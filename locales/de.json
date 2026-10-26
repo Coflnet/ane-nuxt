@@ -785,7 +785,7 @@
   "cancel": "Abbrechen",
   "delete": "Löschen",
   "includeIndividualOffers": "Einzelangebote einbeziehen",
-  "includeIndividualOffersHint": "Auch einzelne Comics, Schallplatten, LEGO und Ersatzteile mit weniger Vergleichsangeboten finden.",
+  "includeIndividualOffersHint": "Auch einzelne Angebote für Comics, Schallplatten, LEGO, Bücher, Möbel und Ersatzteile anzeigen.",
   "includePartOffers": "Einzelne Teileangebote einbeziehen",
   "clearAllFilters": "Alle Filter zurücksetzen",
   "found": "gefunden",
@@ -837,6 +837,8 @@
   "tool_dust_extractor": "Absauggerät",
   "tool_drill_driver": "Bohrschrauber",
   "package_scope_unspecified": "Nicht angegeben",
+  "product_kind_furniture_offer": "Möbelangebot",
+  "attr_dimensions": "Maße",
   "product_kind_hand_tool": "Handwerkzeug",
   "product_kind_power_tool": "Elektrowerkzeug",
   "attr_brand": "Marke",
@@ -1282,5 +1284,8 @@
     "photoBusy": "Die Fotoanalyse ist ausgelastet. Warte kurz und versuche es erneut; deine Maße bleiben erhalten.",
     "photoError": "Das Foto konnte nicht analysiert werden. Versuche es erneut oder gib die Maße von Hand ein.",
     "discardDraft": "Diese Seite verlassen und noch nicht abgesendete Änderungen an der Ersatzteilsuche verwerfen?"
-  }
+  },
+  "budgetCurrency": "Währung des Preislimits",
+  "budgetCurrencyNote": "Dieses Preislimit gilt nur für Angebote in {currency}. Beträge werden nicht zwischen Währungen umgerechnet.",
+  "budgetReferenceCurrencyNote": "Die Währung entspricht deinem Referenzpreis. Entferne die Referenz, um sie zu ändern."
 }

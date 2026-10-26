@@ -27,6 +27,20 @@
         placeholder="0"
       />
     </div>
+    <div class="col-span-2 md:col-span-4">
+      <UiDropdown
+        id="budget-currency"
+        v-model="budgetCurrency"
+        :options="currencyOptions"
+        :label="$t('budgetCurrency')"
+        :disabled="hasReferencePrice"
+        :disabled-string="$t('budgetReferenceCurrencyNote')"
+      />
+      <p class="mt-2 text-sm text-slate-400">
+        {{ $t('budgetCurrencyNote', { currency: budgetCurrency }) }}
+        <span v-if="hasReferencePrice">{{ $t('budgetReferenceCurrencyNote') }}</span>
+      </p>
+    </div>
   </div>
 </template>
 
@@ -37,6 +51,21 @@ import { condidtion } from '~/constants/CreateFilterConstants'
 const condiditonSelected = ref<{ value: string, label: string }[]>([])
 
 const model = defineModel<Filter>()
+
+const hasReferencePrice = computed(() => !!model.value!.referenceUrl && model.value!.referencePrice > 0)
+const budgetCurrency = computed({
+  get: () => model.value!.referenceCurrency || 'EUR',
+  set: (currency: string) => { if (!hasReferencePrice.value) model.value!.referenceCurrency = currency },
+})
+const currencyOptions = computed(() => [...new Set(['EUR', 'GBP', 'SEK', 'PLN', budgetCurrency.value])]
+  .map(value => ({ value, label: value })))
+
+watch(() => model.value!.marketplace, (marketplace) => {
+  // Only the first unambiguous choice on a new alert supplies a default; explicit and saved currencies win.
+  if (model.value!.id || model.value!.referenceCurrency || hasReferencePrice.value) return
+  const currency = ({ Gumtree: 'GBP', Blocket: 'SEK', OLX: 'PLN' } as Record<string, string>)[marketplace]
+  if (currency) model.value!.referenceCurrency = currency
+}, { immediate: true })
 
 // reconstuct the selected conditions from a string updated when editing a filter
 watch(() => model.value!.condition, () => {
