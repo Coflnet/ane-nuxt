@@ -160,7 +160,7 @@
           </select>
         </div>
         <div class="flex flex-col gap-1">
-          <label class="text-xs text-gray-400">{{ $t('search') }}</label>
+          <label class="text-xs text-gray-400">{{ $t('nav.search') }}</label>
           <input
             v-model="filters.search"
             type="text"
@@ -264,7 +264,7 @@
         </div>
       </div>
       <div
-        v-if="items.length === 0 && !loading"
+        v-if="filteredItems.length === 0 && !loading"
         class="text-center py-12 text-slate-400"
       >
         {{ $t('noFlipsFound') }}

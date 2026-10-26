@@ -1334,6 +1334,7 @@ const attrValueTranslationMap: Record<string, Record<string, string>> = {
     diagonal_cutter: 'tool_diagonal_cutter',
     water_pump_pliers: 'tool_water_pump_pliers',
     pliers_wrench: 'tool_pliers_wrench',
+    adjustable_wrench: 'tool_adjustable_wrench',
     angle_grinder: 'tool_angle_grinder',
     dust_extractor: 'tool_dust_extractor',
     drill_driver: 'tool_drill_driver',
