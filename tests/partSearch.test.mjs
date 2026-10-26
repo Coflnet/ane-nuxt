@@ -64,3 +64,32 @@ test('carburetor designation survives editable shared URL parsing and serializat
   form.part_key = 'Bing 1/20/40'
   assert.equal(partSearchParams(form).part_key, 'Bing 1/20/40')
 })
+
+test('shaft signature key URLs populate the visible editable number without hidden gear criteria', () => {
+  const form = partFormFromQuery({ class: 'shaft', part_key: '314-05.211', teeth: '42', module: '1', mode: 'fragment', teeth_observed: '8', arc_degrees: '120' })
+  assert.equal(form.partNumber, '314-05.211')
+  assert.equal(form.part_key, '')
+  const query = partSearchParams(form)
+  assert.equal(query.class, 'shaft')
+  assert.equal(query.partNumber, '314-05.211')
+  for (const field of ['part_key', 'teeth', 'module', 'teeth_observed', 'arc_degrees', 'mode']) assert.ok(!(field in query))
+  assert.deepEqual(partSearchParams(partFormFromQuery(Object.fromEntries(new URLSearchParams(query)))), query)
+  form.partNumber = '314-05.105'
+  assert.equal(partSearchParams(form).partNumber, '314-05.105')
+})
+
+test('an explicit shaft part number wins over its incoming signature-key alias', () => {
+  const form = partFormFromQuery({ class: 'shaft', part_key: '314-05.211', partNumber: '314-05.105' })
+  assert.equal(form.partNumber, '314-05.105')
+  assert.equal(form.part_key, '')
+  assert.ok(!('part_key' in partSearchParams(form)))
+})
+
+test('switching from bearing to shaft does not retain a hidden bearing designation', () => {
+  const form = partFormFromQuery({ class: 'bearing', part_key: '6203-2RS' })
+  form.class = 'shaft'
+  const query = partSearchParams(form)
+  assert.equal(query.class, 'shaft')
+  assert.ok(!('part_key' in query))
+  assert.ok(!('partNumber' in query))
+})

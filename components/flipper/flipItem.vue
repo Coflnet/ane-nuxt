@@ -160,6 +160,12 @@
       </div>
 
       <div class="mt-auto">
+        <NuxtLink
+          v-if="productHistoryUrl"
+          :to="productHistoryUrl"
+          class="block text-center text-sm text-blue-400 hover:text-blue-300 mb-3"
+          data-testid="flip-history"
+        >{{ $t('product.priceHistoryTitle') }}</NuxtLink>
         <a
           v-if="listingUrl"
           :href="listingUrl"
@@ -311,12 +317,14 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { getPlatformUrl } from '~/utils/flipMarketplaceUrl'
+import { parseHistoryCurrency } from '~/utils/priceHistory'
 import type { Flip, FlipSale as SoldFor } from '~/src/api-client/types.gen'
 import { formatDistanceToNow } from 'date-fns'
 import { de } from 'date-fns/locale'
 import { useI18n } from 'vue-i18n'
 
 const { locale, t } = useI18n()
+const localePath = useLocalePath()
 const dateFnsLocale = computed(() => locale.value === 'de' ? { locale: de } : {})
 
 const API_BASE = 'https://ane.coflnet.com'
@@ -346,6 +354,12 @@ const hasComparablePrices = computed(() => {
   if (!/^[A-Z]{3}$/.test(listingCurrency.value)) return false
   const sells = props.item.recentSells ?? []
   return sells.length > 0 && sells.every(sell => sell.key?.endsWith(`${currencyKeyMarker}${listingCurrency.value}`))
+})
+const productHistoryUrl = computed(() => {
+  const id = props.item.listing?.seoId
+  if (!id?.trim()) return null
+  const currency = parseHistoryCurrency(props.item.listing?.currency)
+  return localePath({ path: `/product/${encodeURIComponent(id)}`, query: currency ? { history_currency: currency } : {}, hash: '#price-history' })
 })
 const primaryImageUrl = computed(() => props.item.listing?.imageUrls?.[0] ?? '')
 

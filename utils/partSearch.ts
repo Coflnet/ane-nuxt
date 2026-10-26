@@ -1,4 +1,4 @@
-export const partClasses = ['gear', 'bearing', 'carburetor', 'sprocket', 'pulley', 'generic'] as const
+export const partClasses = ['gear', 'bearing', 'carburetor', 'sprocket', 'pulley', 'shaft', 'generic'] as const
 export const partFields = ['q', 'partNumber', 'machine', 'part_key', 'teeth', 'outerDiameterMm', 'boreMm', 'innerDiameterMm', 'module', 'widthMm', 'teeth_observed', 'arc_degrees', 'pitch_mm', 'tolerance', 'toleranceMm'] as const
 export type PartField = typeof partFields[number]
 export type PartForm = Record<PartField, string> & { class: string, mode: string }
@@ -7,6 +7,8 @@ export function partFormFromQuery(query: Record<string, unknown>): PartForm {
   const value = (key: string) => typeof query[key] === 'string' ? query[key] as string : ''
   return {
     ...Object.fromEntries(partFields.map(key => [key, value(key)])),
+    partNumber: value('partNumber') || (value('class') === 'shaft' ? value('part_key') : ''),
+    part_key: value('class') === 'shaft' ? '' : value('part_key'),
     class: partClasses.includes(value('class') as typeof partClasses[number]) ? value('class') : '',
     mode: value('mode') === 'fragment' || value('teeth_observed') ? 'fragment' : 'full',
     tolerance: value('tolerance') || '0.02',

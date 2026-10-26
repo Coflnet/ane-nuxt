@@ -318,7 +318,8 @@
 
       <!-- Price History Chart -->
       <div
-        class="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-xl mb-8"
+        id="price-history"
+        class="scroll-mt-24 bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-xl mb-8"
       >
         <div class="p-6 border-b border-slate-800">
           <h2 class="text-2xl font-bold text-white">
@@ -336,6 +337,7 @@
                 v-for="days in HISTORY_WINDOWS"
                 :key="days"
                 :value="days"
+                :selected="days === historyDays"
               >
                 {{ $t('product.historyWindowDays', { days }) }}
               </option>

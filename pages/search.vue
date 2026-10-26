@@ -1212,7 +1212,7 @@ const selectedOsVersionSupports = computed(() => (route.query.attr_os_version_su
 const selectedOsVersion = computed(() => (route.query.attr_os_version as string) || '')
 const osVersionOrNewer = ref(!!route.query.attr_os_version_min)
 const selectedNumber = (param: string) => computed(() => specRangeNumber(param, route.query[param]) ?? undefined)
-const yearRangeFilters = computed(() => ['release_year', 'publication_year', 'year'].map(key => {
+const yearRangeFilters = computed(() => ['release_year', 'publication_year', 'year'].map((key) => {
   const min = specRangeNumber(`attr_${key}_min`, route.query[`attr_${key}_min`]) ?? undefined
   const max = specRangeNumber(`attr_${key}_max`, route.query[`attr_${key}_max`]) ?? undefined
   const bounds = bucketNumberBounds([

@@ -98,10 +98,25 @@
           {{ $t('visualSimilarity.preparing') }}
         </p>
         <p
-          v-else-if="hasEmbedding"
+          v-else-if="hasEmbedding && provenance"
           class="text-success text-xs mt-2"
         >
           {{ $t('visualSimilarity.ready') }}
+        </p>
+        <p
+          v-if="hasEmbedding && !provenance"
+          class="text-amber-300 text-xs mt-2"
+        >
+          {{ $t('visualSimilarity.refreshRequired') }}
+          <button
+            v-if="thumbBase64"
+            type="button"
+            class="underline ml-2"
+            :disabled="preparing || !hasCollectorPlan"
+            @click="refreshReference"
+          >
+            {{ $t('visualSimilarity.refresh') }}
+          </button>
         </p>
       </div>
     </div>
@@ -128,6 +143,7 @@ interface Payload {
   emb: number[]
   thumb: string
   thumbMime: string
+  provenance?: Record<string, unknown>
 }
 
 const threshold = ref(0.7)
@@ -135,6 +151,7 @@ const thumbDataUrl = ref<string>('')
 const embedding = ref<number[]>([])
 const thumbBase64 = ref<string>('')
 const thumbMime = ref<string>('image/jpeg')
+const provenance = ref<Record<string, unknown> | undefined>()
 const preparing = ref(false)
 const error = ref<string>('')
 const pendingFile = shallowRef<File | null>(null)
@@ -156,6 +173,7 @@ function loadFromValue(raw: string) {
     embedding.value = p.emb ?? []
     thumbBase64.value = p.thumb ?? ''
     thumbMime.value = p.thumbMime ?? 'image/jpeg'
+    provenance.value = p.provenance
     thumbDataUrl.value = thumbBase64.value ? `data:${thumbMime.value};base64,${thumbBase64.value}` : ''
   }
   catch (e) {
@@ -172,6 +190,7 @@ function serializedPayload() {
     emb: embedding.value,
     thumb: thumbBase64.value,
     thumbMime: thumbMime.value,
+    provenance: provenance.value,
   }
   return JSON.stringify(payload)
 }
@@ -196,6 +215,7 @@ function resetImage() {
   thumbDataUrl.value = ''
   thumbBase64.value = ''
   embedding.value = []
+  provenance.value = undefined
 }
 
 function clear() {
@@ -211,6 +231,16 @@ async function onFileSelected(ev: Event) {
   input.value = ''
 
   await prepareImage(file)
+}
+
+function refreshReference() {
+  try {
+    const bytes = Uint8Array.from(atob(thumbBase64.value), char => char.charCodeAt(0))
+    void prepareImage(new File([bytes], 'reference.jpg', { type: thumbMime.value }))
+  }
+  catch {
+    error.value = useI18n().t('visualSimilarity.refreshFailed')
+  }
 }
 
 async function prepareImage(file: File) {
@@ -231,7 +261,7 @@ async function prepareImage(file: File) {
 
     // Ask backend to embed it (single CLIP call, stored on the filter)
     const apiToken = userStore.token ? `Bearer ${userStore.token}` : ''
-    const res = await $fetch<{ embedding: number[], dimensions: number, threshold: number, thumbBase64: string, thumbMime: string } | { emb: number[], threshold: number, thumb: string, thumbMime: string }>(
+    const res = await $fetch<Partial<Payload> & { embedding?: number[] }>(
       'https://ane.coflnet.com/api/filters/visual-similarity/prepare',
       {
         method: 'POST',
@@ -248,11 +278,12 @@ async function prepareImage(file: File) {
     // C# property naming: PascalCase → camelCase serialization → emb/thumb
     const emb = (res as { emb?: number[], embedding?: number[] }).emb
       ?? (res as { emb?: number[], embedding?: number[] }).embedding
-    if (!emb || emb.length === 0) throw new Error('No embedding returned')
+    if (!emb || emb.length === 0 || !res.provenance) throw new Error(useI18n().t('visualSimilarity.refreshFailed'))
     thumbDataUrl.value = compressed.dataUrl
     thumbBase64.value = compressed.base64
     thumbMime.value = 'image/jpeg'
     embedding.value = emb
+    provenance.value = res.provenance
     pendingFile.value = null
     emitPayload()
   }

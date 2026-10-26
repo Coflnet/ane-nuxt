@@ -5,6 +5,7 @@ import test from 'node:test'
 import { compileScript, parse } from 'vue/compiler-sfc'
 import { computed, effectScope, nextTick, reactive, ref, shallowRef, watch } from 'vue'
 
+const proof = { model_id: 'synthetic/model', model_revision: 'a'.repeat(40), model_sha256: 'b'.repeat(64), projection_id: null, embedding_sha256: 'c'.repeat(64) }
 const previous = JSON.stringify({ threshold: 0.7, emb: [1, 0], thumb: 'previous', thumbMime: 'image/jpeg' })
 const file = { name: 'replacement.png', base64: 'replacement' }
 
@@ -27,6 +28,13 @@ async function createFilter(value = previous, plan = 'collector') {
       })
     }
   }
+  class UploadedFile {
+    constructor(parts, name, options) {
+      this.base64 = Buffer.from(parts[0]).toString('base64')
+      this.name = name
+      this.type = options.type
+    }
+  }
   class Photo {
     width = 512
     height = 256
@@ -41,9 +49,9 @@ async function createFilter(value = previous, plan = 'collector') {
       image = value
     } }), toDataURL: () => `data:image/jpeg;base64,${image.value.split(',')[1]}` }
   } }
-  const component = new Function('__vue', 'ref', 'shallowRef', 'computed', 'watch', 'onBeforeUnmount', 'useUserStore', 'useI18n', '$fetch', 'FileReader', 'Image', 'document', code)(
+  const component = new Function('__vue', 'ref', 'shallowRef', 'computed', 'watch', 'onBeforeUnmount', 'useUserStore', 'useI18n', '$fetch', 'FileReader', 'Image', 'document', 'File', code)(
     await import('vue'), ref, shallowRef, computed, watch, fn => cleanup.push(fn), () => user, () => ({ t: key => key }),
-    (url, options) => new Promise((resolve, reject) => pending.push({ url, options, resolve, reject })), Reader, Photo, document,
+    (url, options) => new Promise((resolve, reject) => pending.push({ url, options, resolve, reject })), Reader, Photo, document, UploadedFile,
   )
   const effects = effectScope()
   const state = effects.run(() => component.setup(props, { expose() {}, emit: (_, payload) => {
@@ -76,9 +84,9 @@ test('failed image replacement preserves the active preview, embedding and seria
   assert.equal(field.emitted.length, 0)
   const retry = field.state.prepareImage(field.state.pendingFile.value)
   await settle()
-  field.pending[1].resolve({ emb: [0, 1] })
+  field.pending[1].resolve({ emb: [0, 1], provenance: proof })
   await retry
-  assert.deepEqual(JSON.parse(field.props.modelValue), { threshold: 0.7, emb: [0, 1], thumb: 'replacement', thumbMime: 'image/jpeg' })
+  assert.deepEqual(JSON.parse(field.props.modelValue), { threshold: 0.7, emb: [0, 1], thumb: 'replacement', thumbMime: 'image/jpeg', provenance: proof })
   assert.equal(field.state.error.value, '')
   assert.equal(field.state.pendingFile.value, null)
   field.stop()
@@ -90,7 +98,7 @@ test('clear cancels an in-flight replacement and ignores a late server response'
   await settle()
   field.state.clear()
   assert.equal(field.pending[0].options.signal?.aborted, true)
-  field.pending[0].resolve({ embedding: [0, 1] })
+  field.pending[0].resolve({ embedding: [0, 1], provenance: proof })
   await attempt
   assert.equal(field.props.modelValue, '')
   assert.equal(field.state.thumbDataUrl.value, '')
@@ -106,7 +114,7 @@ test('an external reset clears the preview and prevents an obsolete upload from 
   await settle()
   field.props.modelValue = ''
   await nextTick()
-  field.pending[0].resolve({ emb: [0, 1] })
+  field.pending[0].resolve({ emb: [0, 1], provenance: proof })
   await attempt
   assert.equal(field.state.thumbDataUrl.value, '')
   assert.deepEqual(field.state.embedding.value, [])
@@ -131,9 +139,9 @@ test('threshold changes while uploading keep the active filter and do not cancel
   field.state.threshold.value = 0.85
   await nextTick()
   assert.equal(JSON.parse(field.props.modelValue).thumb, 'previous')
-  field.pending[0].resolve({ embedding: [0, 1] })
+  field.pending[0].resolve({ embedding: [0, 1], provenance: proof })
   await attempt
-  assert.deepEqual(JSON.parse(field.props.modelValue), { threshold: 0.85, emb: [0, 1], thumb: 'replacement', thumbMime: 'image/jpeg' })
+  assert.deepEqual(JSON.parse(field.props.modelValue), { threshold: 0.85, emb: [0, 1], thumb: 'replacement', thumbMime: 'image/jpeg', provenance: proof })
   field.stop()
 })
 
@@ -153,7 +161,7 @@ test('unmount aborts preparation and emits no late filter update', async () => {
   const attempt = field.select()
   await settle()
   field.stop()
-  field.pending[0].resolve({ emb: [0, 1] })
+  field.pending[0].resolve({ emb: [0, 1], provenance: proof })
   await attempt
   assert.equal(field.emitted.length, 0)
   assert.equal(field.pending[0].options.signal?.aborted, true)
@@ -165,5 +173,37 @@ test('the existing paid-plan gate sends no preparation request for an ineligible
   assert.equal(field.pending.length, 0)
   assert.equal(field.props.modelValue, previous)
   assert.equal(field.state.error.value, 'visualSimilarity.collectorRequired')
+  field.stop()
+})
+
+test('saved checkpoint proof survives loading, threshold edits and serialization', async () => {
+  const field = await createFilter(JSON.stringify({ ...JSON.parse(previous), provenance: proof }))
+  field.state.threshold.value = 0.82
+  await nextTick()
+  assert.deepEqual(JSON.parse(field.props.modelValue).provenance, proof)
+  field.stop()
+})
+
+test('legacy saved thumbnail can be refreshed without uploading the file again', async () => {
+  const field = await createFilter()
+  field.state.refreshReference()
+  await settle()
+  assert.equal(field.pending[0].options.body.imageBase64, 'previous')
+  field.pending[0].resolve({ emb: [0, 1], provenance: proof })
+  await settle()
+  assert.deepEqual(JSON.parse(field.props.modelValue).provenance, proof)
+  assert.equal(JSON.parse(field.props.modelValue).thumb, 'previous')
+  field.stop()
+})
+
+test('a backend response without checkpoint proof cannot replace an active reference', async () => {
+  const field = await createFilter()
+  const attempt = field.select()
+  await settle()
+  field.pending[0].resolve({ emb: [0, 1] })
+  await attempt
+  assert.equal(field.props.modelValue, previous)
+  assert.equal(field.state.error.value, 'visualSimilarity.refreshFailed')
+  assert.equal(field.state.pendingFile.value.name, 'replacement.png')
   field.stop()
 })
