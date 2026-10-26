@@ -1853,6 +1853,11 @@ const categoryTranslationMap: Record<string, string> = {
 
 // Common attribute key translations
 const attrKeyTranslationMap: Record<string, string> = {
+  'tool_type': 'attr_tool_type',
+  'article_number': 'attr_article_number',
+  'length_mm': 'attr_length_mm',
+  'package_scope': 'attr_package_scope',
+  'product_kind': 'attr_product_type',
   'carburetor_designation': 'attr_carburetor_designation',
   'compatibility_brands': 'attr_compatibility_brands',
   'compatibility_source': 'attr_compatibility_source',
@@ -1906,6 +1911,22 @@ const attrKeyTranslationMap: Record<string, string> = {
 
 // Common attribute value translations (for colors, sizes, etc.)
 const attrValueTranslationMap: Record<string, Record<string, string>> = {
+  tool_type: {
+    combination_pliers: 'tool_combination_pliers',
+    diagonal_cutter: 'tool_diagonal_cutter',
+    water_pump_pliers: 'tool_water_pump_pliers',
+    pliers_wrench: 'tool_pliers_wrench',
+    angle_grinder: 'tool_angle_grinder',
+    dust_extractor: 'tool_dust_extractor',
+    drill_driver: 'tool_drill_driver',
+  },
+  package_scope: {
+    unspecified: 'package_scope_unspecified',
+  },
+  product_kind: {
+    hand_tool: 'product_kind_hand_tool',
+    power_tool: 'product_kind_power_tool',
+  },
   compatibility_source: { seller_title_unverified: 'seller_title_unverified' },
   color: {
     Black: 'color_black',
