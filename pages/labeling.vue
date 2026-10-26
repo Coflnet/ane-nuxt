@@ -81,6 +81,7 @@
           class="text-sm text-indigo-300 underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-400"
           data-testid="labeling-diagnostics-toggle"
           :aria-expanded="showDiagnostics"
+          :disabled="diagnosticsLoading"
           @click="toggleDiagnostics"
         >
           {{ $t(showDiagnostics ? 'labelingHideDiagnostics' : 'labelingShowDiagnostics') }}
@@ -262,6 +263,22 @@
             class="text-sm text-slate-300 bg-slate-800 rounded-lg px-3 py-2"
           >
             <p
+              v-if="diagnosticsFailed"
+              role="alert"
+              data-testid="labeling-diagnostics-error"
+            >
+              {{ $t('labelingLoadFailed') }}
+              <button
+                type="button"
+                data-testid="labeling-diagnostics-retry"
+                :disabled="diagnosticsLoading"
+                class="text-indigo-300 underline"
+                @click="loadDiagnostics"
+              >
+                {{ $t('labelingReload') }}
+              </button>
+            </p>
+            <p
               v-if="current.groupKey"
               data-testid="labeling-group"
               class="break-words"
@@ -402,6 +419,8 @@ const photoLoading = reactive<Record<string, boolean>>({ a: false, b: false })
 const archivedBlobs = new Map<string, Promise<string>>()
 
 const showDiagnostics = ref(false)
+const diagnosticsLoading = ref(false)
+const diagnosticsFailed = ref(false)
 // Exposure belongs to this pair review, including undo/retry; it is never a global preference.
 const reviews = reactive(new Map<string, { diagnostic: boolean, label?: LabelAnswer, failed?: boolean, attempt: number }>())
 const currentReview = computed(() => reviewFor(current.value?.pairId))
@@ -414,7 +433,27 @@ function reviewFor(pairId?: string) {
 
 function toggleDiagnostics() {
   showDiagnostics.value = !showDiagnostics.value
-  if (showDiagnostics.value && current.value) currentReview.value.diagnostic = true
+  if (showDiagnostics.value && current.value) {
+    currentReview.value.diagnostic = true
+    loadDiagnostics()
+  }
+}
+
+async function loadDiagnostics() {
+  const pair = current.value
+  if (!pair || diagnosticsLoading.value || pair.similarity != null) return
+  diagnosticsLoading.value = true
+  diagnosticsFailed.value = false
+  try {
+    const details = await api.diagnostics(pair.pairId)
+    if (current.value?.pairId === pair.pairId) Object.assign(pair, details)
+  }
+  catch {
+    if (current.value?.pairId === pair.pairId) diagnosticsFailed.value = true
+  }
+  finally {
+    if (current.value?.pairId === pair.pairId) diagnosticsLoading.value = false
+  }
 }
 const filterInput = ref('')
 const activeFilter = ref('')
@@ -639,6 +678,8 @@ function onPhotoError(key: 'a' | 'b') {
 
 watch(() => current.value?.pairId, (pairId) => {
   showDiagnostics.value = false
+  diagnosticsLoading.value = false
+  diagnosticsFailed.value = false
   if (!pairId) return
   if (activeFilter.value) reviewFor(pairId).diagnostic = true
   if (import.meta.server) return

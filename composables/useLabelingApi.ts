@@ -49,6 +49,7 @@ export function useLabelingApi() {
     photo,
     me: () => request<LabelingMe>('/me'),
     next: (count: number, groupKey: string) => request<LabelingPair[]>('/next', { query: { count, groupKey } }),
+    diagnostics: (pairId: string) => request<LabelingPair>(`/${encodeURIComponent(pairId)}/diagnostics`),
     label: async (pairId: string, label: LabelAnswer, reviewMode?: ReviewMode): Promise<void> => {
       await request<unknown>(`/${encodeURIComponent(pairId)}/label`, { method: 'POST', body: { label, ...(reviewMode ? { reviewMode } : {}) } })
     },

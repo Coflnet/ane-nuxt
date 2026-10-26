@@ -89,7 +89,15 @@ const query = ref('')
 const found = ref<FilterBucket[] | null>(null)
 const loading = ref(false)
 const error = ref(false)
-const options = computed(() => found.value ?? props.buckets)
+const options = computed(() => {
+  if (!found.value) return props.buckets
+  const text = query.value.trim().toLocaleLowerCase()
+  if (!text) return found.value
+  // Discovery searches stored values; keep matches for the labels shown in this locale too.
+  return [...found.value, ...props.buckets.filter(bucket => bucket.value
+    && props.formatValue(bucket.value).toLocaleLowerCase().includes(text)
+    && !found.value!.some(result => result.value === bucket.value))]
+})
 const visibleBuckets = computed<FilterBucket[]>(() => {
   const values = options.value.filter(b => b.value)
   return [...props.selected.filter(value => !values.some(b => b.value === value)).map(value => ({ value })), ...values]

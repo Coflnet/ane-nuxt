@@ -73,16 +73,26 @@ async function mountPage(api) {
   return { root, all, find, click, settle, unmount: () => app.unmount() }
 }
 
-const pair = n => ({ pairId: `p${n}`, groupKey: `secret-model-${n}`, similarity: 0.987, decision: 'secret-decision',
+const diagnosticPair = n => ({ pairId: `p${n}`, groupKey: `secret-model-${n}`, similarity: 0.987, decision: 'secret-decision',
   a: { platform: 'source-a', imageUrl: '/a.png', listingUrl: '/offer-a' },
   b: { platform: 'source-b', imageUrl: '/b.png', listingUrl: '/offer-b' } })
 
+const pair = (n) => {
+  const { pairId, a, b } = diagnosticPair(n)
+  return { pairId, a, b }
+}
+
 test('rendered review hides diagnostics, tracks exposure through hide/skip/undo, and retries the original answer', async () => {
   const calls = []
+  const reveals = []
   let fail = true
   const view = await mountPage({
     me: async () => ({ canLabel: true, userId: 'reviewer' }), stats: async () => null,
     next: async () => [pair(1), pair(2)],
+    diagnostics: async (id) => {
+      reveals.push(id)
+      return diagnosticPair(Number(id.slice(1)))
+    },
     label: async (...args) => {
       calls.push(args)
       if (fail) {
@@ -93,12 +103,14 @@ test('rendered review hides diagnostics, tracks exposure through hide/skip/undo,
   })
   try {
     const visible = () => view.all().map(n => `${n.text} ${JSON.stringify(n.props)}`).join(' ')
+    assert.deepEqual(reveals, [])
     assert.ok(!visible().includes('secret-model'))
     assert.ok(!visible().includes('secret-decision'))
     assert.ok(!visible().includes('0.987'))
     assert.ok(!view.all().some(n => n.type === 'a'))
     assert.match(view.find('labeling-review-mode').text, /labelingBlindReview/)
     await view.click('labeling-diagnostics-toggle')
+    assert.deepEqual(reveals, ['p1'])
     assert.ok(view.find('labeling-group'))
     assert.ok(visible().includes('secret-model-1'))
     await view.click('labeling-diagnostics-toggle')
@@ -135,6 +147,7 @@ test('group filtering records diagnostic exposure even when details are hidden',
   const batches = []
   const view = await mountPage({
     me: async () => ({ canLabel: true, userId: 'reviewer' }), stats: async () => null,
+    diagnostics: async id => diagnosticPair(Number(id.slice(1))),
     next: async (...args) => {
       batches.push(args)
       return [pair(batches.length)]
@@ -153,6 +166,44 @@ test('group filtering records diagnostic exposure even when details are hidden',
     assert.match(view.find('labeling-review-mode').text, /labelingDiagnosticReview/)
     await view.click('labeling-answer-2')
     assert.deepEqual(calls[0], ['p2', 'same_model_other_variant', 'diagnostic'])
+  }
+  finally {
+    view.unmount()
+    delete globalThis.window
+    delete globalThis.Image
+    delete globalThis.Document
+    delete globalThis.ShadowRoot
+  }
+})
+
+test('diagnostics can be retried without replacing the pair or its answer, and stale responses stay off the next pair', async () => {
+  const calls = []
+  let attempts = 0
+  let finish
+  const view = await mountPage({
+    me: async () => ({ canLabel: true, userId: 'reviewer' }), stats: async () => null,
+    next: async () => [pair(1), pair(2)],
+    diagnostics: async () => {
+      if (++attempts === 1) throw new Error('temporary')
+      return new Promise((resolve) => {
+        finish = resolve
+      })
+    },
+    label: async (...args) => { calls.push(args) },
+  })
+  try {
+    await view.click('labeling-diagnostics-toggle')
+    assert.ok(view.find('labeling-diagnostics-error'))
+    await view.click('labeling-diagnostics-retry')
+    await view.click('labeling-answer-3')
+    assert.deepEqual(calls[0], ['p1', 'different', 'diagnostic'])
+    finish(diagnosticPair(1))
+    await view.settle()
+    assert.equal(view.find('labeling-group'), undefined)
+    assert.match(view.find('labeling-review-mode').text, /labelingBlindReview/)
+    await view.click('labeling-undo')
+    assert.ok(view.find('labeling-previous-answer'))
+    assert.match(view.find('labeling-review-mode').text, /labelingDiagnosticReview/)
   }
   finally {
     view.unmount()

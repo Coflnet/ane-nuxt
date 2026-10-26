@@ -195,3 +195,28 @@ test('a failed optional count lookup keeps unknown options selectable without fa
   assert(state.visibleBuckets.value.some(b => b.value === '128GB' && b.count === undefined))
   stop()
 })
+
+test('localized value search keeps current scoped label matches and authoritative discovery counts', async () => {
+  const { state, props, stop } = await createField(async () => [], [{ value: 'Black', count: 12 }])
+  props.selected = []
+  props.formatValue = value => ({ Black: 'Schwarz', Blue: 'Blau' })[value] ?? value
+  state.query.value = '  SCHWARZ  '
+  await nextTick()
+  await new Promise(resolve => setTimeout(resolve, 330))
+  assert.deepEqual(state.visibleBuckets.value, [{ value: 'Black', count: 12 }])
+
+  props.scope = 'another country'
+  props.buckets = [{ value: 'Blue', count: 4 }]
+  await nextTick()
+  await new Promise(resolve => setTimeout(resolve, 330))
+  assert.deepEqual(state.visibleBuckets.value, [], 'a localized match from the previous scope must disappear')
+
+  props.buckets = [{ value: 'Black', count: 9 }]
+  props.loadValues = async () => [{ value: 'Black', count: 7 }, { value: 'Schwarz metallic', count: 2 }]
+  await state.load()
+  assert.deepEqual(state.visibleBuckets.value, [{ value: 'Black', count: 7 }, { value: 'Schwarz metallic', count: 2 }], 'remote values win without duplicates or invented raw aliases')
+  state.query.value = ''
+  await nextTick()
+  assert.deepEqual(state.visibleBuckets.value, props.buckets)
+  stop()
+})
