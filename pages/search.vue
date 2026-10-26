@@ -184,16 +184,15 @@
             @click="clearOsVersion"
           >&times;</button>
         </span>
-        <span
-          v-if="selectedReleaseYearMin !== undefined || selectedReleaseYearMax !== undefined"
-          class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-purple-500/20 text-purple-400 text-xs border border-purple-500/30"
-        >
-          {{ localizeAttrKey('release_year') }}: {{ selectedReleaseYearMin ?? '…' }} – {{ selectedReleaseYearMax ?? '…' }}
-          <button
-            class="ml-1 hover:text-white"
-            @click="clearRange('release_year')"
-          >&times;</button>
-        </span>
+        <template v-for="filter in yearRangeFilters" :key="filter.key">
+          <span
+            v-if="filter.min !== undefined || filter.max !== undefined"
+            class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-purple-500/20 text-purple-400 text-xs border border-purple-500/30"
+          >
+            {{ localizeAttrKey(filter.key) }}: {{ filter.min ?? '…' }} – {{ filter.max ?? '…' }}
+            <button class="ml-1 hover:text-white" @click="clearRange(filter.key)">&times;</button>
+          </span>
+        </template>
         <span
           v-if="selectedScreenSizeMin !== undefined || selectedScreenSizeMax !== undefined"
           class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-purple-500/20 text-purple-400 text-xs border border-purple-500/30"
@@ -457,27 +456,28 @@
 
           <!-- Screen size range (inches) -->
           <FiltersNumberRangeFilter
-            v-if="screenSizeBounds && screenSizeBounds.min < screenSizeBounds.max"
+            v-if="screenSizeBounds"
             :title="localizeAttrKey('screen_size')"
             :bounds="screenSizeBounds"
             :selected-min="selectedScreenSizeMin"
             :selected-max="selectedScreenSizeMax"
-            :step="0.1"
+            step="any"
             unit="&quot;"
             test-id="screen-size"
-            @apply="range => applyRange('screen_size', range, screenSizeBounds)"
+            @apply="range => applyRange('screen_size', range)"
           />
 
-          <!-- Release year range -->
-          <FiltersNumberRangeFilter
-            v-if="releaseYearBounds && releaseYearBounds.min < releaseYearBounds.max"
-            :title="localizeAttrKey('release_year')"
-            :bounds="releaseYearBounds"
-            :selected-min="selectedReleaseYearMin"
-            :selected-max="selectedReleaseYearMax"
-            test-id="release-year"
-            @apply="range => applyRange('release_year', range, releaseYearBounds)"
-          />
+          <template v-for="filter in yearRangeFilters" :key="filter.key">
+            <FiltersNumberRangeFilter
+              v-if="filter.bounds"
+              :title="localizeAttrKey(filter.key)"
+              :bounds="filter.bounds"
+              :selected-min="filter.min"
+              :selected-max="filter.max"
+              :test-id="filter.key.replaceAll('_', '-')"
+              @apply="range => applyRange(filter.key, range)"
+            />
+          </template>
 
           <!-- Battery Range Filter -->
           <div
@@ -1103,6 +1103,7 @@ import {
   impliedOsLabel,
   removeImpliedPhrase,
   sortOsVersionBuckets,
+  specRangeNumber,
   withRangeParams,
 } from '~/utils/specFilters'
 
@@ -1210,16 +1211,20 @@ const selectedOsVersionMin = computed(() => (route.query.attr_os_version_min as 
 const selectedOsVersionSupports = computed(() => (route.query.attr_os_version_supports as string) || '')
 const selectedOsVersion = computed(() => (route.query.attr_os_version as string) || '')
 const osVersionOrNewer = ref(!!route.query.attr_os_version_min)
-const selectedNumber = (param: string) => computed(() => {
-  const raw = Number(String(route.query[param] ?? '').replace(',', '.'))
-  return route.query[param] && Number.isFinite(raw) && raw > 0 ? raw : undefined
-})
-const selectedReleaseYearMin = selectedNumber('attr_release_year_min')
-const selectedReleaseYearMax = selectedNumber('attr_release_year_max')
+const selectedNumber = (param: string) => computed(() => specRangeNumber(param, route.query[param]) ?? undefined)
+const yearRangeFilters = computed(() => ['release_year', 'publication_year', 'year'].map(key => {
+  const min = specRangeNumber(`attr_${key}_min`, route.query[`attr_${key}_min`]) ?? undefined
+  const max = specRangeNumber(`attr_${key}_max`, route.query[`attr_${key}_max`]) ?? undefined
+  const bounds = bucketNumberBounds([
+    ...(attributeBuckets.value[key] ?? []),
+    ...[min, max].filter(value => value !== undefined).map(value => ({ value: String(value) })),
+  ], true)
+  return { key, min, max, bounds }
+}))
 const selectedScreenSizeMin = selectedNumber('attr_screen_size_min')
 const selectedScreenSizeMax = selectedNumber('attr_screen_size_max')
 const hasSpecRangeSelection = computed(() => !!selectedOsVersionMin.value || !!selectedOsVersionSupports.value
-  || selectedReleaseYearMin.value !== undefined || selectedReleaseYearMax.value !== undefined
+  || yearRangeFilters.value.some(filter => filter.min !== undefined || filter.max !== undefined)
   || selectedScreenSizeMin.value !== undefined || selectedScreenSizeMax.value !== undefined)
 
 const manualLoading = ref(false)
@@ -1366,7 +1371,7 @@ const availableAttributeBuckets = computed(() => {
   for (const [key, buckets] of Object.entries(attributeBuckets.value)) {
     if (key.toLowerCase() === 'condition') continue // Skip condition, it has its own section
     if (rangeFilterAttrs.has(key.toLowerCase())) continue // Skip range attributes, they get their own UI
-    if (SPEC_ATTRIBUTE_KEYS.has(key.toLowerCase())) continue // Spec attributes have dedicated controls
+    if (SPEC_ATTRIBUTE_KEYS.has(key.toLowerCase()) || yearRangeFilters.value.some(filter => filter.key === key && filter.bounds)) continue // Dedicated controls
 
     const available = buckets
       .filter(b => b.value && (b.count == null || b.count > 0 || attrFilters[key]?.includes(b.value!)))
@@ -1375,7 +1380,7 @@ const availableAttributeBuckets = computed(() => {
   }
 
   for (const [key, value] of Object.entries(attrFilters)) {
-    if (key === 'condition' || rangeFilterAttrs.has(key.toLowerCase()) || SPEC_ATTRIBUTE_KEYS.has(key.toLowerCase())) continue
+    if (key === 'condition' || rangeFilterAttrs.has(key.toLowerCase()) || SPEC_ATTRIBUTE_KEYS.has(key.toLowerCase()) || yearRangeFilters.value.some(filter => filter.key === key && filter.bounds)) continue
     if (!result[key]) result[key] = value.map(entry => ({ value: entry }))
   }
 
@@ -1394,8 +1399,10 @@ const osVersionBuckets = computed(() => sortOsVersionBuckets(attributeBuckets.va
 const selectedOs = computed(() => (route.query.attr_os as string) || '')
 const selectedOsVersionValue = computed(() => selectedOsVersionMin.value || selectedOsVersionSupports.value || selectedOsVersion.value)
 const hasOsFilter = computed(() => osBuckets.value.length > 0 || osVersionBuckets.value.length > 0 || !!selectedOs.value || !!selectedOsVersionValue.value)
-const releaseYearBounds = computed(() => bucketNumberBounds(attributeBuckets.value['release_year']))
-const screenSizeBounds = computed(() => bucketNumberBounds(attributeBuckets.value['screen_size']))
+const screenSizeBounds = computed(() => bucketNumberBounds([
+  ...(attributeBuckets.value['screen_size'] ?? []),
+  ...[selectedScreenSizeMin.value, selectedScreenSizeMax.value].filter(value => value !== undefined).map(value => ({ value: String(value) })),
+]))
 
 watch(() => [route.query.attr_os_version_supports, route.query.attr_os_version, route.query.attr_os_version_min], ([supports, exact, min]) => {
   if (min) osVersionOrNewer.value = true
@@ -1427,11 +1434,11 @@ function toggleOsVersionOrNewer() {
   router.push({ query })
 }
 
-function applyRange(name: 'release_year' | 'screen_size', range: { min: number | null, max: number | null }, bounds: { min: number, max: number } | null) {
-  router.push({ query: withRangeParams(queryWithoutKeys(), name, range, bounds) })
+function applyRange(name: string, range: { min: number | null, max: number | null }) {
+  router.push({ query: withRangeParams(queryWithoutKeys(), name, range) })
 }
 
-function clearRange(name: 'release_year' | 'screen_size') {
+function clearRange(name: string) {
   router.push({ query: queryWithoutKeys(`attr_${name}_min`, `attr_${name}_max`) })
 }
 

@@ -8,6 +8,10 @@ export const SPEC_RANGE_PARAMS = [
   'attr_os_version_supports',
   'attr_release_year_min',
   'attr_release_year_max',
+  'attr_publication_year_min',
+  'attr_publication_year_max',
+  'attr_year_min',
+  'attr_year_max',
   'attr_screen_size_min',
   'attr_screen_size_max',
 ] as const
@@ -21,8 +25,9 @@ export interface FilterBucketLike {
 }
 
 /** Number inside a bucket value: `6.1"` and `6,1` give 6.1, anything without a number gives null. */
-export function parseBucketNumber(value: string | null | undefined): number | null {
+export function parseBucketNumber(value: string | null | undefined, integer = false): number | null {
   if (!value) return null
+  if (integer) return /^[+-]?\d+$/.test(value.trim()) && Number.isFinite(Number(value)) ? Number(value) : null
   const match = /^(\d+(?:[.,]\d+)?)\s?(?:"|''|zoll|inch(?:es)?)?$/i.exec(value.trim())
   if (!match) return null
   const parsed = Number((match[1] ?? '').replace(',', '.'))
@@ -30,8 +35,8 @@ export function parseBucketNumber(value: string | null | undefined): number | nu
 }
 
 /** Smallest and largest number among the bucket values, or null when none is numeric. */
-export function bucketNumberBounds(buckets: FilterBucketLike[] | undefined): { min: number, max: number } | null {
-  const numbers = (buckets ?? []).map(b => parseBucketNumber(b.value)).filter((n): n is number => n !== null)
+export function bucketNumberBounds(buckets: FilterBucketLike[] | undefined, integer = false): { min: number, max: number } | null {
+  const numbers = (buckets ?? []).map(b => parseBucketNumber(b.value, integer)).filter((n): n is number => n !== null)
   if (numbers.length === 0) return null
   return { min: Math.min(...numbers), max: Math.max(...numbers) }
 }
@@ -43,39 +48,39 @@ export function sortOsVersionBuckets<T extends FilterBucketLike>(buckets: T[] | 
     .sort((a, b) => Number(b.value) - Number(a.value))
 }
 
-function positiveNumber(raw: unknown): number | null {
+export function specRangeNumber(param: string, raw: unknown): number | null {
   if (typeof raw !== 'string' || raw.trim() === '') return null
   const parsed = Number(raw.trim().replace(',', '.'))
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : null
+  const year = /^attr_(?:release_year|publication_year|year)_(?:min|max)$/.test(param)
+  return Number.isFinite(parsed) && (year ? Number.isInteger(parsed) : parsed > 0) ? parsed : null
 }
 
 /**
  * The `attributes` entries for the spec range params of the current URL query. Values that are not
- * positive numbers are dropped, so a hand-edited URL never produces an API error.
+ * finite numbers are dropped. Year boundaries accept signed integers; other ranges stay positive.
  */
 export function buildSpecApiFilters(query: Record<string, unknown>): string[] {
   const result: string[] = []
   for (const param of SPEC_RANGE_PARAMS) {
-    const value = positiveNumber(query[param])
+    const value = specRangeNumber(param, query[param])
     if (value !== null) result.push(`${param.slice('attr_'.length)}:${value}`)
   }
   return result
 }
 
-/** Updates a `<name>_min`/`<name>_max` pair in a query: values equal to the bounds (or empty) are removed. */
+/** Updates explicit range boundaries without dropping values equal to the currently filtered result bounds. */
 export function withRangeParams(
   query: Record<string, string | string[]>,
   name: string,
   range: { min?: number | null, max?: number | null },
-  bounds: { min: number, max: number } | null,
 ): Record<string, string | string[]> {
   const minKey = `attr_${name}_min`
   const maxKey = `attr_${name}_max`
   const result = Object.fromEntries(Object.entries(query).filter(([key]) => key !== minKey && key !== maxKey))
-  if (range.min != null && Number.isFinite(range.min) && (!bounds || range.min > bounds.min)) {
+  if (range.min != null && Number.isFinite(range.min)) {
     result[minKey] = String(range.min)
   }
-  if (range.max != null && Number.isFinite(range.max) && (!bounds || range.max < bounds.max)) {
+  if (range.max != null && Number.isFinite(range.max)) {
     result[maxKey] = String(range.max)
   }
   return result

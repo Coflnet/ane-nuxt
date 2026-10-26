@@ -56,7 +56,7 @@ const props = withDefaults(defineProps<{
   bounds: { min: number, max: number }
   selectedMin?: number
   selectedMax?: number
-  step?: number
+  step?: number | string
   unit?: string
   testId?: string
 }>(), {

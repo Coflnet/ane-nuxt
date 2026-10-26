@@ -534,12 +534,15 @@ async function analyzePhoto() {
   photoRequest = current
   photoLoading.value = true
   photoError.value = ''
+  const photoFields = ['class', 'mode', 'teeth', 'teeth_observed', 'arc_degrees'] as const
+  const photoValues = photoFields.map(field => form[field])
   try {
     const estimate = await $fetch<GearPhotoEstimate>(`${apiBase}/api/parts/photo`, {
       method: 'POST', body: { imageBase64: photoBase64.value, mode: form.mode }, signal: current.signal,
     })
     if (current.signal.aborted) return
     photoEstimate.value = estimate
+    if (photoFields.some((field, index) => form[field] !== photoValues[index])) return
     if (form.mode === 'fragment' && estimate.teethObserved && estimate.arcDegrees) {
       form.class = 'gear'
       form.teeth_observed = String(estimate.teethObserved)

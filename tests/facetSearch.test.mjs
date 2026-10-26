@@ -186,8 +186,8 @@ test('a failed optional count lookup keeps unknown options selectable without fa
   const source = await readFile(new URL('../pages/search.vue', import.meta.url), 'utf8')
   const declaration = source.slice(source.indexOf('const availableAttributeBuckets = computed('), source.indexOf('// Battery range:'))
   const code = stripTypeScriptTypes(declaration) + '\nreturn availableAttributeBuckets'
-  const buckets = new Function('computed', 'activeAttributeFilters', 'attributeBuckets', 'rangeFilterAttrs', 'SPEC_ATTRIBUTE_KEYS', code)(
-    computed, ref({ storage: ['256GB'] }), ref({ storage: [{ value: '128GB' }, { value: '256GB', count: 0 }, { value: '512GB', count: 0 }] }), new Set(), new Set(),
+  const buckets = new Function('computed', 'activeAttributeFilters', 'attributeBuckets', 'rangeFilterAttrs', 'SPEC_ATTRIBUTE_KEYS', 'yearRangeFilters', code)(
+    computed, ref({ storage: ['256GB'] }), ref({ storage: [{ value: '128GB' }, { value: '256GB', count: 0 }, { value: '512GB', count: 0 }] }), new Set(), new Set(), ref([]),
   )
   assert.deepEqual(buckets.value.storage.map(b => b.value), ['128GB', '256GB'])
   assert.equal(buckets.value.storage[0].count, undefined)
