@@ -425,6 +425,63 @@
             {{ $t('product.historyExcludedCurrencies', { count: excludedHistoryRows }) }}
           </p>
         </div>
+        <details
+          v-if="priceHistory.length"
+          class="p-6"
+          data-testid="history-daily-details"
+        >
+          <summary class="cursor-pointer text-blue-300">
+            {{ $t('product.historyDailySnapshots') }}
+          </summary>
+          <div class="overflow-x-auto mt-4">
+            <table
+              class="w-full text-sm text-left whitespace-nowrap"
+              data-testid="history-daily-table"
+            >
+              <caption class="sr-only">
+                {{ $t('product.historyDailySnapshots') }} ({{ recordedCurrency }})
+              </caption>
+              <thead class="text-slate-300">
+                <tr>
+                  <th
+                    v-for="key in ['historyDate', 'historyDailyMedian', 'historyMinimum', 'historyMaximum', 'historySampleCount']"
+                    :key="key"
+                    scope="col"
+                    class="px-3 py-2"
+                  >
+                    {{ $t(`product.${key}`) }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="point in priceHistory"
+                  :key="point.date"
+                  class="border-t border-slate-700 text-slate-200"
+                >
+                  <th
+                    scope="row"
+                    class="px-3 py-2 font-normal"
+                  >
+                    <time :datetime="point.date">{{ formatDate(point.date) }}</time>
+                  </th>
+                  <td class="px-3 py-2">
+                    {{ formatRecordedPrice(point.medianPrice) }}
+                  </td>
+                  <td class="px-3 py-2">
+                    {{ formatRecordedPrice(point.minPrice) }}
+                  </td>
+                  <td class="px-3 py-2">
+                    {{ formatRecordedPrice(point.maxPrice) }}
+                  </td>
+                  <td class="px-3 py-2">
+                    {{ point.sampleCount }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
         <div
           v-if="priceHistory.length > 1"
           class="p-6"
@@ -1215,8 +1272,7 @@ function formatPrice(amount: number | undefined | null) {
 
 function formatDate(dateStr: string | undefined) {
   if (!dateStr) return ''
-  const d = new Date(dateStr)
-  return d.toLocaleDateString('de-DE', { month: 'short', day: 'numeric' })
+  return new Date(dateStr.slice(0, 10)).toLocaleDateString(locale.value, { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })
 }
 
 const attrKeyTranslationMap: Record<string, string> = {

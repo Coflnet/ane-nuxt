@@ -1010,6 +1010,12 @@
       "priceComparison": "By comparing all current listings for {name} side by side you can quickly identify the best deal. The price history chart reveals whether prices are trending up or down, helping you decide the right moment to buy. Filter by condition (new, used, refurbished) and sort by price to find exactly what you need.",
       "disclaimer": "All data shown on this page is aggregated automatically. Prices, product details and condition labels are derived automatically from marketplace listings and may occasionally be inaccurate. Always verify details on the seller's original listing before purchasing. If you notice incorrect information, use the report button to help us improve."
     },
+    "historyDailySnapshots": "Daily asking-price snapshots",
+    "historyDate": "Date",
+    "historyDailyMedian": "Daily median",
+    "historyMinimum": "Minimum",
+    "historyMaximum": "Maximum",
+    "historySampleCount": "Listing samples",
     "historyWindow": "History window",
     "historyWindowDays": "Last {days} days",
     "historyLoading": "Loading price history…",

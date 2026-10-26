@@ -68,3 +68,39 @@ test('actual history-window options server-render the same window as the URL-bac
     assert.match(selected[0][0], new RegExp(`value="${days}"`))
   }
 })
+
+test('daily history table exposes exact selected-currency snapshots with closed accessible details', async () => {
+  const { readFile } = await import('node:fs/promises')
+  const { stripTypeScriptTypes } = await import('node:module')
+  const { parse, compileScript } = await import('@vue/compiler-sfc')
+  const Vue = await import('vue')
+  const { renderToString } = await import('@vue/server-renderer')
+  const { selectHistoryCurrency } = await import('../utils/priceHistory.ts')
+  const source = await readFile(new URL('../pages/product/[id].vue', import.meta.url), 'utf8')
+  const details = source.match(/<details[^>]+data-testid="history-daily-details"[\s\S]*?<\/details>/)?.[0]
+  assert(details, 'Actual product page must provide the daily history details')
+  const dateFunction = source.match(/function formatDate\([\s\S]*?\n\}/)?.[0]
+  assert(dateFunction)
+  const { descriptor } = parse(`<script setup lang="ts">const props = defineProps<{ priceHistory: any[], recordedCurrency: string | null, language: string }>(); const locale = { value: props.language }; const formatRecordedPrice = (amount: number) => __format(amount, props.recordedCurrency, props.language); ${dateFunction}</script><template>${details}</template>`)
+  const code = stripTypeScriptTypes(compileScript(descriptor, { id: 'daily-history', inlineTemplate: true }).content)
+    .replace(/import \{([^}]+)\} from ['"]vue['"]/g, (_, names) => `const {${names.replaceAll(' as ', ': ')}} = Vue`)
+    .replace('export default', 'return')
+  const component = new Function('Vue', '__format', code)(Vue, formatHistoryPrice)
+  const history = [{ date: '2026-10-25T00:00:00.0000000', currency: 'EUR', medianPrice: 210, minPrice: 0, maxPrice: 420, sampleCount: 16 }, { date: '2026-10-26', currency: null, medianPrice: 9999 }, { date: '2026-10-26', currency: 'GBP', medianPrice: 8888 }]
+  for (const language of ['en', 'de']) {
+    const app = Vue.createSSRApp(component, { priceHistory: selectHistoryCurrency(history, 'EUR'), recordedCurrency: 'EUR', language })
+    const labels = JSON.parse(await readFile(new URL(`../locales/${language}.json`, import.meta.url), 'utf8'))
+    app.config.globalProperties.$t = key => labels.product[key.split('.')[1]]
+    const html = await renderToString(app)
+    assert.match(html, /<summary[^>]*>/)
+    assert.doesNotMatch(html.slice(0, html.indexOf('>') + 1), /\sopen[\s=>]/)
+    assert.match(html, /overflow-x-auto/)
+    assert.match(html, /<caption[^>]*>[^<]+\(EUR\)\s*<\/caption>/)
+    assert.equal((html.match(/scope="col"/g) ?? []).length, 5)
+    assert.equal((html.match(/scope="row"/g) ?? []).length, 1)
+    assert(html.includes(new Date('2026-10-25').toLocaleDateString(language, { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })))
+    for (const amount of [0, 210, 420]) assert(html.includes(formatHistoryPrice(amount, 'EUR', language)))
+    assert.match(html, />16<\/td>/)
+    assert.doesNotMatch(html, /9999|8888|GBP/)
+  }
+})
