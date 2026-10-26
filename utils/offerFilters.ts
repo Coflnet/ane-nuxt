@@ -1,3 +1,5 @@
+import { activeMarketplaces } from '../constants/CreateFilterConstants.ts'
+
 /**
  * Pure logic of the product page offers filter (marketplace, country and the three quick
  * actions "My country", "EU (shipping)" and "Nearby"). The state lives in the URL query so a
@@ -72,7 +74,9 @@ export function emptyOfferFilter(): OfferFilterState {
 export function parseOfferFilterQuery(query: QueryLike): OfferFilterState {
   const maxDistance = finiteNumber(first(query.max_distance))
   return {
-    platforms: splitList(first(query.platforms)),
+    platforms: [...new Set(splitList(first(query.platforms)).map(value =>
+      activeMarketplaces.find(option => option.value.toLowerCase() === value.toLowerCase())?.value ?? value,
+    ))],
     countries: splitList(first(query.countries), true),
     shipping: ['true', '1'].includes(first(query.shipping).toLowerCase()),
     zip: first(query.zip).trim(),

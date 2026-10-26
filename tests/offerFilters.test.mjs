@@ -177,3 +177,9 @@ test('offer filters preserve the independent history window', () => {
   assert.equal(parseOfferFilterQuery({ ...query, history_days: '365' }).zip, '00000')
   assert.equal(buildMatchesParams(state).days, undefined)
 })
+
+test('marketplace query canonicalizes advertised names before deduplication and preserves unknown source names', () => {
+  assert.deepEqual(parseOfferFilterQuery({ platforms: 'ebay,Ebay,OLX,olx' }).platforms, ['Ebay', 'OLX'])
+  assert.deepEqual(parseOfferFilterQuery({ platforms: 'ebay,RetiredSource,reTIredSource' }).platforms,
+    ['Ebay', 'RetiredSource', 'reTIredSource'])
+})

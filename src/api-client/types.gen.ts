@@ -1232,6 +1232,7 @@ export type ServicesProductServiceSearchProductsResult = {
     } | null;
     categoryBuckets?: Array<ServicesProductServiceFilterBucket> | null;
     conditionBuckets?: Array<ServicesProductServiceFilterBucket> | null;
+    platformBuckets?: Array<ServicesProductServiceFilterBucket> | null;
     attributeBuckets?: {
         [key: string]: Array<ServicesProductServiceFilterBucket>;
     } | null;
@@ -4333,6 +4334,8 @@ export type SearchProductsData = {
          * Maximum distance in km (requires lat/lon)
          */
         maxDistanceKm?: number;
+        /** Canonical marketplace names, comma separated (OR within this filter). */
+        platforms?: string;
         country?: string;
         offset?: number;
         /**

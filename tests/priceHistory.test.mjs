@@ -104,3 +104,26 @@ test('daily history table exposes exact selected-currency snapshots with closed 
     assert.doesNotMatch(html, /9999|8888|GBP/)
   }
 })
+
+test('history currency server-renders the selected cohort even when it is not the first available option', async () => {
+  const { readFile } = await import('node:fs/promises')
+  const { stripTypeScriptTypes } = await import('node:module')
+  const { parse, compileScript } = await import('@vue/compiler-sfc')
+  const Vue = await import('vue')
+  const { renderToString } = await import('@vue/server-renderer')
+  const source = await readFile(new URL('../pages/product/[id].vue', import.meta.url), 'utf8')
+  const select = [...source.matchAll(/<select\b[\s\S]*?<\/select>/g)].map(m => m[0]).find(html => html.includes('data-testid="history-currency"'))
+  assert(select)
+  const { descriptor } = parse(`<script setup lang="ts">defineProps<{ selectedHistoryCurrency: string, historyCurrencyOptions: string[] }>(); const setHistoryCurrency = () => {};</script><template>${select}</template>`)
+  const code = stripTypeScriptTypes(compileScript(descriptor, { id: 'history-currency', inlineTemplate: true }).content)
+    .replace(/import \{([^}]+)\} from ['"]vue['"]/g, (_, names) => `const {${names.replaceAll(' as ', ': ')}} = Vue`)
+    .replace('export default', 'return')
+  const component = new Function('Vue', code)(Vue)
+  for (const currency of ['EUR', 'GBP']) {
+    const app = Vue.createSSRApp(component, { selectedHistoryCurrency: currency, historyCurrencyOptions: ['GBP', 'EUR'] })
+    const html = await renderToString(app)
+    const selected = [...html.matchAll(/<option\b[^>]*>/g)].filter(m => /\bselected[\s=>]/.test(m[0]))
+    assert.equal(selected.length, 1, html)
+    assert.match(selected[0][0], new RegExp(`value="${currency}"`))
+  }
+})

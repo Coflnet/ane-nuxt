@@ -184,6 +184,8 @@
   "searching": "Searching...",
   "searchResults": "Search Results",
   "noResultsFound": "No results found",
+  "cataloguePriceReference": "Product-wide EUR reference",
+  "cataloguePriceScope": "Prices and price filters use product-wide EUR references across marketplaces and countries. Open a product to see matching offers in their original currencies.",
   "startingFrom": "Starting from",
   "checkPrice": "Check Price",
   "details": "Details",
@@ -1050,7 +1052,7 @@
     "referenceContext": "Reference prices may include delisted listings; they are not verified transaction prices. The difference excludes fees and costs and does not predict resale profit.",
     "historicalMedian": "Approximate historical asking-price median",
     "historySamples": "{count} daily listing samples",
-    "historyAskingContext": "These are asking prices, not completed sales. A listing may appear in several daily snapshots; this reference does not verify an individual offer or predict resale profit.",
+    "historyAskingContext": "History combines recorded offers across marketplaces and countries; the offer filters below do not change this history. These are asking prices, not completed sales. A listing may appear in several daily snapshots; this reference does not verify an individual offer or predict resale profit.",
     "historyCurrencyUnknown": "Some snapshots have no recorded currency. Values are shown without a currency symbol and cannot be used for currency-adjusted comparisons.",
     "priceHistoryDays": "{days} daily snapshots · line: daily median · band: minimum–maximum"
   },

@@ -4,6 +4,7 @@ import { stripTypeScriptTypes } from 'node:module'
 import test from 'node:test'
 import { computed, effectScope, nextTick, reactive, ref, watch } from 'vue'
 import { searchRouteQuery } from '../utils/searchQuery.ts'
+import { parseOfferFilterQuery } from '../utils/offerFilters.ts'
 import { attributeValues } from '../utils/facetSearch.ts'
 import { partFormFromQuery } from '../utils/partSearch.ts'
 
@@ -14,16 +15,17 @@ function searchState(query) {
   const route = reactive({ query })
   const requests = []
   const state = {
-    route, computed, watch, searchRouteQuery, attributeValues, toUrlSlug: slug => slug, PAGE_SIZE: 24, prevQuery: {},
+    route, computed, watch, searchRouteQuery, attributeValues, parseOfferFilterQuery, toUrlSlug: slug => slug, PAGE_SIZE: 24, prevQuery: {},
     router: { push({ query }) { route.query = query } },
     buildSpecApiFilters: () => [], manualLoading: ref(false), searchError: ref(false),
     interpretation: ref(null), allProducts: ref([]), hasSearched: ref(true), totalResults: ref(0),
-    categoryBuckets: ref([]), conditionBuckets: ref([]), attributeBuckets: ref({}), distanceFilterKm: ref(50),
+    platformBuckets: ref([]), categoryBuckets: ref([]), conditionBuckets: ref([]), attributeBuckets: ref({}), distanceFilterKm: ref(50),
   }
   for (const name of ['selectedCategory', 'selectedCondition', 'selectedMinPrice', 'selectedMaxPrice', 'selectedSort', 'userLocation', 'selectedMaxDistance', 'selectedCountryCode', 'selectedBatteryMin', 'selectedBatteryMax']) state[name] = ref(undefined)
   state.activeAttributeFilters = ref({})
   const code = [
     source.match(/const searchQuery = computed[^\n]*/)[0],
+    source.match(/const selectedPlatforms = computed[^\n]*/)[0],
     source.match(/const includePartOffers = computed[^\n]*/)[0],
     source.match(/const includeIndividualOffers = computed[^\n]*/)[0],
     ...['routeHasSearchQuery', 'syncPrevQuery', 'buildSearchParams', 'queryWithoutKeys', 'includeIndividualOffersInSearch', 'toggleIndividualOffers', 'toggleFilter', 'clearAllFilters', 'onSearch', 'onSearchCategorySelect'].map(functionSource),
@@ -103,7 +105,7 @@ test('parts catalogue links carry editable form text and explicitly include indi
 })
 
 test('individual-offer recovery preserves all URL criteria, sharing, history and explicit legacy choice', async () => {
-  const criteria = { q: 'Der Rote Korsar', category: 'ane-comics', condition: 'used', price_min: '5', price_max: '50', sort: 'price_asc', country: 'DE', zip: '10115', max_distance: '20', attr_series: ['Der Rote Korsar', 'Tintin'], attr_language: 'German' }
+  const criteria = { q: 'Der Rote Korsar', category: 'ane-comics', condition: 'used', price_min: '5', price_max: '50', sort: 'price_asc', platforms: 'Ebay,Vinted', country: 'DE', zip: '10115', max_distance: '20', attr_series: ['Der Rote Korsar', 'Tintin'], attr_language: 'German' }
   const state = searchState(criteria)
   try {
     state.toggleIndividualOffers()

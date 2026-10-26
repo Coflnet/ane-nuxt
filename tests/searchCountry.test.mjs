@@ -4,6 +4,7 @@ import { stripTypeScriptTypes } from 'node:module'
 import test from 'node:test'
 import { compileScript, parse } from 'vue/compiler-sfc'
 import { computed, effectScope, nextTick, reactive, ref, watch } from 'vue'
+import { parseOfferFilterQuery } from '../utils/offerFilters.ts'
 import { attributeValues } from '../utils/facetSearch.ts'
 import { buildSpecApiFilters, SPEC_RANGE_PARAMS } from '../utils/specFilters.ts'
 
@@ -12,7 +13,7 @@ import { buildSpecApiFilters, SPEC_RANGE_PARAMS } from '../utils/specFilters.ts'
 async function searchPage(query) {
   const { descriptor } = parse(await readFile(new URL('../pages/search.vue', import.meta.url), 'utf8'))
   const ast = compileScript(descriptor, { id: 'search-country' }).scriptSetupAst
-  const declarations = new Set(['searchQuery', 'includePartOffers', 'includeIndividualOffers', 'selectedCategory', 'selectedCondition', 'selectedMinPrice', 'selectedMaxPrice', 'selectedSort', 'selectedMaxDistance', 'activeAttributeFilters', 'hasActiveFilters', 'selectedCountryCode', 'prevQuery'])
+  const declarations = new Set(['searchQuery', 'includePartOffers', 'includeIndividualOffers', 'selectedCategory', 'selectedCondition', 'selectedPlatforms', 'selectedMinPrice', 'selectedMaxPrice', 'selectedSort', 'selectedMaxDistance', 'activeAttributeFilters', 'hasActiveFilters', 'selectedCountryCode', 'prevQuery'])
   const functions = new Set(['routeHasSearchQuery', 'syncPrevQuery', 'onCountrySelect', 'clearAllFilters', 'buildSearchParams'])
   const source = descriptor.scriptSetup.content
   const code = ast.filter(node =>
@@ -28,19 +29,19 @@ async function searchPage(query) {
   const requests = []
   let page
   const scope = effectScope()
-  const factory = new Function('ref', 'computed', 'reactive', 'watch', 'route', 'router', 'performSearch', 'attributeValues', 'buildSpecApiFilters', 'SPEC_RANGE_PARAMS', `
+  const factory = new Function('ref', 'computed', 'reactive', 'watch', 'route', 'router', 'performSearch', 'attributeValues', 'buildSpecApiFilters', 'SPEC_RANGE_PARAMS', 'parseOfferFilterQuery', `
     const userLocation = ref(null), selectedBatteryMin = ref(), selectedBatteryMax = ref();
     const hasSpecRangeSelection = ref(false), hasSearched = ref(true), distanceFilterKm = ref(50);
     const PAGE_SIZE = 20, urlToNumeric = ref({}), germanLabelBySlug = ref({});
     const resolveSearchCategoryParam = value => value;
     let searchSeq = 0;
     const manualLoading = ref(false), searchError = ref(false), interpretation = ref(null);
-    const allProducts = ref([]), totalResults = ref(0), categoryBuckets = ref([]), conditionBuckets = ref([]), attributeBuckets = ref({});
+    const allProducts = ref([]), totalResults = ref(0), categoryBuckets = ref([]), conditionBuckets = ref([]), platformBuckets = ref([]), attributeBuckets = ref({});
     ${stripTypeScriptTypes(code)}
     syncPrevQuery();
     return { selectedCountryCode, hasActiveFilters, onCountrySelect, clearAllFilters, buildSearchParams };
   `)
-  page = scope.run(() => factory(ref, computed, reactive, watch, route, router, () => requests.push(page.buildSearchParams()), attributeValues, buildSpecApiFilters, SPEC_RANGE_PARAMS))
+  page = scope.run(() => factory(ref, computed, reactive, watch, route, router, () => requests.push(page.buildSearchParams()), attributeValues, buildSpecApiFilters, SPEC_RANGE_PARAMS, parseOfferFilterQuery))
   return { ...page, route, router, requests, stop: () => scope.stop(), select: async (value) => {
     page.onCountrySelect({ target: { value } })
     await nextTick()

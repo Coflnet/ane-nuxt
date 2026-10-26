@@ -122,6 +122,19 @@
       </div>
       <!-- Active filters badges -->
       <div class="flex flex-wrap gap-2 mb-4">
+        <span
+          v-for="platform in selectedPlatforms"
+          :key="platform"
+          class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-xs border border-blue-500/30"
+        >
+          {{ activeMarketplaces.find(option => option.value === platform)?.label ?? platform }}
+          <button
+            type="button"
+            class="ml-1 hover:text-white"
+            :aria-label="`${$t('removeFilter', 'Remove filter')}: ${platform}`"
+            @click="togglePlatform(platform)"
+          >&times;</button>
+        </span>
         <!-- Distance filter badge -->
         <span
           v-if="selectedMaxDistance"
@@ -235,6 +248,43 @@
               <span v-if="!includePartOffers || includeIndividualOffers" class="block mt-1 text-xs text-slate-400">{{ $t('includeIndividualOffersHint') }}</span>
             </span>
           </label>
+          <fieldset
+            class="bg-slate-800/50 p-5 rounded-xl border border-slate-700/50"
+            data-testid="marketplace-filter"
+          >
+            <legend class="text-sm font-bold text-slate-300 uppercase tracking-wider px-1">
+              {{ $t('marketplace', 'Marketplace') }}
+            </legend>
+            <p class="mb-3 text-xs text-slate-400">
+              {{ $t('marketplaceProductCounts', 'Match any selected marketplace. Counts show products.') }}
+            </p>
+            <p
+              class="mb-3 text-xs text-slate-400"
+              data-testid="catalogue-price-scope"
+            >
+              {{ $t('cataloguePriceScope') }}
+            </p>
+            <div class="space-y-2">
+              <label
+                v-for="option in availablePlatforms"
+                :key="option.value"
+                class="flex items-center gap-2 text-sm text-slate-300 cursor-pointer"
+              >
+                <input
+                  type="checkbox"
+                  :value="option.value"
+                  :checked="selectedPlatforms.includes(option.value)"
+                  class="accent-cyan-400"
+                  @change="togglePlatform(option.value)"
+                >
+                <span>{{ option.label }}</span>
+                <span
+                  v-if="option.count != null"
+                  class="text-xs text-slate-400"
+                >({{ option.count }})</span>
+              </label>
+            </div>
+          </fieldset>
           <!-- Category Filter -->
           <div
             v-if="availableCategoryBuckets.length > 0"
@@ -573,23 +623,12 @@
                   <option value="">
                     {{ $t('anyCountry', 'Any country') }}
                   </option>
-                  <option value="DE">
-                    {{ $t('countryDE', 'Germany') }}
-                  </option>
-                  <option value="AT">
-                    {{ $t('countryAT', 'Austria') }}
-                  </option>
-                  <option value="CH">
-                    {{ $t('countryCH', 'Switzerland') }}
-                  </option>
-                  <option value="NL">
-                    {{ $t('countryNL', 'Netherlands') }}
-                  </option>
-                  <option value="BE">
-                    {{ $t('countryBE', 'Belgium') }}
-                  </option>
-                  <option value="FR">
-                    {{ $t('countryFR', 'France') }}
+                  <option
+                    v-for="code in ['DE', 'AT', 'CH', 'NL', 'BE', 'FR', 'GB', 'SE', 'PL']"
+                    :key="code"
+                    :value="code"
+                  >
+                    {{ $t(`country${code}`, countryName(code, locale)) }}
                   </option>
                 </select>
               </div>
@@ -807,8 +846,14 @@
                   </div>
 
                   <div class="flex items-center justify-between mt-4">
-                    <div class="text-sm text-slate-400">
-                      <span class="block text-xs">{{ $t('startingFrom', 'Starting from') }}</span>
+                    <div
+                      class="text-sm text-slate-400"
+                      data-testid="catalogue-price"
+                    >
+                      <span
+                        v-if="product.minPrice"
+                        class="block text-xs"
+                      >{{ $t('cataloguePriceReference') }}</span>
                       <span class="text-lg font-bold text-green-400">
                         {{ product.minPrice ? formatPrice(product.minPrice) : $t('checkPrice', 'Check Price') }}
                       </span>
@@ -1090,6 +1135,9 @@ import { useCategories } from '~/composable/useCategories'
 import { useUserLocation } from '~/composable/useUserLocation'
 import { useFormat } from '~/composable/useFormat'
 import { searchRouteQuery } from '~/utils/searchQuery'
+import { activeMarketplaces } from '~/constants/CreateFilterConstants'
+import { parseOfferFilterQuery } from '~/utils/offerFilters'
+import { countryName } from '~/utils/countryDetection'
 import { attributeValues, toggleAttributeValue, facetSearchParams } from '~/utils/facetSearch'
 import { countPopulatedSubCategories, formatCategoryCount, getCategoryProductCount as getCategoryProductCountFor, normalizeCategoryCounts, resolveCategoryCount } from '~/utils/categoryCounts'
 import { resolveSearchCategoryParam } from '~/utils/searchCategoryParam'
@@ -1125,6 +1173,7 @@ const searchQuery = computed(() => (route.query.q as string) || '')
 const includePartOffers = computed(() => route.query.includePartOffers === 'true')
 const includeIndividualOffers = computed(() => route.query.includeIndividualOffers === 'true')
 const selectedCategory = computed(() => (route.query.category as string) || '')
+const selectedPlatforms = computed(() => parseOfferFilterQuery(route.query).platforms)
 const selectedCondition = computed(() => (route.query.condition as string) || '')
 const selectedMinPrice = computed(() => route.query.price_min ? Number(route.query.price_min) : undefined)
 const selectedMaxPrice = computed(() => route.query.price_max ? Number(route.query.price_max) : undefined)
@@ -1145,6 +1194,7 @@ const hasActiveFilters = computed(
   () =>
     includePartOffers.value || includeIndividualOffers.value
     || !!selectedCategory.value
+    || selectedPlatforms.value.length > 0
     || !!selectedCondition.value
     || selectedMinPrice.value !== undefined
     || selectedMaxPrice.value !== undefined
@@ -1183,6 +1233,12 @@ const formattedTotalResults = computed(() => (
 ))
 const categoryBuckets = ref<FilterBucket[]>([])
 const conditionBuckets = ref<FilterBucket[]>([])
+const platformBuckets = ref<FilterBucket[]>([])
+const availablePlatforms = computed(() => [
+  ...activeMarketplaces,
+  ...selectedPlatforms.value.filter(value => !activeMarketplaces.some(option => option.value === value))
+    .map(value => ({ value, label: value })),
+].map(option => ({ ...option, count: platformBuckets.value.find(bucket => bucket.value === option.value)?.count })))
 const attributeBuckets = ref<Record<string, FilterBucket[]>>({})
 
 // Price range state
@@ -1253,12 +1309,12 @@ const isSearchMode = computed(() => routeHasSearchQuery(route.query))
 function routeHasSearchQuery(query: typeof route.query): boolean {
   return !!(query.includeIndividualOffers === 'true' || query.includePartOffers === 'true' || query.q || query.category || query.condition
     || query.price_min || query.price_max || query.sort || query.max_distance
-    || query.zip || query.country
+    || query.zip || query.country || query.platforms
     || Object.keys(query).some(k => k.startsWith('attr_')))
 }
 
 // Track previous query params to detect server-side filter changes that need a re-fetch
-const prevQuery = reactive({ includeIndividualOffers: false, includePartOffers: false, q: '' as string | undefined, category: '' as string | undefined, condition: '' as string | undefined, price_min: '' as string | undefined, price_max: '' as string | undefined, attrs: '' as string | undefined, sort: '' as string | undefined, max_distance: '' as string | undefined, country: '' })
+const prevQuery = reactive({ includeIndividualOffers: false, includePartOffers: false, q: '' as string | undefined, category: '' as string | undefined, condition: '' as string | undefined, price_min: '' as string | undefined, price_max: '' as string | undefined, attrs: '' as string | undefined, sort: '' as string | undefined, max_distance: '' as string | undefined, country: '', platforms: '' })
 
 function syncPrevQuery() {
   prevQuery.includeIndividualOffers = includeIndividualOffers.value
@@ -1271,6 +1327,7 @@ function syncPrevQuery() {
   prevQuery.sort = route.query.sort ? String(route.query.sort) : ''
   prevQuery.max_distance = route.query.max_distance ? String(route.query.max_distance) : ''
   prevQuery.country = selectedCountryCode.value
+  prevQuery.platforms = selectedPlatforms.value.join(',')
   prevQuery.attrs = Object.entries(route.query)
     .filter(([k]) => k.startsWith('attr_'))
     .sort(([a], [b]) => a.localeCompare(b))
@@ -2025,6 +2082,7 @@ function buildSearchParams(offset = 0) {
   // when it's known (see resolveSearchCategoryParam), falling back to the numeric/API
   // slug otherwise.
   if (selectedCategory.value) params.category = resolveSearchCategoryParam(selectedCategory.value, urlToNumeric.value, germanLabelBySlug.value)
+  if (selectedPlatforms.value.length) params.platforms = selectedPlatforms.value.join(',')
   if (selectedCondition.value) params.condition = selectedCondition.value.toLowerCase()
   if (selectedMinPrice.value !== undefined) params.minPrice = selectedMinPrice.value
   if (selectedMaxPrice.value !== undefined) params.maxPrice = selectedMaxPrice.value
@@ -2113,6 +2171,8 @@ function applySearchResponse(response: SearchProductsResponse, append: boolean) 
     else {
       allProducts.value = response?.products || []
       interpretation.value = (response as SearchProductsResponse & { interpretation?: SearchInterpretation | null })?.interpretation ?? null
+
+      platformBuckets.value = response?.platformBuckets ?? []
 
       // Use aggregation buckets if available (new backend), otherwise derive from products
       if (response?.categoryBuckets && response.categoryBuckets.length > 0) {
@@ -2279,6 +2339,15 @@ function toggleFilter(type: 'category' | 'condition' | 'includePartOffers', valu
 
   const query = queryWithoutKeys()
   query[type] = value
+  router.push({ query })
+}
+
+function togglePlatform(value: string) {
+  const values = selectedPlatforms.value.includes(value)
+    ? selectedPlatforms.value.filter(platform => platform !== value)
+    : [...selectedPlatforms.value, value]
+  const query = queryWithoutKeys('platforms')
+  if (values.length) query.platforms = values.join(',')
   router.push({ query })
 }
 
@@ -2457,6 +2526,7 @@ watch(() => route.query, () => {
   const hasQuery = routeHasSearchQuery(route.query)
   if (hasQuery) {
     // Detect if server-side filter params changed (search, category, condition, price, sort, distance, or attributes)
+    const currentPlatforms = selectedPlatforms.value.join(',')
     const currentQ = route.query.q ? String(route.query.q) : ''
     const currentCategory = route.query.category ? String(route.query.category) : ''
     const currentCondition = route.query.condition ? String(route.query.condition) : ''
@@ -2473,7 +2543,7 @@ watch(() => route.query, () => {
       .map(([k, v]) => `${k}=${JSON.stringify(v)}`)
       .join('&')
 
-    const queryChanged = includeIndividualOffers.value !== prevQuery.includeIndividualOffers || includePartOffers.value !== prevQuery.includePartOffers || currentQ !== prevQuery.q || currentCategory !== prevQuery.category || currentCondition !== prevQuery.condition || currentPriceMin !== prevQuery.price_min || currentPriceMax !== prevQuery.price_max || currentAttrs !== prevQuery.attrs || currentSort !== prevQuery.sort || currentMaxDistance !== prevQuery.max_distance || currentCountry !== prevQuery.country
+    const queryChanged = includeIndividualOffers.value !== prevQuery.includeIndividualOffers || includePartOffers.value !== prevQuery.includePartOffers || currentQ !== prevQuery.q || currentCategory !== prevQuery.category || currentCondition !== prevQuery.condition || currentPriceMin !== prevQuery.price_min || currentPriceMax !== prevQuery.price_max || currentAttrs !== prevQuery.attrs || currentSort !== prevQuery.sort || currentMaxDistance !== prevQuery.max_distance || currentCountry !== prevQuery.country || currentPlatforms !== prevQuery.platforms
 
     if (queryChanged || !hasSearched.value) {
       performSearch()
@@ -2487,6 +2557,7 @@ watch(() => route.query, () => {
     prevQuery.sort = currentSort
     prevQuery.max_distance = currentMaxDistance
     prevQuery.country = currentCountry
+    prevQuery.platforms = currentPlatforms
 
     // Sync distance slider
     if (currentMaxDistance) {
@@ -2508,6 +2579,7 @@ watch(() => route.query, () => {
     totalResults.value = 0
     categoryBuckets.value = []
     conditionBuckets.value = []
+    platformBuckets.value = []
     attributeBuckets.value = {}
   }
 // Initial load (incl. timeout refetch) is handled by useRaceableAsyncData above;
@@ -2549,6 +2621,8 @@ function getDisplayCategory(product: ProductDocument): string | null {
 
 function buildProductLink(): string {
   const params = new URLSearchParams()
+  if (selectedPlatforms.value.length) params.append('platforms', selectedPlatforms.value.join(','))
+  if (selectedCountryCode.value) params.append('countries', selectedCountryCode.value)
   if (route.query.zip) params.append('zip', route.query.zip as string)
   if (route.query.lat) params.append('lat', route.query.lat as string)
   if (route.query.lon) params.append('lon', route.query.lon as string)

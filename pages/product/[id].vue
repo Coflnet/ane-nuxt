@@ -360,6 +360,7 @@
                 v-for="currency in historyCurrencyOptions"
                 :key="currency"
                 :value="currency"
+                :selected="currency === selectedHistoryCurrency"
               >{{ currency }}</option>
             </select>
           </label>

@@ -188,6 +188,8 @@
   "searching": "Suche läuft...",
   "searchResults": "Suchergebnisse",
   "noResultsFound": "Keine Ergebnisse gefunden",
+  "cataloguePriceReference": "Produktweiter EUR-Referenzpreis",
+  "cataloguePriceScope": "Preise und Preisfilter verwenden produktweite EUR-Referenzpreise über Marktplätze und Länder hinweg. Öffne ein Produkt, um passende Angebote in ihren Originalwährungen zu sehen.",
   "startingFrom": "Ab",
   "checkPrice": "Preis prüfen",
   "details": "Details",
@@ -1050,7 +1052,7 @@
     "referenceContext": "Referenzpreise können gelöschte Inserate enthalten; sie sind keine bestätigten Verkaufspreise. Der Abstand berücksichtigt keine Gebühren oder Kosten und sagt keinen Wiederverkaufsgewinn voraus.",
     "historicalMedian": "Geschätzter historischer Median der Angebotspreise",
     "historySamples": "{count} tägliche Inseratstichproben",
-    "historyAskingContext": "Dies sind Angebotspreise, keine abgeschlossenen Verkäufe. Ein Inserat kann an mehreren Tagen enthalten sein; diese Referenz bestätigt weder ein einzelnes Angebot noch einen Wiederverkaufsgewinn.",
+    "historyAskingContext": "Der Verlauf fasst erfasste Angebote verschiedener Marktplätze und Länder zusammen; die Angebotsfilter unten ändern diesen Verlauf nicht. Dies sind Angebotspreise, keine abgeschlossenen Verkäufe. Ein Inserat kann an mehreren Tagen enthalten sein; diese Referenz bestätigt weder ein einzelnes Angebot noch einen Wiederverkaufsgewinn.",
     "historyCurrencyUnknown": "Bei einigen Tagesständen wurde keine Währung erfasst. Die Werte erscheinen ohne Währungssymbol und eignen sich nicht für währungsbereinigte Vergleiche.",
     "priceHistoryDays": "{days} Tagesstände · Linie: Tagesmedian · Band: Minimum–Maximum"
   },
