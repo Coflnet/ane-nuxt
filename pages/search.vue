@@ -1149,6 +1149,7 @@ const hasActiveFilters = computed(
     || selectedMinPrice.value !== undefined
     || selectedMaxPrice.value !== undefined
     || !!selectedMaxDistance.value
+    || !!selectedCountryCode.value
     || selectedBatteryMin.value !== undefined
     || selectedBatteryMax.value !== undefined
     || hasSpecRangeSelection.value
@@ -1257,7 +1258,7 @@ function routeHasSearchQuery(query: typeof route.query): boolean {
 }
 
 // Track previous query params to detect server-side filter changes that need a re-fetch
-const prevQuery = reactive({ includeIndividualOffers: false, includePartOffers: false, q: '' as string | undefined, category: '' as string | undefined, condition: '' as string | undefined, price_min: '' as string | undefined, price_max: '' as string | undefined, attrs: '' as string | undefined, sort: '' as string | undefined, max_distance: '' as string | undefined })
+const prevQuery = reactive({ includeIndividualOffers: false, includePartOffers: false, q: '' as string | undefined, category: '' as string | undefined, condition: '' as string | undefined, price_min: '' as string | undefined, price_max: '' as string | undefined, attrs: '' as string | undefined, sort: '' as string | undefined, max_distance: '' as string | undefined, country: '' })
 
 function syncPrevQuery() {
   prevQuery.includeIndividualOffers = includeIndividualOffers.value
@@ -1269,6 +1270,7 @@ function syncPrevQuery() {
   prevQuery.price_max = route.query.price_max ? String(route.query.price_max) : ''
   prevQuery.sort = route.query.sort ? String(route.query.sort) : ''
   prevQuery.max_distance = route.query.max_distance ? String(route.query.max_distance) : ''
+  prevQuery.country = selectedCountryCode.value
   prevQuery.attrs = Object.entries(route.query)
     .filter(([k]) => k.startsWith('attr_'))
     .sort(([a], [b]) => a.localeCompare(b))
@@ -2425,6 +2427,8 @@ function onSearchCategorySelect(slug: string) {
 
 // Watch route query changes and trigger search
 watch(() => route.query, () => {
+  const currentCountry = (route.query.country as string) || ''
+  selectedCountryCode.value = currentCountry
   const hasQuery = routeHasSearchQuery(route.query)
   if (hasQuery) {
     // Detect if server-side filter params changed (search, category, condition, price, sort, distance, or attributes)
@@ -2444,7 +2448,7 @@ watch(() => route.query, () => {
       .map(([k, v]) => `${k}=${JSON.stringify(v)}`)
       .join('&')
 
-    const queryChanged = includeIndividualOffers.value !== prevQuery.includeIndividualOffers || includePartOffers.value !== prevQuery.includePartOffers || currentQ !== prevQuery.q || currentCategory !== prevQuery.category || currentCondition !== prevQuery.condition || currentPriceMin !== prevQuery.price_min || currentPriceMax !== prevQuery.price_max || currentAttrs !== prevQuery.attrs || currentSort !== prevQuery.sort || currentMaxDistance !== prevQuery.max_distance
+    const queryChanged = includeIndividualOffers.value !== prevQuery.includeIndividualOffers || includePartOffers.value !== prevQuery.includePartOffers || currentQ !== prevQuery.q || currentCategory !== prevQuery.category || currentCondition !== prevQuery.condition || currentPriceMin !== prevQuery.price_min || currentPriceMax !== prevQuery.price_max || currentAttrs !== prevQuery.attrs || currentSort !== prevQuery.sort || currentMaxDistance !== prevQuery.max_distance || currentCountry !== prevQuery.country
 
     if (queryChanged || !hasSearched.value) {
       performSearch()
@@ -2457,6 +2461,7 @@ watch(() => route.query, () => {
     prevQuery.attrs = currentAttrs
     prevQuery.sort = currentSort
     prevQuery.max_distance = currentMaxDistance
+    prevQuery.country = currentCountry
 
     // Sync distance slider
     if (currentMaxDistance) {
