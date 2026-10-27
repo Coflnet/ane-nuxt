@@ -16,6 +16,9 @@
   "advanvedFilters": "",
   "again": "Nochmal",
   "allMarket": "Alle Marktplätze",
+  "currency": "Währung",
+  "allCurrencies": "Alle Währungen",
+  "removeFilter": "Filter entfernen",
   "flipSources": {
     "all": "Alle",
     "clear": "Alle Marktplätze",

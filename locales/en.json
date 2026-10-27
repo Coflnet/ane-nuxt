@@ -16,6 +16,9 @@
   "advanvedFilters": "Advanced Filters",
   "again": "Again",
   "allMarket": "All Free Marketplaces",
+  "currency": "Currency",
+  "allCurrencies": "All currencies",
+  "removeFilter": "Remove filter",
   "flipSources": {
     "all": "All",
     "clear": "All marketplaces",
