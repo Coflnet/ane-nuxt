@@ -99,3 +99,33 @@ test('country alone exposes reset and clearing all filters clears the request sc
   }
   finally { page.stop() }
 })
+
+test('actual country control server-renders the URL country before hydration with an associated label', async () => {
+  const Vue = await import('vue')
+  const { renderToString } = await import('vue/server-renderer')
+  const { countryName } = await import('../utils/countryDetection.ts')
+  const source = await readFile(new URL('../pages/search.vue', import.meta.url), 'utf8')
+  const control = source.slice(source.indexOf('<!-- Country shortcut -->') + '<!-- Country shortcut -->'.length, source.indexOf('<!-- ZIP code input:'))
+  assert(control.includes(':value="selectedCountryCode"'))
+  const { descriptor } = parse(`<script setup lang="ts">defineProps<{ selectedCountryCode: string }>(); const locale = 'en'; const countryName = __countryName; const onCountrySelect = () => {};</script><template>${control}</template>`)
+  const code = stripTypeScriptTypes(compileScript(descriptor, { id: 'country-select-ssr', inlineTemplate: true }).content)
+    .replace(/import \{([^}]+)\} from ['"]vue['"]/g, (_, names) => `const {${names.replaceAll(' as ', ': ')}} = Vue`)
+    .replace('export default', 'return')
+  const component = new Function('Vue', '__countryName', code)(Vue, countryName)
+  for (const country of ['SE', 'PL', 'GB']) {
+    const page = await searchPage({ q: 'camera', country })
+    try {
+      assert.equal(page.buildSearchParams().country, country)
+      const app = Vue.createSSRApp(component, { selectedCountryCode: page.selectedCountryCode.value })
+      app.config.globalProperties.$t = (_, fallback) => fallback
+      const html = await renderToString(app)
+      const selected = [...html.matchAll(/<option\b[^>]*>/g)].filter(m => /\bselected[\s=>]/.test(m[0]))
+      assert.equal(selected.length, 1, html)
+      assert.match(selected[0][0], new RegExp(`value="${country}"`))
+      const id = html.match(/<select\b[^>]+\bid="([^"]+)"/)?.[1]
+      assert(id, 'Country select must have an ID')
+      assert(html.includes(`for="${id}"`), 'Visible Country label must name the select')
+    }
+    finally { page.stop() }
+  }
+})

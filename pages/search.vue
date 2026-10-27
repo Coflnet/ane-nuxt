@@ -614,8 +614,12 @@
             <div class="space-y-3">
               <!-- Country shortcut -->
               <div>
-                <label class="text-xs text-slate-400 mb-1 block">{{ $t('country', 'Country') }}</label>
+                <label
+                  for="catalogue-country"
+                  class="text-xs text-slate-400 mb-1 block"
+                >{{ $t('country', 'Country') }}</label>
                 <select
+                  id="catalogue-country"
                   :value="selectedCountryCode"
                   class="w-full px-3 py-2 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-slate-200 focus:border-blue-500/50 focus:outline-none"
                   @change="onCountrySelect($event)"
@@ -627,6 +631,7 @@
                     v-for="code in ['DE', 'AT', 'CH', 'NL', 'BE', 'FR', 'GB', 'SE', 'PL']"
                     :key="code"
                     :value="code"
+                    :selected="code === selectedCountryCode"
                   >
                     {{ $t(`country${code}`, countryName(code, locale)) }}
                   </option>
