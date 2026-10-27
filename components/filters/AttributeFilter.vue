@@ -77,15 +77,16 @@ import type { ServicesProductServiceFilterBucket as FilterBucket } from '~/src/a
 
 const props = defineProps<{
   title: string
+  draft?: string
   buckets: FilterBucket[]
   selected: string[]
   scope: string
   formatValue: (value: string) => string
   loadValues: (query: string) => Promise<FilterBucket[]>
 }>()
-defineEmits<{ select: [value: string] }>()
+const emit = defineEmits<{ 'select': [value: string], 'update:draft': [value: string] }>()
 
-const query = ref('')
+const query = computed({ get: () => props.draft ?? '', set: value => emit('update:draft', value) })
 const found = ref<FilterBucket[] | null>(null)
 const loading = ref(false)
 const error = ref(false)

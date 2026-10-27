@@ -443,6 +443,7 @@
           <FiltersAttributeFilter
             v-for="(buckets, attrKey) in availableAttributeBuckets"
             :key="attrKey"
+            v-model:draft="facetDrafts[attrKey]"
             :title="localizeAttrKey(attrKey)"
             :buckets="buckets"
             :selected="activeAttributeFilters[attrKey] ?? []"
@@ -1425,6 +1426,8 @@ const availableConditionBuckets = computed(() => {
     .filter(b => b.value && (b.count ?? 0) > 0)
     .sort((a, b) => (b.count || 0) - (a.count || 0))
 })
+
+const facetDrafts = reactive<Record<string, string>>({})
 
 // Compute available attribute buckets accounting for other selected filters
 const availableAttributeBuckets = computed(() => {

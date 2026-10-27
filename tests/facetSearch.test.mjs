@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises'
 import { stripTypeScriptTypes } from 'node:module'
 import test from 'node:test'
 import { compileScript, parse } from 'vue/compiler-sfc'
+import * as Vue from 'vue'
 import { computed, effectScope, nextTick, reactive, ref, watch } from 'vue'
 import { attributeValues, toggleAttributeValue, facetSearchParams } from '../utils/facetSearch.ts'
 
@@ -24,9 +25,11 @@ async function createField(loadValues, buckets = [], server = false) {
   const component = new Function('__vue', 'ref', 'computed', 'watch', 'onBeforeUnmount', 'onMounted', code)(
     await import('vue'), ref, computed, watch, fn => cleanup.push(fn), (fn) => { if (!server) fn() },
   )
-  const props = reactive({ title: 'Series', buckets, selected: ['Selected outside the top 50'], scope: 'one', formatValue: value => value, loadValues })
+  const props = reactive({ title: 'Series', draft: '', buckets, selected: ['Selected outside the top 50'], scope: 'one', formatValue: value => value, loadValues })
   const effects = effectScope()
-  const state = effects.run(() => component.setup(props, { expose() {}, emit() {} }))
+  const state = effects.run(() => component.setup(props, { expose() {}, emit(event, value) {
+    if (event === 'update:draft') props.draft = value
+  } }))
   return { state, props, stop: () => {
     effects.stop()
     cleanup.forEach(fn => fn())
@@ -219,4 +222,90 @@ test('localized value search keeps current scoped label matches and authoritativ
   await nextTick()
   assert.deepEqual(state.visibleBuckets.value, props.buckets)
   stop()
+})
+
+// Compile the page's actual loop and bucket computation so removing a key unmounts its field.
+test('page retains facet discovery drafts through removal and remount and cancels the removed request', async () => {
+  const page = await readFile(new URL('../pages/search.vue', import.meta.url), 'utf8')
+  const loop = page.slice(page.indexOf('<FiltersAttributeFilter'), page.indexOf('/>', page.indexOf('<FiltersAttributeFilter')) + 2)
+  const drafts = page.match(/const facetDrafts = [^\n]+/)?.[0] ?? ''
+  const buckets = page.slice(page.indexOf('const availableAttributeBuckets = computed('), page.indexOf('// Battery range:'))
+  const pending = []
+  const fixture = {
+    attributeBuckets: ref({ article_number: [{ value: '8070', count: 1 }] }), activeAttributeFilters: ref({}),
+    rangeFilterAttrs: new Set(), SPEC_ATTRIBUTE_KEYS: new Set(), yearRangeFilters: ref([]),
+    facetSearchScope: ref('A'), localizeAttrKey: key => key, localizeAttrValue: (_key, value) => value,
+    loadAttributeValues: (_key, query) => new Promise(resolve => pending.push({ query, resolve })), toggleAttributeFilter() {},
+  }
+  function compile(source, id) {
+    const { descriptor } = parse(source)
+    const code = stripTypeScriptTypes(compileScript(descriptor, { id, inlineTemplate: true }).content)
+      .replace(/import\s*\{([^}]*)\}\s*from\s*['"]vue['"]/g, (_, names) => `const {${names.replace(/\bas\b/g, ':')}} = Vue`)
+      .replace('export default', 'return')
+    return new Function('Vue', 'fixture', `const { ref, computed, reactive, watch, onMounted, onBeforeUnmount } = Vue; ${code}`)(Vue, fixture)
+  }
+  const field = compile(await readFile(new URL('../components/filters/AttributeFilter.vue', import.meta.url), 'utf8'), 'draft-field')
+  const parent = compile(`<script setup lang="ts">const { attributeBuckets, activeAttributeFilters, rangeFilterAttrs, SPEC_ATTRIBUTE_KEYS, yearRangeFilters, facetSearchScope, localizeAttrKey, localizeAttrValue, loadAttributeValues, toggleAttributeFilter } = fixture;\n${drafts}\n${buckets}</script><template><div>${loop}</div></template>`, 'draft-parent')
+  const node = type => ({ type, tagName: type.toUpperCase(), props: {}, listeners: {}, children: [],
+    addEventListener(name, fn) { this.listeners[name] = fn }, removeEventListener() {}, getRootNode: () => ({ activeElement: null }),
+  })
+  const renderer = Vue.createRenderer({
+    createElement: node, createText: text => ({ ...node('#text'), text }), createComment: () => node('#comment'),
+    setText(n, text) { n.text = text }, setElementText(n, text) {
+      n.text = text
+      n.children = []
+    },
+    parentNode: n => n.parent, nextSibling: () => null,
+    patchProp(n, key, _old, value) {
+      n.props[key] = value
+      if (key === 'value') n.value = value
+    },
+    insert(n, parent, anchor) {
+      if (n.parent) n.parent.children.splice(n.parent.children.indexOf(n), 1)
+      n.parent = parent
+      const index = anchor ? parent.children.indexOf(anchor) : -1
+      if (index < 0) parent.children.push(n)
+      else parent.children.splice(index, 0, n)
+    },
+    remove(n) {
+      n.parent.children.splice(n.parent.children.indexOf(n), 1)
+      n.parent = null
+    },
+  })
+  globalThis.Document ??= class {}
+  globalThis.ShadowRoot ??= class {}
+  const app = renderer.createApp(parent)
+  app.component('FiltersAttributeFilter', field)
+  app.config.globalProperties.$t = key => key
+  const root = node('root')
+  const all = (n = root) => [n, ...n.children.flatMap(child => all(child))]
+  app.mount(root)
+  try {
+    const original = all().find(n => n.type === 'input')
+    original.value = '807'
+    original.listeners.input({ target: original })
+    await nextTick()
+    await new Promise(resolve => setTimeout(resolve, 330))
+    assert.equal(pending[0].query, '807')
+    fixture.attributeBuckets.value = {}
+    fixture.facetSearchScope.value = 'B'
+    await nextTick()
+    assert.equal(all().some(n => n.type === 'input'), false, 'the actual page loop must remove the field')
+    pending[0].resolve([{ value: 'obsolete removed-field response' }])
+    await nextTick()
+    fixture.attributeBuckets.value = { article_number: [{ value: '8071', count: 1 }] }
+    fixture.facetSearchScope.value = 'A restored'
+    await nextTick()
+    const restored = all().find(n => n.type === 'input')
+    assert.notEqual(restored, original, 'a fresh field must have mounted')
+    assert.equal(restored.value, '807', 'the page must restore the typed draft')
+    await new Promise(resolve => setTimeout(resolve, 330))
+    assert.equal(pending[1].query, '807')
+    pending[1].resolve([{ value: '8072 fresh result', count: 1 }])
+    await new Promise(resolve => setTimeout(resolve, 0))
+    await nextTick()
+    assert(all().some(n => n.text === '8072 fresh result'))
+    assert(!all().some(n => n.text === 'obsolete removed-field response'))
+  }
+  finally { app.unmount() }
 })
