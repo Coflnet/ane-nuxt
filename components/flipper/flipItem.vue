@@ -21,9 +21,9 @@
       <!-- Profit Badge -->
       <div
         v-if="hasComparablePrices && profit > 0"
-        class="absolute top-3 right-3 bg-green-500/90 backdrop-blur-sm text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-lg"
+        class="absolute top-3 right-3 bg-green-500/90 backdrop-blur-sm text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-lg max-w-[calc(100%_-_1.5rem)] text-right"
       >
-        {{ $t('product.referenceGap') }}: +{{ formattedProfit }}
+        {{ $t(isAuction ? 'product.referenceGapAtBid' : 'product.referenceGap') }}: +{{ formattedProfit }}
       </div>
     </div>
 
@@ -83,7 +83,7 @@
 
       <div class="space-y-2 mb-4">
         <div class="flex justify-between items-center">
-          <span class="text-gray-400 text-xs">{{ $t('product.listedPrice') }}</span>
+          <span class="text-gray-400 text-xs">{{ $t(isAuction ? 'product.currentBid' : 'product.listedPrice') }}</span>
           <span class="text-white font-bold text-lg">{{ formattedPrice }}</span>
         </div>
         <div class="flex justify-between items-center">
@@ -101,6 +101,7 @@
 
       <p class="text-xs text-gray-400 mb-4">
         {{ $t('product.referenceContext') }}
+        <span v-if="isAuction">{{ $t('product.auctionBidContext') }}</span>
       </p>
 
       <!-- Category & Location -->
@@ -342,15 +343,16 @@ const emit = defineEmits<{
   click: []
 }>()
 
+const isAuction = computed(() => props.item.listing?.priceKind?.split(',').some(kind => kind.trim() === 'Auction') ?? false)
 const profit = computed(() => props.item.potentialProfit ?? 0)
 const legacyEuroPlatforms = new Set(['Kleinanzeigen', 'Marktplaats', 'Willhaben'])
 const currencyKeyMarker = String.fromCharCode(31) + 'currency:'
 const listingCurrency = computed(() => {
-  const currency = props.item.listing?.currency?.toUpperCase() ?? ''
-  return /^[A-Z]{3}$/.test(currency) ? currency : legacyEuroPlatforms.has(props.item.listing?.platform ?? '') ? 'EUR' : ''
+  const currency = props.item.listing?.currency?.trim().toUpperCase() ?? ''
+  return /^[A-Z]{3}$/.test(currency) ? currency : !currency && legacyEuroPlatforms.has(props.item.listing?.platform ?? '') ? 'EUR' : ''
 })
 const hasComparablePrices = computed(() => {
-  if (listingCurrency.value === 'EUR') return props.item.listing?.currency?.toUpperCase() === 'EUR' || legacyEuroPlatforms.has(props.item.listing?.platform ?? '')
+  if (listingCurrency.value === 'EUR') return true
   if (!/^[A-Z]{3}$/.test(listingCurrency.value)) return false
   const sells = props.item.recentSells ?? []
   return sells.length > 0 && sells.every(sell => sell.key?.endsWith(`${currencyKeyMarker}${listingCurrency.value}`))

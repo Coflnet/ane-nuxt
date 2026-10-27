@@ -16,6 +16,12 @@
   "advanvedFilters": "",
   "again": "Nochmal",
   "allMarket": "Alle Marktplätze",
+  "flipSources": {
+    "all": "Alle",
+    "clear": "Alle Marktplätze",
+    "loadedFeedHint": "Die Marktplatzauswahl filtert den geladenen Feed und neue Angebote. Ältere Angebote dieser Quellen werden dadurch nicht nachgeladen.",
+    "empty": "Keine passenden Marktplätze im geladenen Feed. Setze die Filter zurück oder aktualisiere den Feed."
+  },
   "alreadyHaveAccount": "Du hast schon einen Account?",
   "and": "und",
   "apiRef": "API Referenz",
@@ -985,6 +991,9 @@
     "catchAllHint": "Diese Angebote konnten keinem bestimmten Produkt zugeordnet werden.",
     "offersCount": "{count} Angebote",
     "listedPrice": "Listenpreis",
+    "currentBid": "Erfasstes Gebot",
+    "referenceGapAtBid": "Abstand beim erfassten Gebot",
+    "auctionBidContext": "Auktionspreis zum erfassten Gebot. Bis zum Auktionsende kann der Preis steigen.",
     "marketValue": "Marktwert",
     "attributes": {
       "title": "Attribute",

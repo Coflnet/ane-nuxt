@@ -159,6 +159,34 @@
             </option>
           </select>
         </div>
+        <details class="w-48 max-w-full rounded-lg border border-gray-700 bg-gray-800 text-sm text-white">
+          <summary class="flex min-h-11 sm:min-h-0 items-center cursor-pointer px-3 py-1.5">
+            {{ $t('product.filters.marketplaces') }}{{ filters.platforms.length ? ` (${filters.platforms.length})` : `: ${$t('flipSources.all')}` }}
+          </summary>
+          <div class="max-h-48 overflow-y-auto px-3 pb-2 flex flex-col gap-2">
+            <button
+              v-if="filters.platforms.length"
+              type="button"
+              class="min-h-11 sm:min-h-0 text-left text-xs text-blue-300"
+              @click="filters.platforms = []"
+            >
+              {{ $t('flipSources.clear') }}
+            </button>
+            <label
+              v-for="platform in availablePlatforms"
+              :key="platform"
+              class="flex min-h-11 sm:min-h-0 items-center gap-2"
+            >
+              <input
+                v-model="filters.platforms"
+                type="checkbox"
+                :value="platform"
+                class="accent-indigo-500"
+              >
+              {{ platform }}
+            </label>
+          </div>
+        </details>
         <div class="flex flex-col gap-1">
           <label class="text-xs text-gray-400">{{ $t('nav.search') }}</label>
           <input
@@ -236,6 +264,9 @@
           <span class="text-xs text-gray-500">{{ filteredItems.length }}/{{ items.length }} {{ $t('flips') }}</span>
         </div>
       </div>
+      <p class="mt-3 text-xs text-gray-400">
+        {{ $t('flipSources.loadedFeedHint') }}
+      </p>
     </UiDefaultContainer>
 
     <!-- Feed -->
@@ -268,6 +299,12 @@
         class="text-center py-12 text-slate-400"
       >
         {{ $t('noFlipsFound') }}
+        <p
+          v-if="filters.platforms.length"
+          class="mt-2 text-sm"
+        >
+          {{ $t('flipSources.empty') }}
+        </p>
       </div>
       <div
         v-if="loading"
@@ -530,8 +567,10 @@ async function saveFlipFilter() {
   const filterData: Array<{ name: string, value: string }> = []
   filterData.push({ name: 'IsFlipNotification', value: 'true' })
   if (hasSelectedCurrency.value) filterData.push({ name: 'ReferenceCurrency', value: filters.currency })
+  if (filters.platforms.length) filterData.push({ name: 'IncludePlatforms', value: filters.platforms.join(',') })
   if (filters.search) filterData.push({ name: 'SearchTerm', value: filters.search })
   if (hasSelectedCurrency.value && filters.minProfit > 0) filterData.push({ name: 'MinProfit', value: String(filters.minProfit) })
+  if (hasSelectedCurrency.value && filters.minMarginPct > 0) filterData.push({ name: 'MinMarginPct', value: String(filters.minMarginPct) })
   if (filters.minRefs > 0) filterData.push({ name: 'MinReferences', value: String(filters.minRefs) })
   if (filters.category) filterData.push({ name: 'ContainsKeyWord', value: JSON.stringify([filters.category]) })
 
@@ -570,14 +609,18 @@ async function saveFlipFilter() {
 }
 
 // --- Filters (persisted to localStorage) ---
-const defaultFilters = { search: '', currency: 'EUR', minProfit: 0, minMarginPct: 0, minRefs: 0, category: '', maxDistance: 0 }
+const defaultFilters = { platforms: [] as string[], search: '', currency: 'EUR', minProfit: 0, minMarginPct: 0, minRefs: 0, category: '', maxDistance: 0 }
 const filters = reactive(loadFilters())
+const availablePlatforms = computed(() => [...new Set([
+  ...filters.platforms,
+  ...items.value.map(item => item.listing?.platform).filter((platform): platform is NonNullable<typeof platform> => !!platform && platform !== 'Unknown'),
+])].sort())
 
 const legacyEuroPlatforms = new Set(['Kleinanzeigen', 'Marktplaats', 'Willhaben'])
 const currencyKeyMarker = String.fromCharCode(31) + 'currency:'
 function getFlipCurrency(item: Flip): string {
-  const currency = item.listing?.currency?.toUpperCase() ?? ''
-  return /^[A-Z]{3}$/.test(currency) ? currency : legacyEuroPlatforms.has(item.listing?.platform ?? '') ? 'EUR' : ''
+  const currency = item.listing?.currency?.trim().toUpperCase() ?? ''
+  return /^[A-Z]{3}$/.test(currency) ? currency : !currency && legacyEuroPlatforms.has(item.listing?.platform ?? '') ? 'EUR' : ''
 }
 
 const availableCurrencies = computed(() => [...new Set(items.value.map(getFlipCurrency).filter(currency => currency && currency !== 'EUR'))].sort())
@@ -587,7 +630,7 @@ const hasSelectedCurrency = computed(() => !['*', 'UNKNOWN'].includes(filters.cu
 function hasComparableFlip(item: Flip): boolean {
   const currency = getFlipCurrency(item)
   if (!/^[A-Z]{3}$/.test(currency)) return false
-  if (currency === 'EUR') return item.listing?.currency?.toUpperCase() === 'EUR' || legacyEuroPlatforms.has(item.listing?.platform ?? '')
+  if (currency === 'EUR') return true
   const sells = item.recentSells ?? []
   return sells.length > 0 && sells.every(sell => sell.key?.endsWith(`${currencyKeyMarker}${currency}`))
 }
@@ -687,11 +730,11 @@ function saveFilters() {
 }
 
 const hasActiveFilters = computed(() =>
-  filters.currency !== 'EUR' || filters.search !== '' || filters.minProfit > 0 || filters.minMarginPct > 0 || filters.minRefs > 0 || filters.category !== '' || filters.maxDistance > 0,
+  filters.platforms.length > 0 || filters.currency !== 'EUR' || filters.search !== '' || filters.minProfit > 0 || filters.minMarginPct > 0 || filters.minRefs > 0 || filters.category !== '' || filters.maxDistance > 0,
 )
 
 function clearFilters() {
-  Object.assign(filters, defaultFilters)
+  Object.assign(filters, defaultFilters, { platforms: [] })
 }
 
 watch(filters, saveFilters)
@@ -1067,6 +1110,7 @@ async function refreshFeed() {
 const filteredItems = computed(() => {
   let result = items.value.filter((item) => {
     const listing = item.listing
+    if (filters.platforms.length && !filters.platforms.includes(listing?.platform ?? '')) return false
     const profit = item.potentialProfit ?? 0
     const price = listing?.price ?? 0
     const median = item.medianPrice ?? 0

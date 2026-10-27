@@ -12,7 +12,7 @@
           />
         </div>
 
-        <div class="flex items-center space-x-12">
+        <div class="flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:gap-12">
           <div class="">
             <h3 class="font-medium text-white mb-2">
               {{ $t('resources') }}

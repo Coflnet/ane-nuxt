@@ -16,6 +16,12 @@
   "advanvedFilters": "Advanced Filters",
   "again": "Again",
   "allMarket": "All Free Marketplaces",
+  "flipSources": {
+    "all": "All",
+    "clear": "All marketplaces",
+    "loadedFeedHint": "Marketplace selection filters the loaded feed and new arrivals. It does not fetch older offers from those sources.",
+    "empty": "No matching marketplaces in the loaded feed. Clear filters or refresh the feed."
+  },
   "alreadyHaveAccount": "Already have an account?",
   "and": "and",
   "apiRef": "API Reference",
@@ -985,6 +991,9 @@
     "catchAllHint": "These offers could not be assigned to a specific product.",
     "offersCount": "{count} Offers",
     "listedPrice": "Listed Price",
+    "currentBid": "Recorded bid",
+    "referenceGapAtBid": "Gap at recorded bid",
+    "auctionBidContext": "Auction price at the recorded bid. Bids may increase before the auction ends.",
     "marketValue": "Market Value",
     "attributes": {
       "title": "Product Attributes",
