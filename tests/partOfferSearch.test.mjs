@@ -1,3 +1,4 @@
+import { searchCurrency } from '../utils/searchCurrency.ts'
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import { stripTypeScriptTypes } from 'node:module'
@@ -15,7 +16,7 @@ function searchState(query) {
   const route = reactive({ query })
   const requests = []
   const state = {
-    route, computed, watch, searchRouteQuery, attributeValues, parseOfferFilterQuery, toUrlSlug: slug => slug, PAGE_SIZE: 24, prevQuery: {},
+    route, computed, watch, searchCurrency, searchRouteQuery, attributeValues, parseOfferFilterQuery, toUrlSlug: slug => slug, PAGE_SIZE: 24, prevQuery: {},
     router: { push({ query }) { route.query = query } },
     buildSpecApiFilters: () => [], manualLoading: ref(false), searchError: ref(false),
     interpretation: ref(null), allProducts: ref([]), hasSearched: ref(true), totalResults: ref(0),
@@ -26,6 +27,7 @@ function searchState(query) {
   const code = [
     source.match(/const searchQuery = computed[^\n]*/)[0],
     source.match(/const selectedPlatforms = computed[^\n]*/)[0],
+    source.match(/const selectedPriceCurrency = computed[^\n]*/)[0],
     source.match(/const includePartOffers = computed[^\n]*/)[0],
     source.match(/const includeIndividualOffers = computed[^\n]*/)[0],
     ...['routeHasSearchQuery', 'syncPrevQuery', 'buildSearchParams', 'queryWithoutKeys', 'includeIndividualOffersInSearch', 'toggleIndividualOffers', 'toggleFilter', 'clearAllFilters', 'onSearch', 'onSearchCategorySelect'].map(functionSource),
@@ -75,7 +77,7 @@ test('a flag-only shared link searches and false or malformed flags keep normal 
   try {
     state.route.query = searchRouteQuery('', true)
     await nextTick()
-    assert.deepEqual(state.requests.at(-1), { offset: 0, limit: 24, includePartOffers: 'true' })
+    assert.deepEqual(state.requests.at(-1), { offset: 0, limit: 24, priceCurrency: 'EUR', includePartOffers: 'true' })
     for (const value of ['false', '1', ['true']]) {
       state.route.query = { q: 'Getriebe', includePartOffers: value }
       await nextTick()

@@ -35,6 +35,25 @@
         </select>
       </div>
 
+      <label class="text-sm text-slate-300">
+        {{ $t('budgetCurrency') }}
+        <select
+          :value="state.priceCurrency || ''"
+          class="ml-2 rounded bg-slate-800 px-2 py-2"
+          @change="emit('change', { ...state, priceCurrency: ($event.target as HTMLSelectElement).value || undefined })"
+        >
+          <option
+            value=""
+            :selected="!state.priceCurrency"
+          >{{ $t('all') }}</option>
+          <option
+            v-for="currency in [...new Set(['EUR', 'GBP', 'SEK', 'PLN', state.priceCurrency].filter(Boolean))]"
+            :key="currency"
+            :value="currency"
+            :selected="currency === state.priceCurrency"
+          >{{ currency }}</option>
+        </select>
+      </label>
       <!-- EU shipping -->
       <button
         type="button"

@@ -1,3 +1,4 @@
+import { searchCurrency } from '../utils/searchCurrency.ts'
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import { stripTypeScriptTypes } from 'node:module'
@@ -13,7 +14,7 @@ import { buildSpecApiFilters, SPEC_RANGE_PARAMS } from '../utils/specFilters.ts'
 async function searchPage(query) {
   const { descriptor } = parse(await readFile(new URL('../pages/search.vue', import.meta.url), 'utf8'))
   const ast = compileScript(descriptor, { id: 'search-country' }).scriptSetupAst
-  const declarations = new Set(['searchQuery', 'includePartOffers', 'includeIndividualOffers', 'selectedCategory', 'selectedCondition', 'selectedPlatforms', 'selectedMinPrice', 'selectedMaxPrice', 'selectedSort', 'selectedMaxDistance', 'activeAttributeFilters', 'hasActiveFilters', 'selectedCountryCode', 'prevQuery'])
+  const declarations = new Set(['searchQuery', 'includePartOffers', 'includeIndividualOffers', 'selectedCategory', 'selectedCondition', 'selectedPlatforms', 'selectedPriceCurrency', 'selectedMinPrice', 'selectedMaxPrice', 'selectedSort', 'selectedMaxDistance', 'activeAttributeFilters', 'hasActiveFilters', 'selectedCountryCode', 'prevQuery'])
   const functions = new Set(['routeHasSearchQuery', 'syncPrevQuery', 'onCountrySelect', 'clearAllFilters', 'buildSearchParams'])
   const source = descriptor.scriptSetup.content
   const code = ast.filter(node =>
@@ -29,7 +30,7 @@ async function searchPage(query) {
   const requests = []
   let page
   const scope = effectScope()
-  const factory = new Function('ref', 'computed', 'reactive', 'watch', 'route', 'router', 'performSearch', 'attributeValues', 'buildSpecApiFilters', 'SPEC_RANGE_PARAMS', 'parseOfferFilterQuery', `
+  const factory = new Function('ref', 'computed', 'reactive', 'watch', 'route', 'router', 'performSearch', 'attributeValues', 'buildSpecApiFilters', 'SPEC_RANGE_PARAMS', 'parseOfferFilterQuery', 'searchCurrency', `
     const userLocation = ref(null), selectedBatteryMin = ref(), selectedBatteryMax = ref();
     const hasSpecRangeSelection = ref(false), hasSearched = ref(true), distanceFilterKm = ref(50);
     const PAGE_SIZE = 20, urlToNumeric = ref({}), germanLabelBySlug = ref({});
@@ -41,7 +42,7 @@ async function searchPage(query) {
     syncPrevQuery();
     return { selectedCountryCode, hasActiveFilters, onCountrySelect, clearAllFilters, buildSearchParams };
   `)
-  page = scope.run(() => factory(ref, computed, reactive, watch, route, router, () => requests.push(page.buildSearchParams()), attributeValues, buildSpecApiFilters, SPEC_RANGE_PARAMS, parseOfferFilterQuery))
+  page = scope.run(() => factory(ref, computed, reactive, watch, route, router, () => requests.push(page.buildSearchParams()), attributeValues, buildSpecApiFilters, SPEC_RANGE_PARAMS, parseOfferFilterQuery, searchCurrency))
   return { ...page, route, router, requests, stop: () => scope.stop(), select: async (value) => {
     page.onCountrySelect({ target: { value } })
     await nextTick()

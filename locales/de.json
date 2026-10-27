@@ -198,7 +198,7 @@
   "searchResults": "Suchergebnisse",
   "noResultsFound": "Keine Ergebnisse gefunden",
   "cataloguePriceReference": "Produktweiter EUR-Referenzpreis",
-  "cataloguePriceScope": "Preise und Preisfilter verwenden produktweite EUR-Referenzpreise über Marktplätze und Länder hinweg. Öffne ein Produkt, um passende Angebote in ihren Originalwährungen zu sehen.",
+  "cataloguePriceScope": "Preise und Budgets verwenden Originalpreise in {currency} aus den gewählten Marktplätzen und dem Land. Unbekannte Preise werden als Preis prüfen angezeigt. Keine Währungsumrechnung.",
   "startingFrom": "Ab",
   "checkPrice": "Preis prüfen",
   "details": "Details",

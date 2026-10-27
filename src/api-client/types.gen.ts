@@ -718,6 +718,8 @@ export type OpensearchProductDocument = {
     condition?: string | null;
     averagePrice?: number | null;
     medianPrice?: number | null;
+    scopedMinPrice?: number | null;
+    scopedPriceCurrency?: string | null;
     minPrice?: number | null;
     maxPrice?: number | null;
     listingCount?: number | null;
@@ -1237,6 +1239,8 @@ export type ServicesProductServiceSearchProductsResult = {
         [key: string]: Array<ServicesProductServiceFilterBucket>;
     } | null;
     priceMin?: number | null;
+    priceCurrency?: string | null;
+    currencyBuckets?: Array<ServicesProductServiceFilterBucket> | null;
     priceMax?: number | null;
     interpretation?: ServicesProductServiceSearchInterpretation;
 };
@@ -4310,6 +4314,8 @@ export type SearchProductsData = {
          * Optional attribute filters as key:value pairs (e.g. attributes=color:black)
          */
         attributes?: Array<string>;
+        /** Native scoped asking-price currency; omitted keeps the legacy EUR contract. */
+        priceCurrency?: string;
         /**
          * Optional minimum price filter
          */

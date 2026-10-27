@@ -11,6 +11,7 @@ export type QuickAction = 'country' | 'eu' | 'nearby'
 export const NEARBY_DISTANCE_KM = 50
 
 export interface OfferFilterState {
+  priceCurrency?: string
   /** Marketplace names as the API knows them (Vinted, Kleinanzeigen, ...). */
   platforms: string[]
   /** ISO codes or the special value `EU`. */
@@ -42,7 +43,7 @@ export interface OfferFacets {
 }
 
 /** Query keys owned by the offers filter. */
-export const OFFER_FILTER_QUERY_KEYS = ['platforms', 'countries', 'shipping', 'zip', 'zip_country', 'lat', 'lon', 'max_distance'] as const
+export const OFFER_FILTER_QUERY_KEYS = ['price_currency', 'platforms', 'countries', 'shipping', 'zip', 'zip_country', 'lat', 'lon', 'max_distance'] as const
 
 type QueryValue = string | null | undefined | (string | null)[]
 type QueryLike = Record<string, QueryValue>
@@ -68,7 +69,7 @@ function finiteNumber(value: string): number | undefined {
 }
 
 export function emptyOfferFilter(): OfferFilterState {
-  return { platforms: [], countries: [], shipping: false, zip: '', zipCountry: '', lat: undefined, lon: undefined, maxDistance: undefined }
+  return { priceCurrency: undefined, platforms: [], countries: [], shipping: false, zip: '', zipCountry: '', lat: undefined, lon: undefined, maxDistance: undefined }
 }
 
 export function parseOfferFilterQuery(query: QueryLike): OfferFilterState {
@@ -77,6 +78,7 @@ export function parseOfferFilterQuery(query: QueryLike): OfferFilterState {
     platforms: [...new Set(splitList(first(query.platforms)).map(value =>
       activeMarketplaces.find(option => option.value.toLowerCase() === value.toLowerCase())?.value ?? value,
     ))],
+    priceCurrency: /^[A-Z]{3}$/.test(first(query.price_currency).toUpperCase()) ? first(query.price_currency).toUpperCase() : undefined,
     countries: splitList(first(query.countries), true),
     shipping: ['true', '1'].includes(first(query.shipping).toLowerCase()),
     zip: first(query.zip).trim(),
@@ -95,6 +97,7 @@ export function buildOfferFilterQuery(state: OfferFilterState, baseQuery: QueryL
     const v = first(value)
     if (v) query[key] = v
   }
+  if (state.priceCurrency) query.price_currency = state.priceCurrency
   if (state.platforms.length) query.platforms = state.platforms.join(',')
   if (state.countries.length) query.countries = state.countries.join(',')
   if (state.shipping) query.shipping = 'true'
@@ -116,7 +119,7 @@ export function hasPosition(state: OfferFilterState): boolean {
 
 /** True when any filter narrows the offer list. */
 export function hasActiveOfferFilter(state: OfferFilterState): boolean {
-  return state.platforms.length > 0
+  return !!state.priceCurrency || state.platforms.length > 0
     || state.countries.length > 0
     || state.shipping
     || (hasPosition(state) && !!state.maxDistance)
@@ -174,6 +177,7 @@ export function toggleListValue(list: readonly string[], value: string): string[
 /** Parameters for the matches endpoint (`buildProductResourceUrl`). */
 export function buildMatchesParams(state: OfferFilterState) {
   return {
+    priceCurrency: state.priceCurrency,
     zip: state.zip || undefined,
     zipCountry: state.zip && state.zipCountry ? state.zipCountry : undefined,
     lat: state.lat,
@@ -227,6 +231,7 @@ export function extractApiErrorMessage(error: unknown, fallback: string): string
  */
 export function buildSimilarSearchQuery(productName: string, state: OfferFilterState): Record<string, string> {
   const query: Record<string, string> = { q: productName, sort: 'relevance' }
+  if (state.priceCurrency) query.price_currency = state.priceCurrency
   if (hasPosition(state) && state.maxDistance) {
     if (state.zip) {
       query.zip = state.zip

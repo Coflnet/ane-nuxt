@@ -173,10 +173,10 @@
           >&times;</button>
         </span>
         <span
-          v-if="selectedMinPrice || selectedMaxPrice"
+          v-if="selectedMinPrice !== undefined || selectedMaxPrice !== undefined"
           class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-400 text-xs border border-yellow-500/30"
         >
-          {{ $t('price', 'Price') }}: {{ selectedMinPrice ? formatPrice(selectedMinPrice) : '€0' }} – {{ selectedMaxPrice ? formatPrice(selectedMaxPrice) : '∞' }}
+          {{ $t('price', 'Price') }}: {{ selectedMinPrice ? formatPrice(selectedMinPrice) : formatPrice(0) }} – {{ selectedMaxPrice !== undefined ? formatPrice(selectedMaxPrice) : '∞' }}
           <button
             class="ml-1 hover:text-white"
             type="button"
@@ -283,7 +283,7 @@
               class="mb-3 text-xs text-slate-400"
               data-testid="catalogue-price-scope"
             >
-              {{ $t('cataloguePriceScope') }}
+              {{ $t('cataloguePriceScope', { currency: selectedPriceCurrency }) }}
             </p>
             <div class="space-y-2">
               <label
@@ -358,34 +358,53 @@
             <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-3">
               {{ $t('price', 'Price') }}
             </h3>
+            <label class="mb-3 block text-sm text-slate-300">
+              {{ $t('budgetCurrency') }}
+              <select
+                :value="selectedPriceCurrency"
+                class="ml-2 rounded bg-slate-700 px-2 py-1"
+                data-testid="search-price-currency"
+                @change="onPriceCurrencySelect"
+              >
+                <option
+                  v-for="currency in priceCurrencies"
+                  :key="currency"
+                  :value="currency"
+                  :selected="currency === selectedPriceCurrency"
+                >{{ currency }}</option>
+              </select>
+            </label>
             <div
               v-if="priceRangeMax > 0"
               class="space-y-3"
             >
               <div class="flex items-center gap-2">
                 <div class="relative flex-1 min-w-0">
-                  <span class="absolute left-2 top-1/2 -translate-y-1/2 text-slate-500 text-xs">€</span>
+                  <span class="absolute left-2 top-1/2 -translate-y-1/2 text-slate-500 text-xs">{{ selectedPriceCurrency }}</span>
                   <input
                     v-model.number="priceFilterMin"
                     type="number"
+                    step="any"
                     :min="0"
                     :max="priceFilterMax"
                     :placeholder="Math.floor(priceRangeMin).toString()"
-                    class="w-full pl-6 pr-1 py-1.5 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-slate-200 focus:border-blue-500/50 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                    @change="applyPriceFilter"
+                    class="w-full pl-10 pr-1 py-1.5 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-slate-200 focus:border-blue-500/50 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    @focus="pinPriceCurrency"
+                    @change="applyPriceFilter('min')"
                   >
                 </div>
                 <span class="text-slate-500 text-xs flex-shrink-0">–</span>
                 <div class="relative flex-1 min-w-0">
-                  <span class="absolute left-2 top-1/2 -translate-y-1/2 text-slate-500 text-xs">€</span>
+                  <span class="absolute left-2 top-1/2 -translate-y-1/2 text-slate-500 text-xs">{{ selectedPriceCurrency }}</span>
                   <input
                     v-model.number="priceFilterMax"
                     type="number"
+                    step="any"
                     :min="priceFilterMin"
-                    :max="priceRangeMax"
                     :placeholder="Math.ceil(priceRangeMax).toString()"
-                    class="w-full pl-6 pr-1 py-1.5 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-slate-200 focus:border-blue-500/50 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                    @change="applyPriceFilter"
+                    class="w-full pl-10 pr-1 py-1.5 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-slate-200 focus:border-blue-500/50 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    @focus="pinPriceCurrency"
+                    @change="applyPriceFilter('max')"
                   >
                 </div>
               </div>
@@ -407,7 +426,8 @@
                   :step="priceSliderStep"
                   class="absolute inset-x-0 w-full appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-blue-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-slate-900 [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-blue-500 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-slate-900"
                   @input="(e: Event) => { priceFilterMin = Math.min(Number((e.target as HTMLInputElement).value), priceFilterMax - priceSliderStep) }"
-                  @change="applyPriceFilter"
+                  @focus="pinPriceCurrency"
+                  @change="applyPriceFilter('min')"
                 >
                 <input
                   :value="priceFilterMax"
@@ -417,7 +437,8 @@
                   :step="priceSliderStep"
                   class="absolute inset-x-0 w-full appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-blue-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-slate-900 [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-blue-500 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-slate-900"
                   @input="(e: Event) => { priceFilterMax = Math.max(Number((e.target as HTMLInputElement).value), priceFilterMin + priceSliderStep) }"
-                  @change="applyPriceFilter"
+                  @focus="pinPriceCurrency"
+                  @change="applyPriceFilter('max')"
                 >
               </div>
               <div class="flex justify-between text-xs text-slate-500">
@@ -879,12 +900,8 @@
                       class="text-sm text-slate-400"
                       data-testid="catalogue-price"
                     >
-                      <span
-                        v-if="product.minPrice"
-                        class="block text-xs"
-                      >{{ $t('cataloguePriceReference') }}</span>
                       <span class="text-lg font-bold text-green-400">
-                        {{ product.minPrice ? formatPrice(product.minPrice) : $t('checkPrice', 'Check Price') }}
+                        {{ nativeScopedPrice(product, selectedPriceCurrency) !== undefined ? formatPrice(nativeScopedPrice(product, selectedPriceCurrency)!) : $t('checkPrice', 'Check Price') }}
                       </span>
                     </div>
                     <div class="px-3 py-1 bg-slate-700/50 rounded-full text-xs text-slate-300">
@@ -1163,6 +1180,7 @@ import type { OpensearchProductAttribute as ProductAttribute, OpensearchProductD
 import { useCategories } from '~/composable/useCategories'
 import { useUserLocation } from '~/composable/useUserLocation'
 import { useFormat } from '~/composable/useFormat'
+import { searchCurrency, nativeScopedPrice } from '~/utils/searchCurrency'
 import { searchRouteQuery } from '~/utils/searchQuery'
 import { activeMarketplaces } from '~/constants/CreateFilterConstants'
 import { parseOfferFilterQuery } from '~/utils/offerFilters'
@@ -1203,6 +1221,9 @@ const includePartOffers = computed(() => route.query.includePartOffers === 'true
 const includeIndividualOffers = computed(() => route.query.includeIndividualOffers === 'true')
 const selectedCategory = computed(() => (route.query.category as string) || '')
 const selectedPlatforms = computed(() => parseOfferFilterQuery(route.query).platforms)
+const selectedPriceCurrency = computed(() => searchCurrency(route.query, selectedPlatforms.value))
+const currencyBuckets = ref<FilterBucket[]>([])
+const priceCurrencies = computed(() => [...new Set(['EUR', 'GBP', 'SEK', 'PLN', selectedPriceCurrency.value, ...currencyBuckets.value.map(bucket => bucket.value).filter((value): value is string => !!value)])])
 const selectedCondition = computed(() => (route.query.condition as string) || '')
 const selectedMinPrice = computed(() => route.query.price_min ? Number(route.query.price_min) : undefined)
 const selectedMaxPrice = computed(() => route.query.price_max ? Number(route.query.price_max) : undefined)
@@ -1338,12 +1359,12 @@ const isSearchMode = computed(() => routeHasSearchQuery(route.query))
 function routeHasSearchQuery(query: typeof route.query): boolean {
   return !!(query.includeIndividualOffers === 'true' || query.includePartOffers === 'true' || query.q || query.category || query.condition
     || query.price_min || query.price_max || query.sort || query.max_distance
-    || query.zip || query.country || query.platforms
+    || query.zip || query.country || query.platforms || query.price_currency
     || Object.keys(query).some(k => k.startsWith('attr_')))
 }
 
 // Track previous query params to detect server-side filter changes that need a re-fetch
-const prevQuery = reactive({ includeIndividualOffers: false, includePartOffers: false, q: '' as string | undefined, category: '' as string | undefined, condition: '' as string | undefined, price_min: '' as string | undefined, price_max: '' as string | undefined, attrs: '' as string | undefined, sort: '' as string | undefined, max_distance: '' as string | undefined, country: '', platforms: '' })
+const prevQuery = reactive({ includeIndividualOffers: false, includePartOffers: false, q: '' as string | undefined, category: '' as string | undefined, condition: '' as string | undefined, price_min: '' as string | undefined, price_max: '' as string | undefined, attrs: '' as string | undefined, sort: '' as string | undefined, max_distance: '' as string | undefined, country: '', platforms: '', price_currency: '' })
 
 function syncPrevQuery() {
   prevQuery.includeIndividualOffers = includeIndividualOffers.value
@@ -1357,12 +1378,16 @@ function syncPrevQuery() {
   prevQuery.max_distance = route.query.max_distance ? String(route.query.max_distance) : ''
   prevQuery.country = selectedCountryCode.value
   prevQuery.platforms = selectedPlatforms.value.join(',')
+  prevQuery.price_currency = selectedPriceCurrency.value
   prevQuery.attrs = Object.entries(route.query)
     .filter(([k]) => k.startsWith('attr_'))
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([k, v]) => `${k}=${JSON.stringify(v)}`)
     .join('&')
 }
+
+// Share the existing supersession sequence with the initial client response/error watchers.
+let searchSeq = 0
 
 // First results page: rendered server-side when the backend is quick, otherwise
 // a skeleton is sent and the client re-fetches after hydration. ZIP-based
@@ -1402,12 +1427,12 @@ const { data: initialSearch, loading: initialLoading, error: initialError } = us
 )
 
 // Combined loading: initial SSR fetch OR a client-side re-filter.
-const loading = computed(() => (initialLoading.value && !initialError.value) || manualLoading.value)
+const loading = computed(() => (initialLoading.value && !hasSearched.value && !initialError.value) || manualLoading.value)
 
 // Apply the SSR result on both server render and client hydration, and prime
 // the change-detection state so the route watcher doesn't re-fetch on load.
 watch(initialSearch, (resp) => {
-  if (resp) {
+  if (resp && searchSeq === 0) {
     applySearchResponse(resp, false)
     hasSearched.value = true
     syncPrevQuery()
@@ -1416,7 +1441,7 @@ watch(initialSearch, (resp) => {
 
 // A failing first page must show the error state, not the category browser.
 watch(initialError, (err) => {
-  if (err && routeHasSearchQuery(route.query)) {
+  if (err && searchSeq === 0 && routeHasSearchQuery(route.query)) {
     searchError.value = true
     hasSearched.value = true
     syncPrevQuery()
@@ -2105,7 +2130,7 @@ function localizeAttrValue(attrKey: string, value: string): string {
 // --- Search & filter logic ---
 
 function buildSearchParams(offset = 0) {
-  const params: Record<string, string | number | string[]> = { offset, limit: PAGE_SIZE }
+  const params: Record<string, string | number | string[]> = { offset, limit: PAGE_SIZE, priceCurrency: selectedPriceCurrency.value }
   if (searchQuery.value) params.query = searchQuery.value
   if (includePartOffers.value) params.includePartOffers = 'true'
   if (includeIndividualOffers.value) params.includeIndividualOffers = 'true'
@@ -2153,7 +2178,6 @@ async function loadAttributeValues(key: string, value: string): Promise<FilterBu
 // Every new search supersedes the previous one: a late response of an older
 // request is ignored, so fast filter clicks never show stale results.
 // (The generated client deep-clones its options, so an AbortSignal cannot be passed.)
-let searchSeq = 0
 
 async function performSearch(append = false) {
   if (import.meta.server) return
@@ -2195,6 +2219,9 @@ async function performSearch(append = false) {
 }
 
 function applySearchResponse(response: SearchProductsResponse, append: boolean) {
+  if (response?.priceCurrency !== selectedPriceCurrency.value) {
+    response = { ...response, products: response?.products?.map(product => ({ ...product, scopedMinPrice: null, scopedPriceCurrency: null })) }
+  }
   {
     if (append) {
       allProducts.value = [...allProducts.value, ...(response?.products || [])]
@@ -2204,6 +2231,7 @@ function applySearchResponse(response: SearchProductsResponse, append: boolean) 
       interpretation.value = (response as SearchProductsResponse & { interpretation?: SearchInterpretation | null })?.interpretation ?? null
 
       platformBuckets.value = response?.platformBuckets ?? []
+      currencyBuckets.value = response?.currencyBuckets ?? []
 
       // Use aggregation buckets if available (new backend), otherwise derive from products
       if (response?.categoryBuckets && response.categoryBuckets.length > 0) {
@@ -2312,8 +2340,8 @@ function applySearchResponse(response: SearchProductsResponse, append: boolean) 
     priceRangeMax.value = 0
 
     // Update price range from aggregation
-    // Backend always returns the global price range (not narrowed by price filter)
-    if (response?.priceMin != null && response?.priceMax != null) {
+    // The range uses the same native currency and source scope as the hits.
+    if (response?.priceCurrency === selectedPriceCurrency.value && response?.priceMin != null && response?.priceMax != null) {
       priceRangeMin.value = Math.floor(response.priceMin)
       priceRangeMax.value = Math.ceil(response.priceMax)
       // Sync slider to URL values or full range
@@ -2323,7 +2351,7 @@ function applySearchResponse(response: SearchProductsResponse, append: boolean) 
     else if (allProducts.value.length > 0) {
       // Derive price range from product hits when aggregation is unavailable
       const prices = allProducts.value
-        .map(p => p.minPrice)
+        .map(p => nativeScopedPrice(p, selectedPriceCurrency.value))
         .filter((p): p is number => p != null && p > 0)
       if (prices.length > 0) {
         priceRangeMin.value = Math.floor(Math.min(...prices))
@@ -2397,6 +2425,7 @@ function removeAttributeFilter(key: string) {
 function clearAllFilters() {
   const query: Record<string, string> = {}
   if (searchQuery.value) query.q = searchQuery.value
+  if (route.query.price_currency) query.price_currency = selectedPriceCurrency.value
   router.push({ query })
 }
 
@@ -2524,30 +2553,35 @@ function onCountrySelect(event: Event) {
   router.push({ query })
 }
 
-function applyPriceFilter() {
-  const query = queryWithoutKeys('price_min', 'price_max')
-  if (priceFilterMin.value > priceRangeMin.value) {
-    query.price_min = String(Math.round(priceFilterMin.value))
-  }
-  if (priceFilterMax.value < priceRangeMax.value) {
-    query.price_max = String(Math.round(priceFilterMax.value))
-  }
+function pinPriceCurrency() {
+  if (!route.query.price_currency) void router.replace({ query: { ...route.query, price_currency: selectedPriceCurrency.value } })
+}
+
+function onPriceCurrencySelect(event: Event) {
+  router.push({ query: { ...route.query, price_currency: (event.target as HTMLSelectElement).value } })
+}
+
+function applyPriceFilter(bound: 'min' | 'max') {
+  const key = `price_${bound}`
+  const query = { ...queryWithoutKeys(key), price_currency: selectedPriceCurrency.value } as Record<string, string | string[]>
+  const amount = bound === 'min' ? priceFilterMin.value : priceFilterMax.value
+  if (Number.isFinite(amount) && amount >= 0) query[key] = String(amount)
   router.push({ query })
 }
 
 function clearPriceFilter() {
-  const query = queryWithoutKeys('price_min', 'price_max')
+  const query = { ...queryWithoutKeys('price_min', 'price_max'), price_currency: selectedPriceCurrency.value }
   priceFilterMin.value = priceRangeMin.value
   priceFilterMax.value = priceRangeMax.value
   router.push({ query })
 }
 
 function onSearch(query: string) {
-  router.push({ query: searchRouteQuery(query, includePartOffers.value, includeIndividualOffers.value) })
+  router.push({ query: { ...searchRouteQuery(query, includePartOffers.value, includeIndividualOffers.value), ...(route.query.price_currency ? { price_currency: selectedPriceCurrency.value } : {}) } })
 }
 
 function onSearchCategorySelect(slug: string) {
-  router.push({ query: { ...searchRouteQuery('', includePartOffers.value, includeIndividualOffers.value), category: toUrlSlug(slug) || slug } })
+  router.push({ query: { ...searchRouteQuery('', includePartOffers.value, includeIndividualOffers.value), category: toUrlSlug(slug) || slug, ...(route.query.price_currency ? { price_currency: selectedPriceCurrency.value } : {}) } })
 }
 
 // Watch route query changes and trigger search
@@ -2574,7 +2608,7 @@ watch(() => route.query, () => {
       .map(([k, v]) => `${k}=${JSON.stringify(v)}`)
       .join('&')
 
-    const queryChanged = includeIndividualOffers.value !== prevQuery.includeIndividualOffers || includePartOffers.value !== prevQuery.includePartOffers || currentQ !== prevQuery.q || currentCategory !== prevQuery.category || currentCondition !== prevQuery.condition || currentPriceMin !== prevQuery.price_min || currentPriceMax !== prevQuery.price_max || currentAttrs !== prevQuery.attrs || currentSort !== prevQuery.sort || currentMaxDistance !== prevQuery.max_distance || currentCountry !== prevQuery.country || currentPlatforms !== prevQuery.platforms
+    const queryChanged = includeIndividualOffers.value !== prevQuery.includeIndividualOffers || includePartOffers.value !== prevQuery.includePartOffers || currentQ !== prevQuery.q || currentCategory !== prevQuery.category || currentCondition !== prevQuery.condition || currentPriceMin !== prevQuery.price_min || currentPriceMax !== prevQuery.price_max || currentAttrs !== prevQuery.attrs || currentSort !== prevQuery.sort || currentMaxDistance !== prevQuery.max_distance || currentCountry !== prevQuery.country || currentPlatforms !== prevQuery.platforms || selectedPriceCurrency.value !== prevQuery.price_currency
 
     if (queryChanged || !hasSearched.value) {
       performSearch()
@@ -2589,6 +2623,7 @@ watch(() => route.query, () => {
     prevQuery.max_distance = currentMaxDistance
     prevQuery.country = currentCountry
     prevQuery.platforms = currentPlatforms
+    prevQuery.price_currency = selectedPriceCurrency.value
 
     // Sync distance slider
     if (currentMaxDistance) {
@@ -2618,7 +2653,7 @@ watch(() => route.query, () => {
 })
 
 function formatPrice(amount: number) {
-  return new Intl.NumberFormat(locale.value === 'de' ? 'de-DE' : 'en-US', { style: 'currency', currency: 'EUR' }).format(amount)
+  return new Intl.NumberFormat(locale.value === 'de' ? 'de-DE' : 'en-US', { style: 'currency', currency: selectedPriceCurrency.value }).format(amount)
 }
 
 /** Build a better display name when product.name is just the brand or too generic */
@@ -2651,7 +2686,7 @@ function getDisplayCategory(product: ProductDocument): string | null {
 }
 
 function buildProductLink(): string {
-  const params = new URLSearchParams()
+  const params = new URLSearchParams({ price_currency: selectedPriceCurrency.value })
   if (selectedPlatforms.value.length) params.append('platforms', selectedPlatforms.value.join(','))
   if (selectedCountryCode.value) params.append('countries', selectedCountryCode.value)
   if (route.query.zip) params.append('zip', route.query.zip as string)

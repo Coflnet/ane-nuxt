@@ -194,7 +194,7 @@
   "searchResults": "Search Results",
   "noResultsFound": "No results found",
   "cataloguePriceReference": "Product-wide EUR reference",
-  "cataloguePriceScope": "Prices and price filters use product-wide EUR references across marketplaces and countries. Open a product to see matching offers in their original currencies.",
+  "cataloguePriceScope": "Prices and budgets use native asking prices in {currency} from the selected marketplaces and country. Unknown prices are shown as Check Price. No currency conversion.",
   "startingFrom": "Starting from",
   "checkPrice": "Check Price",
   "details": "Details",
