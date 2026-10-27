@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto max-w-6xl px-4 py-8">
+  <div class="container mx-auto max-w-6xl px-0 py-4 sm:px-4 sm:py-8">
     <nav
       class="mb-6 flex gap-4 text-sm"
       :aria-label="t('parts.tools')"
@@ -299,18 +299,18 @@
               :src="hit.imageUrl"
               alt=""
               loading="lazy"
-              class="h-24 w-24 shrink-0 rounded-lg object-contain"
+              class="h-16 w-16 sm:h-24 sm:w-24 shrink-0 rounded-lg object-contain"
             >
-            <div><h3 class="font-semibold text-white">{{ hit.name }}</h3><p class="mt-2 text-cyan-300">{{ hit.minPrice ? formatPrice(hit.minPrice) : t('parts.priceUnknown') }}</p><p class="mt-1 text-sm text-slate-400">{{ t('parts.offers', { count: hit.listingCount }) }}</p></div>
+            <div class="min-w-0 flex-1 [overflow-wrap:anywhere]"><h3 class="font-semibold text-white">{{ hit.name }}</h3><p class="mt-2 text-cyan-300">{{ hit.minPrice ? formatPrice(hit.minPrice) : t('parts.priceUnknown') }}</p><p class="mt-1 text-sm text-slate-400">{{ t('parts.offers', { count: hit.listingCount }) }}</p></div>
           </NuxtLink>
           <dl class="mt-4 grid grid-cols-2 gap-2 text-sm">
             <template
               v-for="field in resultFields"
               :key="field"
             >
-              <dt class="text-slate-400">
+              <dt class="min-w-0 [overflow-wrap:anywhere] text-slate-400">
                 {{ t(`parts.fields.${field}`) }}
-              </dt><dd class="text-slate-200">
+              </dt><dd class="min-w-0 [overflow-wrap:anywhere] text-slate-200">
                 {{ hit[field] ?? t('parts.unknown') }}
               </dd>
             </template>
@@ -599,4 +599,8 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .part-input { @apply w-full rounded-lg border border-slate-600 bg-slate-900 px-3 py-2 text-slate-100 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400; }
+@media (max-width: 639px) {
+  .part-input { min-height: 44px; font-size: 16px; }
+  button, summary { min-height: 44px; }
+}
 </style>

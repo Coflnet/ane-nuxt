@@ -6,6 +6,7 @@
     />
     <UiButton
       :primary="true"
+      :proccessing="savingFilter"
       aria-label="Save Filter"
       class="w-full block md:hidden mb-4"
       @on-click="saveFilter"

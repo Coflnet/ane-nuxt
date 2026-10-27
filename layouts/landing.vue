@@ -61,7 +61,11 @@
           </div>
           <div class="md:hidden">
             <button
-              class="text-gray-300 mr-4"
+              type="button"
+              class="size-11 inline-flex items-center justify-center rounded-lg text-gray-300 mr-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-400"
+              aria-label="Toggle navigation menu"
+              :aria-expanded="mobileMenuOpen"
+              aria-controls="landing-mobile-navigation"
               @click="mobileMenuOpen = !mobileMenuOpen"
             >
               <Icon
@@ -80,6 +84,7 @@
         <!-- Mobile menu -->
         <div
           v-if="mobileMenuOpen"
+          id="landing-mobile-navigation"
           class="md:hidden mt-4 space-y-4 text-center"
         >
           <a
@@ -108,7 +113,7 @@
           >{{
             $t('signIn') }}</a>
           <a
-            :href="mobileCtaPath"
+            :href="desktopCtaPath"
             class="block px-4 py-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition-all text-center shadow-lg shadow-indigo-900/20"
           >
             {{ isLoggedIn ? $t('overview') : $t('getStarted') }}
@@ -133,5 +138,4 @@ const isLoggedIn = computed(() => userStore?.isLoggedIn ?? false)
 const isWebView = computed(() => userStore?.isWebView ?? false)
 const logoPath = computed(() => localePath(isLoggedIn.value ? '/overview' : '/'))
 const desktopCtaPath = computed(() => localePath(isLoggedIn.value ? '/overview' : '/filters/create'))
-const mobileCtaPath = computed(() => localePath(isLoggedIn.value ? '/filters/create' : '/overview'))
 </script>

@@ -1,16 +1,16 @@
 <template>
   <div class="overflow-x-auto">
-    <table class="w-full text-left text-sm text-slate-400">
-      <thead class="text-xs uppercase bg-slate-800/50 text-slate-300">
-        <tr>
-          <th class="px-6 py-4 rounded-tl-lg">
+    <table class="block sm:table w-full text-left text-sm text-slate-400">
+      <thead class="block sm:table-header-group text-xs uppercase bg-slate-800/50 text-slate-300">
+        <tr class="flex sm:table-row">
+          <th class="hidden sm:table-cell px-6 py-4 rounded-tl-lg">
             {{ $t('product.marketplace') }}
           </th>
-          <th class="px-6 py-4">
+          <th class="hidden sm:table-cell px-6 py-4">
             {{ $t('product.title') }}
           </th>
           <th
-            class="px-6 py-4 cursor-pointer hover:text-white"
+            class="px-3 py-2 sm:px-6 sm:py-4 cursor-pointer hover:text-white"
             @click="$emit('sort', 'price')"
           >
             {{ $t('product.price') }}
@@ -20,7 +20,7 @@
             />
           </th>
           <th
-            class="px-6 py-4 cursor-pointer hover:text-white"
+            class="px-3 py-2 sm:px-6 sm:py-4 cursor-pointer hover:text-white"
             @click="$emit('sort', 'date')"
           >
             {{ $t('product.date') }}
@@ -29,19 +29,19 @@
               class="inline w-4 h-4"
             />
           </th>
-          <th class="px-6 py-4 rounded-tr-lg">
+          <th class="hidden sm:table-cell px-6 py-4 rounded-tr-lg">
             {{ $t('product.action') }}
           </th>
         </tr>
       </thead>
-      <tbody>
+      <tbody class="block sm:table-row-group">
         <tr
           v-for="listing in listings"
           :key="listing.listingId || listing.productId || ''"
-          class="border-b border-slate-700/50 hover:bg-slate-800/30"
+          class="grid grid-cols-[minmax(0,1fr)_auto] gap-x-2 p-3 sm:table-row sm:p-0 border-b border-slate-700/50 hover:bg-slate-800/30"
           :class="{ 'opacity-50': unavailableListings.has(listing.listingId || listing.productId || '') }"
         >
-          <td class="px-6 py-4 font-medium text-slate-200">
+          <td class="hidden sm:table-cell px-6 py-4 font-medium text-slate-200">
             <span class="inline-flex items-center gap-2">
               {{ listing.platform || getMarketplaceName(listing.listingUrl) }}
               <span
@@ -59,11 +59,11 @@
               </span>
             </span>
           </td>
-          <td class="px-6 py-4">
+          <td class="col-span-2 row-start-3 p-0 sm:px-6 sm:py-4">
             <a
               :href="listing.listingUrl ?? undefined"
               target="_blank"
-              class="hover:text-blue-400 transition-colors line-clamp-1"
+              class="hidden sm:line-clamp-1 hover:text-blue-400 transition-colors"
             >
               {{ listing.title }}
             </a>
@@ -87,19 +87,19 @@
               {{ $t('product.filters.distanceKm', { km: Math.round(listing.distanceKm) }) }}
             </span>
           </td>
-          <td class="px-6 py-4 font-bold text-slate-200">
+          <td class="col-start-1 row-start-1 p-0 sm:px-6 sm:py-4 font-bold text-slate-200">
             {{ formatPrice(listing.price, listing.currency) }}
           </td>
-          <td class="px-6 py-4">
+          <td class="col-start-1 row-start-2 p-0 sm:px-6 sm:py-4 text-xs sm:text-sm">
             {{ formatDate(listing.postedAt) }}
           </td>
-          <td class="px-6 py-4">
+          <td class="col-start-2 row-start-1 row-span-2 self-center p-0 sm:px-6 sm:py-4">
             <div class="flex items-center gap-2">
               <a
                 :href="listing.listingUrl ?? undefined"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="inline-flex items-center gap-1 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-full transition-all hover:scale-105 shadow-lg shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                class="inline-flex min-h-11 sm:min-h-0 shrink-0 whitespace-nowrap items-center gap-1 px-3 sm:px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-full transition-all hover:scale-105 shadow-lg shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 :class="{ 'pointer-events-none opacity-50': checkingAvailability.has(listing.listingId || listing.productId || '') }"
                 @click="handleViewDeal($event, listing)"
               >
@@ -117,8 +117,9 @@
                 </template>
               </a>
               <button
-                class="p-2 text-slate-400 hover:text-red-400 transition-colors"
+                class="min-w-11 min-h-11 sm:min-w-0 sm:min-h-0 shrink-0 p-2 text-slate-400 hover:text-red-400 transition-colors"
                 :title="$t('product.reportListing')"
+                :aria-label="$t('product.reportListing')"
                 @click="openReportDialog(listing)"
               >
                 <Icon

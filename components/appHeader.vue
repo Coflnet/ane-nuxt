@@ -15,8 +15,11 @@
             </div>
           </div>
           <button
-            class="mr-3 text-white md:hidden focus:outline-none"
+            type="button"
+            class="mr-3 size-11 shrink-0 inline-flex items-center justify-center rounded-lg text-white md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-400"
             aria-label="Toggle navigation menu"
+            :aria-expanded="isMobileMenuOpen"
+            aria-controls="mobile-navigation-menu"
             @click="toggleMobileMenu"
           >
             <Icon

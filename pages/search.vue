@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto px-4 py-6 sm:py-8">
+  <div class="container mx-auto px-0 py-2 sm:px-4 sm:py-8">
     <!-- Hero Section -->
     <div
       class="text-center"
@@ -59,7 +59,7 @@
         </h2>
         <div class="flex flex-wrap items-center gap-3">
           <button
-            class="lg:hidden inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-slate-200 bg-slate-800 border border-slate-600/50 hover:bg-slate-700 transition-colors"
+            class="lg:hidden inline-flex min-h-11 sm:min-h-0 items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-slate-200 bg-slate-800 border border-slate-600/50 hover:bg-slate-700 transition-colors"
             type="button"
             :aria-expanded="isFilterPanelOpen"
             @click="isFilterPanelOpen = !isFilterPanelOpen"
@@ -87,7 +87,7 @@
               type="button"
               role="radio"
               :aria-checked="activeSort === option.value"
-              class="whitespace-nowrap rounded-md px-3 py-1 transition-colors"
+              class="min-h-11 sm:min-h-0 whitespace-nowrap rounded-md px-3 py-1 transition-colors"
               :class="activeSort === option.value ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-700 hover:text-white'"
               @click="onSortSelect(option.value)"
             >
@@ -121,7 +121,7 @@
         </span>
       </div>
       <!-- Active filters badges -->
-      <div class="flex flex-wrap gap-2 mb-4">
+      <div class="active-filter-badges flex flex-wrap gap-2 mb-4">
         <span
           v-for="platform in selectedPlatforms"
           :key="platform"
@@ -143,6 +143,8 @@
           ≤ {{ selectedMaxDistance }} km
           <button
             class="ml-1 hover:text-white"
+            type="button"
+            :aria-label="`${$t('removeFilter', 'Remove filter')}: ${$t('maxDistance', 'Max distance (km)')}`"
             @click="clearDistanceFilter"
           >&times;</button>
         </span>
@@ -153,6 +155,8 @@
           {{ localizeCategory(selectedCategory) }}
           <button
             class="ml-1 hover:text-white"
+            type="button"
+            :aria-label="`${$t('removeFilter', 'Remove filter')}: ${localizeCategory(selectedCategory)}`"
             @click="clearFilter('category')"
           >&times;</button>
         </span>
@@ -163,6 +167,8 @@
           {{ localizeCondition(selectedCondition) }}
           <button
             class="ml-1 hover:text-white"
+            type="button"
+            :aria-label="`${$t('removeFilter', 'Remove filter')}: ${localizeCondition(selectedCondition)}`"
             @click="clearFilter('condition')"
           >&times;</button>
         </span>
@@ -173,6 +179,8 @@
           {{ $t('price', 'Price') }}: {{ selectedMinPrice ? formatPrice(selectedMinPrice) : '€0' }} – {{ selectedMaxPrice ? formatPrice(selectedMaxPrice) : '∞' }}
           <button
             class="ml-1 hover:text-white"
+            type="button"
+            :aria-label="`${$t('removeFilter', 'Remove filter')}: ${$t('price', 'Price')}`"
             @click="clearPriceFilter"
           >&times;</button>
         </span>
@@ -184,6 +192,8 @@
           {{ localizeAttrKey(String(key)) }}: {{ value.map(entry => localizeAttrValue(String(key), entry)).join(` ${$t('filterValueOr')} `) }}
           <button
             class="ml-1 hover:text-white"
+            type="button"
+            :aria-label="`${$t('removeFilter', 'Remove filter')}: ${localizeAttrKey(String(key))}`"
             @click="removeAttributeFilter(String(key))"
           >&times;</button>
         </span>
@@ -194,6 +204,8 @@
           {{ localizeAttrKey('os_version') }}: {{ selectedOsVersionMin ? `${selectedOsVersionMin}+` : $t('osVersionRuns', { version: selectedOsVersionSupports }) }}
           <button
             class="ml-1 hover:text-white"
+            type="button"
+            :aria-label="`${$t('removeFilter', 'Remove filter')}: ${localizeAttrKey('os_version')}`"
             @click="clearOsVersion"
           >&times;</button>
         </span>
@@ -203,7 +215,12 @@
             class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-purple-500/20 text-purple-400 text-xs border border-purple-500/30"
           >
             {{ localizeAttrKey(filter.key) }}: {{ filter.min ?? '…' }} – {{ filter.max ?? '…' }}
-            <button class="ml-1 hover:text-white" @click="clearRange(filter.key)">&times;</button>
+            <button
+              type="button"
+              class="ml-1 hover:text-white"
+              :aria-label="`${$t('removeFilter', 'Remove filter')}: ${localizeAttrKey(filter.key)}`"
+              @click="clearRange(filter.key)"
+            >&times;</button>
           </span>
         </template>
         <span
@@ -213,6 +230,8 @@
           {{ localizeAttrKey('screen_size') }}: {{ selectedScreenSizeMin ?? '…' }}&quot; – {{ selectedScreenSizeMax ?? '…' }}&quot;
           <button
             class="ml-1 hover:text-white"
+            type="button"
+            :aria-label="`${$t('removeFilter', 'Remove filter')}: ${localizeAttrKey('screen_size')}`"
             @click="clearRange('screen_size')"
           >&times;</button>
         </span>
@@ -224,6 +243,8 @@
           {{ localizeAttrKey('battery') }}: {{ selectedBatteryMin ?? batteryRangeMin }}% – {{ selectedBatteryMax ?? batteryRangeMax }}%
           <button
             class="ml-1 hover:text-white"
+            type="button"
+            :aria-label="`${$t('removeFilter', 'Remove filter')}: ${localizeAttrKey('battery')}`"
             @click="() => { batteryFilterMin = batteryRangeMin; batteryFilterMax = batteryRangeMax; const q = { ...route.query } as Record<string, string>; delete q.attr_battery_min; delete q.attr_battery_max; router.push({ query: q }) }"
           >&times;</button>
         </span>
@@ -708,6 +729,7 @@
                 <div class="flex items-center gap-2">
                   <input
                     v-model.number="distanceFilterKm"
+                    :aria-label="$t('maxDistance', 'Max distance (km)')"
                     type="number"
                     :min="1"
                     :max="500"
@@ -719,6 +741,7 @@
                 </div>
                 <input
                   :value="distanceFilterKm"
+                  :aria-label="$t('maxDistance', 'Max distance (km)')"
                   type="range"
                   :min="5"
                   :max="500"
@@ -2684,3 +2707,10 @@ useSeoMeta({
   ogType: 'website',
 })
 </script>
+
+<style scoped>
+@media (max-width: 639px) {
+  .active-filter-badges > span { max-width: 100%; overflow-wrap: anywhere; padding-block: 0; padding-right: 0; }
+  .active-filter-badges button { min-width: 44px; min-height: 44px; flex-shrink: 0; }
+}
+</style>

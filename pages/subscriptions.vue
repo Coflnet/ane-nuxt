@@ -1,5 +1,5 @@
 <template>
-  <div class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+  <div class="py-6 sm:py-12 px-0 sm:px-6 lg:px-8 max-w-7xl mx-auto">
     <div class="text-center mb-12">
       <h1 class="text-3xl font-extrabold text-white sm:text-4xl">
         {{ $t('chooseYourPlan') }}
@@ -16,10 +16,10 @@
           v-model="discountCode"
           type="text"
           :placeholder="$t('enterDiscountCode')"
-          class="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-indigo-500 focus:outline-none"
+          class="min-w-0 flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-indigo-500 focus:outline-none"
         >
         <button
-          class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors text-sm font-medium"
+          class="shrink-0 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors text-sm font-medium"
           @click="applyDiscount"
         >
           {{ $t('apply') }}

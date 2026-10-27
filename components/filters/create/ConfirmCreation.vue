@@ -1,5 +1,5 @@
 <template>
-  <div class="items-center justify-end space-x-4 pt-6 border-t border-slate-700 mt-6 hidden md:flex">
+  <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-4 pt-6 border-t border-slate-700 mt-6">
     <NuxtLink
       to="/filters"
       aria-label="Cancel Filter Creation"

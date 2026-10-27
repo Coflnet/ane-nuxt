@@ -59,7 +59,7 @@
           </div>
           <div class="flex flex-col gap-1">
             <label class="text-xs text-gray-400">{{ $t('location') }}</label>
-            <div class="flex gap-2">
+            <div class="flex flex-wrap sm:flex-nowrap gap-2">
               <input
                 v-model="locationZip"
                 type="text"
