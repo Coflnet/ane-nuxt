@@ -91,3 +91,97 @@ test('busy photo analysis preserves the image and measurements for retry', async
   assert.equal(state.form.boreMm, '8.5')
   assert.equal(state.photoLoading.value, false)
 })
+
+test('retargeting description, part number or machine prevents stale photo autofill', async () => {
+  for (const [field, value] of [['q', 'Kugellager 6203-2RS'], ['partNumber', 'OTHER-42'], ['machine', 'another machine']]) {
+    const { state, resolve, run } = photoState()
+    const pending = run()
+    state.form[field] = value
+    const manual = { ...state.form }
+    resolve({ teeth: 42, verified: false, confidence: 0.5 })
+    await pending
+    assert.deepEqual(state.form, manual, field)
+    assert.equal(state.photoEstimate.value.teeth, 42, 'the estimate remains available for manual review')
+  }
+})
+
+const choose = stripTypeScriptTypes(source.match(/async function choosePhoto\([\s\S]*?\n\}/)[0])
+function replacementPhotoState(decode = async () => ({ width: 100, height: 100, close() {} })) {
+  const revoked = []
+  const state = {
+    photoVersion: 0, photoRequest: undefined, t: key => key,
+    photoError: ref(''), photoEstimate: ref({ teeth: 40 }), photoBase64: ref('valid-photo'), photoPreview: ref('blob:valid'), photoDirty: ref(true),
+    form: partFormFromQuery({ class: 'gear', teeth: '40', boreMm: '8.5' }),
+    createImageBitmap: decode,
+    URL: { revokeObjectURL: value => revoked.push(value), createObjectURL: () => 'blob:replacement' },
+    document: { createElement: () => ({ getContext: () => ({ fillRect() {}, drawImage() {} }), toDataURL: () => 'replacement-photo' }) },
+  }
+  const run = file => new Function('state', 'event', `with (state) { ${choose}; return choosePhoto(event) }`)(state, { target: { files: [file] } })
+  return { state, revoked, run }
+}
+
+test('invalid replacement photos preserve the already selected valid photo and manual criteria', async () => {
+  for (const file of [{ type: 'image/heic', size: 10 }, { type: 'image/jpeg', size: 16 * 1024 * 1024 }]) {
+    const { state, revoked, run } = replacementPhotoState(() => {
+      throw new Error('invalid file must not decode')
+    })
+    const manual = { ...state.form }
+    await run(file)
+    assert.equal(state.photoError.value, 'parts.photoTypeError')
+    assert.equal(state.photoBase64.value, 'valid-photo')
+    assert.equal(state.photoPreview.value, 'blob:valid')
+    assert.equal(state.photoEstimate.value.teeth, 40)
+    assert.deepEqual(revoked, [])
+    assert.deepEqual(state.form, manual)
+  }
+})
+
+test('an unreadable replacement keeps the previous usable photo for retry', async () => {
+  const { state, revoked, run } = replacementPhotoState(async () => {
+    throw new Error('synthetic decode failure')
+  })
+  const pending = run({ type: 'image/jpeg', size: 100 })
+  const current = new AbortController()
+  state.photoRequest = current
+  await pending
+  assert.equal(state.photoError.value, 'parts.photoReadError')
+  assert.equal(state.photoBase64.value, 'valid-photo')
+  assert.equal(state.photoPreview.value, 'blob:valid')
+  assert.equal(state.photoEstimate.value.teeth, 40)
+  assert.equal(current.signal.aborted, false, 'failed replacement keeps analysis of the usable photo')
+  assert.deepEqual(revoked, [])
+})
+
+test('a decoded replacement commits the new photo and clears only the old photo estimate', async () => {
+  const { state, revoked, run } = replacementPhotoState()
+  const manual = { ...state.form }
+  await run({ type: 'image/jpeg', size: 100 })
+  assert.equal(state.photoBase64.value, 'replacement-photo')
+  assert.equal(state.photoPreview.value, 'blob:replacement')
+  assert.equal(state.photoEstimate.value, null)
+  assert.deepEqual(revoked, ['blob:valid'])
+  assert.deepEqual(state.form, manual)
+})
+
+test('a committed replacement aborts analysis started on the previous photo during decoding', async () => {
+  let finishDecode
+  const decoding = new Promise((resolve) => {
+    finishDecode = resolve
+  })
+  const { state, run } = replacementPhotoState(() => decoding)
+  const analysis = photoState()
+  Object.assign(state, { apiBase: '', photoLoading: ref(false), $fetch: analysis.state.$fetch })
+  const replacement = run({ type: 'image/jpeg', size: 100 })
+  const pending = new Function('state', `with (state) { ${analyze}; return analyzePhoto() }`)(state)
+  const request = state.photoRequest
+  assert.equal(request.signal.aborted, false)
+  finishDecode({ width: 100, height: 100, close() {} })
+  await replacement
+  assert.equal(request.signal.aborted, true)
+  analysis.resolve({ teeth: 42, verified: false, confidence: 0.5 })
+  await pending
+  assert.equal(state.photoBase64.value, 'replacement-photo')
+  assert.equal(state.photoEstimate.value, null)
+  assert.equal(state.form.teeth, '40')
+  assert.equal(state.photoLoading.value, false)
+})

@@ -82,7 +82,6 @@ test('numeric spec changes preserve repeated generic attribute choices', () => {
   assert.equal(next.attr_release_year_min, '2020')
 })
 
-
 test('year filters preserve independent signed integer boundaries and other repeated choices', () => {
   const query = { q: 'comics', attr_storage: ['128GB', '256GB'], attr_publication_year_min: '1972', attr_publication_year_max: '1980', attr_year_max: '-100', attr_release_year_min: '0' }
   assert.deepEqual(buildSpecApiFilters(query), ['release_year_min:0', 'publication_year_min:1972', 'publication_year_max:1980', 'year_max:-100'])
@@ -97,7 +96,7 @@ test('year filters preserve independent signed integer boundaries and other repe
 })
 
 test('precise screen dimensions and existing inch spellings reject other dimensions and composites', () => {
-  for (const value of ['5.43', '5.43"', '5,43 Zoll', '5.43 inch', '5.43 inches', "5.43''"]) assert.equal(parseBucketNumber(value), 5.43)
+  for (const value of ['5.43', '5.43"', '5,43 Zoll', '5.43 inch', '5.43 inches', '5.43\'\'']) assert.equal(parseBucketNumber(value), 5.43)
   for (const value of ['150 mm', '6 cm', '1920x1080', '6.1 x 3.2', 'Infinity']) assert.equal(parseBucketNumber(value), null)
   assert.deepEqual(buildSpecApiFilters({ attr_screen_size_min: '5.43', attr_screen_size_max: '5.43' }), ['screen_size_min:5.43', 'screen_size_max:5.43'])
 })
@@ -110,13 +109,25 @@ async function mountRange(props) {
     .replace(/import \{([^}]+)\} from ['"]vue['"]/g, (_, names) => `const {${names.replaceAll(' as ', ': ')}} = Vue`)
     .replace('export default', 'return')
   const component = new Function('Vue', `const { ref, watch } = Vue; ${code}`)(Vue)
-  const node = type => ({ type, tagName: type.toUpperCase(), props: {}, listeners: {}, children: [], addEventListener(name, fn) { this.listeners[name] = fn }, removeEventListener() {}, getRootNode: () => ({ activeElement: null }) })
+  const node = type => ({ type, tagName: type.toUpperCase(), props: {}, listeners: {}, children: [], addEventListener(name, fn) {
+    this.listeners[name] = fn
+  }, removeEventListener() {}, getRootNode: () => ({ activeElement: null }) })
   const renderer = Vue.createRenderer({
     createElement: node, createText: text => ({ ...node('#text'), text }), createComment: () => node('#comment'),
-    setText(n, text) { n.text = text }, setElementText(n, text) { n.text = text; n.children = [] },
+    setText(n, text) { n.text = text },
+    setElementText(n, text) {
+      n.text = text
+      n.children = []
+    },
     parentNode: n => n.parent, nextSibling: () => null,
-    patchProp(n, key, old, value) { n.props[key] = value; if (key === 'value') n.value = value },
-    insert(n, parent) { n.parent = parent; parent.children.push(n) }, remove() {},
+    patchProp(n, key, old, value) {
+      n.props[key] = value
+      if (key === 'value') n.value = value
+    },
+    insert(n, parent) {
+      n.parent = parent
+      parent.children.push(n)
+    }, remove() {},
   })
   const emitted = []
   const root = node('root')
@@ -158,7 +169,8 @@ test('rendered precise inputs retain current values through filtered bounds and 
     assert.equal(view.find('screen-size-max').value, '')
     await view.change('screen-size-min', '')
     assert.deepEqual(view.emitted.at(-1), { min: null, max: null })
-  } finally { view.unmount() }
+  }
+  finally { view.unmount() }
 })
 
 test('actual page year controls survive single-value and empty responses without losing URL selection', async () => {

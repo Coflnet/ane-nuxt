@@ -497,10 +497,6 @@ async function choosePhoto(event: Event) {
   const version = ++photoVersion
   photoRequest?.abort()
   photoError.value = ''
-  photoEstimate.value = null
-  photoBase64.value = ''
-  if (photoPreview.value) URL.revokeObjectURL(photoPreview.value)
-  photoPreview.value = ''
   if (!['image/jpeg', 'image/png'].includes(file.type) || file.size > 15 * 1024 * 1024) {
     photoError.value = t('parts.photoTypeError')
     return
@@ -520,9 +516,13 @@ async function choosePhoto(event: Event) {
     context.fillRect(0, 0, canvas.width, canvas.height)
     context.drawImage(image, 0, 0, canvas.width, canvas.height)
     image.close()
-    photoBase64.value = canvas.toDataURL('image/jpeg', 0.9)
+    const base64 = canvas.toDataURL('image/jpeg', 0.9)
+    const preview = URL.createObjectURL(file)
+    photoRequest?.abort()
     if (photoPreview.value) URL.revokeObjectURL(photoPreview.value)
-    photoPreview.value = URL.createObjectURL(file)
+    photoBase64.value = base64
+    photoPreview.value = preview
+    photoEstimate.value = null
     photoDirty.value = true
   }
   catch { photoError.value = t('parts.photoReadError') }
@@ -534,7 +534,7 @@ async function analyzePhoto() {
   photoRequest = current
   photoLoading.value = true
   photoError.value = ''
-  const photoFields = ['class', 'mode', 'teeth', 'teeth_observed', 'arc_degrees'] as const
+  const photoFields = ['q', 'partNumber', 'machine', 'class', 'mode', 'teeth', 'teeth_observed', 'arc_degrees'] as const
   const photoValues = photoFields.map(field => form[field])
   try {
     const estimate = await $fetch<GearPhotoEstimate>(`${apiBase}/api/parts/photo`, {
