@@ -7,10 +7,10 @@
   >
     <div class="flex flex-wrap items-center gap-2">
       <!-- My country + country picker -->
-      <div class="inline-flex items-stretch rounded-full overflow-hidden border" :class="active === 'country' ? 'border-blue-500/60' : 'border-slate-600/50'">
+      <div class="inline-flex max-w-full flex-wrap sm:flex-nowrap items-stretch rounded-xl sm:rounded-full overflow-hidden border" :class="active === 'country' ? 'border-blue-500/60' : 'border-slate-600/50'">
         <button
           type="button"
-          class="px-4 py-2 text-sm font-medium transition-colors inline-flex items-center gap-2"
+          class="min-h-11 px-4 py-2 text-sm font-medium transition-colors inline-flex items-center gap-2"
           :class="active === 'country' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'"
           :aria-pressed="active === 'country'"
           data-testid="offer-filter-country"
@@ -22,7 +22,7 @@
         <select
           :value="country"
           :aria-label="$t('product.filters.changeCountry')"
-          class="bg-slate-800 text-slate-300 text-sm border-l border-slate-600/50 px-2 focus:outline-none focus:ring-2 focus:ring-blue-500/50 max-w-[7rem]"
+          class="min-h-11 bg-slate-800 text-slate-300 text-sm border-l border-slate-600/50 px-2 focus:outline-none focus:ring-2 focus:ring-blue-500/50 max-w-[7rem]"
           @change="onCountrySelect"
         >
           <option

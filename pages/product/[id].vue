@@ -12,7 +12,7 @@
       class="max-w-7xl mx-auto"
     >
       <!-- Breadcrumb -->
-      <nav class="flex text-sm text-slate-400 mb-6">
+      <nav class="flex flex-wrap text-sm text-slate-400 mb-6">
         <NuxtLink
           :to="localePath('/')"
           class="hover:text-blue-400"

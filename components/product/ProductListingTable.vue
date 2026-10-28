@@ -58,7 +58,7 @@
         <tr
           v-for="(listing, listingIndex) in sortedListings"
           :key="listingIdentityKey(listing) || JSON.stringify([listing.platform, listing.listingUrl, listingIndex])"
-          class="grid grid-cols-[minmax(0,1fr)_auto] gap-x-2 p-3 sm:table-row sm:p-0 border-b border-slate-700/50 hover:bg-slate-800/30"
+          class="grid grid-cols-[minmax(0,1fr)_auto] gap-x-1 p-2 sm:table-row sm:p-0 border-b border-slate-700/50 hover:bg-slate-800/30"
           :class="{ 'opacity-50': unavailableListings.has(listingIdentityKey(listing) || '') }"
         >
           <td class="hidden sm:table-cell px-6 py-4 font-medium text-slate-200">
