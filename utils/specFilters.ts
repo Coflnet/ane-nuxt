@@ -2,7 +2,7 @@
 // them as attr_* params; the API receives the same names without the prefix as `attributes=key:value`
 // (see ProductSearchQueryBuilder.BuildImpliedAttributeQueries / BuildAttributeRangeQueries in AneApi).
 
-export const MEASUREMENT_RANGE_KEYS = ['wrench_size_mm', 'length_mm', 'part_inner_mm', 'part_outer_diameter_mm', 'part_width_mm'] as const
+export const MEASUREMENT_RANGE_KEYS = ['wrench_size_mm', 'socket_size_mm', 'length_mm', 'part_inner_mm', 'part_outer_diameter_mm', 'part_width_mm'] as const
 
 /** URL params that are ranges/"or newer" and get their own controls instead of generic attribute chips. */
 export const SPEC_RANGE_PARAMS = [
@@ -18,6 +18,8 @@ export const SPEC_RANGE_PARAMS = [
   'attr_screen_size_max',
   'attr_wrench_size_mm_min',
   'attr_wrench_size_mm_max',
+  'attr_socket_size_mm_min',
+  'attr_socket_size_mm_max',
   'attr_length_mm_min',
   'attr_length_mm_max',
   'attr_part_inner_mm_min',

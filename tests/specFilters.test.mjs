@@ -195,7 +195,7 @@ test('actual page year controls survive single-value and empty responses without
 })
 
 test('millimetre ranges match exact API syntax and preserve independent search scope', () => {
-  assert.deepEqual(MEASUREMENT_RANGE_KEYS, ['wrench_size_mm', 'length_mm', 'part_inner_mm', 'part_outer_diameter_mm', 'part_width_mm'])
+  assert.deepEqual(MEASUREMENT_RANGE_KEYS, ['wrench_size_mm', 'socket_size_mm', 'length_mm', 'part_inner_mm', 'part_outer_diameter_mm', 'part_width_mm'])
   for (const value of ['10.5', '10,5', ' 10,5 MM ', '10.5mm']) assert.equal(measurementNumber(value), 10.5)
   for (const value of ['0', '-1', '+1', '1e3', '12 cm', '10x20', 'Infinity', 'NaN']) assert.equal(measurementNumber(value), null)
   const query = { q: 'Bahco', platforms: ['Ebay', 'Blocket'], country: 'SE', price_currency: 'SEK', attr_article_number: ['111M-10', '111M-13'] }
@@ -208,6 +208,11 @@ test('millimetre ranges match exact API syntax and preserve independent search s
   assert.equal(hasInvalidMeasurementRange({ attr_length_mm_min: '20', attr_length_mm_max: '10' }), true)
   assert.equal(hasInvalidMeasurementRange({ attr_length_mm_min: ['10', '20'] }), true)
   assert.equal(hasInvalidMeasurementRange({ attr_wrench_size_mm_min: 'bad' }), true)
+  const socket = withRangeParams(query, 'socket_size_mm', { min: 4.5, max: 13 })
+  assert.deepEqual(buildSpecApiFilters(socket), ['socket_size_mm_min:4.5', 'socket_size_mm_max:13'])
+  assert.deepEqual(withRangeParams(socket, 'socket_size_mm', {}), query)
+  assert.equal(hasInvalidMeasurementRange({ attr_socket_size_mm_min: '13', attr_socket_size_mm_max: '4,5 mm' }), true)
+  assert.equal(hasInvalidMeasurementRange({ attr_socket_size_mm_min: '1/4 inch' }), true)
 })
 
 test('millimetre inputs reject reversed and nonpositive ranges without emitting or losing edits', async () => {

@@ -5,28 +5,29 @@ import test from 'node:test'
 import * as Vue from 'vue'
 import { parse, compileScript } from '@vue/compiler-sfc'
 import { renderToString } from '@vue/server-renderer'
-import { lowestSameCurrencyOffer, referenceWebUrl } from '../utils/shopReference.ts'
+import { lowestSameCurrencyOffer, referenceWebUrl, validAutomaticReference } from '../utils/shopReference.ts'
 import { formatHistoryPrice, parseHistoryCurrency } from '../utils/priceHistory.ts'
 
 const source = await readFile(new URL('../components/product/ShopReference.vue', import.meta.url), 'utf8')
 const fixture = { selectedReference: { selector: '/price', price: 200, currency: 'PLN' }, url: 'https://shop.example/camera', host: 'shop.example', listing: { title: 'Camera body' }, priceCandidates: [{ selector: '/price', text: '200 PLN', price: 200, currency: 'PLN' }, { selector: '/shipping', text: '10 PLN delivery', price: 10, currency: 'PLN' }] }
 const offers = [{ price: 5, currency: 'EUR', title: 'Euro camera' }, { price: 100, currency: 'PLN', title: 'Used camera body', condition: 'Used', listingUrl: 'https://market.example/camera' }, { price: 120, currency: 'PLN' }]
 
-async function componentState(respond = async () => fixture) {
+async function componentState(respond = async () => fixture, productId) {
   const { descriptor } = parse(source)
-  const script = stripTypeScriptTypes(descriptor.scriptSetup.content.replace(/^import .*$/gm, '').replace('const props = defineProps<{ offers: ShopOffer[] }>()', ''))
+  const script = stripTypeScriptTypes(descriptor.scriptSetup.content.replace(/^import .*$/gm, '').replace(/const props = defineProps<.*>\(\)/, ''))
   const calls = []
-  const props = Vue.reactive({ offers: [...offers] })
-  const factory = new Function('ref', 'computed', 'watch', 'props', 'useI18n', 'apiClient', '$fetch', 'lowestSameCurrencyOffer', 'referenceWebUrl', 'parseHistoryCurrency', `
+  const props = Vue.reactive({ offers: [...offers], productId })
+  let mounted
+  const factory = new Function('ref', 'computed', 'watch', 'props', 'useI18n', 'apiClient', '$fetch', 'lowestSameCurrencyOffer', 'referenceWebUrl', 'parseHistoryCurrency', 'onMounted', 'validAutomaticReference', `
     ${script}
-    return { url, loading, error, preview, observedAt, selectedSelector, currencyLabel, confirmed, selectedPrice, currency, lowestOffer, clearPreview, loadPreview };
+    return { url, loading, error, preview, observedAt, selectedSelector, currencyLabel, confirmed, selectedPrice, currency, lowestOffer, clearPreview, loadPreview, automatic, automaticLoading, loadAutomatic };
   `)
   const scope = Vue.effectScope()
   const state = scope.run(() => factory(Vue.ref, Vue.computed, Vue.watch, props, () => ({ t: key => key, locale: Vue.ref('en') }), { getConfig: () => ({ baseURL: 'https://ane.example' }) }, async (url, options) => {
     calls.push({ url, options })
     return respond()
-  }, lowestSameCurrencyOffer, referenceWebUrl, parseHistoryCurrency))
-  return { state, calls, props, stop: () => scope.stop() }
+  }, lowestSameCurrencyOffer, referenceWebUrl, parseHistoryCurrency, (callback) => { mounted = callback }, validAutomaticReference))
+  return { state, calls, props, mount: () => mounted(), stop: () => scope.stop() }
 }
 
 test('comparison uses explicit same-currency loaded offers and never cached EUR or unknown amounts', () => {
@@ -99,22 +100,22 @@ test('actual component only fetches on explicit action, requires price selection
 })
 
 async function renderReference(language, options = {}) {
-  const seed = `url.value = __fixture.url; preview.value = __fixture; observedAt.value = '2026-10-28T10:00:00Z'; selectedSelector.value = '/price'; currencyLabel.value = __currency; confirmed.value = __confirmed;`
+  const seed = `automatic.value = __automatic; url.value = __fixture.url; preview.value = __fixture; observedAt.value = '2026-10-28T10:00:00Z'; selectedSelector.value = '/price'; currencyLabel.value = __currency; confirmed.value = __confirmed;`
   const { descriptor } = parse(source.replace('</script>', `${seed}\n</script>`))
   const compiled = stripTypeScriptTypes(compileScript(descriptor, { id: 'shop-reference', inlineTemplate: true }).content)
     .replace(/import \{([^}]+)\} from ['"]vue['"]/g, (_, names) => `const {${names.replaceAll(' as ', ': ')}} = Vue`)
     .replace(/^import .*$/gm, '').replace('export default', 'return')
   const labels = JSON.parse(await readFile(new URL(`../locales/${language}.json`, import.meta.url), 'utf8'))
   const t = key => key.split('.').reduce((value, part) => value?.[part], labels) ?? key
-  const component = new Function('Vue', 'useI18n', 'apiClient', 'formatHistoryPrice', 'parseHistoryCurrency', 'lowestSameCurrencyOffer', 'referenceWebUrl', '__fixture', '__currency', '__confirmed', compiled)(Vue, () => ({ locale: Vue.ref(language), t }), {}, formatHistoryPrice, parseHistoryCurrency, lowestSameCurrencyOffer, referenceWebUrl, options.preview ?? fixture, options.currency ?? 'PLN', options.confirmed ?? false)
+  const component = new Function('Vue', 'useI18n', 'apiClient', 'formatHistoryPrice', 'parseHistoryCurrency', 'lowestSameCurrencyOffer', 'referenceWebUrl', '__fixture', '__currency', '__confirmed', '__automatic', 'validAutomaticReference', compiled)(Vue, () => ({ locale: Vue.ref(language), t }), {}, formatHistoryPrice, parseHistoryCurrency, lowestSameCurrencyOffer, referenceWebUrl, options.preview ?? fixture, options.currency ?? 'PLN', options.confirmed ?? false, options.automatic ?? null, validAutomaticReference)
   return renderToString(Vue.createSSRApp(component, { offers }))
 }
 
 test('actual reference component SSR exposes native contextual amounts and guards numeric difference behind explicit confirmation', async () => {
   for (const language of ['en', 'de']) {
     const contextual = await renderReference(language)
-    assert.match(contextual, /^<details\b/)
-    assert.doesNotMatch(contextual.slice(0, contextual.indexOf('>') + 1), /\sopen[\s=>]/u, 'optional shop form is collapsed by default')
+    assert.match(contextual, /<details\b/)
+    assert.doesNotMatch(contextual.match(/<details[^>]*>/)[0], /\sopen[\s=>]/u, 'optional shop form is collapsed by default')
     assert.match(contextual, /<summary[^>]*min-h-11/)
     assert.match(contextual, /shop.example/)
     assert.match(contextual, /200,?\.?00?\s*(PLN|zł)|PLN\s*200/)
@@ -165,5 +166,67 @@ test('malformed preview schemas use the visible retry error and preserve the ent
       assert.equal(page.state.loading.value, false)
     }
     finally { page.stop() }
+  }
+})
+
+const automaticQuote = { provider: 'Lefeld', url: 'https://www.lefeld.de/knipex-kombizange-03-01-160-160mm', merchantSku: '10024102;12433', brand: 'KNIPEX', mpn: '03 01 160', gtin: '4003773013235', price: 10.07, currency: 'EUR', availability: 'LimitedAvailability', condition: 'unknown', observedAt: '2026-10-28T15:26:24Z' }
+
+test('actual automatic handler loads by exact product ID on mount using GET, without manual input or confirmation', async () => {
+  const page = await componentState(async () => ({ status: 'found', reference: automaticQuote }), 'knipex/03 01 160')
+  try {
+    await page.mount()
+    assert.equal(page.calls.length, 1)
+    assert.equal(page.calls[0].url, 'https://ane.example/api/Product/knipex%2F03%2001%20160/shop-reference')
+    assert.deepEqual(page.calls[0].options, { method: 'GET' })
+    assert.deepEqual(page.state.automatic.value.reference, automaticQuote)
+    assert.equal(page.state.preview.value, null)
+    assert.equal(page.state.selectedPrice.value, undefined)
+    assert.equal(page.state.confirmed.value, false)
+    assert.equal(page.state.url.value, '')
+  }
+  finally { page.stop() }
+  const manualOnly = await componentState()
+  try {
+    await manualOnly.mount()
+    assert.equal(manualOnly.calls.length, 0)
+  }
+  finally { manualOnly.stop() }
+})
+
+test('automatic reference rejects invalid source/price/condition and permits a useful GET retry without losing manual input', async () => {
+  for (const change of [{ url: 'https://wrong.example/knipex-03-01-160' }, { currency: 'USD' }, { price: 0 }, { price: Infinity }, { condition: 'used' }, { availability: 'OutOfStock' }, { observedAt: 'invalid' }, { brand: '' }]) {
+    assert.equal(validAutomaticReference({ ...automaticQuote, ...change }), false)
+  }
+  let attempt = 0
+  const page = await componentState(async () => ++attempt === 1 ? { status: 'found', reference: { ...automaticQuote, currency: 'USD' } } : { status: 'found', reference: automaticQuote }, 'knipex-0301160')
+  try {
+    page.state.url.value = fixture.url
+    await page.mount()
+    assert.equal(page.state.automatic.value.status, 'temporarily_unavailable')
+    assert.equal(page.state.url.value, fixture.url)
+    await page.state.loadAutomatic()
+    assert.equal(page.state.automatic.value.status, 'found')
+    assert.equal(page.calls.length, 2)
+    assert(page.calls.every(call => call.options.method === 'GET'))
+    assert.equal(page.state.url.value, fixture.url)
+  }
+  finally { page.stop() }
+})
+
+test('actual automatic markup labels unknown condition, source, currency and freshness without an automatic profit calculation', async () => {
+  for (const language of ['en', 'de']) {
+    const html = await renderReference(language, { automatic: { status: 'found', reference: automaticQuote } })
+    const automatic = html.slice(html.indexOf('<section'), html.indexOf('</section>'))
+    assert.match(automatic, /Lefeld/)
+    assert.match(automatic, /03 01 160/)
+    assert.match(automatic, /Condition unspecified|Zustand nicht angegeben/)
+    assert.match(automatic, /2026-10-28T15:26:24Z/)
+    assert.match(automatic, /10[.,]07/)
+    assert.match(automatic, /EUR/)
+    assert.match(automatic, /not resale profit|kein Wiederverkaufsgewinn/)
+    assert.doesNotMatch(automatic, /shop-reference-gap|200|100 PLN/)
+    const unavailable = await renderReference(language, { automatic: { status: 'temporarily_unavailable' } })
+    assert.match(unavailable, /Retry store reference|Shop-Referenz erneut laden/)
+    assert.match(unavailable, /role="status"/)
   }
 })

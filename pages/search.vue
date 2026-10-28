@@ -2044,6 +2044,9 @@ const attrKeyTranslationMap: Record<string, string> = {
   'article_number': 'attr_article_number',
   'length_mm': 'attr_length_mm',
   'wrench_size_mm': 'attr_wrench_size_mm',
+  'socket_size_mm': 'attr_socket_size_mm',
+  'square_drive_inches': 'attr_square_drive_inches',
+  'socket_profile': 'attr_socket_profile',
   'part_inner_mm': 'attr_part_inner_mm',
   'part_outer_diameter_mm': 'attr_part_outer_diameter_mm',
   'part_width_mm': 'attr_part_width_mm',
@@ -2103,7 +2106,10 @@ const attrKeyTranslationMap: Record<string, string> = {
 
 // Common attribute value translations (for colors, sizes, etc.)
 const attrValueTranslationMap: Record<string, Record<string, string>> = {
+  socket_profile: { hex: 'socketProfileHex', bi_hex: 'socketProfileBiHex' },
   tool_type: {
+    socket: 'tool_socket',
+    deep_socket: 'tool_deep_socket',
     combination_pliers: 'tool_combination_pliers',
     diagonal_cutter: 'tool_diagonal_cutter',
     water_pump_pliers: 'tool_water_pump_pliers',

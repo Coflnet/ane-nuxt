@@ -777,6 +777,7 @@
 
       <ProductShopReference
         :key="productId"
+        :product-id="productId"
         :offers="matches"
       />
 
