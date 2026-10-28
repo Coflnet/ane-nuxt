@@ -90,7 +90,9 @@ export default defineNuxtConfig({
     '/marketplaces/**': { prerender: prerenderMarketingRoutes },
     // SSR'd on demand, then cached + revalidated in the background (big repeat-load win).
     '/product/**': { swr: 600 },
-    '/search': { swr: 60 },
+    // Store coverage expires with its quote; inline fresh search data instead of caching a second payload render.
+    '/search': { swr: false, cache: false },
+    '/de/search': { swr: false, cache: false },
     '/_ipx/**': { prerender: false },
     // Internal tool: depends on the visitor, so never prerendered or cached, and never indexed.
     '/labeling': { prerender: false, swr: false, cache: false, robots: false },
