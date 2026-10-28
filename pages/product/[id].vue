@@ -184,7 +184,14 @@
           </p>
 
           <p
-            v-if="isBroadProductGroup"
+            v-if="isUnidentifiedMediaPage"
+            class="mb-6 text-sm text-amber-300"
+            data-testid="unidentified-media-notice"
+          >
+            {{ $t('product.unidentifiedMediaNotice') }}
+          </p>
+          <p
+            v-if="isBroadProductGroup && !isUnidentifiedMediaPage"
             class="mb-6 text-sm text-amber-300"
             data-testid="broad-product-price-hint"
           >
@@ -340,14 +347,14 @@
       >
         <div class="p-6 border-b border-slate-800">
           <h2 class="text-2xl font-bold text-white">
-            {{ $t(isBroadProductGroup ? 'product.broadHistoryTitle' : 'product.priceHistoryTitle') }}
+            {{ $t(isUnidentifiedMediaPage ? 'product.mediaHistoryTitle' : isBroadProductGroup ? 'product.broadHistoryTitle' : 'product.priceHistoryTitle') }}
           </h2>
           <p
             v-if="isBroadProductGroup"
             class="mt-3 text-sm text-amber-300"
             data-testid="broad-product-history-hint"
           >
-            {{ $t('product.broadHistoryHint') }}
+            {{ $t(isUnidentifiedMediaPage ? 'product.mediaHistoryHint' : 'product.broadHistoryHint') }}
           </p>
           <label class="block text-sm text-slate-300 mt-3">
             {{ $t('product.historyWindow') }}
@@ -440,7 +447,10 @@
             {{ $t('product.historicalMedian') }}: ~{{ formatRecordedPrice(priceStats.medianPrice || 0) }}
             <span class="text-sm text-slate-400"> · {{ $t('product.historySamples', { count: priceStats.dataPoints }) }}</span>
           </p>
-          <p class="text-sm text-slate-400 mt-2">
+          <p
+            v-if="!isUnidentifiedMediaPage"
+            class="text-sm text-slate-400 mt-2"
+          >
             {{ $t('product.historyAskingContext') }}
           </p>
           <p
@@ -456,7 +466,7 @@
           data-testid="history-daily-details"
         >
           <summary class="cursor-pointer text-blue-300">
-            {{ $t(isBroadProductGroup ? 'product.broadHistoryRecords' : 'product.historyDailySnapshots') }}
+            {{ $t(isUnidentifiedMediaPage ? 'product.mediaHistoryRecords' : isBroadProductGroup ? 'product.broadHistoryRecords' : 'product.historyDailySnapshots') }}
           </summary>
           <div class="overflow-x-auto mt-4">
             <table
@@ -464,7 +474,7 @@
               data-testid="history-daily-table"
             >
               <caption class="sr-only">
-                {{ $t(isBroadProductGroup ? 'product.broadHistoryRecords' : 'product.historyDailySnapshots') }} ({{ recordedCurrency }})
+                {{ $t(isUnidentifiedMediaPage ? 'product.mediaHistoryRecords' : isBroadProductGroup ? 'product.broadHistoryRecords' : 'product.historyDailySnapshots') }} ({{ recordedCurrency }})
               </caption>
               <thead class="text-slate-300">
                 <tr>
@@ -779,6 +789,7 @@
       </div>
 
       <ProductShopReference
+        v-if="!isUnidentifiedMediaPage"
         :key="productId"
         :product-id="productId"
         :offers="matches"
@@ -786,7 +797,7 @@
 
       <!-- Related Products -->
       <div
-        v-if="relatedProducts.length > 0"
+        v-if="!isUnidentifiedMediaPage && relatedProducts.length > 0"
         class="mt-8"
       >
         <h2 class="text-2xl font-bold text-white mb-4">
@@ -931,7 +942,7 @@ import { useOfferCountry } from '~/composable/useOfferCountry'
 import { listingIdentityKey } from '~/utils/listingIdentity'
 import { buildProductResourceUrl } from '~/utils/productApiUrl'
 import { buildNotifyFilterUrl } from '~/utils/notifyFilterUrl'
-import { isIndividualOffer } from '~/utils/searchCurrency'
+import { isIndividualOffer, isUnidentifiedMediaOffer } from '~/utils/searchCurrency'
 import { formatHistoryPrice, historyCurrencies, chooseHistoryCurrency, selectHistoryCurrency, parseHistoryCurrency, historyTimeFraction, HISTORY_WINDOWS, parseHistoryDays } from '~/utils/priceHistory'
 import {
   caseOfId,
@@ -1049,7 +1060,8 @@ const { data: historyData, loading: historyLoading, error: historyError, refresh
   { watch: [historyDays, requestedHistoryCurrency] },
 )
 // Keep the chart and summary bound to the same completed window, including navigation races.
-const isBroadProductGroup = computed(() => product.value?.isCatchAll === true && !isIndividualOffer(product.value))
+const isUnidentifiedMediaPage = computed(() => isUnidentifiedMediaOffer(product.value))
+const isBroadProductGroup = computed(() => isUnidentifiedMediaPage.value || (product.value?.isCatchAll === true && !isIndividualOffer(product.value)))
 const currentHistory = computed(() => !historyLoading.value && !historyError.value && historyData.value?.days === historyDays.value && historyData.value?.requestedCurrency === requestedHistoryCurrency.value ? historyData.value : null)
 const rawPriceHistory = computed(() => currentHistory.value?.history ?? [])
 const recordedCurrency = computed(() => currentHistory.value?.currency ?? null)
@@ -1318,6 +1330,7 @@ const attrKeyTranslationMap: Record<string, string> = {
   wrench_size_mm: 'attr_wrench_size_mm',
   package_scope: 'attr_package_scope',
   product_kind: 'attr_product_type',
+  media_format: 'attr_media_format',
   carburetor_designation: 'attr_carburetor_designation',
   compatibility_brands: 'attr_compatibility_brands',
   compatibility_source: 'attr_compatibility_source',
@@ -1656,7 +1669,7 @@ onMounted(async () => {
   })
   const [, relatedRes, facetsRes] = await Promise.all([
     loadMatches(),
-    $fetch<ProductWithOffers[]>(buildRelatedProductsUrl(productId)).catch(() => []),
+    isUnidentifiedMediaPage.value ? [] : $fetch<ProductWithOffers[]>(buildRelatedProductsUrl(productId)).catch(() => []),
     // 404 on an older API: the filter then hides the counts
     $fetch<unknown>(buildFacetsUrl(productId)).catch(() => null),
   ])

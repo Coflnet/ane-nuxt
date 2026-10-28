@@ -2131,6 +2131,7 @@ const attrKeyTranslationMap: Record<string, string> = {
   'service': 'attr_service',
   'product type': 'attr_product_type',
   'product_type': 'attr_product_type',
+  'media_format': 'attr_media_format',
   'console name': 'attr_console_name',
   'console_name': 'attr_console_name',
   'game name': 'attr_game_name',
@@ -2169,6 +2170,7 @@ const attrValueTranslationMap: Record<string, Record<string, string>> = {
     unspecified: 'package_scope_unspecified',
   },
   product_kind: {
+    media_offer: 'product_kind_media_offer',
     hand_tool: 'product_kind_hand_tool',
     power_tool: 'product_kind_power_tool',
     furniture_offer: 'product_kind_furniture_offer',
