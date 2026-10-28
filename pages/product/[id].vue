@@ -289,7 +289,10 @@
                       {{ localizeAttrValue(String(key), opt.value) }}
                     </option>
                   </select>
-                  <span v-else>{{ localizeAttrValue(String(key), String(value)) }}</span>
+                  <span
+                    v-else
+                    class="min-w-0 [overflow-wrap:anywhere]"
+                  >{{ localizeAttrValue(String(key), String(value)) }}</span>
                 </div>
               </div>
             </div>
