@@ -114,12 +114,12 @@
             {{ formatDate(listing.postedAt) }}
           </td>
           <td class="col-start-2 row-start-1 row-span-2 self-center p-0 sm:px-6 sm:py-4">
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1 sm:gap-2">
               <a
                 :href="listing.listingUrl ?? undefined"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="inline-flex min-h-11 sm:min-h-0 shrink-0 whitespace-nowrap items-center gap-1 px-3 sm:px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-full transition-all hover:scale-105 shadow-lg shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                class="inline-flex min-h-11 sm:min-h-0 shrink-0 whitespace-nowrap items-center gap-1 px-1 sm:px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-full transition-all hover:scale-105 shadow-lg shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 :class="{ 'pointer-events-none opacity-50': checkingAvailability.has(listingIdentityKey(listing) || '') }"
                 @click="handleViewDeal($event, listing)"
               >
@@ -132,7 +132,7 @@
                   {{ $t('product.viewDeal') }}
                   <Icon
                     name="tabler:external-link"
-                    class="w-3 h-3"
+                    class="hidden sm:block w-3 h-3"
                   />
                 </template>
               </a>
