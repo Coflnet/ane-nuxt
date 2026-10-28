@@ -44,11 +44,11 @@ export type ClientModelMatchStats = {
     searchesAvailableMonthly?: number | null;
 };
 
-export type ClientModelPlatform = 'Unknown' | 'Ebay' | 'Kleinanzeigen' | 'Marktplaats' | 'Willhaben' | 'Shpock' | 'MarktDe' | 'Vinted' | 'Facebook' | 'Poshmark' | 'Mercari' | 'Depop' | 'Mobile' | 'AutoScout24' | 'WirKaufenDeinAuto' | 'AutoDe' | 'Gebrauchtwagen12' | 'Craigslist' | 'OfferUp' | 'OLX' | 'Quoka' | 'Gumtree' | 'Kijiji' | 'Carousell' | 'Carvana' | 'Autotrader' | 'CarsGuide' | 'Nextdoor' | 'Lebecoin' | 'Wallapop';
+export type ClientModelPlatform = 'Unknown' | 'Ebay' | 'Kleinanzeigen' | 'Marktplaats' | 'Willhaben' | 'Shpock' | 'MarktDe' | 'Vinted' | 'Facebook' | 'Poshmark' | 'Mercari' | 'Depop' | 'Mobile' | 'AutoScout24' | 'WirKaufenDeinAuto' | 'AutoDe' | 'Gebrauchtwagen12' | 'Craigslist' | 'OfferUp' | 'OLX' | 'Quoka' | 'Gumtree' | 'Kijiji' | 'Carousell' | 'Carvana' | 'Autotrader' | 'CarsGuide' | 'Nextdoor' | 'Lebecoin' | 'Wallapop' | 'Subito' | 'Milanuncios' | 'Allegro' | 'AllegroLokalnie' | 'Ricardo' | 'Tutti' | 'Anibis' | 'Tradera' | 'Blocket' | 'Finn' | 'Tori' | 'DBA' | 'TwoDehands' | 'Bazos' | 'Sbazar' | 'Adverts' | 'DoneDeal' | 'ParuVendu' | 'Rakuten' | 'Catawiki' | 'Cardmarket' | 'Delcampe' | 'Vendora' | 'Jofogas' | 'Njuskalo' | 'UnknownDefaultOpenApi';
 
 export type ClientModelPriceKind = 'Unknown' | 'BuyItemNow' | 'Auction' | 'Negotiatable' | 'IncludesTax';
 
-export type ClientModelSearchState = 'None' | 'Disabled' | 'DisabledError';
+export type ClientModelSearchState = 'None' | 'Disabled' | 'DisabledError' | 'DisabledInactive';
 
 export type ClientModelStoredListing = {
     platform?: ClientModelPlatform;
@@ -78,6 +78,8 @@ export type ClientModelStoredListing = {
     createdAt?: string | null;
     soldBefore?: string | null;
     commercial?: boolean | null;
+    seoId?: string | null;
+    categories?: Array<string> | null;
     priceKindList?: Array<ClientModelPriceKind> | null;
 };
 
@@ -86,7 +88,7 @@ export type ClientModelStringStringKeyValuePair = {
     value?: string | null;
 };
 
-export type ClientModelTargetType = 'Unknown' | 'FireBase' | 'DiscordWebhook' | 'Email' | 'WhatsApp';
+export type ClientModelTargetType = 'Unknown' | 'FireBase' | 'DiscordWebhook' | 'Email' | 'WhatsApp' | 'UnknownDefaultOpenApi';
 
 export type CoflnetAuthTokenContainer = {
     authToken?: string | null;
@@ -115,6 +117,21 @@ export type ControllersListingExistsResponse = {
      * Whether the listing is already known
      */
     exists?: boolean;
+};
+
+export type ControllersPartPhotoEstimate = {
+    teeth?: number | null;
+    verified?: boolean;
+    confidence?: number;
+    reason?: string | null;
+    teethObserved?: number | null;
+    arcDegrees?: number | null;
+    teethEstimatedFromFragment?: number | null;
+};
+
+export type ControllersPartPhotoRequest = {
+    imageBase64?: string | null;
+    mode?: string | null;
 };
 
 export type ControllersProductControllerAvailabilityResult = {
@@ -157,6 +174,7 @@ export type ExtensionDiscoveredListing = {
     price?: number | null;
     currency?: string | null;
     imageUrls?: Array<string> | null;
+    browserCaptureUnverified?: boolean;
 };
 
 export type ExtensionDiscoveryResponse = {
@@ -339,6 +357,10 @@ export type LabelingBandStats = {
 
 export type LabelingLabelingControllerLabelRequest = {
     label?: string | null;
+    /**
+     * UI exposure only; neither mode certifies reviewer independence or an untouched holdout.
+     */
+    reviewMode?: string | null;
 };
 
 export type LabelingLabelingControllerMeResponse = {
@@ -363,7 +385,7 @@ export type LabelingLabelingStats = {
 
 export type LabelingNextPair = {
     pairId?: string | null;
-    similarity?: number;
+    similarity?: number | null;
     secondBest?: number | null;
     decision?: string | null;
     groupKey?: string | null;
@@ -459,6 +481,45 @@ export type ListingSaleEvidence = {
     soldObservedAt?: string | null;
 };
 
+export type MarketplaceFilterMatch = {
+    listenerId?: number | null;
+    listingData?: MarketplaceStoredListing;
+    matchedAt?: string | null;
+};
+
+export type MarketplaceStoredListing = {
+    id?: string | null;
+    title?: string | null;
+    descriptionShort?: string | null;
+    description?: string | null;
+    category?: string | null;
+    street?: string | null;
+    locality?: string | null;
+    region?: string | null;
+    country?: string | null;
+    imageUrls?: Array<string> | null;
+    price?: number | null;
+    currency?: string | null;
+    contact?: string | null;
+    userId?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
+    shipping?: string | null;
+    returnPolicy?: string | null;
+    priceKind?: PriceKind;
+    attributes?: {
+        [key: string]: string;
+    } | null;
+    foundAt?: string;
+    createdAt?: string | null;
+    soldBefore?: string | null;
+    commercial?: boolean | null;
+    platform?: Platform;
+    seoId?: string | null;
+    categories?: Array<string> | null;
+    priceKindList?: Array<PriceKind> | null;
+};
+
 export type MicrosoftAspNetCoreMvcProblemDetails = {
     type?: string | null;
     title?: string | null;
@@ -487,6 +548,105 @@ export type ModelsInviteLinkResponse = {
  * Types of issues that can be reported
  */
 export type ModelsIssueType = 'WrongCategory' | 'Duplicate' | 'WrongListing' | 'IncorrectInformation' | 'Spam' | 'Other' | 'WrongMatch' | 'SameProductAs';
+
+/**
+ * Represents a categorized product aggregated from multiple listings
+ */
+export type ModelsProduct = {
+    /**
+     * Unique product identifier (SEO ID)
+     */
+    id?: string | null;
+    /**
+     * Product name/title
+     */
+    name?: string | null;
+    /**
+     * Primary product category
+     */
+    category?: string | null;
+    /**
+     * All categories this product belongs to
+     */
+    categories?: Array<string> | null;
+    /**
+     * Product brand (if applicable)
+     */
+    brand?: string | null;
+    /**
+     * Product model number or identifier
+     */
+    model?: string | null;
+    /**
+     * Product description
+     */
+    description?: string | null;
+    /**
+     * Product condition (new, like_new, good, used, broken)
+     */
+    condition?: string | null;
+    /**
+     * URL to product image
+     */
+    imageUrl?: string | null;
+    /**
+     * Number of active listings for this product
+     */
+    listingCount?: number;
+    /**
+     * Product attributes (e.g., storage_size, ram_size, color)
+     */
+    attributes?: {
+        [key: string]: string;
+    } | null;
+    /**
+     * Lowest price across all listings
+     */
+    minPrice?: number | null;
+    /**
+     * Highest price across all listings
+     */
+    maxPrice?: number | null;
+    /**
+     * Average price across all listings
+     */
+    avgPrice?: number | null;
+    /**
+     * When this product was first created
+     */
+    createdAt?: string;
+    /**
+     * Last time this product data was updated
+     */
+    updatedAt?: string;
+    /**
+     * Id of the verified known-products catalog entry this product's brand/model (or name) matches;
+     * null when nothing in the catalog matches (including when the catalog is disabled or empty).
+     */
+    knownProductId?: string | null;
+    /**
+     * Verified allowed values per attribute key for Coflnet.Ane.Models.Product.KnownProductId's catalog entry (e.g.
+     * storage_size -> ["128GB", "256GB", "512GB"]); null when Coflnet.Ane.Models.Product.KnownProductId is null. A
+     * key present with an empty list means the key is allowed but its value is not verified/limited.
+     */
+    possibleAttributes?: {
+        [key: string]: Array<string>;
+    } | null;
+    /**
+     * True when this product currently has at least one active listing. Coflnet.Ane.Models.Product.ListingCount
+     * alone cannot answer this - it counts listings that went inactive up to 30 days ago too - so a
+     * product can show a non-zero listing count while having zero active offers. The frontend uses this
+     * to decide whether to load `GET /api/product/{id}/alternatives` for a product page without
+     * re-requesting the matches endpoint.
+     */
+    hasActiveOffers?: boolean;
+    /**
+     * True when this is a catch-all page (`nike-clothing-unspecific`, ...): a collection of offers that
+     * could not be assigned to a specific product. Such pages are excluded from search, suggestions, related,
+     * alternatives, category counts and sitemaps; the page should show a hint and be marked noindex.
+     */
+    isCatchAll?: boolean;
+};
 
 /**
  * An alternative product suggested for a product page that has no active offers - same shape as
@@ -613,6 +773,7 @@ export type ModelsProductIssueReport = {
      * Listing the report is about (required for Coflnet.Ane.Models.IssueType.WrongMatch)
      */
     listingId?: string | null;
+    listingPlatform?: Platform;
     /**
      * The other product (required for Coflnet.Ane.Models.IssueType.SameProductAs)
      */
@@ -632,9 +793,13 @@ export type ModelsProductIssueReport = {
  */
 export type ModelsProductMatch = {
     /**
-     * Listing ID from kleinanzeigen.de
+     * Legacy numeric listing identifier. Use NativeListingId with Platform for exact offer identity.
      */
     listingId?: number;
+    /**
+     * Exact opaque marketplace ID, including any country prefix; pair with Platform.
+     */
+    nativeListingId?: string | null;
     /**
      * Product ID this listing belongs to
      */
@@ -718,8 +883,6 @@ export type OpensearchProductDocument = {
     condition?: string | null;
     averagePrice?: number | null;
     medianPrice?: number | null;
-    scopedMinPrice?: number | null;
-    scopedPriceCurrency?: string | null;
     minPrice?: number | null;
     maxPrice?: number | null;
     listingCount?: number | null;
@@ -733,6 +896,19 @@ export type OpensearchProductDocument = {
     countries?: Array<string> | null;
     canonicalSeoId?: string | null;
     relatedSeoIds?: Array<string> | null;
+    marketplaceSourcesVersion?: number | null;
+    marketplaceSources?: Array<OpensearchProductMarketplaceSource> | null;
+    scopedMinPrice?: number | null;
+    scopedPriceCurrency?: string | null;
+    storeReferences?: Array<ShopReferencesProductStoreReference> | null;
+};
+
+export type OpensearchProductMarketplaceSource = {
+    platform?: string | null;
+    country?: string | null;
+    sourceCurrency?: string | null;
+    minPrice?: number | null;
+    maxPrice?: number | null;
 };
 
 export type PaymentControllerActiveSubscription = {
@@ -764,8 +940,6 @@ export type Platform = 'Unknown' | 'Ebay' | 'Kleinanzeigen' | 'Marktplaats' | 'W
 export type PriceKind = 'Unknown' | 'BuyItemNow' | 'Auction' | 'Negotiatable' | 'IncludesTax';
 
 export type PricePoint = {
-    /** Explicit recorded currency; null for unverified legacy snapshots. */
-    currency?: string | null;
     productSeoId?: string | null;
     date?: string;
     averagePrice?: number;
@@ -773,42 +947,11 @@ export type PricePoint = {
     minPrice?: number;
     maxPrice?: number;
     sampleCount?: number;
-};
-
-export type Product = {
-    id?: string | null;
-    category?: Array<string> | null;
-    name?: string | null;
-    normalizedName?: string | null;
-    brand?: string | null;
-    model?: string | null;
-    identifierType?: string | null;
-    identifierValue?: string | null;
-    condition?: string | null;
-    averagePrice?: number;
-    medianPrice?: number;
-    minPrice?: number;
-    maxPrice?: number;
-    estimatedValue?: number | null;
-    soldCount?: number | null;
-    listingCount?: number;
-    offersFound?: number;
-    createdAt?: string;
-    lastUpdated?: string;
-    sampleTitles?: Array<string> | null;
-    imageUrl?: string | null;
-    attributes?: {
-        [key: string]: string;
-    } | null;
-    localizedNames?: {
-        [key: string]: string;
-    } | null;
-    canonicalSeoId?: string | null;
-    relatedSeoIds?: Array<string> | null;
+    currency?: string | null;
 };
 
 export type ReferenceListingsReferenceListingPreviewRequest = {
-    url?: string | null;
+    url: string;
     locale?: string | null;
     selectedSelector?: string | null;
     additionalSelectors?: Array<string> | null;
@@ -1044,25 +1187,29 @@ export type ServicesPartSearchResponse = {
 };
 
 /**
- * Price history statistics response DTO
+ * Price history statistics response DTO. Monetary statistics are null unless every selected row certifies one common currency.
  */
 export type ServicesPriceHistoryStats = {
-    /** Explicit common recorded currency; null when prices cannot be safely aggregated. */
-    currency?: string | null;
-    /** Estimated from daily aggregates, never an exact pooled listing median. */
-    medianIsApproximate?: boolean;
     /**
-     * Total daily listing samples; the same listing may recur across days
+     * Common recorded currency, or null when any snapshot lacks it or currencies differ.
+     */
+    currency?: string | null;
+    /**
+     * Total daily listing samples; the same listing can appear in multiple daily snapshots.
      */
     dataPoints?: number;
     /**
-     * Sample-weighted mean of selected same-currency daily means; null when incomparable
+     * Sample-count-weighted average of the recorded daily mean prices.
      */
     averagePrice?: number | null;
     /**
-     * Sample-weighted estimate from same-currency daily medians; not a pooled listing median
+     * Estimated upper median of daily medians weighted by their sample counts, not the exact pooled listing median.
      */
     medianPrice?: number | null;
+    /**
+     * True when the median is estimated from daily aggregates rather than individual listing prices.
+     */
+    medianIsApproximate?: boolean;
     /**
      * Minimum price found in the history period
      */
@@ -1157,7 +1304,7 @@ export type ServicesProductRelations = {
  */
 export type ServicesProductServiceFilterBucket = {
     value?: string | null;
-    count?: number;
+    count?: number | null;
     sampleImageUrl?: string | null;
 };
 
@@ -1234,15 +1381,16 @@ export type ServicesProductServiceSearchProductsResult = {
     } | null;
     categoryBuckets?: Array<ServicesProductServiceFilterBucket> | null;
     conditionBuckets?: Array<ServicesProductServiceFilterBucket> | null;
-    platformBuckets?: Array<ServicesProductServiceFilterBucket> | null;
     attributeBuckets?: {
         [key: string]: Array<ServicesProductServiceFilterBucket>;
     } | null;
     priceMin?: number | null;
-    priceCurrency?: string | null;
-    currencyBuckets?: Array<ServicesProductServiceFilterBucket> | null;
     priceMax?: number | null;
     interpretation?: ServicesProductServiceSearchInterpretation;
+    platformBuckets?: Array<ServicesProductServiceFilterBucket> | null;
+    priceCurrency?: string | null;
+    currencyBuckets?: Array<ServicesProductServiceFilterBucket> | null;
+    storeBuckets?: Array<ServicesProductServiceFilterBucket> | null;
 };
 
 export type ServicesProductServiceSearchSuggestion = {
@@ -1252,6 +1400,26 @@ export type ServicesProductServiceSearchSuggestion = {
     imageUrl?: string | null;
     category?: string | null;
     minPrice?: number | null;
+};
+
+export type ServicesShopReferenceObservation = {
+    provider?: string | null;
+    url?: string | null;
+    merchantSku?: string | null;
+    brand?: string | null;
+    mpn?: string | null;
+    gtin?: string | null;
+    price?: number;
+    currency?: string | null;
+    availability?: string | null;
+    condition?: string | null;
+    observedAt?: string;
+};
+
+export type ServicesShopReferenceResult = {
+    status?: string | null;
+    reference?: ServicesShopReferenceObservation;
+    retryAt?: string | null;
 };
 
 /**
@@ -1290,6 +1458,22 @@ export type ServicesUnidentifiedGamesPage = {
      * Pass back as `pagingState` for the next page; null on the last page.
      */
     nextPagingState?: string | null;
+};
+
+export type ShopReferencesProductStoreReference = {
+    knownProductId?: string | null;
+    provider?: string | null;
+    url?: string | null;
+    merchantSku?: string | null;
+    brand?: string | null;
+    mpn?: string | null;
+    gtin?: string | null;
+    price?: number;
+    currency?: string | null;
+    availability?: string | null;
+    condition?: string | null;
+    observedAt?: string;
+    expiresAt?: string;
 };
 
 export type TrainingReportsControllerResolutionRequest = {
@@ -3030,6 +3214,59 @@ export type NextResponses = {
 
 export type NextResponse = NextResponses[keyof NextResponses];
 
+export type DiagnosticsData = {
+    body?: never;
+    path: {
+        pairId: string;
+    };
+    query?: never;
+    url: '/api/labeling/{pairId}/diagnostics';
+};
+
+export type DiagnosticsErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type DiagnosticsError = DiagnosticsErrors[keyof DiagnosticsErrors];
+
+export type DiagnosticsResponses = {
+    /**
+     * OK
+     */
+    200: LabelingNextPair;
+};
+
+export type DiagnosticsResponse = DiagnosticsResponses[keyof DiagnosticsResponses];
+
 export type LabelData = {
     body?: LabelingLabelingControllerLabelRequest;
     path: {
@@ -3392,7 +3629,7 @@ export type GetMatchesResponses = {
     /**
      * OK
      */
-    200: Array<ClientModelFilterMatch>;
+    200: Array<MarketplaceFilterMatch>;
 };
 
 export type GetMatchesResponse = GetMatchesResponses[keyof GetMatchesResponses];
@@ -3508,6 +3745,57 @@ export type ExistsResponses = {
 
 export type ExistsResponse = ExistsResponses[keyof ExistsResponses];
 
+export type MeasureData = {
+    body?: ControllersPartPhotoRequest;
+    path?: never;
+    query?: never;
+    url: '/api/parts/photo';
+};
+
+export type MeasureErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type MeasureError = MeasureErrors[keyof MeasureErrors];
+
+export type MeasureResponses = {
+    /**
+     * OK
+     */
+    200: ControllersPartPhotoEstimate;
+};
+
+export type MeasureResponse = MeasureResponses[keyof MeasureResponses];
+
 export type SearchPartsData = {
     body?: never;
     path?: never;
@@ -3528,6 +3816,7 @@ export type SearchPartsData = {
         machine?: string;
         tolerance?: number;
         limit?: number;
+        toleranceMm?: number;
     };
     url: '/api/parts/search';
 };
@@ -3563,6 +3852,10 @@ export type SearchPartsErrors = {
          */
         trace?: string;
     };
+    /**
+     * Service Unavailable
+     */
+    503: unknown;
 };
 
 export type SearchPartsError = SearchPartsErrors[keyof SearchPartsErrors];
@@ -3950,7 +4243,7 @@ export type GetProductResponses = {
     /**
      * OK
      */
-    200: Product;
+    200: ModelsProduct;
 };
 
 export type GetProductResponse = GetProductResponses[keyof GetProductResponses];
@@ -4015,7 +4308,7 @@ export type GetRelatedProductsResponses = {
     /**
      * OK
      */
-    200: Array<Product>;
+    200: Array<ModelsProduct>;
 };
 
 export type GetRelatedProductsResponse = GetRelatedProductsResponses[keyof GetRelatedProductsResponses];
@@ -4130,6 +4423,7 @@ export type GetProductMatchesData = {
          * ISO country code used for the zip lookup (default DE)
          */
         zipCountry?: string;
+        priceCurrency?: string;
     };
     url: '/api/Product/{id}/matches';
 };
@@ -4238,6 +4532,60 @@ export type GetProductMatchFacetsResponses = {
 
 export type GetProductMatchFacetsResponse = GetProductMatchFacetsResponses[keyof GetProductMatchFacetsResponses];
 
+export type GetListingAvailabilityData = {
+    body?: never;
+    path?: never;
+    query?: {
+        platform?: Platform;
+        id?: string;
+    };
+    url: '/api/Product/availability';
+};
+
+export type GetListingAvailabilityErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetListingAvailabilityError = GetListingAvailabilityErrors[keyof GetListingAvailabilityErrors];
+
+export type GetListingAvailabilityResponses = {
+    /**
+     * OK
+     */
+    200: ControllersProductControllerAvailabilityResult;
+};
+
+export type GetListingAvailabilityResponse = GetListingAvailabilityResponses[keyof GetListingAvailabilityResponses];
+
 export type IsProductAvailableData = {
     body?: never;
     path: {
@@ -4300,8 +4648,6 @@ export type SearchProductsData = {
          * Search query
          */
         query?: string;
-        /** Include active identified individual collectible and part offers. */
-        includeIndividualOffers?: boolean;
         /**
          * Optional category filter
          */
@@ -4314,8 +4660,6 @@ export type SearchProductsData = {
          * Optional attribute filters as key:value pairs (e.g. attributes=color:black)
          */
         attributes?: Array<string>;
-        /** Native scoped asking-price currency; omitted keeps the legacy EUR contract. */
-        priceCurrency?: string;
         /**
          * Optional minimum price filter
          */
@@ -4340,14 +4684,34 @@ export type SearchProductsData = {
          * Maximum distance in km (requires lat/lon)
          */
         maxDistanceKm?: number;
-        /** Canonical marketplace names, comma separated (OR within this filter). */
-        platforms?: string;
+        /**
+         * Optional single two-letter country code, trimmed and case-insensitive. Validates ASCII syntax, not registry membership; EU is not expanded here.
+         */
         country?: string;
         offset?: number;
         /**
          * Maximum results (default 20)
          */
         limit?: number;
+        /**
+         * Discover values of this attribute within the search scope, omitting product hits.
+         */
+        facetKey?: string;
+        /**
+         * Literal substring to match before limiting attribute values to 50.
+         */
+        facetQuery?: string;
+        /**
+         * Include active individual mechanical part offers alongside comparable products; default false.
+         */
+        includePartOffers?: boolean;
+        /**
+         * Include active identified individual collectible and part offers; default false.
+         */
+        includeIndividualOffers?: boolean;
+        platforms?: string;
+        priceCurrency?: string;
+        store?: string;
     };
     url: '/api/Product/search';
 };
@@ -4409,7 +4773,9 @@ export type GetPriceHistoryData = {
          * Number of days of history to retrieve (default 90, max 365)
          */
         days?: number;
-        /** Exact recorded currency; legacy unknown rows are excluded when selected. */
+        /**
+         * Optional exact recorded currency; omitted returns raw records including legacy null currency.
+         */
         currency?: string;
     };
     url: '/api/Product/{id}/price-history';
@@ -4450,6 +4816,10 @@ export type GetPriceHistoryErrors = {
          */
         trace?: string;
     };
+    /**
+     * Service Unavailable
+     */
+    503: unknown;
 };
 
 export type GetPriceHistoryError = GetPriceHistoryErrors[keyof GetPriceHistoryErrors];
@@ -4476,7 +4846,9 @@ export type GetPriceStatsData = {
          * Number of days of history to analyze (default 90, max 365)
          */
         days?: number;
-        /** Exact recorded currency; legacy unknown rows are excluded when selected. */
+        /**
+         * Optional exact recorded currency. Monetary aggregates are null unless all selected rows certify one currency.
+         */
         currency?: string;
     };
     url: '/api/Product/{id}/price-stats';
@@ -4517,6 +4889,10 @@ export type GetPriceStatsErrors = {
          */
         trace?: string;
     };
+    /**
+     * Service Unavailable
+     */
+    503: unknown;
 };
 
 export type GetPriceStatsError = GetPriceStatsErrors[keyof GetPriceStatsErrors];
@@ -5198,6 +5574,63 @@ export type UseLinkResponses = {
      */
     200: unknown;
 };
+
+export type GetData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/Product/{id}/shop-reference';
+};
+
+export type GetErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Not Found
+     */
+    404: MicrosoftAspNetCoreMvcProblemDetails;
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetError = GetErrors[keyof GetErrors];
+
+export type GetResponses = {
+    /**
+     * OK
+     */
+    200: ServicesShopReferenceResult;
+};
+
+export type GetResponse = GetResponses[keyof GetResponses];
 
 export type GetSitemapIndexData = {
     body?: never;
@@ -5968,3 +6401,52 @@ export type UpdateMeResponses = {
 };
 
 export type UpdateMeResponse = UpdateMeResponses[keyof UpdateMeResponses];
+
+export type RecordActivityData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/user/activity';
+};
+
+export type RecordActivityErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type RecordActivityError = RecordActivityErrors[keyof RecordActivityErrors];
+
+export type RecordActivityResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};

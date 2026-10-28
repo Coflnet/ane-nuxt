@@ -197,7 +197,7 @@ async function loadEditParam() {
     filter.value.notificationTarget = activeFilter.target ?? ''
     filter.value.name = activeFilter.name ?? ''
     filter.value.id = activeFilter.id ?? 0
-    filter.value.notificationType = activeFilter.targetType ?? 'Unknown'
+    filter.value.notificationType = activeFilter.targetType === 'UnknownDefaultOpenApi' ? 'Unknown' : activeFilter.targetType ?? 'Unknown'
 
     activeFilter.filters.forEach((item) => {
       switch (item.name) {

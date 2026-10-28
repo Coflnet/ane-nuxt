@@ -1,4 +1,4 @@
-import { getMatches, type ClientModelFilterMatch as FilterMatch, type Platform, type ClientModelStoredListing as StoredListing } from '~/src/api-client'
+import { getMatches, type ClientModelFilterMatch as FilterMatch, type ClientModelStoredListing as StoredListing } from '~/src/api-client'
 
 export const useListingStore = defineStore('listing', () => {
   const userStore = useUserStore()
@@ -64,7 +64,7 @@ export const useListingStore = defineStore('listing', () => {
     return getUrl(listing.platform, listing.id, lang)
   }
 
-  function getUrl(listing: Platform, id: string, lang: string) {
+  function getUrl(listing: NonNullable<StoredListing['platform']>, id: string, lang: string) {
     if (listing === 'Kleinanzeigen') {
       return `https://www.kleinanzeigen.de/s-anzeige/copy/${id}-1-1`
     }

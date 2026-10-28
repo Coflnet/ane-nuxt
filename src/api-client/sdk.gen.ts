@@ -2,7 +2,7 @@
 
 import type { Client, Composable, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { AddFilterData, AddFilterError, AddFilterResponse, CancelSubscriptionData, CancelSubscriptionError, CancelSubscriptionResponse, CreateLinkData, CreateLinkError, CreateLinkResponse, DaysData, DaysError, DeleteData, DeleteError, DeleteFilterData, DeleteFilterError, DeleteFilterWithTokenData, DeleteFilterWithTokenError, DeleteMeData, DeleteMeError, DiscoverData, DiscoverError, DiscoverResponse, DoRedirectData, DoRedirectError, ExistsData, ExistsError, ExistsResponse, ExportData, ExportError, GetAllCategoriesData, GetAllCategoriesError, GetAllCategoriesResponse, GetAttributesToExtractData, GetAttributesToExtractError, GetAttributesToExtractResponse, GetCategoriesWithCountsData, GetCategoriesWithCountsError, GetCategoriesWithCountsResponse, GetCategoryCountsBySlugData, GetCategoryCountsBySlugError, GetCategoryCountsBySlugResponse, GetCategoryData, GetCategoryError, GetCategoryResponse, GetCountryData, GetCountryError, GetCountryResponse, GetDiscountData, GetDiscountError, GetDiscountResponse, GetFilterByTokenData, GetFilterByTokenError, GetFilterByTokenResponse, GetFiltersData, GetFiltersError, GetFiltersResponse, GetFlipReportsData, GetFlipReportsError, GetFlipReportsResponse, GetFlipsData, GetFlipsError, GetFlipsResponse, GetInfoData, GetInfoError, GetInfoResponse, GetLinkData, GetLinkError, GetLinkResponse, GetLiveFlipsData, GetLiveFlipsError, GetLocationData, GetLocationError, GetLocationResponse, GetMatchesData, GetMatchesError, GetMatchesResponse, GetMeData, GetMeError, GetMeResponse, GetOptionsData, GetOptionsError, GetOptionsResponse, GetPartDetailsData, GetPartDetailsError, GetPartDetailsResponse, GetPartsForMachineData, GetPartsForMachineError, GetPartsForMachineResponse, GetPointsData, GetPointsError, GetPointsResponse, GetPriceHistoryData, GetPriceHistoryError, GetPriceHistoryResponse, GetPriceStatsData, GetPriceStatsError, GetPriceStatsResponse, GetProductAlternativesData, GetProductAlternativesError, GetProductAlternativesResponse, GetProductData, GetProductError, GetProductMatchesData, GetProductMatchesError, GetProductMatchesResponse, GetProductMatchFacetsData, GetProductMatchFacetsError, GetProductMatchFacetsResponse, GetProductRelationsData, GetProductRelationsError, GetProductRelationsResponse, GetProductResponse, GetRegroupRunData, GetRegroupRunError, GetRelatedProductsData, GetRelatedProductsError, GetRelatedProductsResponse, GetReportData, GetReportError, GetScopeData, GetScopeError, GetScopeResponse, GetSitemapChunkData, GetSitemapChunkDeData, GetSitemapChunkDeError, GetSitemapChunkError, GetSitemapIndexData, GetSitemapIndexDeData, GetSitemapIndexDeError, GetSitemapIndexError, GetStatsData, GetStatsError, GetStatsResponse, GetSubCategoriesData, GetSubCategoriesError, GetSubCategoriesResponse, GetSubscriptionData, GetSubscriptionError, GetSubscriptionResponse, GetSuggestionsData, GetSuggestionsError, GetSuggestionsResponse, GetTasksData, GetTasksError, GetTasksResponse, GetTopLevelCategoriesData, GetTopLevelCategoriesError, GetTopLevelCategoriesResponse, GetTrainingSamplesData, GetTrainingSamplesError, GetTrainingSamplesResponse, GetUnidentifiedGamesData, GetUnidentifiedGameSeriesData, GetUnidentifiedGameSeriesError, GetUnidentifiedGameSeriesResponse, GetUnidentifiedGamesError, GetUnidentifiedGamesResponse, IsProductAvailableData, IsProductAvailableError, IsProductAvailableResponse, LabelData, LabelError, ListData, ListError, ListingsData, ListingsError, ListLinksData, ListLinksError, ListLinksResponse, LoginFirebaseData, LoginFirebaseError, LoginFirebaseResponse, MarketplacesData, MarketplacesError, MeData, MeError, MeResponse, MovesData, MovesError, NextData, NextError, NextResponse, PhotoData, PhotoError, PreviewData, PreviewError, PreviewResponse, ReportFlipData, ReportFlipError, ReportFlipResponse, ReportMatchData, ReportMatchError, ReportMatchResponse, ReportProductIssueData, ReportProductIssueError, ResolveCategoryPathData, ResolveCategoryPathError, ResolveCategoryPathResponse, ResolveData, ResolveError, SearchPartsData, SearchPartsError, SearchPartsResponse, SearchProductsData, SearchProductsError, SearchProductsResponse, SeedData, SeedError, SeedResponse, StatsData, StatsError, StatsResponse, SubmitData, SubmitError, SubmitResponse, SubscribeData, SubscribeError, SubscribeResponse, TakedownData, TakedownError, TakedownResponse, TestFilterData, TestFilterError, TestFilterResponse, UpdateMeData, UpdateMeError, UpdateMeResponse, UseLinkData, UseLinkError } from './types.gen';
+import type { AddFilterData, AddFilterError, AddFilterResponse, CancelSubscriptionData, CancelSubscriptionError, CancelSubscriptionResponse, CreateLinkData, CreateLinkError, CreateLinkResponse, DaysData, DaysError, DeleteData, DeleteError, DeleteFilterData, DeleteFilterError, DeleteFilterWithTokenData, DeleteFilterWithTokenError, DeleteMeData, DeleteMeError, DiagnosticsData, DiagnosticsError, DiagnosticsResponse, DiscoverData, DiscoverError, DiscoverResponse, DoRedirectData, DoRedirectError, ExistsData, ExistsError, ExistsResponse, ExportData, ExportError, GetAllCategoriesData, GetAllCategoriesError, GetAllCategoriesResponse, GetAttributesToExtractData, GetAttributesToExtractError, GetAttributesToExtractResponse, GetCategoriesWithCountsData, GetCategoriesWithCountsError, GetCategoriesWithCountsResponse, GetCategoryCountsBySlugData, GetCategoryCountsBySlugError, GetCategoryCountsBySlugResponse, GetCategoryData, GetCategoryError, GetCategoryResponse, GetCountryData, GetCountryError, GetCountryResponse, GetData, GetDiscountData, GetDiscountError, GetDiscountResponse, GetError, GetFilterByTokenData, GetFilterByTokenError, GetFilterByTokenResponse, GetFiltersData, GetFiltersError, GetFiltersResponse, GetFlipReportsData, GetFlipReportsError, GetFlipReportsResponse, GetFlipsData, GetFlipsError, GetFlipsResponse, GetInfoData, GetInfoError, GetInfoResponse, GetLinkData, GetLinkError, GetLinkResponse, GetListingAvailabilityData, GetListingAvailabilityError, GetListingAvailabilityResponse, GetLiveFlipsData, GetLiveFlipsError, GetLocationData, GetLocationError, GetLocationResponse, GetMatchesData, GetMatchesError, GetMatchesResponse, GetMeData, GetMeError, GetMeResponse, GetOptionsData, GetOptionsError, GetOptionsResponse, GetPartDetailsData, GetPartDetailsError, GetPartDetailsResponse, GetPartsForMachineData, GetPartsForMachineError, GetPartsForMachineResponse, GetPointsData, GetPointsError, GetPointsResponse, GetPriceHistoryData, GetPriceHistoryError, GetPriceHistoryResponse, GetPriceStatsData, GetPriceStatsError, GetPriceStatsResponse, GetProductAlternativesData, GetProductAlternativesError, GetProductAlternativesResponse, GetProductData, GetProductError, GetProductMatchesData, GetProductMatchesError, GetProductMatchesResponse, GetProductMatchFacetsData, GetProductMatchFacetsError, GetProductMatchFacetsResponse, GetProductRelationsData, GetProductRelationsError, GetProductRelationsResponse, GetProductResponse, GetRegroupRunData, GetRegroupRunError, GetRelatedProductsData, GetRelatedProductsError, GetRelatedProductsResponse, GetReportData, GetReportError, GetResponse, GetScopeData, GetScopeError, GetScopeResponse, GetSitemapChunkData, GetSitemapChunkDeData, GetSitemapChunkDeError, GetSitemapChunkError, GetSitemapIndexData, GetSitemapIndexDeData, GetSitemapIndexDeError, GetSitemapIndexError, GetStatsData, GetStatsError, GetStatsResponse, GetSubCategoriesData, GetSubCategoriesError, GetSubCategoriesResponse, GetSubscriptionData, GetSubscriptionError, GetSubscriptionResponse, GetSuggestionsData, GetSuggestionsError, GetSuggestionsResponse, GetTasksData, GetTasksError, GetTasksResponse, GetTopLevelCategoriesData, GetTopLevelCategoriesError, GetTopLevelCategoriesResponse, GetTrainingSamplesData, GetTrainingSamplesError, GetTrainingSamplesResponse, GetUnidentifiedGamesData, GetUnidentifiedGameSeriesData, GetUnidentifiedGameSeriesError, GetUnidentifiedGameSeriesResponse, GetUnidentifiedGamesError, GetUnidentifiedGamesResponse, IsProductAvailableData, IsProductAvailableError, IsProductAvailableResponse, LabelData, LabelError, ListData, ListError, ListingsData, ListingsError, ListLinksData, ListLinksError, ListLinksResponse, LoginFirebaseData, LoginFirebaseError, LoginFirebaseResponse, MarketplacesData, MarketplacesError, MeasureData, MeasureError, MeasureResponse, MeData, MeError, MeResponse, MovesData, MovesError, NextData, NextError, NextResponse, PhotoData, PhotoError, PreviewData, PreviewError, PreviewResponse, RecordActivityData, RecordActivityError, ReportFlipData, ReportFlipError, ReportFlipResponse, ReportMatchData, ReportMatchError, ReportMatchResponse, ReportProductIssueData, ReportProductIssueError, ResolveCategoryPathData, ResolveCategoryPathError, ResolveCategoryPathResponse, ResolveData, ResolveError, SearchPartsData, SearchPartsError, SearchPartsResponse, SearchProductsData, SearchProductsError, SearchProductsResponse, SeedData, SeedError, SeedResponse, StatsData, StatsError, StatsResponse, SubmitData, SubmitError, SubmitResponse, SubscribeData, SubscribeError, SubscribeResponse, TakedownData, TakedownError, TakedownResponse, TestFilterData, TestFilterError, TestFilterResponse, UpdateMeData, UpdateMeError, UpdateMeResponse, UseLinkData, UseLinkError } from './types.gen';
 
 export type Options<TComposable extends Composable = '$fetch', TData extends TDataShape = TDataShape, ResT = unknown, DefaultT = undefined> = Options2<TComposable, TData, ResT, DefaultT> & {
     /**
@@ -138,8 +138,14 @@ export const addFilter = <TComposable extends Composable = '$fetch', DefaultT ex
     }
 });
 
+/**
+ * Deletes a filter of the logged-in user.
+ */
 export const deleteFilter = <TComposable extends Composable = '$fetch', DefaultT = undefined>(options: Options<TComposable, DeleteFilterData, unknown, DefaultT>) => (options.client ?? client).delete<TComposable, unknown | DefaultT, DeleteFilterError, DefaultT>({ url: '/api/filters/{id}', ...options });
 
+/**
+ * Unsubscribe link from a notification e-mail; the token is the credential, so no login is required.
+ */
 export const deleteFilterWithToken = <TComposable extends Composable = '$fetch', DefaultT = undefined>(options: Options<TComposable, DeleteFilterWithTokenData, unknown, DefaultT>) => (options.client ?? client).delete<TComposable, unknown | DefaultT, DeleteFilterWithTokenError, DefaultT>({ url: '/api/filters/{id}/token/{token}', ...options });
 
 export const getFilterByToken = <TComposable extends Composable = '$fetch', DefaultT extends GetFilterByTokenResponse = GetFilterByTokenResponse>(options: Options<TComposable, GetFilterByTokenData, GetFilterByTokenResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetFilterByTokenResponse | DefaultT, GetFilterByTokenError, DefaultT>({ url: '/api/filters/{id}/token/{token}', ...options });
@@ -192,9 +198,14 @@ export const getTrainingSamples = <TComposable extends Composable = '$fetch', De
 export const me = <TComposable extends Composable = '$fetch', DefaultT extends MeResponse = MeResponse>(options: Options<TComposable, MeData, MeResponse, DefaultT>) => (options.client ?? client).get<TComposable, MeResponse | DefaultT, MeError, DefaultT>({ url: '/api/labeling/me', ...options });
 
 /**
- * Up to count (max 50) pairs this user has not labeled, closest to the join threshold first.
+ * Up to count (max 50) pairs this user has not labeled, with model diagnostics omitted.
  */
 export const next = <TComposable extends Composable = '$fetch', DefaultT extends NextResponse = NextResponse>(options: Options<TComposable, NextData, NextResponse, DefaultT>) => (options.client ?? client).get<TComposable, NextResponse | DefaultT, NextError, DefaultT>({ url: '/api/labeling/next', ...options });
+
+/**
+ * Explicitly reveals model diagnostics for one pair; opening this is diagnostic exposure, not blind review.
+ */
+export const diagnostics = <TComposable extends Composable = '$fetch', DefaultT extends DiagnosticsResponse = DiagnosticsResponse>(options: Options<TComposable, DiagnosticsData, DiagnosticsResponse, DefaultT>) => (options.client ?? client).get<TComposable, DiagnosticsResponse | DefaultT, DiagnosticsError, DefaultT>({ url: '/api/labeling/{pairId}/diagnostics', ...options });
 
 /**
  * Stores the label (same_item, same_model_other_variant, different, unsure); a second call by the same user overwrites.
@@ -251,10 +262,19 @@ export const getStats = <TComposable extends Composable = '$fetch', DefaultT ext
  */
 export const exists = <TComposable extends Composable = '$fetch', DefaultT extends ExistsResponse = ExistsResponse>(options: Options<TComposable, ExistsData, ExistsResponse, DefaultT>) => (options.client ?? client).get<TComposable, ExistsResponse | DefaultT, ExistsError, DefaultT>({ url: '/api/listing/exists', ...options });
 
+export const measure = <TComposable extends Composable = '$fetch', DefaultT extends MeasureResponse = MeasureResponse>(options: Options<TComposable, MeasureData, MeasureResponse, DefaultT>) => (options.client ?? client).post<TComposable, MeasureResponse | DefaultT, MeasureError, DefaultT>({
+    url: '/api/parts/photo',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
 /**
  * Finds parts. class (default gear) picks the part class and its keys: gears take teeth (1..400), bearings and generic parts partKey
  * (a designation like 6203-2RS or a part number). Either a free text (q, at most 200 characters: "gear 42 teeth ~35 mm", "Zahnrad 42 Zähne Bohrung 8 mm", "Teile-Nr. 1619P08924",
- * "Zahnrad für Bosch GSR 12V", "Kugellager 6203-2RS") or explicit values; explicit values win. Sizes match within tolerance (relative, default 8 %, floor 1.5 mm); a size
+ * "Zahnrad für Bosch GSR 12V", "Kugellager 6203-2RS") or explicit values; explicit values win. Sizes match within tolerance (relative, default 8 %, floor 1.5 mm, overridden by toleranceMm); a size
  * the page does not know never excludes it. Reverse search by a broken gear: teethObserved intact teeth over arcDegrees degrees, or pitchMm
  * with outerDiameterMm, estimate the original count (Coflnet.Ane.Services.PartSearchResponse.Estimate) and search its range ranked by closeness, module and bore. One of key,
  * estimate, part number or machine is required. Pages reached over a same-part edge are marked `same_part_confirmed` or `same_part_candidate`.
@@ -319,6 +339,11 @@ export const getProductMatches = <TComposable extends Composable = '$fetch', Def
  * Counts over the active offers of a product without any filter, to build the filter controls
  */
 export const getProductMatchFacets = <TComposable extends Composable = '$fetch', DefaultT extends GetProductMatchFacetsResponse = GetProductMatchFacetsResponse>(options: Options<TComposable, GetProductMatchFacetsData, GetProductMatchFacetsResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetProductMatchFacetsResponse | DefaultT, GetProductMatchFacetsError, DefaultT>({ url: '/api/Product/{id}/matches/facets', ...options });
+
+/**
+ * Check an exact opaque native ID, including IDs containing URL path/query characters.
+ */
+export const getListingAvailability = <TComposable extends Composable = '$fetch', DefaultT extends GetListingAvailabilityResponse = GetListingAvailabilityResponse>(options: Options<TComposable, GetListingAvailabilityData, GetListingAvailabilityResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetListingAvailabilityResponse | DefaultT, GetListingAvailabilityError, DefaultT>({ url: '/api/Product/availability', ...options });
 
 export const isProductAvailable = <TComposable extends Composable = '$fetch', DefaultT extends IsProductAvailableResponse = IsProductAvailableResponse>(options: Options<TComposable, IsProductAvailableData, IsProductAvailableResponse, DefaultT>) => (options.client ?? client).get<TComposable, IsProductAvailableResponse | DefaultT, IsProductAvailableError, DefaultT>({ url: '/api/Product/{platform}/{id}/available', ...options });
 
@@ -393,6 +418,8 @@ export const listLinks = <TComposable extends Composable = '$fetch', DefaultT ex
 export const getLink = <TComposable extends Composable = '$fetch', DefaultT extends GetLinkResponse = GetLinkResponse>(options: Options<TComposable, GetLinkData, GetLinkResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetLinkResponse | DefaultT, GetLinkError, DefaultT>({ url: '/api/referral/link/{id}', ...options });
 
 export const useLink = <TComposable extends Composable = '$fetch', DefaultT = undefined>(options: Options<TComposable, UseLinkData, unknown, DefaultT>) => (options.client ?? client).post<TComposable, unknown | DefaultT, UseLinkError, DefaultT>({ url: '/api/referral/use', ...options });
+
+export const get = <TComposable extends Composable = '$fetch', DefaultT extends GetResponse = GetResponse>(options: Options<TComposable, GetData, GetResponse, DefaultT>) => (options.client ?? client).get<TComposable, GetResponse | DefaultT, GetError, DefaultT>({ url: '/api/Product/{id}/shop-reference', ...options });
 
 /**
  * Sitemap index for default (en) locale.
@@ -489,3 +516,9 @@ export const updateMe = <TComposable extends Composable = '$fetch', DefaultT ext
         ...options.headers
     }
 });
+
+/**
+ * Called by the website on every page render. Notification filters of users without activity for 30 days are
+ * paused. Cheap to call often, at most one write per user and hour.
+ */
+export const recordActivity = <TComposable extends Composable = '$fetch', DefaultT = undefined>(options: Options<TComposable, RecordActivityData, unknown, DefaultT>) => (options.client ?? client).post<TComposable, unknown | DefaultT, RecordActivityError, DefaultT>({ url: '/api/user/activity', ...options });
