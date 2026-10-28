@@ -14,7 +14,7 @@ import { buildSpecApiFilters, SPEC_RANGE_PARAMS } from '../utils/specFilters.ts'
 async function searchPage(query) {
   const { descriptor } = parse(await readFile(new URL('../pages/search.vue', import.meta.url), 'utf8'))
   const ast = compileScript(descriptor, { id: 'search-country' }).scriptSetupAst
-  const declarations = new Set(['searchQuery', 'includePartOffers', 'includeIndividualOffers', 'selectedCategory', 'selectedCondition', 'selectedPlatforms', 'selectedPriceCurrency', 'selectedMinPrice', 'selectedMaxPrice', 'selectedSort', 'selectedMaxDistance', 'activeAttributeFilters', 'hasActiveFilters', 'selectedCountryCode', 'prevQuery'])
+  const declarations = new Set(['selectedStore', 'storeBuckets', 'searchQuery', 'includePartOffers', 'includeIndividualOffers', 'selectedCategory', 'selectedCondition', 'selectedPlatforms', 'selectedPriceCurrency', 'selectedMinPrice', 'selectedMaxPrice', 'selectedSort', 'selectedMaxDistance', 'activeAttributeFilters', 'hasActiveFilters', 'selectedCountryCode', 'prevQuery'])
   const functions = new Set(['routeHasSearchQuery', 'syncPrevQuery', 'onCountrySelect', 'clearAllFilters', 'buildSearchParams'])
   const source = descriptor.scriptSetup.content
   const code = ast.filter(node =>

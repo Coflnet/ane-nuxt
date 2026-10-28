@@ -20,11 +20,12 @@ function searchState(query) {
     router: { push({ query }) { route.query = query } },
     buildSpecApiFilters: () => [], manualLoading: ref(false), searchError: ref(false),
     interpretation: ref(null), allProducts: ref([]), hasSearched: ref(true), totalResults: ref(0),
-    platformBuckets: ref([]), categoryBuckets: ref([]), conditionBuckets: ref([]), attributeBuckets: ref({}), distanceFilterKm: ref(50),
+    platformBuckets: ref([]), storeBuckets: ref([]), categoryBuckets: ref([]), conditionBuckets: ref([]), attributeBuckets: ref({}), distanceFilterKm: ref(50),
   }
   for (const name of ['selectedCategory', 'selectedCondition', 'selectedMinPrice', 'selectedMaxPrice', 'selectedSort', 'userLocation', 'selectedMaxDistance', 'selectedCountryCode', 'selectedBatteryMin', 'selectedBatteryMax']) state[name] = ref(undefined)
   state.activeAttributeFilters = ref({})
   const code = [
+    source.match(/const selectedStore = computed[^\n]*/)[0],
     source.match(/const searchQuery = computed[^\n]*/)[0],
     source.match(/const selectedPlatforms = computed[^\n]*/)[0],
     source.match(/const selectedPriceCurrency = computed[^\n]*/)[0],

@@ -122,6 +122,16 @@
       </div>
       <!-- Active filters badges -->
       <div class="active-filter-badges flex flex-wrap gap-2 mb-4">
+        <button
+          v-if="selectedStore"
+          type="button"
+          class="inline-flex min-h-11 items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/20 px-3 py-1 text-xs text-blue-400"
+          data-testid="active-store-reference"
+          :aria-label="$t('clearStoreReferenceFilter')"
+          @click="clearFilter('store')"
+        >
+          {{ $t('storeReferenceFilter') }}: {{ selectedStore }} ×
+        </button>
         <span
           v-for="platform in selectedPlatforms"
           :key="platform"
@@ -329,6 +339,38 @@
                 >({{ option.count }})</span>
               </label>
             </div>
+          </fieldset>
+          <fieldset
+            class="bg-slate-800/50 p-5 rounded-xl border border-slate-700/50"
+            data-testid="store-reference-filter"
+          >
+            <legend class="text-sm font-bold text-slate-300 uppercase tracking-wider px-1">
+              {{ $t('storeReferenceFilter') }}
+            </legend>
+            <label class="flex min-h-11 items-center gap-2 text-sm text-slate-300 cursor-pointer">
+              <input
+                type="checkbox"
+                :checked="selectedStore.toLowerCase() === 'lefeld'"
+                class="accent-cyan-400"
+                data-testid="store-reference-lefeld"
+                @change="toggleFilter('store', 'Lefeld')"
+              >
+              <span>Lefeld</span>
+              <span
+                v-if="storeBuckets.length"
+                class="text-xs text-slate-400"
+              >({{ storeBuckets[0]?.count }})</span>
+            </label>
+            <p class="mt-2 text-xs text-slate-400">
+              {{ $t('storeReferenceFilterHint') }}
+            </p>
+            <p
+              v-if="!storeBuckets.length"
+              class="mt-2 text-xs text-slate-400"
+              role="status"
+            >
+              {{ $t('storeReferenceCoverageUnavailable') }}
+            </p>
           </fieldset>
           <!-- Category Filter -->
           <div
@@ -1285,6 +1327,8 @@ const includePartOffers = computed(() => route.query.includePartOffers === 'true
 const includeIndividualOffers = computed(() => route.query.includeIndividualOffers === 'true')
 const selectedCategory = computed(() => (route.query.category as string) || '')
 const selectedPlatforms = computed(() => parseOfferFilterQuery(route.query).platforms)
+const selectedStore = computed(() => route.query.store ? String(route.query.store) : '')
+const storeBuckets = ref<FilterBucket[]>([])
 const selectedPriceCurrency = computed(() => searchCurrency(route.query, selectedPlatforms.value))
 const currencyBuckets = ref<FilterBucket[]>([])
 const priceCurrencies = computed(() => [...new Set(['EUR', 'GBP', 'SEK', 'PLN', selectedPriceCurrency.value, ...currencyBuckets.value.map(bucket => bucket.value).filter((value): value is string => !!value)])])
@@ -1309,6 +1353,7 @@ const hasActiveFilters = computed(
     includePartOffers.value || includeIndividualOffers.value
     || !!selectedCategory.value
     || selectedPlatforms.value.length > 0
+    || !!selectedStore.value
     || !!selectedCondition.value
     || selectedMinPrice.value !== undefined
     || selectedMaxPrice.value !== undefined
@@ -1433,12 +1478,12 @@ const isSearchMode = computed(() => routeHasSearchQuery(route.query))
 function routeHasSearchQuery(query: typeof route.query): boolean {
   return !!(query.includeIndividualOffers === 'true' || query.includePartOffers === 'true' || query.q || query.category || query.condition
     || query.price_min || query.price_max || query.sort || query.max_distance
-    || query.zip || query.country || query.platforms || query.price_currency
+    || query.zip || query.country || query.platforms || query.price_currency || query.store
     || Object.keys(query).some(k => k.startsWith('attr_')))
 }
 
 // Track previous query params to detect server-side filter changes that need a re-fetch
-const prevQuery = reactive({ includeIndividualOffers: false, includePartOffers: false, q: '' as string | undefined, category: '' as string | undefined, condition: '' as string | undefined, price_min: '' as string | undefined, price_max: '' as string | undefined, attrs: '' as string | undefined, sort: '' as string | undefined, max_distance: '' as string | undefined, country: '', platforms: '', price_currency: '' })
+const prevQuery = reactive({ includeIndividualOffers: false, includePartOffers: false, q: '' as string | undefined, category: '' as string | undefined, condition: '' as string | undefined, price_min: '' as string | undefined, price_max: '' as string | undefined, attrs: '' as string | undefined, sort: '' as string | undefined, max_distance: '' as string | undefined, country: '', platforms: '', price_currency: '', store: '' })
 
 function syncPrevQuery() {
   prevQuery.includeIndividualOffers = includeIndividualOffers.value
@@ -1452,6 +1497,7 @@ function syncPrevQuery() {
   prevQuery.max_distance = route.query.max_distance ? String(route.query.max_distance) : ''
   prevQuery.country = selectedCountryCode.value
   prevQuery.platforms = selectedPlatforms.value.join(',')
+  prevQuery.store = selectedStore.value
   prevQuery.price_currency = selectedPriceCurrency.value
   prevQuery.attrs = Object.entries(route.query)
     .filter(([k]) => k.startsWith('attr_'))
@@ -2223,6 +2269,7 @@ function buildSearchParams(offset = 0) {
   // slug otherwise.
   if (selectedCategory.value) params.category = resolveSearchCategoryParam(selectedCategory.value, urlToNumeric.value, germanLabelBySlug.value)
   if (selectedPlatforms.value.length) params.platforms = selectedPlatforms.value.join(',')
+  if (selectedStore.value) params.store = selectedStore.value
   if (selectedCondition.value) params.condition = selectedCondition.value.toLowerCase()
   if (selectedMinPrice.value !== undefined) params.minPrice = selectedMinPrice.value
   if (selectedMaxPrice.value !== undefined) params.maxPrice = selectedMaxPrice.value
@@ -2325,6 +2372,7 @@ function applySearchResponse(response: SearchProductsResponse, append: boolean) 
       interpretation.value = (response as SearchProductsResponse & { interpretation?: SearchInterpretation | null })?.interpretation ?? null
 
       platformBuckets.value = response?.platformBuckets ?? []
+      storeBuckets.value = (response?.storeBuckets ?? []).filter(bucket => bucket.value === 'Lefeld' && (bucket.count ?? 0) > 0)
       currencyBuckets.value = response?.currencyBuckets ?? []
 
       // Use aggregation buckets if available (new backend), otherwise derive from products
@@ -2484,8 +2532,8 @@ function toggleIndividualOffers() {
   router.push({ query })
 }
 
-function toggleFilter(type: 'category' | 'condition' | 'includePartOffers', value: string) {
-  if (route.query[type] === value) {
+function toggleFilter(type: 'category' | 'condition' | 'includePartOffers' | 'store', value: string) {
+  if (route.query[type] === value || (type === 'store' && selectedStore.value.toLowerCase() === value.toLowerCase())) {
     router.push({ query: queryWithoutKeys(type) })
     return
   }
@@ -2702,7 +2750,7 @@ watch(() => route.query, () => {
       .map(([k, v]) => `${k}=${JSON.stringify(v)}`)
       .join('&')
 
-    const queryChanged = includeIndividualOffers.value !== prevQuery.includeIndividualOffers || includePartOffers.value !== prevQuery.includePartOffers || currentQ !== prevQuery.q || currentCategory !== prevQuery.category || currentCondition !== prevQuery.condition || currentPriceMin !== prevQuery.price_min || currentPriceMax !== prevQuery.price_max || currentAttrs !== prevQuery.attrs || currentSort !== prevQuery.sort || currentMaxDistance !== prevQuery.max_distance || currentCountry !== prevQuery.country || currentPlatforms !== prevQuery.platforms || selectedPriceCurrency.value !== prevQuery.price_currency
+    const queryChanged = includeIndividualOffers.value !== prevQuery.includeIndividualOffers || includePartOffers.value !== prevQuery.includePartOffers || currentQ !== prevQuery.q || currentCategory !== prevQuery.category || currentCondition !== prevQuery.condition || currentPriceMin !== prevQuery.price_min || currentPriceMax !== prevQuery.price_max || currentAttrs !== prevQuery.attrs || currentSort !== prevQuery.sort || currentMaxDistance !== prevQuery.max_distance || currentCountry !== prevQuery.country || currentPlatforms !== prevQuery.platforms || selectedStore.value !== prevQuery.store || selectedPriceCurrency.value !== prevQuery.price_currency
 
     if (queryChanged || !hasSearched.value) {
       performSearch()
@@ -2717,6 +2765,7 @@ watch(() => route.query, () => {
     prevQuery.max_distance = currentMaxDistance
     prevQuery.country = currentCountry
     prevQuery.platforms = currentPlatforms
+    prevQuery.store = selectedStore.value
     prevQuery.price_currency = selectedPriceCurrency.value
 
     // Sync distance slider
@@ -2740,6 +2789,7 @@ watch(() => route.query, () => {
     categoryBuckets.value = []
     conditionBuckets.value = []
     platformBuckets.value = []
+    storeBuckets.value = []
     attributeBuckets.value = {}
   }
 // Initial load (incl. timeout refetch) is handled by useRaceableAsyncData above;

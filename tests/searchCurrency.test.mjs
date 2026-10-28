@@ -32,7 +32,7 @@ test('currency survives offer URL edits, matches requests and similar search', (
 test('actual response handler requires honored currency and never derives a range from legacy EUR', async () => {
   const source = await readFile(new URL('../pages/search.vue', import.meta.url), 'utf8')
   const handler = source.match(/function applySearchResponse\([\s\S]*?\n\}/)[0]
-  const state = Object.fromEntries(['allProducts', 'platformBuckets', 'currencyBuckets', 'categoryBuckets', 'conditionBuckets'].map(key => [key, ref([])]))
+  const state = Object.fromEntries(['allProducts', 'storeBuckets', 'platformBuckets', 'currencyBuckets', 'categoryBuckets', 'conditionBuckets'].map(key => [key, ref([])]))
   for (const key of ['interpretation', 'totalResults', 'batteryRangeMin', 'batteryRangeMax', 'batteryFilterMin', 'batteryFilterMax', 'priceRangeMin', 'priceRangeMax', 'priceFilterMin', 'priceFilterMax']) state[key] = ref(0)
   for (const key of ['selectedBatteryMin', 'selectedBatteryMax', 'selectedMinPrice', 'selectedMaxPrice']) state[key] = ref(undefined)
   state.attributeBuckets = ref({})

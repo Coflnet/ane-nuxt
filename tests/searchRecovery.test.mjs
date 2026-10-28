@@ -75,7 +75,7 @@ async function lifecycle(query = { priceCurrency: 'SEK', platforms: 'Blocket' })
       return { data: initialData, error: initialError, loading: initialLoading }
     },
   }
-  for (const key of ['platformBuckets', 'currencyBuckets', 'categoryBuckets', 'conditionBuckets']) state[key] = ref([])
+  for (const key of ['storeBuckets', 'platformBuckets', 'currencyBuckets', 'categoryBuckets', 'conditionBuckets']) state[key] = ref([])
   for (const key of ['priceRangeMin', 'priceRangeMax', 'priceFilterMin', 'priceFilterMax', 'batteryRangeMin', 'batteryRangeMax', 'batteryFilterMin', 'batteryFilterMax']) state[key] = ref(0)
   for (const key of ['selectedBatteryMin', 'selectedBatteryMax', 'selectedMinPrice', 'selectedMaxPrice', 'interpretation']) state[key] = ref(undefined)
   state.attributeBuckets = ref({})
