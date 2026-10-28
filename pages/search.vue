@@ -876,6 +876,11 @@
                     class="inline-flex items-center gap-1 px-2 py-0.5 mb-2 rounded text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40"
                     data-testid="empty-case-badge"
                   >{{ $t('product.relations.emptyCaseBadge') }}</span>
+                  <span
+                    v-if="isIndividualOffer(product)"
+                    class="inline-flex px-2 py-0.5 mb-2 rounded text-xs font-semibold bg-indigo-500/20 text-indigo-200"
+                    data-testid="individual-offer-badge"
+                  >{{ $t('individualOfferLabel') }}</span>
                   <h3 class="text-lg font-semibold text-slate-100 mb-2 line-clamp-2 min-h-[3.5rem]">
                     {{ productDisplayName(product) }}
                   </h3>
@@ -895,11 +900,20 @@
                     </span>
                   </div>
 
+                  <p
+                    v-if="isUnspecificProductGroup(product)"
+                    class="mt-2 text-xs text-amber-300"
+                    data-testid="unspecific-group-hint"
+                  >{{ $t('unspecificGroupPriceHint') }}</p>
                   <div class="flex items-center justify-between mt-4">
                     <div
                       class="text-sm text-slate-400"
                       data-testid="catalogue-price"
                     >
+                      <span
+                        v-if="isIndividualOffer(product)"
+                        class="block text-xs text-slate-400"
+                      >{{ $t('individualOfferPrice') }}</span>
                       <span class="text-lg font-bold text-green-400">
                         {{ nativeScopedPrice(product, selectedPriceCurrency) !== undefined ? formatPrice(nativeScopedPrice(product, selectedPriceCurrency)!) : $t('checkPrice', 'Check Price') }}
                       </span>
@@ -1180,7 +1194,7 @@ import type { OpensearchProductAttribute as ProductAttribute, OpensearchProductD
 import { useCategories } from '~/composable/useCategories'
 import { useUserLocation } from '~/composable/useUserLocation'
 import { useFormat } from '~/composable/useFormat'
-import { searchCurrency, nativeScopedPrice } from '~/utils/searchCurrency'
+import { searchCurrency, nativeScopedPrice, isIndividualOffer, isUnspecificProductGroup } from '~/utils/searchCurrency'
 import { searchRouteQuery } from '~/utils/searchQuery'
 import { activeMarketplaces } from '~/constants/CreateFilterConstants'
 import { parseOfferFilterQuery } from '~/utils/offerFilters'
@@ -1969,6 +1983,7 @@ const attrKeyTranslationMap: Record<string, string> = {
   'tool_type': 'attr_tool_type',
   'article_number': 'attr_article_number',
   'length_mm': 'attr_length_mm',
+  'wrench_size_mm': 'attr_wrench_size_mm',
   'package_scope': 'attr_package_scope',
   'product_kind': 'attr_product_type',
   'carburetor_designation': 'attr_carburetor_designation',
@@ -2720,7 +2735,7 @@ function getTopAttributes(product: ProductDocument, limit = 4): ProductAttribute
     'old_price', 'original_price', 'currency',
     'location_id', 'seller_id', 'shop_id', 'user_id', 'item_id',
     'does_not_come_from_search_engine__teaser_attribute', 'teaser_attribute',
-    'product_kind', 'case_of',
+    'product_kind', 'case_of', 'specificity',
   ])
   return product.attributes
     .filter((a: ProductAttribute) => a.key && a.value

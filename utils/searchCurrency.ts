@@ -7,7 +7,31 @@ export function searchCurrency(query: Record<string, unknown>, platforms: string
   return platforms.length === 1 ? ({ Gumtree: 'GBP', Blocket: 'SEK', OLX: 'PLN' } as Record<string, string>)[platforms[0]!] ?? 'EUR' : 'EUR'
 }
 
+type SearchPriceProduct = {
+  scopedMinPrice?: number | null
+  scopedPriceCurrency?: string | null
+  identifierType?: string | null
+  attributes?: { key?: string | null, value?: string | null }[] | Record<string, string> | null
+}
+
+function productAttribute(product: SearchPriceProduct, key: string): string | null | undefined {
+  return Array.isArray(product.attributes)
+    ? product.attributes.find(attribute => attribute.key?.toLowerCase() === key)?.value
+    : product.attributes?.[key]
+}
+
+/** Independent offer kinds keep their own native asking amount, even without a comparable edition. */
+export function isIndividualOffer(product: SearchPriceProduct): boolean {
+  const kind = productAttribute(product, 'product_kind')
+  return product.identifierType?.endsWith('_offer') === true || kind?.endsWith('_offer') === true || kind === 'comic_lot'
+}
+
+export function isUnspecificProductGroup(product: SearchPriceProduct): boolean {
+  return !isIndividualOffer(product) && productAttribute(product, 'specificity')?.toLowerCase() === 'unspecific'
+}
+
 /** An unpriced native result must never fall back to the legacy product-wide EUR field. */
-export function nativeScopedPrice(product: { scopedMinPrice?: number | null, scopedPriceCurrency?: string | null }, currency: string): number | undefined {
+export function nativeScopedPrice(product: SearchPriceProduct, currency: string): number | undefined {
+  if (isUnspecificProductGroup(product)) return undefined
   return product.scopedPriceCurrency === currency && Number.isFinite(product.scopedMinPrice) && product.scopedMinPrice! > 0 ? product.scopedMinPrice! : undefined
 }

@@ -1,4 +1,7 @@
 {
+  "individualOfferLabel": "Einzelangebot",
+  "individualOfferPrice": "Angezeigter Betrag",
+  "unspecificGroupPriceHint": "Angebote können verschiedene Editionen oder Pakete umfassen. Prüfe die einzelnen Angebotsdetails.",
   "filterValueOr": "oder",
   "filterMatchAny": "Mindestens einen gewählten Wert erfüllen; andere Filter gelten weiterhin.",
   "XActiveFilters": "{amount} benutzerdefinierte Suchanfragen",
@@ -796,7 +799,7 @@
   "cancel": "Abbrechen",
   "delete": "Löschen",
   "includeIndividualOffers": "Einzelangebote einbeziehen",
-  "includeIndividualOffersHint": "Auch einzelne Angebote für Comics, Schallplatten, LEGO, Bücher, Möbel und Ersatzteile anzeigen.",
+  "includeIndividualOffersHint": "Auch einzelne Angebote für Karten, Comics, Schallplatten, LEGO, Bücher, Möbel und Ersatzteile anzeigen.",
   "includePartOffers": "Einzelne Teileangebote einbeziehen",
   "clearAllFilters": "Alle Filter zurücksetzen",
   "found": "gefunden",
@@ -838,6 +841,7 @@
   "attr_tool_type": "Werkzeugart",
   "attr_article_number": "Artikelnummer",
   "attr_length_mm": "Länge (mm)",
+  "attr_wrench_size_mm": "Schlüsselweite (mm)",
   "attr_package_scope": "Lieferumfang",
   "tool_combination_pliers": "Kombizange",
   "tool_diagonal_cutter": "Seitenschneider",
@@ -931,6 +935,9 @@
     "unknown": "Unbekannt"
   },
   "product": {
+    "broadHistoryTitle": "Aufzeichnungen gemischter Angebote",
+    "broadHistoryHint": "Diese Aufzeichnungen können verschiedene Editionen und Pakete zusammenfassen. Sie sind kein vergleichbarer Preisverlauf eines exakt bestimmten Produkts. Prüfe die einzelnen Angebote.",
+    "broadHistoryRecords": "Aufzeichnungen gemischter Angebote anzeigen (keine vergleichbaren Preise)",
     "relations": {
       "emptyCaseNotice": "Leerhülle – das Spiel ist nicht enthalten",
       "goToGame": "Zum Spiel",
@@ -1068,7 +1075,31 @@
     "historySamples": "{count} tägliche Inseratstichproben",
     "historyAskingContext": "Der Verlauf fasst erfasste Angebote verschiedener Marktplätze und Länder zusammen; die Angebotsfilter unten ändern diesen Verlauf nicht. Dies sind Angebotspreise, keine abgeschlossenen Verkäufe. Ein Inserat kann an mehreren Tagen enthalten sein; diese Referenz bestätigt weder ein einzelnes Angebot noch einen Wiederverkaufsgewinn.",
     "historyCurrencyUnknown": "Bei einigen Tagesständen wurde keine Währung erfasst. Die Werte erscheinen ohne Währungssymbol und eignen sich nicht für währungsbereinigte Vergleiche.",
-    "priceHistoryDays": "{days} Tagesstände · Linie: Tagesmedian · Band: Minimum–Maximum"
+    "priceHistoryDays": "{days} Tagesstände · Linie: Tagesmedian · Band: Minimum–Maximum",
+    "shopReference": {
+      "title": "Shoppreis vergleichen",
+      "help": "Füge die öffentliche URL eines Shopartikels ein und wähle seinen Preis. Dies ist eine manuelle Referenz, keine Suche in allen Shops.",
+      "url": "Öffentliche Shopartikel-URL",
+      "fetch": "Preisvorschau laden",
+      "loading": "Vorschau wird geladen…",
+      "observed": "Vorschau abgerufen am",
+      "choosePrice": "Artikelpreis auswählen",
+      "noPrices": "Kein nutzbarer Preis gefunden. Prüfe die Artikel-URL und versuche eine andere Seite.",
+      "currency": "Währungsangabe prüfen / korrigieren",
+      "currencyHelp": "Die Währung kann voreingestellt sein. Prüfe sie auf der Shopseite. Das Ändern der Angabe rechnet den Betrag nicht um.",
+      "shopAmount": "Ausgewählter Shopbetrag",
+      "unknownCurrency": "Währung unbekannt",
+      "unknown": "Unbekannt",
+      "shopCondition": "Zustand im Shop",
+      "loadedAmount": "Günstigstes geladenes Angebot in dieser Währung",
+      "offerCondition": "Zustand des Angebots",
+      "openOffer": "Dieses Angebot öffnen",
+      "confirm": "Ich habe Shopbetrag und Währung geprüft, dass dieses Angebot dasselbe Produkt, dieselbe Edition und dasselbe Paket betrifft und ob die Beträge Festpreise oder aktuelle Gebote sind. Ich habe die angezeigten Zustände verglichen.",
+      "gap": "Shopbetrag minus Betrag des geladenen Angebots",
+      "noComparable": "Kein geladenes Angebot hat diese ausdrücklich angegebene Währung. Der Shoppreis bleibt eine Kontextreferenz.",
+      "limits": "Angezeigte Beträge können aktuelle Gebote sein. Identität, Bestand, Angebotsformat, Versand und Shopzustand sind nicht geprüft. Gebühren und Lieferung fehlen; der Abstand ist kein Wiederverkaufsgewinn. Es wird nichts gespeichert oder überwacht.",
+      "error": "Die Seite konnte nicht geladen werden. Deine URL bleibt erhalten; versuche es erneut oder nutze eine andere öffentliche Artikel-URL."
+    }
   },
   "attr_mileage": "Kilometerstand",
   "attr_year": "Baujahr",

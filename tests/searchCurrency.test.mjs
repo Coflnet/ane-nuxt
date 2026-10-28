@@ -26,6 +26,7 @@ test('currency survives offer URL edits, matches requests and similar search', (
   assert.equal(buildOfferFilterQuery(state).price_currency, 'SEK')
   assert.equal(buildMatchesParams(state).priceCurrency, 'SEK')
   assert.equal(buildSimilarSearchQuery('camera', state).price_currency, 'SEK')
+  assert.equal(buildSimilarSearchQuery('camera', state).platforms, 'Blocket')
 })
 
 test('actual response handler requires honored currency and never derives a range from legacy EUR', async () => {
@@ -51,4 +52,43 @@ test('actual response handler requires honored currency and never derives a rang
   apply({ products: [product], priceCurrency: 'SEK' }, false)
   assert.equal(state.priceRangeMin.value, 100)
   assert.equal(state.priceRangeMax.value, 100)
+})
+
+test('similar-offer links retain source currency country and nearby scope across reloads', () => {
+  for (const query of [
+    { price_currency: 'PLN', platforms: 'OLX,Ebay', countries: 'PL' },
+    { price_currency: 'GBP', platforms: 'Gumtree', countries: 'GB', zip: 'SW1A 1AA', zip_country: 'GB', max_distance: '25' },
+    { price_currency: 'SEK', platforms: 'Blocket', countries: 'SE', lat: '59.3', lon: '18.1', max_distance: '50' },
+  ]) {
+    const state = parseOfferFilterQuery(query)
+    const destination = buildSimilarSearchQuery('camera', state)
+    const reloaded = Object.fromEntries(new URLSearchParams(destination))
+    assert.equal(reloaded.platforms, query.platforms)
+    assert.equal(reloaded.price_currency, query.price_currency)
+    assert.equal(reloaded.country, query.countries)
+    assert.equal(reloaded.max_distance, query.max_distance)
+    assert.equal(reloaded.zip, query.zip)
+    assert.equal(reloaded.lat, query.lat)
+    assert.equal(reloaded.lon, query.lon)
+  }
+})
+
+test('unspecific groups suppress product prices while independent native asking amounts remain available', () => {
+  const price = { scopedMinPrice: 100, scopedPriceCurrency: 'PLN', minPrice: 9999, averagePrice: 9999 }
+  for (const attributes of [[{ key: 'specificity', value: 'unspecific' }], { specificity: 'unspecific' }]) {
+    assert.equal(nativeScopedPrice({ ...price, attributes }, 'PLN'), undefined)
+    for (const identifierType of ['mechanical_part_offer', 'equipment_offer', 'vinyl_offer', 'comic_offer', 'lego_offer', 'paper_offer', 'furniture_offer', 'pokemon_card_offer']) {
+      assert.equal(nativeScopedPrice({ ...price, attributes, identifierType }, 'PLN'), 100)
+      assert.equal(nativeScopedPrice({ ...price, attributes, identifierType }, 'EUR'), undefined)
+    }
+  }
+  for (const kind of ['book_offer', 'stationery_offer', 'audio_equipment_offer', 'hand_tool_offer', 'comic_lot', 'pokemon_card_offer']) {
+    assert.equal(nativeScopedPrice({ ...price, attributes: { specificity: 'unspecific', product_kind: kind } }, 'PLN'), 100)
+  }
+  assert.equal(nativeScopedPrice(price, 'PLN'), 100, 'unmarked exact product keeps its scoped native amount')
+  assert.equal(nativeScopedPrice(price, 'EUR'), undefined)
+  assert.equal(nativeScopedPrice({ minPrice: 9999, averagePrice: 9999 }, 'EUR'), undefined, 'legacy aggregate never replaces a missing native amount')
+  for (const scopedMinPrice of [0, -1, null, undefined, NaN, Infinity]) {
+    assert.equal(nativeScopedPrice({ ...price, scopedMinPrice }, 'PLN'), undefined)
+  }
 })

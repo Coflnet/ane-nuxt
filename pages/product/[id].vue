@@ -183,9 +183,20 @@
             {{ product.description }}
           </p>
 
+          <p
+            v-if="isBroadProductGroup"
+            class="mb-6 text-sm text-amber-300"
+            data-testid="broad-product-price-hint"
+          >
+            {{ $t('unspecificGroupPriceHint') }}
+          </p>
+
           <!-- Price Stats -->
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50">
+            <div
+              v-if="!isBroadProductGroup"
+              class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50"
+            >
               <div class="text-slate-500 text-xs uppercase font-bold mb-1">
                 {{ $t('product.averagePrice') }}
               </div>
@@ -193,7 +204,10 @@
                 ~{{ formatPrice(product.avgPrice) }}
               </div>
             </div>
-            <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50">
+            <div
+              v-if="!isBroadProductGroup"
+              class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50"
+            >
               <div class="text-slate-500 text-xs uppercase font-bold mb-1">
                 {{ $t('product.priceRange') }}
               </div>
@@ -323,8 +337,15 @@
       >
         <div class="p-6 border-b border-slate-800">
           <h2 class="text-2xl font-bold text-white">
-            {{ $t('product.priceHistoryTitle') }}
+            {{ $t(isBroadProductGroup ? 'product.broadHistoryTitle' : 'product.priceHistoryTitle') }}
           </h2>
+          <p
+            v-if="isBroadProductGroup"
+            class="mt-3 text-sm text-amber-300"
+            data-testid="broad-product-history-hint"
+          >
+            {{ $t('product.broadHistoryHint') }}
+          </p>
           <label class="block text-sm text-slate-300 mt-3">
             {{ $t('product.historyWindow') }}
             <select
@@ -398,7 +419,7 @@
             {{ $t('product.historyNoComparableCurrency') }}
           </p>
           <p
-            v-if="priceHistory.length"
+            v-if="!isBroadProductGroup && priceHistory.length"
             class="text-sm text-slate-400 mt-1"
           >
             {{ $t('product.priceHistoryDays', { days: priceHistory.length }) }}
@@ -432,7 +453,7 @@
           data-testid="history-daily-details"
         >
           <summary class="cursor-pointer text-blue-300">
-            {{ $t('product.historyDailySnapshots') }}
+            {{ $t(isBroadProductGroup ? 'product.broadHistoryRecords' : 'product.historyDailySnapshots') }}
           </summary>
           <div class="overflow-x-auto mt-4">
             <table
@@ -440,7 +461,7 @@
               data-testid="history-daily-table"
             >
               <caption class="sr-only">
-                {{ $t('product.historyDailySnapshots') }} ({{ recordedCurrency }})
+                {{ $t(isBroadProductGroup ? 'product.broadHistoryRecords' : 'product.historyDailySnapshots') }} ({{ recordedCurrency }})
               </caption>
               <thead class="text-slate-300">
                 <tr>
@@ -484,7 +505,7 @@
           </div>
         </details>
         <div
-          v-if="priceHistory.length > 1"
+          v-if="!isBroadProductGroup && priceHistory.length > 1"
           class="p-6"
         >
           <div class="relative h-64">
@@ -616,7 +637,7 @@
               {{ alt.name }}
             </h3>
             <p
-              v-if="alt.minPrice ?? alt.avgPrice"
+              v-if="(alt.minPrice ?? alt.avgPrice) && (!alt.isCatchAll || isIndividualOffer(alt))"
               class="text-sm text-emerald-400 mt-1"
             >
               {{ $t('product.noOffers.priceFrom', { price: formatPrice(alt.minPrice ?? alt.avgPrice) }) }}
@@ -753,6 +774,11 @@
         </div>
       </div>
 
+      <ProductShopReference
+        :key="productId"
+        :offers="matches"
+      />
+
       <!-- Related Products -->
       <div
         v-if="relatedProducts.length > 0"
@@ -779,7 +805,7 @@
               {{ rp.name }}
             </h3>
             <p
-              v-if="rp.avgPrice"
+              v-if="rp.avgPrice && (!rp.isCatchAll || isIndividualOffer(rp))"
               class="text-sm text-emerald-400 mt-1"
             >
               {{ formatPrice(rp.avgPrice) }}
@@ -899,6 +925,7 @@ import { useUserStore } from '~/stores/user'
 import { useOfferCountry } from '~/composable/useOfferCountry'
 import { buildProductResourceUrl } from '~/utils/productApiUrl'
 import { buildNotifyFilterUrl } from '~/utils/notifyFilterUrl'
+import { isIndividualOffer } from '~/utils/searchCurrency'
 import { formatHistoryPrice, historyCurrencies, chooseHistoryCurrency, selectHistoryCurrency, parseHistoryCurrency, historyTimeFraction, HISTORY_WINDOWS, parseHistoryDays } from '~/utils/priceHistory'
 import {
   caseOfId,
@@ -998,7 +1025,7 @@ const historyDays = computed(() => parseHistoryDays(route.query.history_days))
 function setHistoryDays(value: string) {
   void router.replace({ query: { ...route.query, history_days: String(parseHistoryDays(value)) }, hash: route.hash })
 }
-const requestedHistoryCurrency = computed(() => parseHistoryCurrency(route.query.history_currency))
+const requestedHistoryCurrency = computed(() => parseHistoryCurrency(route.query.history_currency) ?? parseHistoryCurrency(route.query.price_currency))
 function setHistoryCurrency(value: string) {
   void router.replace({ query: { ...route.query, history_currency: value }, hash: route.hash })
 }
@@ -1016,6 +1043,7 @@ const { data: historyData, loading: historyLoading, error: historyError, refresh
   { watch: [historyDays, requestedHistoryCurrency] },
 )
 // Keep the chart and summary bound to the same completed window, including navigation races.
+const isBroadProductGroup = computed(() => product.value?.isCatchAll === true && !isIndividualOffer(product.value))
 const currentHistory = computed(() => !historyLoading.value && !historyError.value && historyData.value?.days === historyDays.value && historyData.value?.requestedCurrency === requestedHistoryCurrency.value ? historyData.value : null)
 const rawPriceHistory = computed(() => currentHistory.value?.history ?? [])
 const recordedCurrency = computed(() => currentHistory.value?.currency ?? null)
@@ -1024,6 +1052,7 @@ const historyCurrencyOptions = computed(() => [...new Set([requestedHistoryCurre
 const selectedHistoryCurrency = computed(() => requestedHistoryCurrency.value ?? historyData.value?.currency ?? '')
 const excludedHistoryRows = computed(() => rawPriceHistory.value.length - priceHistory.value.length)
 const priceStats = computed<PriceHistoryStats | null>(() => {
+  if (isBroadProductGroup.value) return null
   const stats = currentHistory.value?.stats
   return recordedCurrency.value && stats?.currency === recordedCurrency.value ? stats : null
 })
@@ -1104,7 +1133,7 @@ function checkMainImageLoaded() {
 // CTA inside ProductListingTable's empty state (see buildNotifyFilterUrl for the prefill).
 const notifyFilterHref = computed(() => {
   if (!product.value) return null
-  const { path, query } = buildNotifyFilterUrl(product.value)
+  const { path, query } = buildNotifyFilterUrl(isBroadProductGroup.value ? { ...product.value, avgPrice: null } : product.value)
   return localePath({ path, query })
 })
 
@@ -1135,7 +1164,7 @@ const filteredAttributes = computed<Record<string, string>>(() => {
   if (!attrs) return {}
   const result: Record<string, string> = {}
   for (const [key, value] of Object.entries(attrs)) {
-    if (key.toLowerCase() === 'condition' || key === 'product_kind' || key === 'case_of') continue
+    if (key.toLowerCase() === 'condition' || key === 'product_kind' || key === 'case_of' || key.toLowerCase() === 'specificity') continue
     result[key] = value
   }
   return result
@@ -1280,6 +1309,7 @@ const attrKeyTranslationMap: Record<string, string> = {
   tool_type: 'attr_tool_type',
   article_number: 'attr_article_number',
   length_mm: 'attr_length_mm',
+  wrench_size_mm: 'attr_wrench_size_mm',
   package_scope: 'attr_package_scope',
   product_kind: 'attr_product_type',
   carburetor_designation: 'attr_carburetor_designation',

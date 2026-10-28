@@ -127,3 +127,52 @@ test('history currency server-renders the selected cohort even when it is not th
     assert.match(selected[0][0], new RegExp(`value="${currency}"`))
   }
 })
+
+test('actual history loader follows search native currency and preserves explicit history choices', async () => {
+  const { readFile } = await import('node:fs/promises')
+  const { stripTypeScriptTypes } = await import('node:module')
+  const { computed, reactive, ref } = await import('vue')
+  const { parseHistoryCurrency, parseHistoryDays, chooseHistoryCurrency, selectHistoryCurrency } = await import('../utils/priceHistory.ts')
+  const source = await readFile(new URL('../pages/product/[id].vue', import.meta.url), 'utf8')
+  const declarations = source.slice(source.indexOf('const historyDays ='), source.indexOf('// Keep the chart'))
+  const route = reactive({ query: { price_currency: ' pln ', platforms: 'OLX', countries: 'PL', history_days: '30' }, hash: '#price-history' })
+  const requests = []
+  const snapshots = [{ currency: 'EUR', medianPrice: 20 }, { currency: 'PLN', medianPrice: 100 }]
+  const factory = new Function('computed', 'route', 'router', 'parseHistoryCurrency', 'parseHistoryDays', 'chooseHistoryCurrency', 'useRaceableAsyncData', 'getPriceHistory', 'getPriceStats', 'product', `
+    const productId = 'camera';
+    ${stripTypeScriptTypes(declarations)}
+    return { requestedHistoryCurrency, setHistoryCurrency, setHistoryDays };
+  `)
+  let loader
+  const page = factory(computed, route, { replace(next) {
+    route.query = next.query
+    route.hash = next.hash
+  } }, parseHistoryCurrency, parseHistoryDays, chooseHistoryCurrency,
+  (_, run) => {
+    loader = run
+    return { data: ref(null), loading: ref(false), error: ref(null), refresh() {} }
+  },
+  async () => snapshots, async (request) => {
+    requests.push(request)
+    return { currency: request.query.currency }
+  }, ref({ currency: 'EUR' }))
+  assert.equal((await loader()).currency, 'PLN', 'search native currency wins over product EUR and available default cohort')
+  assert.deepEqual(requests.at(-1).query, { days: 30, currency: 'PLN' })
+  page.setHistoryCurrency('EUR')
+  assert.equal((await loader()).currency, 'EUR', 'explicit chart choice remains independent from offer currency')
+  assert.equal(route.query.price_currency, ' pln ')
+  assert.equal(route.query.platforms, 'OLX')
+  assert.equal(route.query.countries, 'PL')
+  assert.equal(route.hash, '#price-history')
+  page.setHistoryDays('365')
+  assert.deepEqual(requests.at(-1).query, { days: 30, currency: 'EUR' })
+  assert.equal((await loader()).days, 365)
+  assert.deepEqual(requests.at(-1).query, { days: 365, currency: 'EUR' })
+  route.query = { price_currency: 'GBP', history_days: '7' }
+  const missing = await loader()
+  assert.equal(missing.currency, 'GBP')
+  assert.deepEqual(selectHistoryCurrency(missing.history, missing.currency), [], 'missing native history never borrows another currency')
+  assert.deepEqual(requests.at(-1).query, { days: 7, currency: 'GBP' })
+  route.query = {}
+  assert.equal((await loader()).currency, 'EUR', 'direct product entry keeps the existing editable product default')
+})

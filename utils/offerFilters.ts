@@ -232,6 +232,7 @@ export function extractApiErrorMessage(error: unknown, fallback: string): string
 export function buildSimilarSearchQuery(productName: string, state: OfferFilterState): Record<string, string> {
   const query: Record<string, string> = { q: productName, sort: 'relevance' }
   if (state.priceCurrency) query.price_currency = state.priceCurrency
+  if (state.platforms.length) query.platforms = state.platforms.join(',')
   if (hasPosition(state) && state.maxDistance) {
     if (state.zip) {
       query.zip = state.zip

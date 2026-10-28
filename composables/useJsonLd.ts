@@ -47,6 +47,12 @@ export function buildBreadcrumbJsonLd(items: { name: string, url: string }[]): J
 }
 
 export function buildProductJsonLd(product: ProductWithOffers, canonical: string): JsonLdNode {
+  if (product.isCatchAll) return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    'name': product.name ?? undefined,
+    'url': canonical,
+  }
   const node: JsonLdNode = {
     '@context': 'https://schema.org',
     '@type': 'Product',

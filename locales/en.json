@@ -1,4 +1,7 @@
 {
+  "individualOfferLabel": "Individual offer",
+  "individualOfferPrice": "Listed amount",
+  "unspecificGroupPriceHint": "Offers may cover different editions or packages. Check the individual offer details.",
   "filterValueOr": "or",
   "filterMatchAny": "Match any selected value; other filters still apply.",
   "XActiveFilters": "{amount} Custom Searches",
@@ -796,7 +799,7 @@
   "cancel": "Cancel",
   "delete": "Delete",
   "includeIndividualOffers": "Include individual offers",
-  "includeIndividualOffersHint": "Also include individual listings for comics, records, LEGO, books, furniture and spare parts.",
+  "includeIndividualOffersHint": "Also include individual listings for cards, comics, records, LEGO, books, furniture and spare parts.",
   "includePartOffers": "Include individual part offers",
   "clearAllFilters": "Clear All Filters",
   "found": "found",
@@ -838,6 +841,7 @@
   "attr_tool_type": "Tool type",
   "attr_article_number": "Article number",
   "attr_length_mm": "Length (mm)",
+  "attr_wrench_size_mm": "Wrench size (mm)",
   "attr_package_scope": "Package contents",
   "tool_combination_pliers": "Combination pliers",
   "tool_diagonal_cutter": "Diagonal cutters",
@@ -931,6 +935,9 @@
     "unknown": "Unknown"
   },
   "product": {
+    "broadHistoryTitle": "Recorded mixed-offer snapshots",
+    "broadHistoryHint": "These records may combine different editions and packages. They are not a comparable price history for one exact product. Check individual offers.",
+    "broadHistoryRecords": "Show recorded mixed-offer snapshots (not comparable prices)",
     "relations": {
       "emptyCaseNotice": "Empty case – the game is not included",
       "goToGame": "Go to the game",
@@ -1068,7 +1075,31 @@
     "historySamples": "{count} daily listing samples",
     "historyAskingContext": "History combines recorded offers across marketplaces and countries; the offer filters below do not change this history. These are asking prices, not completed sales. A listing may appear in several daily snapshots; this reference does not verify an individual offer or predict resale profit.",
     "historyCurrencyUnknown": "Some snapshots have no recorded currency. Values are shown without a currency symbol and cannot be used for currency-adjusted comparisons.",
-    "priceHistoryDays": "{days} daily snapshots · line: daily median · band: minimum–maximum"
+    "priceHistoryDays": "{days} daily snapshots · line: daily median · band: minimum–maximum",
+    "shopReference": {
+      "title": "Compare a shop price",
+      "help": "Paste one public shop item URL and choose its price. This is a manual reference, not a search across all shops.",
+      "url": "Public shop item URL",
+      "fetch": "Fetch price preview",
+      "loading": "Loading preview…",
+      "observed": "Preview observed at",
+      "choosePrice": "Choose the item price",
+      "noPrices": "No usable price found. Check the item URL and try another page.",
+      "currency": "Check / correct currency label",
+      "currencyHelp": "The currency may be a default. Check it on the shop page. Editing the label does not convert the amount.",
+      "shopAmount": "Selected shop amount",
+      "unknownCurrency": "Unknown currency",
+      "unknown": "Unknown",
+      "shopCondition": "Shop condition",
+      "loadedAmount": "Lowest loaded offer in this currency",
+      "offerCondition": "Offer condition",
+      "openOffer": "Open this offer",
+      "confirm": "I checked this shop amount and currency, that this offer is the same exact product, edition and package, and whether the amounts are fixed prices or current bids. I have compared the conditions shown.",
+      "gap": "Shop amount minus loaded offer amount",
+      "noComparable": "No loaded offer has this explicit currency. The shop price remains a contextual reference.",
+      "limits": "Displayed amounts may be current bids. Identity, stock, buying format, shipping and shop condition are not verified. Fees and delivery are excluded; this difference is not resale profit. Nothing is saved or monitored.",
+      "error": "Could not preview this page. Your URL is preserved; retry or use another public item URL."
+    }
   },
   "attr_mileage": "Mileage",
   "attr_year": "Year",

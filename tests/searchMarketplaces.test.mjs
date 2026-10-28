@@ -1,4 +1,4 @@
-import { searchCurrency, nativeScopedPrice } from '../utils/searchCurrency.ts'
+import { searchCurrency, nativeScopedPrice, isIndividualOffer } from '../utils/searchCurrency.ts'
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import { stripTypeScriptTypes } from 'node:module'
@@ -186,6 +186,7 @@ test('actual catalogue cards render native scoped prices, never legacy EUR fallb
         for (const [scopedMinPrice, scopedPriceCurrency] of [[100, currency], [0, currency], [null, currency], [undefined, undefined], [100, 'USD']]) {
           const app = Vue.createSSRApp(component, { product: { minPrice: 999, scopedMinPrice, scopedPriceCurrency }, language, currency })
           app.config.globalProperties.$t = (key, args) => labels[key]?.replace('{currency}', args?.currency?.value ?? args?.currency)
+          app.config.globalProperties.isIndividualOffer = isIndividualOffer
           const html = await renderToString(app)
           if (scopedMinPrice > 0 && scopedPriceCurrency === currency) assert(html.includes(new Intl.NumberFormat(language === 'de' ? 'de-DE' : 'en-US', { style: 'currency', currency }).format(100)))
           else assert(html.includes(labels.checkPrice))

@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
+import { buildProductJsonLd } from '../composables/useJsonLd.ts'
 import {
   alternativeReasonLabelKey,
   buildCategoryFallbackUrl,
@@ -84,4 +85,20 @@ test('resolveAvailableOfferCount falls back to the SSR listingCount before match
 test('resolveAvailableOfferCount never goes negative', () => {
   assert.equal(resolveAvailableOfferCount({ hasActiveOffers: true, matchesCount: 2, unavailableCount: 5, fallbackListingCount: 0 }), 0)
   assert.equal(resolveAvailableOfferCount({ hasActiveOffers: true, matchesCount: 0, unavailableCount: 0, fallbackListingCount: -3 }), 0)
+})
+
+test('catch-all pages advertise a collection without exact product price or stock claims', () => {
+  const product = { id: 'mixed-card', name: 'Mixed card offers', listingCount: 3, minPrice: 10, maxPrice: 200, avgPrice: 100 }
+  for (const identifierType of [undefined, 'pokemon_card_offer']) {
+    const schema = buildProductJsonLd({ ...product, identifierType, isCatchAll: true }, 'https://ane.example/product/mixed-card')
+    assert.equal(schema['@type'], 'CollectionPage')
+    assert.equal(schema.name, product.name)
+    assert.equal(schema.url, 'https://ane.example/product/mixed-card')
+    assert.equal(schema.offers, undefined)
+    assert.equal(schema.sku, undefined)
+    assert.doesNotMatch(JSON.stringify(schema), /AggregateOffer|InStock|priceCurrency|lowPrice/)
+  }
+  const exact = buildProductJsonLd({ ...product, isCatchAll: false }, 'https://ane.example/product/exact-card')
+  assert.equal(exact['@type'], 'Product')
+  assert.equal(exact.offers.lowPrice, 10)
 })
