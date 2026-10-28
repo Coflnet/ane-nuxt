@@ -27,6 +27,8 @@ export interface OfferFilterState {
 
 /** Fields the matches endpoint adds on top of the generated ProductMatch. */
 export interface OfferMatchExtras {
+  /** Exact native id from the API; optional until the public OpenAPI client is regenerated. */
+  nativeListingId?: string | null
   platform?: string | null
   country?: string | null
   currency?: string | null

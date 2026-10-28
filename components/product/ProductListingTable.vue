@@ -56,10 +56,10 @@
       </thead>
       <tbody class="block sm:table-row-group">
         <tr
-          v-for="listing in sortedListings"
-          :key="listing.listingId || listing.productId || ''"
+          v-for="(listing, listingIndex) in sortedListings"
+          :key="listingIdentityKey(listing) || JSON.stringify([listing.platform, listing.listingUrl, listingIndex])"
           class="grid grid-cols-[minmax(0,1fr)_auto] gap-x-2 p-3 sm:table-row sm:p-0 border-b border-slate-700/50 hover:bg-slate-800/30"
-          :class="{ 'opacity-50': unavailableListings.has(listing.listingId || listing.productId || '') }"
+          :class="{ 'opacity-50': unavailableListings.has(listingIdentityKey(listing) || '') }"
         >
           <td class="hidden sm:table-cell px-6 py-4 font-medium text-slate-200">
             <span class="inline-flex items-center gap-2">
@@ -72,7 +72,7 @@
                 <span aria-hidden="true">{{ countryFlag(listing.country) }}</span> {{ listing.country }}
               </span>
               <span
-                v-if="unavailableListings.has(listing.listingId || listing.productId || '')"
+                v-if="unavailableListings.has(listingIdentityKey(listing) || '')"
                 class="text-xs text-red-400"
               >
                 (Unavailable)
@@ -88,7 +88,7 @@
               {{ listing.title }}
             </a>
             <span
-              v-if="unavailableListings.has(listing.listingId || listing.productId || '')"
+              v-if="unavailableListings.has(listingIdentityKey(listing) || '')"
               class="block text-xs text-red-400 mt-0.5"
               role="status"
             >
@@ -120,11 +120,11 @@
                 target="_blank"
                 rel="noopener noreferrer"
                 class="inline-flex min-h-11 sm:min-h-0 shrink-0 whitespace-nowrap items-center gap-1 px-3 sm:px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-full transition-all hover:scale-105 shadow-lg shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-                :class="{ 'pointer-events-none opacity-50': checkingAvailability.has(listing.listingId || listing.productId || '') }"
+                :class="{ 'pointer-events-none opacity-50': checkingAvailability.has(listingIdentityKey(listing) || '') }"
                 @click="handleViewDeal($event, listing)"
               >
                 <Icon
-                  v-if="checkingAvailability.has(listing.listingId || listing.productId || '')"
+                  v-if="checkingAvailability.has(listingIdentityKey(listing) || '')"
                   name="tabler:loader-2"
                   class="w-3 h-3 animate-spin"
                 />
@@ -285,6 +285,14 @@
           >
             {{ reportError }}
           </p>
+          <button
+            v-if="reportError === $t('product.listingIdentityUnavailable') && selectedListing"
+            type="button"
+            class="mb-4 min-h-11 rounded-lg border border-slate-600 px-4 text-sm text-blue-300"
+            @click="emit('refreshListings')"
+          >
+            {{ $t('product.reloadListingIdentity') }}
+          </button>
 
           <div class="flex gap-3 justify-end">
             <button
@@ -312,8 +320,9 @@
 import { reportProductIssue } from '~/src/api-client'
 import { useUserStore } from '~/stores/user'
 import { labelingErrorStatus } from '~/composables/useLabelingApi'
+import { nativeListingId, listingIdentityKey } from '~/utils/listingIdentity'
 import { buildReportBody, extractProductId, reportErrorMessage } from '~/utils/productReport'
-import type { ModelsIssueType, ModelsProductMatch as GeneratedProductMatch } from '~/src/api-client/types.gen'
+import type { ModelsIssueType, ModelsProductMatch as GeneratedProductMatch, Platform } from '~/src/api-client/types.gen'
 import { countryFlag } from '~/utils/countryDetection'
 import type { OfferMatchExtras } from '~/utils/offerFilters'
 import { canSortOfferPrices, sortLoadedOffers, type OfferSort } from '~/utils/offerSort'
@@ -340,6 +349,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'listingUnavailable', listingId: number | string): void
+  (e: 'refreshListings'): void
 }>()
 
 const sort = ref<OfferSort | null>(null)
@@ -382,7 +392,7 @@ const issueTypes: { value: ModelsIssueType, label: string }[] = [
 
 const { getMarketplaceName } = useAvailabilityCheck()
 const { openListing } = useListingOpener()
-const { locale } = useI18n()
+const { t, locale } = useI18n()
 const { formatCurrency, formatNumber } = useFormat()
 
 function formatPrice(amount: number | undefined | null, currency: string | undefined | null) {
@@ -397,29 +407,39 @@ function formatDate(dateStr: string | undefined | null) {
 }
 
 async function handleViewDeal(e: MouseEvent, listing: ProductMatch) {
-  const listingId = listing.listingId || listing.productId || ''
+  const listingId = nativeListingId(listing)
+  const key = listingIdentityKey(listing)
 
-  if (listingId) {
-    checkingAvailability.value.add(listingId)
+  if (key) {
+    checkingAvailability.value.add(key)
   }
 
   try {
     await openListing(e, {
       listingId,
+      platform: listing.platform,
       url: listing.listingUrl,
       onUnavailable: () => {
-        if (!listingId) return
-        unavailableListings.value.add(listingId)
+        if (!listingId || !key) return
+        unavailableListings.value.add(key)
         emit('listingUnavailable', listingId)
       },
     })
   }
   finally {
-    if (listingId) {
-      checkingAvailability.value.delete(listingId)
+    if (key) {
+      checkingAvailability.value.delete(key)
     }
   }
 }
+
+// Refresh only the selected offer object; unfinished report fields remain in the open dialog.
+watch(() => props.listings, (listings) => {
+  const selected = selectedListing.value
+  if (!selected?.listingUrl || (nativeListingId(selected) && reportError.value !== t('product.listingIdentityUnavailable'))) return
+  const refreshed = listings.find(listing => listing.listingUrl === selected.listingUrl && listing.platform === selected.platform)
+  if (refreshed) selectedListing.value = refreshed
+})
 
 function openReportDialog(listing: ProductMatch) {
   // Reports need an account: send visitors to the login instead of firing an unauthenticated request.
@@ -459,12 +479,17 @@ async function submitReport(quickType?: ModelsIssueType) {
   reportError.value = ''
 
   try {
-    const listingId = selectedListing.value?.listingId?.toString()
+    const listingId = nativeListingId(selectedListing.value)
+    if (selectedListing.value && !listingId) {
+      reportError.value = t('product.listingIdentityUnavailable')
+      return
+    }
     await reportProductIssue({
       path: { id: props.productId },
       body: buildReportBody({
         type,
         listingId,
+        listingPlatform: selectedListing.value?.platform as Platform | undefined,
         productId: props.productId,
         otherProductId: otherProductId.value,
         comment: reportDescription.value,
@@ -478,7 +503,7 @@ async function submitReport(quickType?: ModelsIssueType) {
   catch (error) {
     console.error('Failed to submit report:', error)
     const status = labelingErrorStatus(error)
-    reportError.value = reportErrorMessage(status)
+    reportError.value = status === 400 && (type === 'WrongMatch' || type === 'WrongListing') ? t('product.listingIdentityUnavailable') : reportErrorMessage(status)
     if (status === 401) navigateTo(localePath({ path: '/login', query: { redirectTo: route.fullPath } }))
   }
   finally {

@@ -3,6 +3,7 @@ import { decideOpen, isPlainLeftClick, runAvailabilityCheck } from '~/utils/list
 
 interface OpenListingOptions {
   listingId: string | number | null | undefined
+  platform?: string | null
   url: string | null | undefined
   /** Called when the listing turned out to be sold or removed (the tab is already closed). */
   onUnavailable: () => void
@@ -17,7 +18,7 @@ interface OpenListingOptions {
 export function useListingOpener() {
   const { checkAvailability } = useAvailabilityCheck()
 
-  async function openListing(e: MouseEvent, { listingId, url, onUnavailable, fallback }: OpenListingOptions): Promise<void> {
+  async function openListing(e: MouseEvent, { listingId, platform, url, onUnavailable, fallback }: OpenListingOptions): Promise<void> {
     if (!url) return
     if (!isPlainLeftClick(e)) {
       // Modified click on a real anchor keeps native behaviour; non-anchor rows open directly
@@ -38,7 +39,7 @@ export function useListingOpener() {
     tab.opener = null
 
     const result = listingId
-      ? await runAvailabilityCheck(() => checkAvailability(listingId, url))
+      ? await runAvailabilityCheck(() => checkAvailability(listingId, url, platform))
       : 'available'
     if (decideOpen(true, result) === 'close-tab-mark-unavailable') {
       tab.close()

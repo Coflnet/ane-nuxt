@@ -717,6 +717,7 @@
             :has-active-filter="offerFilterActive"
             :show-distance="offerFilterNearby"
             @listing-unavailable="handleListingUnavailable"
+            @refresh-listings="loadMatches(false, true)"
           />
         </div>
 
@@ -923,6 +924,7 @@ import ProductOfferFilters from '~/components/product/OfferFilters.vue'
 import { useI18n } from 'vue-i18n'
 import { useUserStore } from '~/stores/user'
 import { useOfferCountry } from '~/composable/useOfferCountry'
+import { listingIdentityKey } from '~/utils/listingIdentity'
 import { buildProductResourceUrl } from '~/utils/productApiUrl'
 import { buildNotifyFilterUrl } from '~/utils/notifyFilterUrl'
 import { isIndividualOffer } from '~/utils/searchCurrency'
@@ -1548,7 +1550,7 @@ function onOfferFilterChange(next: OfferFilterState) {
 
 // Client-side reload of the offers on every filter change. A newer request supersedes an older one.
 let matchesSeq = 0
-async function loadMatches(append = false) {
+async function loadMatches(append = false, preserveOnError = false) {
   if (append && (matchesLoading.value || !matchesBefore.value || !matchesHasMore.value)) return
   const before = append ? matchesBefore.value : undefined
   if (!append) {
@@ -1562,8 +1564,16 @@ async function loadMatches(append = false) {
   try {
     const result = await $fetch<(ProductMatch & OfferMatchExtras)[]>(buildMatchesUrl(productId, before))
     if (seq !== matchesSeq) return
-    const seen = new Set(matches.value.map(m => `${m.platform}:${m.listingId}`))
-    matches.value = append ? [...matches.value, ...result.filter(m => !seen.has(`${m.platform}:${m.listingId}`))] : result
+    const seen = new Set(matches.value.map(listingIdentityKey).filter(key => key !== null))
+    matches.value = append
+      ? [...matches.value, ...result.filter((m) => {
+          const key = listingIdentityKey(m)
+          if (!key) return true
+          if (seen.has(key)) return false
+          seen.add(key)
+          return true
+        })]
+      : result
     const nextBefore = result.at(-1)?.postedAt
     // A short nonempty page can hit the API's bounded scan; keep walking until an empty page.
     matchesHasMore.value = !!nextBefore && nextBefore !== before
@@ -1579,7 +1589,7 @@ async function loadMatches(append = false) {
       zipError.value = extractApiErrorMessage(error, t('product.filters.zipInvalid'))
       return
     }
-    if (!append) matches.value = []
+    if (!append && !preserveOnError) matches.value = []
     matchesError.value = append ? 'more' : 'initial'
   }
   finally {

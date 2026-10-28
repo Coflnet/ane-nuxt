@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises'
 import { stripTypeScriptTypes } from 'node:module'
 import test from 'node:test'
 import { ref } from 'vue'
+import { listingIdentityKey } from '../utils/listingIdentity.ts'
 import { buildProductResourceUrl } from '../utils/productApiUrl.ts'
 import { buildMatchesParams, emptyOfferFilter } from '../utils/offerFilters.ts'
 
@@ -11,7 +12,7 @@ const fn = name => source.match(new RegExp(`(?:async )?function ${name}\\([\\s\\
 function state() {
   const calls = []
   const pending = []
-  const scope = { ref, buildProductResourceUrl, buildMatchesParams, API_BASE: 'https://local.invalid', productId: 'sony-playstation-5-used', t: key => key, extractApiErrorMessage: () => 'invalid zip' }
+  const scope = { ref, listingIdentityKey, buildProductResourceUrl, buildMatchesParams, API_BASE: 'https://local.invalid', productId: 'sony-playstation-5-used', t: key => key, extractApiErrorMessage: () => 'invalid zip' }
   for (const [key, value] of Object.entries({ matches: [], matchesLoading: false, matchesLoaded: false, matchesBefore: undefined, matchesHasMore: false, matchesError: null, zipError: '', offerFilter: emptyOfferFilter() })) scope[key] = ref(value)
   scope.$fetch = (url) => {
     calls.push(new URL(url))
@@ -20,7 +21,7 @@ function state() {
   const code = `${fn('buildMatchesUrl')}\nlet matchesSeq=0;${fn('loadMatches')}\nreturn {loadMatches}`
   return { ...scope, ...new Function('scope', `with(scope){${stripTypeScriptTypes(`function setup(){${code}}`)};return setup()}`)(scope), calls, pending }
 }
-const row = (id, time) => ({ listingId: id, platform: 'Kleinanzeigen', postedAt: `2026-10-25T${time}:00Z` })
+const row = (id, time) => ({ listingId: id + 1000, platform: 'Kleinanzeigen', postedAt: `2026-10-25T${time}:00Z` })
 
 test('short pages remain pageable; cursor retains filters, append deduplicates, empty page finishes', async () => {
   const s = state()
@@ -34,7 +35,7 @@ test('short pages remain pageable; cursor retains filters, append deduplicates, 
   for (const [key, value] of Object.entries({ countries: 'DE', platforms: 'Kleinanzeigen', shippingOnly: 'true', zip: '10115', zipCountry: 'DE', limit: '50' })) assert.equal(s.calls.at(-1).searchParams.get(key), value)
   s.pending.shift().resolve([row(2, '11:00'), row(3, '10:00')])
   await more
-  assert.deepEqual(s.matches.value.map(m => m.listingId), [1, 2, 3])
+  assert.deepEqual(s.matches.value.map(m => m.listingId), [1001, 1002, 1003])
   const end = s.loadMatches(true)
   s.pending.shift().resolve([])
   await end
@@ -64,7 +65,7 @@ test('append errors preserve offers and cursor for retry; filter reload supersed
   await fresh
   late.resolve([row(2, '11:00')])
   await retry
-  assert.deepEqual(s.matches.value.map(m => m.listingId), [4])
+  assert.deepEqual(s.matches.value.map(m => m.listingId), [1004])
   assert.equal(s.matchesError.value, null)
   assert.equal(s.matchesBefore.value, '2026-10-25T09:00:00Z')
 })
@@ -82,4 +83,36 @@ test('cursor is preserved exactly when two timestamps differ below JavaScript mi
   await request
   assert.equal(s.matchesBefore.value, nextCursor)
   assert.equal(s.matchesHasMore.value, true)
+})
+
+test('pagination keeps opaque native identities and platform boundaries despite rounded equal hashes', async () => {
+  const s = state()
+  const first = { ...row(6607570264169701000, '12:00'), platform: 'OLX', nativeListingId: 'pl:ID1aZrpy' }
+  let request = s.loadMatches()
+  s.pending.shift().resolve([first])
+  await request
+  request = s.loadMatches(true)
+  const second = { ...first, nativeListingId: 'pl:ID1aZrpz', postedAt: row(0, '11:00').postedAt }
+  const anotherPlatform = { ...first, platform: 'Vinted' }
+  const unknown = { ...first, nativeListingId: undefined }
+  s.pending.shift().resolve([first, second, second, anotherPlatform, unknown, { ...unknown }])
+  await request
+  assert.deepEqual(s.matches.value.map(m => [m.platform, m.nativeListingId]), [['OLX', 'pl:ID1aZrpy'], ['OLX', 'pl:ID1aZrpz'], ['Vinted', 'pl:ID1aZrpy'], ['OLX', undefined], ['OLX', undefined]])
+})
+
+test('explicit report identity refresh502 preserves rows and error so the open report stays mounted', async () => {
+  const s = state()
+  let request = s.loadMatches()
+  s.pending.shift().resolve([row(1, '12:00')])
+  await request
+  request = s.loadMatches(false, true)
+  s.pending.shift().reject({ status: 502 })
+  await request
+  assert.deepEqual(s.matches.value.map(m => m.listingId), [1001])
+  assert.equal(s.matchesError.value, 'initial')
+  assert.equal(s.matchesLoading.value, false)
+  request = s.loadMatches()
+  s.pending.shift().reject({ status: 502 })
+  await request
+  assert.deepEqual(s.matches.value, [], 'ordinary filter failures keep their existing clearing behavior')
 })

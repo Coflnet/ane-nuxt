@@ -5,6 +5,9 @@ import { stripTypeScriptTypes } from 'node:module'
 import { compileScript, parse } from '@vue/compiler-sfc'
 import * as Vue from 'vue'
 import {
+  MEASUREMENT_RANGE_KEYS,
+  measurementNumber,
+  hasInvalidMeasurementRange,
   bucketNumberBounds,
   buildSpecApiFilters,
   impliedOsFilter,
@@ -107,8 +110,9 @@ async function mountRange(props) {
   const { descriptor } = parse(source)
   const code = stripTypeScriptTypes(compileScript(descriptor, { id: 'range-test', inlineTemplate: true }).content)
     .replace(/import \{([^}]+)\} from ['"]vue['"]/g, (_, names) => `const {${names.replaceAll(' as ', ': ')}} = Vue`)
+    .replace(/import \{ measurementNumber \} from ['"]~\/utils\/specFilters['"]/g, '')
     .replace('export default', 'return')
-  const component = new Function('Vue', `const { ref, watch } = Vue; ${code}`)(Vue)
+  const component = new Function('Vue', 'measurementNumber', `const { ref, watch } = Vue; ${code}`)(Vue, measurementNumber)
   const node = type => ({ type, tagName: type.toUpperCase(), props: {}, listeners: {}, children: [], addEventListener(name, fn) {
     this.listeners[name] = fn
   }, removeEventListener() {}, getRootNode: () => ({ activeElement: null }) })
@@ -188,4 +192,80 @@ test('actual page year controls survive single-value and empty responses without
   route.query = { attr_year_max: '-100' }
   assert.equal(controls.value.find(f => f.key === 'publication_year').bounds, null)
   assert.deepEqual(controls.value.find(f => f.key === 'year').bounds, { min: -100, max: -100 })
+})
+
+test('millimetre ranges match exact API syntax and preserve independent search scope', () => {
+  assert.deepEqual(MEASUREMENT_RANGE_KEYS, ['wrench_size_mm', 'length_mm', 'part_inner_mm', 'part_outer_diameter_mm', 'part_width_mm'])
+  for (const value of ['10.5', '10,5', ' 10,5 MM ', '10.5mm']) assert.equal(measurementNumber(value), 10.5)
+  for (const value of ['0', '-1', '+1', '1e3', '12 cm', '10x20', 'Infinity', 'NaN']) assert.equal(measurementNumber(value), null)
+  const query = { q: 'Bahco', platforms: ['Ebay', 'Blocket'], country: 'SE', price_currency: 'SEK', attr_article_number: ['111M-10', '111M-13'] }
+  const next = withRangeParams(query, 'wrench_size_mm', { min: 10.5, max: 20 })
+  assert.deepEqual(next, { ...query, attr_wrench_size_mm_min: '10.5', attr_wrench_size_mm_max: '20' })
+  assert.deepEqual(buildSpecApiFilters({ ...next, attr_length_mm_min: '140 mm' }), ['wrench_size_mm_min:10.5', 'wrench_size_mm_max:20', 'length_mm_min:140'])
+  assert.deepEqual(withRangeParams(next, 'wrench_size_mm', {}), query)
+  assert.equal(hasInvalidMeasurementRange(next), false)
+  assert.equal(hasInvalidMeasurementRange({ attr_length_mm_max: '12,5mm' }), false)
+  assert.equal(hasInvalidMeasurementRange({ attr_length_mm_min: '20', attr_length_mm_max: '10' }), true)
+  assert.equal(hasInvalidMeasurementRange({ attr_length_mm_min: ['10', '20'] }), true)
+  assert.equal(hasInvalidMeasurementRange({ attr_wrench_size_mm_min: 'bad' }), true)
+})
+
+test('millimetre inputs reject reversed and nonpositive ranges without emitting or losing edits', async () => {
+  const props = Vue.reactive({ title: 'Length', positive: true, unit: 'mm', step: 'any', invalidMessage: 'Use positive ordered values', testId: 'length-mm' })
+  const view = await mountRange(props)
+  try {
+    assert.equal(view.find('length-mm-min').props.placeholder, undefined)
+    assert.equal(view.find('length-mm-max').props.max, undefined)
+    await view.change('length-mm-min', '20,5 mm')
+    assert.deepEqual(view.emitted.at(-1), { min: 20.5, max: null })
+    const emittedCount = view.emitted.length
+    await view.change('length-mm-max', '10')
+    assert.equal(view.emitted.length, emittedCount)
+    assert.equal(view.find('length-mm-max').value, '10')
+    await view.change('length-mm-max', '20.5')
+    assert.deepEqual(view.emitted.at(-1), { min: 20.5, max: 20.5 })
+    const validCount = view.emitted.length
+    await view.change('length-mm-min', '1e3')
+    assert.equal(view.emitted.length, validCount)
+    await view.change('length-mm-min', '0')
+    assert.deepEqual(view.emitted.at(-1), { min: 20.5, max: 20.5 })
+    await view.change('length-mm-min', '')
+    assert.deepEqual(view.emitted.at(-1), { min: null, max: 20.5 })
+    props.selectedMax = 30
+    await Vue.nextTick()
+    assert.equal(Number(view.find('length-mm-max').value), 30)
+  }
+  finally { view.unmount() }
+})
+
+test('actual measurement controls require observed keys while unavailable deep links remain removable', async () => {
+  const source = await readFile(new URL('../pages/search.vue', import.meta.url), 'utf8')
+  const declaration = source.slice(source.indexOf('const measurementRangeFilters = computed('), source.indexOf('const selectedScreenSizeMin'))
+  const route = Vue.reactive({ query: { attr_length_mm_min: '140', attr_length_mm_max: 'bad' } })
+  const buckets = Vue.ref({ wrench_size_mm: [{ value: '10', count: 2 }], length_mm: [{ value: '140', count: 0 }] })
+  const controls = new Function('computed', 'route', 'attributeBuckets', 'specRangeNumber', 'MEASUREMENT_RANGE_KEYS', 'hasInvalidMeasurementRange', stripTypeScriptTypes(declaration) + '\nreturn { measurementRangeFilters, invalidMeasurementRange }')(
+    Vue.computed, route, buckets, specRangeNumber, MEASUREMENT_RANGE_KEYS, hasInvalidMeasurementRange,
+  )
+  assert.equal(controls.measurementRangeFilters.value.find(f => f.key === 'wrench_size_mm').available, true)
+  const length = controls.measurementRangeFilters.value.find(f => f.key === 'length_mm')
+  assert.equal(length.available, false)
+  assert.equal(length.rawMax, 'bad')
+  assert.equal(controls.invalidMeasurementRange.value, true)
+  route.query = { attr_length_mm_max: '200' }
+  buckets.value = { length_mm: [{ value: '200' }] }
+  assert.equal(controls.measurementRangeFilters.value.find(f => f.key === 'length_mm').max, 200)
+  assert.equal(controls.invalidMeasurementRange.value, false)
+})
+
+test('bearing dimensions use canonical observed attributes without losing explicit part scope', () => {
+  const query = { q: 'SKF', includePartOffers: 'true', platforms: ['Ebay'], country: 'DE', price_currency: 'EUR', attr_part_designation: ['6203', '6203-2RS'] }
+  const next = withRangeParams(withRangeParams(query, 'part_inner_mm', { min: 17, max: 17 }), 'part_outer_diameter_mm', { max: 40 })
+  assert.deepEqual(buildSpecApiFilters({ ...next, attr_part_width_mm_min: '12 mm' }), ['part_inner_mm_min:17', 'part_inner_mm_max:17', 'part_outer_diameter_mm_max:40', 'part_width_mm_min:12'])
+  assert.equal(next.includePartOffers, 'true')
+  assert.deepEqual(next.attr_part_designation, ['6203', '6203-2RS'])
+  assert.equal(next.price_currency, 'EUR')
+  assert.equal(next.country, 'DE')
+  assert.deepEqual(next.platforms, ['Ebay'])
+  assert.equal(hasInvalidMeasurementRange({ attr_part_inner_mm_min: '20', attr_part_inner_mm_max: '17' }), true)
+  assert.equal(hasInvalidMeasurementRange({ attr_part_width_mm_min: '12 cm' }), true)
 })

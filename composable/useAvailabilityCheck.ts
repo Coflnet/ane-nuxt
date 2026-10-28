@@ -1,7 +1,9 @@
 import type { Platform } from '~/src/api-client'
+import { nativeListingId } from '~/utils/listingIdentity'
 import { AVAILABILITY_TIMEOUT_MS } from '~/utils/listingOpen'
 
 export const useAvailabilityCheck = () => {
+  const apiBase = useApiBaseUrl()
   const platformMap: Record<string, Platform> = {
     kleinanzeigen: 'Kleinanzeigen',
     marktplaats: 'Marktplaats',
@@ -39,14 +41,16 @@ export const useAvailabilityCheck = () => {
     return platformMap[hostname] || 'Unknown'
   }
 
-  async function checkAvailability(listingId: string | number | null | undefined, url?: string | null): Promise<boolean> {
+  async function checkAvailability(listingId: string | number | null | undefined, url?: string | null, listingPlatform?: string | null): Promise<boolean> {
     if (!listingId) return true
 
-    const platform = getPlatformFromUrl(url)
+    const platform = listingPlatform || getPlatformFromUrl(url)
     if (platform === 'Unknown') return true
+    const id = typeof listingId === 'number' ? nativeListingId({ listingId, platform }) : listingId
+    if (!id) return true
 
     try {
-      const response = await $fetch<{ isAvailable: boolean }>(`https://ane.coflnet.com/api/Product/${platform}/${listingId}/available`, { timeout: AVAILABILITY_TIMEOUT_MS })
+      const response = await $fetch<{ isAvailable: boolean }>(`${apiBase.replace(/\/$/, '')}/api/Product/availability`, { query: { platform, id }, timeout: AVAILABILITY_TIMEOUT_MS })
       return response.isAvailable
     }
     catch (error) {

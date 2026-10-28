@@ -1,3 +1,4 @@
+import { hasInvalidMeasurementRange } from '../utils/specFilters.ts'
 import { nativeScopedPrice } from '../utils/searchCurrency.ts'
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
@@ -49,12 +50,12 @@ test('explicit budgets remain exact outside the observed range and an emptied fi
   assert.equal(state.route.query.price_currency, 'SEK')
 })
 
-async function lifecycle() {
-  const route = reactive({ query: { priceCurrency: 'SEK', platforms: 'Blocket' } })
+async function lifecycle(query = { priceCurrency: 'SEK', platforms: 'Blocket' }) {
+  const route = reactive({ query: { ...query } })
   const requests = []
   const initialData = ref(null), initialError = ref(null), initialLoading = ref(true)
   const state = {
-    route, ref, computed, watch, zipResolving: ref(false), selectedCategory: ref(''),
+    route, ref, computed, watch, hasInvalidMeasurementRange, zipResolving: ref(false), selectedCategory: ref(''),
     routeHasSearchQuery: () => true,
     buildSearchParams: () => ({ ...route.query }),
     fetchTopLevelCategories: async () => {}, ensureGermanLabels: async () => {}, syncPrevQuery: () => {},
@@ -82,7 +83,8 @@ async function lifecycle() {
   const initialEnd = source.indexOf('// Compute available category buckets', initialStart)
   const block = source.slice(initialStart, initialEnd)
   const seq = source.match(/let searchSeq = 0/)[0]
-  const code = `${seq}; ${block}; ${functionSource('performSearch')}; ${functionSource('applySearchResponse')}; return { performSearch, loading }`
+  const measurementValidation = source.match(/const invalidMeasurementRange = computed\([^\n]+/)[0]
+  const code = `${seq}; ${measurementValidation}; ${block}; ${functionSource('performSearch')}; ${functionSource('applySearchResponse')}; return { performSearch, loading }`
   const effects = effectScope()
   const actions = effects.run(() => new Function('state', `with (state) { ${stripTypeScriptTypes(`function setup() { ${code} }`).replaceAll('import.meta.server', 'false')}; return setup(); }`)(state))
   await nextTick()
@@ -169,4 +171,30 @@ test('actual budget chip SSR distinguishes a zero maximum from an unbounded budg
     const expectedMax = max === undefined ? '∞' : new Intl.NumberFormat('en-US', { style: 'currency', currency: 'SEK' }).format(max)
     assert(html.includes(`– ${expectedMax}`), 'Actual chip renders the exact maximum, including zero')
   }
+})
+
+test('malformed millimetre deep link issues no initial or retry request and recovers after correction', async () => {
+  const query = { priceCurrency: 'SEK', platforms: 'Blocket', country: 'SE', attr_part_inner_mm_min: 'not-a-dimension' }
+  const page = await lifecycle(query)
+  try {
+    await new Promise(resolve => setImmediate(resolve))
+    assert.equal(page.hasSearched.value, false, 'cached-null hydration has no fetcher-side local state')
+    const resultVisibility = source.match(/v-if="(loading \|\| products.length > 0 \|\| hasSearched \|\| invalidMeasurementRange)"/)[1]
+    assert.equal(new Function('loading', 'products', 'hasSearched', 'invalidMeasurementRange', `return ${resultVisibility}`)(false, [], false, hasInvalidMeasurementRange(page.route.query)), true, 'URL-derived recovery stays visible after cached-null hydration')
+    await page.performSearch()
+    assert.equal(page.requests.length, 0)
+    assert.equal(hasInvalidMeasurementRange(page.route.query), true, 'actual validation keeps the recovery error visible')
+    assert.equal(page.route.query.attr_part_inner_mm_min, 'not-a-dimension', 'raw selection remains available to the remove chip')
+    assert.deepEqual(page.route.query, query)
+    assert.equal(page.loading.value, false)
+    page.route.query = { ...query, attr_part_inner_mm_min: '17' }
+    const recovered = page.performSearch()
+    assert.equal(page.requests.length, 1)
+    assert.deepEqual(page.requests[0].query, page.route.query)
+    page.requests[0].resolve({ priceCurrency: 'SEK', products: [{ id: 'corrected-dimension' }] })
+    await recovered
+    assert.deepEqual(page.allProducts.value, [{ id: 'corrected-dimension' }])
+    assert.equal(page.searchError.value, false)
+  }
+  finally { page.stop() }
 })

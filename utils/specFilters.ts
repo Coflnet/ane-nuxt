@@ -2,6 +2,8 @@
 // them as attr_* params; the API receives the same names without the prefix as `attributes=key:value`
 // (see ProductSearchQueryBuilder.BuildImpliedAttributeQueries / BuildAttributeRangeQueries in AneApi).
 
+export const MEASUREMENT_RANGE_KEYS = ['wrench_size_mm', 'length_mm', 'part_inner_mm', 'part_outer_diameter_mm', 'part_width_mm'] as const
+
 /** URL params that are ranges/"or newer" and get their own controls instead of generic attribute chips. */
 export const SPEC_RANGE_PARAMS = [
   'attr_os_version_min',
@@ -14,6 +16,16 @@ export const SPEC_RANGE_PARAMS = [
   'attr_year_max',
   'attr_screen_size_min',
   'attr_screen_size_max',
+  'attr_wrench_size_mm_min',
+  'attr_wrench_size_mm_max',
+  'attr_length_mm_min',
+  'attr_length_mm_max',
+  'attr_part_inner_mm_min',
+  'attr_part_inner_mm_max',
+  'attr_part_outer_diameter_mm_min',
+  'attr_part_outer_diameter_mm_max',
+  'attr_part_width_mm_min',
+  'attr_part_width_mm_max',
 ] as const
 
 /** Attribute keys rendered by the dedicated spec controls (not by the generic attribute chip list). */
@@ -50,9 +62,30 @@ export function sortOsVersionBuckets<T extends FilterBucketLike>(buckets: T[] | 
 
 export function specRangeNumber(param: string, raw: unknown): number | null {
   if (typeof raw !== 'string' || raw.trim() === '') return null
+  if (MEASUREMENT_RANGE_KEYS.some(key => param === `attr_${key}_min` || param === `attr_${key}_max`)) return measurementNumber(raw)
   const parsed = Number(raw.trim().replace(',', '.'))
   const year = /^attr_(?:release_year|publication_year|year)_(?:min|max)$/.test(param)
   return Number.isFinite(parsed) && (year ? Number.isInteger(parsed) : parsed > 0) ? parsed : null
+}
+
+/** Match the API's positive decimal millimetre contract without guessing another unit. */
+export function measurementNumber(raw: unknown): number | null {
+  if (typeof raw !== 'string' || !/^\d+(?:[.,]\d+)?\s*(?:mm)?$/i.test(raw.trim())) return null
+  const value = Number(raw.trim().replace(/\s*mm$/i, '').replace(',', '.'))
+  return Number.isFinite(value) && value > 0 ? value : null
+}
+
+/** Invalid shared URLs stay visible/removable and must not trigger an unfiltered search. */
+export function hasInvalidMeasurementRange(query: Record<string, unknown>): boolean {
+  return MEASUREMENT_RANGE_KEYS.some((key) => {
+    const rawMin = query[`attr_${key}_min`]
+    const rawMax = query[`attr_${key}_max`]
+    const min = measurementNumber(rawMin)
+    const max = measurementNumber(rawMax)
+    return (rawMin != null && rawMin !== '' && min === null)
+      || (rawMax != null && rawMax !== '' && max === null)
+      || (min !== null && max !== null && min > max)
+  })
 }
 
 /**

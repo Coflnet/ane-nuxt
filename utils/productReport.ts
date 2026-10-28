@@ -1,7 +1,7 @@
-import type { ModelsIssueType, ModelsProductIssueReport } from '~/src/api-client/types.gen'
+import type { ModelsIssueType, ModelsProductIssueReport, Platform } from '~/src/api-client/types.gen'
 
-/** The request body also carries the product id the report is about; the generated type has no field for it. */
-export type ProductReportBody = ModelsProductIssueReport & { productId?: string }
+/** Optional API fields not yet present in the public generated client. */
+export type ProductReportBody = ModelsProductIssueReport & { productId?: string, listingPlatform?: Platform }
 
 export const MAX_REPORT_COMMENT = 500
 
@@ -36,6 +36,7 @@ export function extractProductId(input: string): string | null {
 export interface ReportBodyInput {
   type: ModelsIssueType
   listingId?: string | null
+  listingPlatform?: Platform | null
   productId?: string | null
   otherProductId?: string | null
   comment?: string | null
@@ -48,6 +49,7 @@ export function buildReportBody(input: ReportBodyInput): ProductReportBody {
   const body: ProductReportBody = { type: input.type, description }
   if (input.suggestion) body.suggestion = input.suggestion
   if (input.listingId) body.listingId = input.listingId
+  if (input.listingPlatform) body.listingPlatform = input.listingPlatform
   if (input.productId) body.productId = input.productId
   if (input.type === 'SameProductAs' && input.otherProductId) body.otherProductId = input.otherProductId
   return body

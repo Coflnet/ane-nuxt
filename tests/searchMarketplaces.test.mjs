@@ -8,14 +8,14 @@ import { computed, effectScope, nextTick, reactive, ref, watch } from 'vue'
 import { activeMarketplaces } from '../constants/CreateFilterConstants.ts'
 import { parseOfferFilterQuery } from '../utils/offerFilters.ts'
 import { attributeValues, facetSearchParams, toggleAttributeValue } from '../utils/facetSearch.ts'
-import { buildSpecApiFilters, SPEC_RANGE_PARAMS, SPEC_ATTRIBUTE_KEYS } from '../utils/specFilters.ts'
+import { buildSpecApiFilters, hasInvalidMeasurementRange, SPEC_RANGE_PARAMS, SPEC_ATTRIBUTE_KEYS } from '../utils/specFilters.ts'
 
 // Execute the actual page declarations, watcher and handlers. Only unrelated UI state and
 // navigation/network boundaries are replaced; marketplace/filter logic comes from the SFC AST.
 async function searchPage(query, respond = () => ({})) {
   const { descriptor } = parse(await readFile(new URL('../pages/search.vue', import.meta.url), 'utf8'))
   const ast = compileScript(descriptor, { id: 'search-marketplaces' }).scriptSetupAst
-  const declarations = new Set(['searchQuery', 'includePartOffers', 'includeIndividualOffers', 'selectedCategory', 'selectedCondition', 'selectedPlatforms', 'selectedPriceCurrency', 'selectedMinPrice', 'selectedMaxPrice', 'selectedSort', 'selectedMaxDistance', 'activeAttributeFilters', 'hasActiveFilters', 'selectedCountryCode', 'prevQuery', 'platformBuckets', 'availablePlatforms', 'attributeBuckets', 'availableAttributeBuckets', 'currencyBuckets'])
+  const declarations = new Set(['searchQuery', 'includePartOffers', 'includeIndividualOffers', 'selectedCategory', 'selectedCondition', 'selectedPlatforms', 'selectedPriceCurrency', 'selectedMinPrice', 'selectedMaxPrice', 'selectedSort', 'selectedMaxDistance', 'activeAttributeFilters', 'hasActiveFilters', 'selectedCountryCode', 'prevQuery', 'platformBuckets', 'availablePlatforms', 'attributeBuckets', 'availableAttributeBuckets', 'currencyBuckets', 'invalidMeasurementRange'])
   const functions = new Set(['routeHasSearchQuery', 'syncPrevQuery', 'onCountrySelect', 'clearAllFilters', 'buildSearchParams', 'togglePlatform', 'queryWithoutKeys', 'buildProductLink', 'loadAttributeValues', 'loadMore', 'performSearch', 'pinPriceCurrency', 'onPriceCurrencySelect', 'applyPriceFilter', 'clearPriceFilter', 'applySearchResponse', 'toggleAttributeFilter', 'removeAttributeFilter'])
   const source = descriptor.scriptSetup.content
   const code = ast.filter(node =>
@@ -32,7 +32,7 @@ async function searchPage(query, respond = () => ({})) {
   const requests = [], responses = []
   let page
   const scope = effectScope()
-  const factory = new Function('ref', 'computed', 'reactive', 'watch', 'route', 'router', 'attributeValues', 'buildSpecApiFilters', 'SPEC_RANGE_PARAMS', 'parseOfferFilterQuery', 'activeMarketplaces', 'facetSearchParams', 'searchProducts', 'responses', 'searchCurrency', 'nativeScopedPrice', 'toggleAttributeValue', 'SPEC_ATTRIBUTE_KEYS', `
+  const factory = new Function('ref', 'computed', 'reactive', 'watch', 'route', 'router', 'attributeValues', 'buildSpecApiFilters', 'SPEC_RANGE_PARAMS', 'parseOfferFilterQuery', 'activeMarketplaces', 'facetSearchParams', 'searchProducts', 'responses', 'searchCurrency', 'nativeScopedPrice', 'toggleAttributeValue', 'SPEC_ATTRIBUTE_KEYS', 'hasInvalidMeasurementRange', `
     const userLocation = ref(null), selectedBatteryMin = ref(), selectedBatteryMax = ref();
     const rangeFilterAttrs = new Set(['battery']), yearRangeFilters = ref([]);
     const batteryRangeMin = ref(0), batteryRangeMax = ref(100), batteryFilterMin = ref(0), batteryFilterMax = ref(100);
@@ -52,7 +52,7 @@ async function searchPage(query, respond = () => ({})) {
   page = scope.run(() => factory(ref, computed, reactive, watch, route, router, attributeValues, buildSpecApiFilters, SPEC_RANGE_PARAMS, parseOfferFilterQuery, activeMarketplaces, facetSearchParams, async ({ query }) => {
     requests.push(query)
     return respond(query)
-  }, responses, searchCurrency, nativeScopedPrice, toggleAttributeValue, SPEC_ATTRIBUTE_KEYS))
+  }, responses, searchCurrency, nativeScopedPrice, toggleAttributeValue, SPEC_ATTRIBUTE_KEYS, hasInvalidMeasurementRange))
   return { ...page, route, router, requests, responses, stop: () => scope.stop(), select: async (value) => {
     page.onCountrySelect({ target: { value } })
     await nextTick()
@@ -326,4 +326,27 @@ test('LP and 2LP use the existing exact attribute flow with independent offers, 
     page.stop()
     reloaded?.stop()
   }
+})
+
+test('malformed millimetre deep link blocks actual search, pagination and facet requests until removed', async () => {
+  const query = { q: 'Bahco', platforms: 'Blocket', country: 'SE', price_currency: 'SEK', attr_length_mm_min: '12 cm' }
+  const page = await searchPage(query)
+  try {
+    await page.performSearch()
+    page.loadMore()
+    assert.deepEqual(await page.loadAttributeValues('brand', 'Bahco'), [])
+    await nextTick()
+    assert.equal(page.requests.length, 0)
+    assert.deepEqual(page.route.query, query, 'the malformed selection remains available for correction/removal')
+    assert.deepEqual(page.allProducts.value, [], 'invalid selection cannot leave old unfiltered results visible')
+    const corrected = { ...query, attr_length_mm_min: '140 mm' }
+    await page.router.push({ query: corrected })
+    await new Promise(resolve => setImmediate(resolve))
+    assert.equal(page.requests.length, 1)
+    assert.deepEqual(page.requests[0].attributes, ['length_mm_min:140'])
+    assert.equal(page.requests[0].priceCurrency, 'SEK')
+    assert.equal(page.requests[0].country, 'SE')
+    assert.equal(page.requests[0].platforms, 'Blocket')
+  }
+  finally { page.stop() }
 })

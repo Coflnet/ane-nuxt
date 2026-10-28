@@ -37,7 +37,7 @@
 
     <!-- Results Section (if searching) -->
     <div
-      v-if="loading || products.length > 0 || hasSearched"
+      v-if="loading || products.length > 0 || hasSearched || invalidMeasurementRange"
       class="max-w-7xl mx-auto"
     >
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-4">
@@ -209,6 +209,30 @@
             @click="clearOsVersion"
           >&times;</button>
         </span>
+        <template
+          v-for="filter in measurementRangeFilters"
+          :key="filter.key"
+        >
+          <span
+            v-if="filter.rawMin || filter.rawMax"
+            class="inline-flex min-w-0 max-w-full items-center gap-1 rounded-full border border-purple-500/30 bg-purple-500/20 px-3 text-xs text-purple-400"
+          >
+            <span class="min-w-0 break-words">{{ localizeAttrKey(filter.key) }}: {{ filter.rawMin || '…' }} – {{ filter.rawMax || '…' }} mm</span>
+            <button
+              type="button"
+              class="min-h-11 min-w-11 shrink-0 hover:text-white"
+              :aria-label="`${$t('removeFilter', 'Remove filter')}: ${localizeAttrKey(filter.key)}`"
+              @click="clearRange(filter.key)"
+            >&times;</button>
+          </span>
+        </template>
+        <p
+          v-if="invalidMeasurementRange"
+          role="alert"
+          class="w-full text-sm text-rose-300"
+        >
+          {{ $t('measurementRangeInvalid') }}
+        </p>
         <template v-for="filter in yearRangeFilters" :key="filter.key">
           <span
             v-if="filter.min !== undefined || filter.max !== undefined"
@@ -572,6 +596,30 @@
             />
           </template>
 
+          <p
+            v-if="measurementRangeFilters.some(filter => filter.available && filter.key.startsWith('part_'))"
+            class="text-sm text-slate-400"
+          >
+            {{ $t('componentMeasurementsHelp') }}
+          </p>
+          <template
+            v-for="filter in measurementRangeFilters"
+            :key="filter.key"
+          >
+            <FiltersNumberRangeFilter
+              v-if="filter.available"
+              :title="localizeAttrKey(filter.key)"
+              :selected-min="filter.min"
+              :selected-max="filter.max"
+              :invalid-message="$t('measurementRangeInvalid')"
+              positive
+              step="any"
+              unit="mm"
+              :test-id="filter.key.replaceAll('_', '-')"
+              @apply="range => applyRange(filter.key, range)"
+            />
+          </template>
+
           <!-- Battery Range Filter -->
           <div
             v-if="hasBatteryBuckets"
@@ -778,7 +826,7 @@
           <!-- Clear all filters -->
           <button
             v-if="hasActiveFilters"
-            class="w-full px-4 py-2 rounded-lg text-sm text-red-400 hover:bg-red-500/10 border border-red-500/20 transition-colors"
+            class="min-h-11 w-full px-4 py-2 rounded-lg text-sm text-red-400 hover:bg-red-500/10 border border-red-500/20 transition-colors"
             @click="clearAllFilters"
           >
             {{ $t('clearAllFilters', 'Clear All Filters') }}
@@ -1204,6 +1252,8 @@ import { countPopulatedSubCategories, formatCategoryCount, getCategoryProductCou
 import { resolveSearchCategoryParam } from '~/utils/searchCategoryParam'
 import { isGameCaseProduct } from '~/utils/productRelations'
 import {
+  MEASUREMENT_RANGE_KEYS,
+  hasInvalidMeasurementRange,
   SPEC_ATTRIBUTE_KEYS,
   SPEC_RANGE_PARAMS,
   bucketNumberBounds,
@@ -1342,9 +1392,19 @@ const yearRangeFilters = computed(() => ['release_year', 'publication_year', 'ye
   ], true)
   return { key, min, max, bounds }
 }))
+const measurementRangeFilters = computed(() => MEASUREMENT_RANGE_KEYS.map(key => ({
+  key,
+  min: specRangeNumber(`attr_${key}_min`, route.query[`attr_${key}_min`]) ?? undefined,
+  max: specRangeNumber(`attr_${key}_max`, route.query[`attr_${key}_max`]) ?? undefined,
+  rawMin: route.query[`attr_${key}_min`],
+  rawMax: route.query[`attr_${key}_max`],
+  available: (attributeBuckets.value[key] ?? []).some(bucket => !!bucket.value && (bucket.count == null || bucket.count > 0)),
+})))
+const invalidMeasurementRange = computed(() => hasInvalidMeasurementRange(route.query))
 const selectedScreenSizeMin = selectedNumber('attr_screen_size_min')
 const selectedScreenSizeMax = selectedNumber('attr_screen_size_max')
 const hasSpecRangeSelection = computed(() => !!selectedOsVersionMin.value || !!selectedOsVersionSupports.value
+  || measurementRangeFilters.value.some(filter => !!filter.rawMin || !!filter.rawMax)
   || yearRangeFilters.value.some(filter => filter.min !== undefined || filter.max !== undefined)
   || selectedScreenSizeMin.value !== undefined || selectedScreenSizeMax.value !== undefined)
 
@@ -1409,7 +1469,7 @@ let searchSeq = 0
 const { data: initialSearch, loading: initialLoading, error: initialError } = useRaceableAsyncData(
   `search-${route.fullPath}`,
   () => {
-    if (!routeHasSearchQuery(route.query) || zipResolving.value) {
+    if (!routeHasSearchQuery(route.query) || zipResolving.value || invalidMeasurementRange.value) {
       return Promise.resolve(null)
     }
     // The category param needs both the URL-slug -> numeric-slug map (fetchTopLevelCategories,
@@ -1984,6 +2044,9 @@ const attrKeyTranslationMap: Record<string, string> = {
   'article_number': 'attr_article_number',
   'length_mm': 'attr_length_mm',
   'wrench_size_mm': 'attr_wrench_size_mm',
+  'part_inner_mm': 'attr_part_inner_mm',
+  'part_outer_diameter_mm': 'attr_part_outer_diameter_mm',
+  'part_width_mm': 'attr_part_width_mm',
   'package_scope': 'attr_package_scope',
   'product_kind': 'attr_product_type',
   'carburetor_designation': 'attr_carburetor_designation',
@@ -2185,6 +2248,7 @@ function buildSearchParams(offset = 0) {
 const facetSearchScope = computed(() => JSON.stringify(buildSearchParams()))
 
 async function loadAttributeValues(key: string, value: string): Promise<FilterBucket[]> {
+  if (invalidMeasurementRange.value) return []
   const response = await searchProducts({ query: facetSearchParams(buildSearchParams(), key, value) })
   return response?.attributeBuckets?.[key] ?? []
 }
@@ -2196,6 +2260,15 @@ async function loadAttributeValues(key: string, value: string): Promise<FilterBu
 
 async function performSearch(append = false) {
   if (import.meta.server) return
+  if (invalidMeasurementRange.value) {
+    searchSeq++
+    allProducts.value = []
+    totalResults.value = 0
+    hasSearched.value = true
+    manualLoading.value = false
+    loadingMore.value = false
+    return
+  }
   if (append && (loadingMore.value || manualLoading.value)) return
 
   const seq = ++searchSeq
