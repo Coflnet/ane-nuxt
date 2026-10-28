@@ -986,6 +986,8 @@
     "openAnyway": "trotzdem öffnen",
     "reportIssue": "Produkt melden",
     "reportListing": "Anzeige melden",
+    "sortLoadedOffers": "Geladene Angebote nach Preis oder Datum sortieren. Weitere Angebote laden, um sie einzubeziehen.",
+    "sortRequiresCurrency": "Die Preissortierung benötigt eine einzige bekannte Währung.",
     "marketplace": "Marktplatz",
     "title": "Titel",
     "price": "Preis",

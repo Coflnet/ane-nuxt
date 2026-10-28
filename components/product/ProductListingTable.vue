@@ -1,5 +1,12 @@
 <template>
   <div class="overflow-x-auto">
+    <p
+      class="px-3 py-2 text-xs text-slate-400"
+      role="status"
+    >
+      {{ $t('product.sortLoadedOffers') }}
+      <span v-if="!canSortPrices">{{ $t('product.sortRequiresCurrency') }}</span>
+    </p>
     <table class="block sm:table w-full text-left text-sm text-slate-400">
       <thead class="block sm:table-header-group text-xs uppercase bg-slate-800/50 text-slate-300">
         <tr class="flex sm:table-row">
@@ -10,24 +17,37 @@
             {{ $t('product.title') }}
           </th>
           <th
-            class="px-3 py-2 sm:px-6 sm:py-4 cursor-pointer hover:text-white"
-            @click="$emit('sort', 'price')"
+            class="px-3 sm:px-6"
+            :aria-sort="activeSort?.field === 'price' ? activeSort.ascending ? 'ascending' : 'descending' : 'none'"
           >
-            {{ $t('product.price') }}
-            <Icon
-              name="tabler:arrows-sort"
-              class="inline w-4 h-4"
-            />
+            <button
+              type="button"
+              class="min-h-11 inline-flex items-center gap-1 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+              :disabled="!canSortPrices"
+              @click="toggleSort('price')"
+            >
+              {{ $t('product.price') }}
+              <Icon
+                :name="sortIcon('price')"
+                class="w-4 h-4"
+              />
+            </button>
           </th>
           <th
-            class="px-3 py-2 sm:px-6 sm:py-4 cursor-pointer hover:text-white"
-            @click="$emit('sort', 'date')"
+            class="px-3 sm:px-6"
+            :aria-sort="activeSort?.field === 'date' ? activeSort.ascending ? 'ascending' : 'descending' : 'none'"
           >
-            {{ $t('product.date') }}
-            <Icon
-              name="tabler:arrows-sort"
-              class="inline w-4 h-4"
-            />
+            <button
+              type="button"
+              class="min-h-11 inline-flex items-center gap-1 hover:text-white"
+              @click="toggleSort('date')"
+            >
+              {{ $t('product.date') }}
+              <Icon
+                :name="sortIcon('date')"
+                class="w-4 h-4"
+              />
+            </button>
           </th>
           <th class="hidden sm:table-cell px-6 py-4 rounded-tr-lg">
             {{ $t('product.action') }}
@@ -36,7 +56,7 @@
       </thead>
       <tbody class="block sm:table-row-group">
         <tr
-          v-for="listing in listings"
+          v-for="listing in sortedListings"
           :key="listing.listingId || listing.productId || ''"
           class="grid grid-cols-[minmax(0,1fr)_auto] gap-x-2 p-3 sm:table-row sm:p-0 border-b border-slate-700/50 hover:bg-slate-800/30"
           :class="{ 'opacity-50': unavailableListings.has(listing.listingId || listing.productId || '') }"
@@ -296,6 +316,7 @@ import { buildReportBody, extractProductId, reportErrorMessage } from '~/utils/p
 import type { ModelsIssueType, ModelsProductMatch as GeneratedProductMatch } from '~/src/api-client/types.gen'
 import { countryFlag } from '~/utils/countryDetection'
 import type { OfferMatchExtras } from '~/utils/offerFilters'
+import { canSortOfferPrices, sortLoadedOffers, type OfferSort } from '~/utils/offerSort'
 import { useAvailabilityCheck } from '~/composable/useAvailabilityCheck'
 import { useListingOpener } from '~/composable/useListingOpener'
 import { useFormat } from '~/composable/useFormat'
@@ -318,9 +339,19 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'sort', field: string): void
   (e: 'listingUnavailable', listingId: number | string): void
 }>()
+
+const sort = ref<OfferSort | null>(null)
+const canSortPrices = computed(() => canSortOfferPrices(props.listings))
+const activeSort = computed(() => sort.value?.field === 'price' && !canSortPrices.value ? null : sort.value)
+const sortedListings = computed(() => sortLoadedOffers(props.listings, activeSort.value))
+function toggleSort(field: OfferSort['field']) {
+  sort.value = { field, ascending: activeSort.value?.field === field ? !activeSort.value.ascending : field === 'price' }
+}
+function sortIcon(field: OfferSort['field']) {
+  return activeSort.value?.field === field ? activeSort.value.ascending ? 'tabler:arrow-up' : 'tabler:arrow-down' : 'tabler:arrows-sort'
+}
 
 // Availability tracking
 const unavailableListings = ref<Set<number | string>>(new Set())

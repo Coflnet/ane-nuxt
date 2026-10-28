@@ -19,6 +19,14 @@ import {
 import { buildProductResourceUrl } from '../utils/productApiUrl.ts'
 import { parseStoredPosition, serializePosition } from '../utils/geoPosition.ts'
 
+test('selected native currency reaches the actual matches URL along with the other filters', () => {
+  const state = parseOfferFilterQuery({ price_currency: 'sek', platforms: 'Blocket', countries: 'SE' })
+  const url = new URL(buildProductResourceUrl('https://api', '7', 'matches', buildMatchesParams(state)))
+  assert.equal(url.searchParams.get('priceCurrency'), 'SEK')
+  assert.equal(url.searchParams.get('platforms'), 'Blocket')
+  assert.equal(url.searchParams.get('countries'), 'SE')
+})
+
 test('an empty query means no filter and no quick action', () => {
   const state = parseOfferFilterQuery({})
   assert.deepEqual(state, emptyOfferFilter())

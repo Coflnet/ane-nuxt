@@ -986,6 +986,8 @@
     "openAnyway": "open anyway",
     "reportIssue": "Report product issue",
     "reportListing": "Report this listing",
+    "sortLoadedOffers": "Sort loaded offers by price or date. Load more offers to include them.",
+    "sortRequiresCurrency": "Price sorting requires a single known currency.",
     "marketplace": "Marketplace",
     "title": "Title",
     "price": "Price",
