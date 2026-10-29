@@ -6,7 +6,6 @@
   "filterMatchAny": "Match any selected value; other filters still apply.",
   "XActiveFilters": "{amount} Custom Searches",
   "XMinuteDelay": "{amount} minute delay",
-  "noExtraDelay": "No extra delay",
   "actions": "Actions",
   "active": "Active",
   "activeFilters": "Custom Searches",
@@ -90,7 +89,7 @@
   "forBestOfBestFlippers": "For the best of the best flippers",
   "appHeaderFlipper": "Flipper",
   "instantFlipperAccess": "Instant access to Flipper feed",
-  "flipperTierPromo": "Flipper offers feed access with no extra delay",
+  "flipperTierPromo": "Flipper offers access to the Flipper feed",
   "flipperTierPromoDetail": "Flipper tier members see flips faster and can set up notifications. Use code EARLY for 69% off!",
   "flipNotification": "Flip Notification",
   "filterPausedInactive": "Paused because you were inactive for 30 days",
@@ -436,7 +435,6 @@
           "notifiers": "Up to 3 custom searches",
           "filters": "Access to multiple marketplaces",
           "premiumSearches": "100 Premium Searches On Signup",
-          "email": "Check channels for your plan at checkout",
           "updates": "60 minutes added delay",
           "analytics": "Advanced analytics"
         },
@@ -451,7 +449,6 @@
           "notifiers": "Up to 20 custom searches",
           "filters": "Access to all marketplaces",
           "premiumSearches": "3500 Premium Searches",
-          "notifications": "Check channels for your plan at checkout",
           "updates": "10 minutes added delay",
           "priceCalculation": "Price Calculation"
         },
@@ -465,8 +462,6 @@
         "features": {
           "notifiers": "Up to 500 custom searches",
           "premiumSearches": "25,000 Premium Searches",
-          "notifications": "Check channels for your plan at checkout",
-          "updates": "No extra delay",
           "flipperAccess": "Instant Flipper feed access",
           "analytics": "Price calculation"
         },
@@ -491,7 +486,7 @@
       },
       "second": {
         "question": "Is there a free trial?",
-        "answer": "There is a free plan with up to three active notifiers. The plan table lists limits and added delay; sign in to manage your notifiers."
+        "answer": "There is a free plan with up to three active notifiers. The plan table lists limits; sign in to manage your notifiers."
       },
       "third": {
         "question": "How many marketplaces can I monitor at once?",
@@ -503,11 +498,11 @@
       },
       "fifth": {
         "question": "How quickly will I receive notifications?",
-        "answer": "Plan terms describe added delays: Free 60 minutes, Collector 10 minutes, Flipper with no extra delay. Polling and delivery can add further time; arrival within one minute is not guaranteed."
+        "answer": "Plan terms describe added delays: Free 60 minutes, Collector 10 minutes. Polling and delivery can add further time; arrival within one minute is not guaranteed."
       },
       "sixth": {
         "question": "What does the Flipper plan include?",
-        "answer": "500 active notifiers, access to the Flipper feed and no plan-added delay. See the plan table for list prices."
+        "answer": "500 active notifiers, access to the Flipper feed. See the plan table for list prices."
       }
     },
     "moreQuestions": "Still have questions?",
@@ -718,7 +713,7 @@
   "errorCreatingSubscription": "There was an error creating your subscription, please try again or contact support",
   "filterNotFound": "Filter not found if this continues please contact support",
   "overview": "Overview",
-  "pushNotifications": "Check channels for your plan at checkout",
+  "pushNotifications": "Push notifications",
   "XPremiumSearchesOnSignUp": "{amount} Premium Searches on Sign-up",
   "copyReferralCode": "Copy Referral Code",
   "copyReferralCodeSuccess": "Referral code copied to clipboard",
@@ -1389,7 +1384,7 @@
     "searches": "Active searches",
     "delay": "Added delay",
     "plan": "Plan",
-    "termsNote": "These prices, active-search limits and added delays are listed in Ane’s repository as of the date above. Confirm current prices and the final charge at checkout. The notifier editor offers email, web push and Discord; availability by plan is not verified here.",
+    "termsNote": "These prices and active-search limits are listed in Ane’s repository as of the date above. Confirm current prices and the final charge at checkout. The notifier editor offers email, web push and Discord.",
     "timingNote": "Added delay is not a polling interval or a delivery guarantee. Marketplace detection, processing and delivery can add time. Push requires permission and Discord requires a channel webhook. Check the final charge and any discounts at checkout.",
     "flipperTitle": "Compare asking prices reproducibly · 29 October 2026",
     "flipperBody": "Choose an item and record model, condition, included accessories, location and observation time. Compare several similar listings and record their asking prices and shipping costs. The Flipper feed compares a listing price with a reference value; the difference is neither a completed-sale price nor profit. For your own calculation, subtract purchase, shipping, repairs, selling fees and taxes. Check completed comparable sales separately. Estimates are uncertain without sufficiently similar offers; a low asking price can reflect defects."

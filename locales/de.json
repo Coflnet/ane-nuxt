@@ -6,7 +6,6 @@
   "filterMatchAny": "Mindestens einen gewählten Wert erfüllen; andere Filter gelten weiterhin.",
   "XActiveFilters": "{amount} benutzerdefinierte Suchanfragen",
   "XMinuteDelay": "{amount} Minuten Verzögerung",
-  "noExtraDelay": "Keine zusätzliche Verzögerung",
   "actions": "Aktionen",
   "active": "Aktiv",
   "activeFilters": "Benutzerdefinierte Suchanfragen",
@@ -88,7 +87,7 @@
   "flipper": "Flipper",
   "appHeaderFlipper": "Flipper",
   "instantFlipperAccess": "Sofortiger Zugang zum Flipper-Feed",
-  "flipperTierPromo": "Flipper bietet Zugriff auf den Flipper-Feed und keine Zusatzverzögerung",
+  "flipperTierPromo": "Flipper bietet Zugriff auf den Flipper-Feed",
   "flipperTierPromoDetail": "Flipper-Mitglieder sehen Flips schneller und können Benachrichtigungen einrichten. Code EARLY für 69% Rabatt!",
   "flipNotification": "Flip-Benachrichtigung",
   "filterPausedInactive": "Pausiert, weil du 30 Tage inaktiv warst",
@@ -486,7 +485,6 @@
           "notifiers": "Bis zu 3 Suchaufträge",
           "filters": "Zugang zu mehreren Marktplätzen",
           "premiumSearches": "100 Premium-Suchen bei der Anmeldung",
-          "email": "Kanäle für deinen Tarif im Checkout prüfen",
           "updates": "60 Minuten Zusatzverzögerung",
           "analytics": "Erweiterte Analysen"
         },
@@ -500,7 +498,6 @@
         "features": {
           "notifiers": "Bis zu 20 Suchaufträge",
           "filters": "Zugang zu allen Marktplätzen",
-          "notifications": "Kanäle für deinen Tarif im Checkout prüfen",
           "premiumSearches": "3500 Premium-Suchanfragen",
           "updates": "10 Minuten Zusatzverzögerung",
           "priceCalculation": "Preisberechnung"
@@ -515,8 +512,6 @@
         "features": {
           "notifiers": "Bis zu 500 Suchaufträge",
           "premiumSearches": "25.000 Premium-Suchanfragen",
-          "notifications": "Kanäle für deinen Tarif im Checkout prüfen",
-          "updates": "Keine Zusatzverzögerung",
           "flipperAccess": "Sofortiger Zugang zum Flipper-Feed",
           "analytics": "Preisberechnung"
         },
@@ -541,7 +536,7 @@
       },
       "second": {
         "question": "Gibt es eine kostenlose Testversion?",
-        "answer": "Es gibt einen kostenlosen Tarif mit bis zu drei aktiven Suchaufträgen. Die Tariftabelle zeigt Limits und Zusatzverzögerung; zum Verwalten deiner Suchaufträge meldest du dich an."
+        "answer": "Es gibt einen kostenlosen Tarif mit bis zu drei aktiven Suchaufträgen. Die Tariftabelle zeigt Limits; zum Verwalten deiner Suchaufträge meldest du dich an."
       },
       "third": {
         "question": "Wie viele Marktplätze kann ich gleichzeitig überwachen?",
@@ -553,11 +548,11 @@
       },
       "fifth": {
         "question": "Wie schnell erhalte ich Benachrichtigungen?",
-        "answer": "Die Tarifangaben beschreiben Zusatzverzögerungen: Free 60 Minuten, Sammler 10 Minuten, Flipper ohne Zusatzverzögerung. Abfrageintervalle und Zustellung können weitere Zeit benötigen; eine Meldung innerhalb einer Minute wird nicht garantiert."
+        "answer": "Die Tarifangaben beschreiben Zusatzverzögerungen: Free 60 Minuten, Sammler 10 Minuten. Abfrageintervalle und Zustellung können weitere Zeit benötigen; eine Meldung innerhalb einer Minute wird nicht garantiert."
       },
       "sixth": {
         "question": "Was bietet der Flipper-Plan?",
-        "answer": "500 aktive Suchaufträge, Zugang zum Flipper-Feed und keine tarifbedingte Zusatzverzögerung. Aktuelle Listenpreise findest du in der Tariftabelle."
+        "answer": "500 aktive Suchaufträge, Zugang zum Flipper-Feed. Aktuelle Listenpreise findest du in der Tariftabelle."
       }
     },
     "moreQuestions": "Haben Sie noch Fragen?",
@@ -717,7 +712,7 @@
   "setRadius": "Radius auswählen",
   "confirm": "Bestätigen",
   "overview": "Überblick",
-  "pushNotifications": "Kanäle für deinen Tarif im Checkout prüfen",
+  "pushNotifications": "Push-Benachrichtigungen",
   "XPremiumSearchesOnSignUp": "{amount} Premium-Suchen bei der Registrierung",
   "copyReferralCode": "Empfehlungscode kopieren",
   "copyReferralCodeSuccess": "Empfehlungscode in die Zwischenablage kopiert",
@@ -1389,7 +1384,7 @@
     "searches": "Aktive Suchaufträge",
     "delay": "Zusatzverzögerung",
     "plan": "Tarif",
-    "termsNote": "Diese Preise, Limits aktiver Suchaufträge und Zusatzverzögerungen stehen zum oben genannten Datum im Ane-Repository. Prüfe die aktuellen Preise und den Endbetrag im Checkout. Der Benachrichtigungseditor bietet E-Mail, Web-Push und Discord; die Verfügbarkeit je Tarif ist hier nicht bestätigt.",
+    "termsNote": "Diese Preise und Limits aktiver Suchaufträge stehen zum oben genannten Datum im Ane-Repository. Prüfe die aktuellen Preise und den Endbetrag im Checkout. Der Benachrichtigungseditor bietet E-Mail, Web-Push und Discord.",
     "timingNote": "Zusatzverzögerung ist kein Abfrageintervall und keine Zustellgarantie. Erkennung auf dem Marktplatz, Verarbeitung und Zustellung können zusätzliche Zeit benötigen. Push benötigt eine Freigabe, Discord einen Kanal-Webhook. Prüfe den Endpreis und mögliche Rabatte im Checkout.",
     "flipperTitle": "Angebotspreise nachvollziehbar vergleichen · 29.10.2026",
     "flipperBody": "Wähle einen Artikel und notiere Modell, Zustand, Lieferumfang, Standort und Zeitpunkt. Vergleiche mehrere möglichst gleiche Angebote und halte deren Preise und Versandkosten fest. Der Flipper-Feed stellt Inseratspreise einem Vergleichswert gegenüber; die Differenz ist kein erzielter Verkaufspreis und kein Gewinn. Ziehe für deine eigene Kalkulation Einkauf, Versand, Reparaturen, Verkaufsgebühren und Steuern ab. Prüfe tatsächlich verkaufte Vergleichsartikel separat. Ohne ausreichend ähnliche Angebote ist die Schätzung unsicher; ein günstiges Inserat kann Mängel haben."

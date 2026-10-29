@@ -182,7 +182,7 @@ Implementation date: 29 October 2026. Run numbers below identify the reports, no
 | Research action | Public URLs (also available with `/de` prefix) | Implementation and remaining limits |
 |---|---|---|
 | 173 P1 Q1,3,6; 172 action 2 | `/marketplaces/kleinanzeigen` | Switch-under-€150 example with pickup radius, exclusions and notification setup. Dated native/Agent/Enhanced comparison links to documentation opened during implementation. Publisher polling claims are explicitly not delivery measurements. |
-| 173 P1 Q6,10; 172 action 1 | `/`, `/de`, `/subscriptions` and marketplace guides | Shared table reads the existing subscription constants for price, active-search limits and added delay. Flipper’s current constant says **no extra delay**, superseding the reports’ one-minute wording. Corrected SMS and speed-question copy, and removed affected unconditional speed claims. |
+| 173 P1 Q6,10; 172 action 1 | `/`, `/de`, `/subscriptions` and marketplace guides | Shared table reads the existing subscription constants for price and active-search limits. The delay column is omitted because no numeric Flipper delay is configured. Corrected SMS and speed-question copy, and removed affected unconditional speed claims. |
 | 173 P1 Q2,8; 172 action 3 | `/marketplaces`, `/de/marketplaces` | Bilingual hub with selectable marketplace and country lists, a repeatable cross-marketplace workflow, channel setup and limits. This consolidates the proposed marketplace-alerts URLs without removing any existing URL. Selector options do not establish live coverage for every marketplace/country pair. |
 | 173 P2 Q4,7; 172 action 5 | `/marketplaces/craigslist`, `/marketplaces/autoscout24` | Price/location examples; native saved-search alternatives; sourced adaptive-email and vehicle-search facts. Ane’s value is shared filters and channel choices, not an unmeasured speed advantage. |
 | 173 P2 Q5; 172 Q10 | `/flipper` | Dated, repeatable asking-price comparison checklist, cost categories and plan link. Clearly separates asking prices, reference values, completed sales and profit. A live worked valuation and measured returns remain open; no numbers were invented. |
@@ -198,4 +198,22 @@ Implementation date: 29 October 2026. Run numbers below identify the reports, no
 - Delivery latency, per-country live coverage, browser-off delivery and realized resale outcomes have not been tested. Do not infer guaranteed speed or profit from a configured notifier or a price difference.
 - Repeat the original question sets only after publication and indexing; compare the two baselines separately. No causal search-ranking improvement is claimed.
 
-- Billing follow-up: confirm current prices, VAT treatment and channels per plan. The shared table labels terms as repository-listed, makes no per-plan channel entitlement claim and directs readers to checkout for the final charge.
+- Billing follow-up: confirm current prices, VAT treatment and channels per plan. The shared table labels terms as repository-listed, omits channel entitlements and directs readers to checkout for the final charge. Subscription cards retain the configured push entitlement.
+
+### Claim sources
+
+- The notifier editor offers eBay, Kleinanzeigen, Marktplaats, Willhaben, Vinted, Blocket, ParuVendu, OLX, Gumtree, AutoScout24 and Craigslist: `constants/CreateFilterConstants.ts:7`, `constants/CreateFilterConstants.ts:19`; the editor consumes that list at `components/filters/SearchValueMarketplaceFilter.vue:32`.
+- The country selector offers Europe, United States, Canada, United Kingdom, Germany, France, Italy, Japan, Netherlands and Australia: `components/ui/CountryDropDown.vue:32`.
+- Shipping selection disables the postcode field: `components/filters/create/CreateCountrySection.vue:18`.
+- Web push requests browser permission, while the app bridge sends a notification-permission request: `components/filters/NotificationSettingsWebPushFilter.vue:34`, `components/filters/NotificationSettingsWebPushFilter.vue:51`. This establishes the request, not successful device authorization or delivery.
+- The editor offers email, web push and Discord: `components/filters/NotificationSettingsFilter.vue:5`.
+- Push notifications are included in all three configured plans: `constants/SubscriptionConstants.ts:36`, `constants/SubscriptionConstants.ts:51`, `constants/SubscriptionConstants.ts:66`.
+- Free and Collector have configured delays of 60 and 10 minutes: `constants/SubscriptionConstants.ts:37`, `constants/SubscriptionConstants.ts:52`.
+- The Flipper card displays a listing price and reference median: `components/flipper/flipItem.vue:487`, `components/flipper/flipItem.vue:491`. Asking-price comparisons do not establish completed-sale prices or profit; the research's Q5 distinguishes asking-price feeds from completed-sales research.
+- Guide FAQ structured data uses the same answers as visible content: `components/marketplaces/AlertGuide.vue:12`.
+
+### Remaining fact questions
+
+- No numeric Flipper delay is defined in the plan configuration. The research lists one minute, while the prior configuration used a nonnumeric “no extra delay” label. Resolve this discrepancy against the delivery implementation before publishing a Flipper delay; the shared comparison omits its delay column and Flipper's delay claims are removed.
+- Email and Discord entitlements by plan are not established by the editor's channel choices. Public plan rows asking readers to verify those entitlements are omitted.
+- No inventory-repricing implementation establishes the guide's previous negative claims about repricing stock. Those claims are omitted; the guide retains general asking-price guidance.

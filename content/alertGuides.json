@@ -17,8 +17,8 @@
           "body": "Open Create notifier, give the search a useful name and select a marketplace. Enter the item name, price range and exclusions. Choose country and delivery method, then a notification channel and save. Repeat for another marketplace with the same budget. Each active notifier counts towards the plan’s search limit. Inspect the first matches and adjust overly broad words."
         },
         {
-          "heading": "New listings, asking prices and repricing",
-          "body": "A notifier helps you find matching listings. It does not automatically reprice your stock or establish a completed-sale price. Use the asking-price workflow on the Flipper page to compare similar items, then check condition, shipping and selling costs before buying."
+          "heading": "New listings and asking prices",
+          "body": "A notifier helps you find matching listings. Use the asking-price workflow on the Flipper page to compare similar items, then check condition, shipping and selling costs before buying."
         },
         {
           "heading": "How do I receive alerts on my phone or in Discord?",
@@ -32,11 +32,11 @@
       "faqs": [
         {
           "question": "What tools help a reseller monitor several second-hand marketplaces?",
-          "answer": "Ane provides marketplace selection, price and keyword filters, and email, push or Discord destinations in one notifier editor. Native saved searches may suffice for a single site. This is listing discovery, not inventory repricing."
+          "answer": "Ane provides marketplace selection, price and keyword filters, and email, push or Discord destinations in one notifier editor. Native saved searches may suffice for a single site."
         },
         {
           "question": "How do free and paid notification delays compare?",
-          "answer": "Compare the dated plan table below. A plan’s added delay is different from how often a marketplace is checked and how long email, push or Discord takes to deliver. Ane does not promise that you will be the first buyer."
+          "answer": "A plan’s added delay is different from how often a marketplace is checked and how long email, push or Discord takes to deliver. Ane does not promise that you will be the first buyer."
         },
         {
           "question": "How can I monitor several second-hand marketplaces and receive email or phone alerts when matching items appear?",
@@ -44,7 +44,7 @@
         },
         {
           "question": "Which marketplace alert services offer a free plan, and how do their notification delays compare with paid plans?",
-          "answer": "Ane has a free plan with three active searches and a listed 60-minute added delay. Collector lists 20 searches and ten minutes; Flipper lists 500 with no extra delay. These are added delays, not measured delivery times. Use the dated plan table for prices."
+          "answer": "Ane has a free plan with three active searches and a listed 60-minute added delay. Collector lists 20 searches and ten minutes; Flipper lists 500 searches. These are added delays, not measured delivery times. Use the dated plan table for prices."
         },
         {
           "question": "Which marketplace monitoring services can send new-item alerts to Discord or email, and what do they cost?",
@@ -204,8 +204,8 @@
           "body": "Öffne Suchauftrag erstellen, vergib einen Namen und wähle einen Marktplatz. Trage Artikelname, Preisbereich und Ausschlusswörter ein. Wähle Land, Lieferart und Benachrichtigungskanal und speichere. Wiederhole das für einen weiteren Marktplatz mit demselben Budget. Jeder aktive Suchauftrag zählt zum Tariflimit. Prüfe erste Treffer und präzisiere zu breite Begriffe."
         },
         {
-          "heading": "Neue Angebote statt automatischer Preisanpassung",
-          "body": "Ein Suchauftrag findet passende Inserate. Er passt nicht automatisch deine Verkaufspreise an und belegt keinen erzielten Verkaufspreis. Vergleiche ähnliche Artikel mit dem Ablauf auf der Flipper-Seite und prüfe Zustand, Versand und Verkaufskosten vor dem Kauf."
+          "heading": "Neue Angebote und Angebotspreise",
+          "body": "Ein Suchauftrag findet passende Inserate. Vergleiche ähnliche Artikel mit dem Ablauf auf der Flipper-Seite und prüfe Zustand, Versand und Verkaufskosten vor dem Kauf."
         },
         {
           "heading": "Wie kommen Treffer aufs Handy oder in Discord?",
@@ -219,11 +219,11 @@
       "faqs": [
         {
           "question": "Welche Tools helfen mir als Reseller, neue Angebote auf mehreren Online-Marktplätzen automatisch zu überwachen?",
-          "answer": "Ane bietet Marktplatzauswahl, Preis- und Wortfilter sowie E-Mail, Push oder Discord im Suchauftragseditor. Für eine einzelne Plattform kann deren eigener Suchauftrag reichen. Es geht um neue Inserate, nicht um die automatische Preisanpassung deines Bestands."
+          "answer": "Ane bietet Marktplatzauswahl, Preis- und Wortfilter sowie E-Mail, Push oder Discord im Suchauftragseditor. Für eine einzelne Plattform kann deren eigener Suchauftrag reichen."
         },
         {
           "question": "Welche kostenlosen und kostenpflichtigen Suchagenten lohnen sich, und wie unterscheiden sich Verzögerungen?",
-          "answer": "Vergleiche die datierte Tariftabelle unten. Tarifbedingte Zusatzverzögerung, Abfrageintervall eines Marktplatzes und Zustellzeit sind verschiedene Größen. Ane verspricht nicht, dass du vor allen anderen Käufern benachrichtigt wirst."
+          "answer": "Tarifbedingte Zusatzverzögerung, Abfrageintervall eines Marktplatzes und Zustellzeit sind verschiedene Größen. Ane verspricht nicht, dass du vor allen anderen Käufern benachrichtigt wirst."
         },
         {
           "question": "Welche Tools melden mir neue passende Angebote auf mehreren Gebraucht-Marktplätzen, ohne dass ich ständig jede Seite aktualisieren muss?",

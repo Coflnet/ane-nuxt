@@ -857,13 +857,6 @@
                     name="tabler:circle-dashed-check"
                     class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                   />
-                  <span class="text-gray-300">{{ $t('pricing.plans.free.features.email') }}</span>
-                </li>
-                <li class="flex items-start">
-                  <Icon
-                    name="tabler:circle-dashed-check"
-                    class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
-                  />
                   <span class="text-gray-300">{{ $t('pricing.plans.free.features.updates') }}</span>
                 </li>
 
@@ -929,13 +922,6 @@
                     name="tabler:circle-dashed-check"
                     class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                   />
-                  <span class="text-gray-300">{{ $t('pricing.plans.collector.features.notifications') }}</span>
-                </li>
-                <li class="flex items-start">
-                  <Icon
-                    name="tabler:circle-dashed-check"
-                    class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
-                  />
                   <span class="text-gray-300">{{ $t('pricing.plans.collector.features.updates') }}</span>
                 </li>
                 <li class="flex items-start">
@@ -989,20 +975,6 @@
                     class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
                   />
                   <span class="text-gray-300">{{ $t('pricing.plans.flipper.features.premiumSearches') }}</span>
-                </li>
-                <li class="flex items-start">
-                  <Icon
-                    name="tabler:circle-dashed-check"
-                    class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
-                  />
-                  <span class="text-gray-300">{{ $t('pricing.plans.flipper.features.notifications') }}</span>
-                </li>
-                <li class="flex items-start">
-                  <Icon
-                    name="tabler:circle-dashed-check"
-                    class="w-5 h-5 text-indigo-400 mr-2 mt-0.5"
-                  />
-                  <span class="text-gray-300">{{ $t('pricing.plans.flipper.features.updates') }}</span>
                 </li>
                 <li class="flex items-start">
                   <Icon

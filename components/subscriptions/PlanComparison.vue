@@ -47,12 +47,6 @@ const currency = computed(() => new Intl.NumberFormat(locale.value, { style: 'cu
             >
               {{ $t('alertGuide.searches') }}
             </th>
-            <th
-              scope="col"
-              class="p-3"
-            >
-              {{ $t('alertGuide.delay') }}
-            </th>
           </tr>
         </thead>
         <tbody>
@@ -72,9 +66,6 @@ const currency = computed(() => new Intl.NumberFormat(locale.value, { style: 'cu
             </td>
             <td class="p-3 tabular-nums">
               {{ plan.features.find(feature => feature.text === 'XActiveFilters')?.amount }}
-            </td>
-            <td class="p-3">
-              {{ plan.id === 'flipper' ? $t('noExtraDelay') : $t('XMinuteDelay', { amount: plan.features.find(feature => feature.text === 'XMinuteDelay')?.amount }) }}
             </td>
           </tr>
         </tbody>
