@@ -39,11 +39,11 @@ export function validAutomaticReference(value: unknown): value is AutomaticShopR
       || (quote.provider === 'GoTools' && quote.brand?.trim().toUpperCase() === 'KNIPEX'
         && goToolsArticles.some(article => url.href === article.url && quote.mpn?.replace(/[^a-z0-9]/gi, '') === article.mpn
           && quote.gtin === article.gtin && quote.merchantSku === article.merchantSku)))
-      && !url.username && !url.password && !url.search && !url.hash
-      && [quote.merchantSku, quote.brand, quote.mpn].every(field => typeof field === 'string' && field.trim().length > 0)
-      && typeof quote.price === 'number' && Number.isFinite(quote.price) && quote.price > 0 && quote.currency === 'EUR'
-      && ['InStock', 'LimitedAvailability'].includes(quote.availability) && ['new', 'unknown'].includes(quote.condition)
-      && typeof quote.observedAt === 'string' && Number.isFinite(Date.parse(quote.observedAt))
+        && !url.username && !url.password && !url.search && !url.hash
+        && [quote.merchantSku, quote.brand, quote.mpn].every(field => typeof field === 'string' && field.trim().length > 0)
+        && typeof quote.price === 'number' && Number.isFinite(quote.price) && quote.price > 0 && quote.currency === 'EUR'
+        && ['InStock', 'LimitedAvailability'].includes(quote.availability) && ['new', 'unknown'].includes(quote.condition)
+        && typeof quote.observedAt === 'string' && Number.isFinite(Date.parse(quote.observedAt))
   }
   catch { return false }
 }
