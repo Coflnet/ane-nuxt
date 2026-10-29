@@ -1371,7 +1371,14 @@ const hasActiveFilters = computed(
 
 // Geolocation state
 const { requestBrowserPosition } = useUserLocation()
-const userLocation = ref<{ lat: number, lon: number } | null>(null)
+// Nearby deep links must scope the first SSR request as well as client searches.
+const urlLat = Number(route.query.lat)
+const urlLon = Number(route.query.lon)
+const userLocation = ref<{ lat: number, lon: number } | null>(
+  route.query.lat && route.query.lon && Number.isFinite(urlLat) && Number.isFinite(urlLon) && !route.query.zip
+    ? { lat: urlLat, lon: urlLon }
+    : null,
+)
 const distanceFilterKm = ref<number>(50)
 const zipCodeInput = ref<string>((route.query.zip as string) || '')
 const locationName = ref<string>('')
@@ -1981,13 +1988,6 @@ onMounted(async () => {
   const urlCountry = route.query.country as string
   if (urlCountry) {
     selectedCountryCode.value = urlCountry
-  }
-  // Restore a position handed over by lat/lon in the URL (product page "Search similar offers nearby")
-  const urlLat = Number(route.query.lat)
-  const urlLon = Number(route.query.lon)
-  if (route.query.lat && route.query.lon && Number.isFinite(urlLat) && Number.isFinite(urlLon) && !route.query.zip) {
-    userLocation.value = { lat: urlLat, lon: urlLon }
-    if (selectedMaxDistance.value) performSearch()
   }
   // Auto-resolve ZIP code from URL on page load
   const urlZip = route.query.zip as string
