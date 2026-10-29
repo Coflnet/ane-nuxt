@@ -23,6 +23,12 @@ export function lowestSameCurrencyOffer(offers: ShopOffer[], currency: string | 
 export type AutomaticShopReference = { provider: string, url: string, merchantSku: string, brand: string, mpn: string, gtin?: string | null, price: number, currency: 'EUR', availability: string, condition: 'new' | 'unknown', observedAt: string }
 export type AutomaticShopResult = { status: 'found' | 'not_found' | 'unsupported' | 'temporarily_unavailable', reference?: AutomaticShopReference | null, retryAt?: string | null }
 
+const goToolsArticles = [
+  { mpn: '0301160', gtin: '4003773013235', merchantSku: '35930', url: 'https://www.gotools.de/werkstattbedarf/handwerkzeuge/zangen/knipex-kombizange-laenge-160-mm-poliert-kunststoffueberzug_144938_35930' },
+  { mpn: '8701250', gtin: '4003773022022', merchantSku: '18450', url: 'https://www.gotools.de/marken/knipex/knipex-wasserpumpenzange-cobra-laenge-250-mm-spannweite-46-mm-poliert_127452_18450' },
+  { mpn: '8603250', gtin: '4003773033837', merchantSku: '18589', url: 'https://www.gotools.de/werkstattbedarf/handwerkzeuge/sanitaerwerkzeuge/zangenschluessel/knipex-zangenschluessel-laenge-250-mm-spannweite-52-mm-verchromt-kunststoffueberzug_127591_18589' },
+]
+
 /** The automatic source must remain a dated, exact-article store quote, separate from manual comparisons. */
 export function validAutomaticReference(value: unknown): value is AutomaticShopReference {
   if (!value || typeof value !== 'object') return false
@@ -30,9 +36,9 @@ export function validAutomaticReference(value: unknown): value is AutomaticShopR
   try {
     const url = new URL(quote.url)
     return ((quote.provider === 'Lefeld' && url.origin === 'https://www.lefeld.de' && /^\/(?:knipex|bahco)-[a-zA-Z0-9%-]+$/.test(url.pathname))
-      || (quote.provider === 'GoTools' && url.href === 'https://www.gotools.de/werkstattbedarf/handwerkzeuge/zangen/knipex-kombizange-laenge-160-mm-poliert-kunststoffueberzug_144938_35930'
-        && quote.brand?.trim().toUpperCase() === 'KNIPEX' && quote.mpn?.replace(/[^a-z0-9]/gi, '') === '0301160'
-        && quote.gtin === '4003773013235' && quote.merchantSku === '35930'))
+      || (quote.provider === 'GoTools' && quote.brand?.trim().toUpperCase() === 'KNIPEX'
+        && goToolsArticles.some(article => url.href === article.url && quote.mpn?.replace(/[^a-z0-9]/gi, '') === article.mpn
+          && quote.gtin === article.gtin && quote.merchantSku === article.merchantSku)))
       && !url.username && !url.password && !url.search && !url.hash
       && [quote.merchantSku, quote.brand, quote.mpn].every(field => typeof field === 'string' && field.trim().length > 0)
       && typeof quote.price === 'number' && Number.isFinite(quote.price) && quote.price > 0 && quote.currency === 'EUR'

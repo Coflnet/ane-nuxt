@@ -171,6 +171,34 @@ test('malformed preview schemas use the visible retry error and preserve the ent
 
 const automaticQuote = { provider: 'Lefeld', url: 'https://www.lefeld.de/knipex-kombizange-03-01-160-160mm', merchantSku: '10024102;12433', brand: 'KNIPEX', mpn: '03 01 160', gtin: '4003773013235', price: 10.07, currency: 'EUR', availability: 'LimitedAvailability', condition: 'unknown', observedAt: '2026-10-28T15:26:24Z' }
 const goToolsQuote = { ...automaticQuote, provider: 'GoTools', url: 'https://www.gotools.de/werkstattbedarf/handwerkzeuge/zangen/knipex-kombizange-laenge-160-mm-poliert-kunststoffueberzug_144938_35930', merchantSku: '35930', price: 10.99 }
+const goToolsQuotes = [goToolsQuote,
+  { ...goToolsQuote, mpn: '87 01 250', merchantSku: '18450', gtin: '4003773022022', url: 'https://www.gotools.de/marken/knipex/knipex-wasserpumpenzange-cobra-laenge-250-mm-spannweite-46-mm-poliert_127452_18450' },
+  { ...goToolsQuote, mpn: '86 03 250', merchantSku: '18589', gtin: '4003773033837', url: 'https://www.gotools.de/werkstattbedarf/handwerkzeuge/sanitaerwerkzeuge/zangenschluessel/knipex-zangenschluessel-laenge-250-mm-spannweite-52-mm-verchromt-kunststoffueberzug_127591_18589' },
+]
+
+test('every reviewed GoTools article binds its own URL, manufacturer number, GTIN and merchant SKU', async () => {
+  for (const reference of goToolsQuotes) {
+    assert.equal(validAutomaticReference(reference), true, reference.mpn)
+    assert.equal(validAutomaticReference({ ...reference, mpn: reference.mpn.replaceAll(' ', '-') }), true)
+    for (const other of goToolsQuotes.filter(quote => quote !== reference)) {
+      for (const field of ['url', 'mpn', 'gtin', 'merchantSku']) {
+        assert.equal(validAutomaticReference({ ...reference, [field]: other[field] }), false, `${reference.mpn}: cross-article ${field}`)
+      }
+    }
+    for (const change of [{ provider: 'Lefeld' }, { brand: 'Bahco' }, { url: reference.url + '?ref=other' },
+      { url: reference.url + '#price' }, { url: reference.url.replace('www.gotools.de', 'www.gotools.de.evil.example') },
+      { url: reference.url.replace('https:', 'http:') }, { url: reference.url.replace('www.gotools.de', 'user:password@www.gotools.de') }]) {
+      assert.equal(validAutomaticReference({ ...reference, ...change }), false)
+    }
+    const page = await componentState(async () => ({ status: 'found', reference }), 'knipex-' + reference.mpn.replaceAll(' ', ''))
+    try {
+      await page.mount()
+      assert.deepEqual(page.state.automatic.value.reference, reference)
+      assert.equal(page.state.confirmed.value, false)
+    }
+    finally { page.stop() }
+  }
+})
 
 test('GoTools automatic reference accepts only its reviewed URL paired with its provider', async () => {
   assert.equal(validAutomaticReference(goToolsQuote), true)
@@ -237,12 +265,12 @@ test('automatic reference rejects invalid source/price/condition and permits a u
 })
 
 test('actual automatic markup labels unknown condition, source, currency and freshness without an automatic profit calculation', async () => {
-  for (const language of ['en', 'de']) for (const reference of [automaticQuote, goToolsQuote]) {
+  for (const language of ['en', 'de']) for (const reference of [automaticQuote, ...goToolsQuotes]) {
     const html = await renderReference(language, { automatic: { status: 'found', reference } })
     const automatic = html.slice(html.indexOf('<section'), html.indexOf('</section>'))
     assert.ok(automatic.includes(reference.provider))
     assert.ok(automatic.includes(reference.url))
-    assert.match(automatic, /03 01 160/)
+    assert.ok(automatic.includes(reference.mpn))
     assert.match(automatic, /Condition unspecified|Zustand nicht angegeben/)
     assert.match(automatic, /2026-10-28T15:26:24Z/)
     assert.match(automatic, reference.provider === 'Lefeld' ? /10[.,]07/ : /10[.,]99/)
