@@ -1,0 +1,376 @@
+{
+  "en": {
+    "overview": {
+      "title": "Marketplace alerts for collectors and resellers",
+      "intro": "Use Ane to create searches for second-hand listings and choose email, web push or a Discord webhook for each notifier. Start with a native saved search if you only need one site’s own notifications; Ane puts marketplace filters and notification choices in one interface.",
+      "sections": [
+        {
+          "heading": "Which marketplaces can I select?",
+          "body": "The notifier editor lists eBay, Kleinanzeigen, Marktplaats, Willhaben, Vinted, Blocket, ParuVendu, OLX, Gumtree, AutoScout24 and Craigslist. These are selectable integrations, not a guarantee that every site or region has live results. Check a narrow search before relying on an alert."
+        },
+        {
+          "heading": "Which countries can I select?",
+          "body": "The editor offers Europe, the United States, Canada, the United Kingdom, Germany, France, Italy, Japan, the Netherlands and Australia. These are country filters, not a marketplace-by-country coverage promise. For local collection, choose pickup, enter a postcode and set a radius; shipping searches disable the postcode field."
+        },
+        {
+          "heading": "How do I monitor several marketplaces?",
+          "body": "Open Create notifier, give the search a useful name and select a marketplace. Enter the item name, price range and exclusions. Choose country and delivery method, then a notification channel and save. Repeat for another marketplace with the same budget. Each active notifier counts towards the plan’s search limit. Inspect the first matches and adjust overly broad words."
+        },
+        {
+          "heading": "New listings, asking prices and repricing",
+          "body": "A notifier helps you find matching listings. It does not automatically reprice your stock or establish a completed-sale price. Use the asking-price workflow on the Flipper page to compare similar items, then check condition, shipping and selling costs before buying."
+        },
+        {
+          "heading": "How do I receive alerts on my phone or in Discord?",
+          "body": "For email, select Email and enter your address. For web push, select Web Push and grant the browser’s notification permission; the app requests device permission. For Discord, select Discord and paste a channel webhook URL. Save the notifier and check its first matching alert. A saved configuration alone is not proof of delivery; check permissions and the destination if an expected match does not arrive."
+        },
+        {
+          "heading": "Create a Discord webhook",
+          "body": "Kleinanzeigen Agent’s documentation describes Discord’s side of setup: open the text channel settings, then Integrations → Webhooks, create a webhook and copy its URL. Paste that URL into the Ane notifier’s Discord field and save. Keep the URL private. On the next matching listing, check that a message arrives in the intended channel; saving successfully is not a delivery test. Alternatively select Email and enter your address."
+        }
+      ],
+      "faqs": [
+        {
+          "question": "What tools help a reseller monitor several second-hand marketplaces?",
+          "answer": "Ane provides marketplace selection, price and keyword filters, and email, push or Discord destinations in one notifier editor. Native saved searches may suffice for a single site. This is listing discovery, not inventory repricing."
+        },
+        {
+          "question": "How do free and paid notification delays compare?",
+          "answer": "Compare the dated plan table below. A plan’s added delay is different from how often a marketplace is checked and how long email, push or Discord takes to deliver. Ane does not promise that you will be the first buyer."
+        },
+        {
+          "question": "How can I monitor several second-hand marketplaces and receive email or phone alerts when matching items appear?",
+          "answer": "Create one notifier per marketplace, set matching item and price filters, then select email or web push. Push needs notification permission. Save and verify initial matches and delivery; active-notifier limits depend on the plan."
+        },
+        {
+          "question": "Which marketplace alert services offer a free plan, and how do their notification delays compare with paid plans?",
+          "answer": "Ane has a free plan with three active searches and a listed 60-minute added delay. Collector lists 20 searches and ten minutes; Flipper lists 500 with no extra delay. These are added delays, not measured delivery times. Use the dated plan table for prices."
+        },
+        {
+          "question": "Which marketplace monitoring services can send new-item alerts to Discord or email, and what do they cost?",
+          "answer": "Ane’s editor offers Discord webhooks and email. The plan table lists Ane prices and search limits. Kleinanzeigen Agent also documents Discord and email; see the dated Kleinanzeigen guide for its publisher-listed price and polling interval."
+        }
+      ],
+      "sources": [
+        {
+          "label": "Kleinanzeigen Agent: Discord setup",
+          "url": "https://kleinanzeigen-agent.de/dokumentation"
+        }
+      ]
+    },
+    "kleinanzeigen": {
+      "title": "Kleinanzeigen alerts: a Nintendo Switch under €150",
+      "intro": "Set the item name, budget and pickup radius before choosing a channel. Kleinanzeigen’s own saved search covers native email or app notifications; Ane adds configurable word filters and Discord as a destination.",
+      "sections": [
+        {
+          "heading": "Set up the example",
+          "body": "Open Create notifier and choose Kleinanzeigen. Search for Nintendo Switch, set maximum price to €149, select Germany and pickup, then enter your postcode and, for example, a 20 km radius. €149 is an example budget below €150, not a valuation."
+        },
+        {
+          "heading": "Exclusions and delivery",
+          "body": "Add exclusions such as defekt and Hülle when looking for a working console. Exclusions can also hide useful offers; review initial matches. Choose email, web push with permission, or Discord with a channel webhook URL, then save. The multi-marketplace guide explains channels in more detail."
+        },
+        {
+          "heading": "Comparison checked 29 October 2026",
+          "body": "Kleinanzeigen documents saved searches with email and app notifications, without a guaranteed delivery time on that page. Kleinanzeigen Agent lists €14.90 net per month per search agent, two-minute checks and email, Telegram or Discord. Enhanced documents a five-minute minimum interval for Kleinanzeigen and requires a running browser. These are publisher claims, not independent measurements. Ane plans are below; polling intervals are not delivery guarantees."
+        }
+      ],
+      "faqs": [
+        {
+          "question": "Can I be first to find a used Nintendo Switch under €150 nearby?",
+          "answer": "Use a maximum price, postcode and radius to narrow matches. This workflow cannot guarantee that you will beat other buyers. Allow for plan delay and delivery time."
+        },
+        {
+          "question": "How do I send filtered Kleinanzeigen matches to push or Discord?",
+          "answer": "Set search terms and excluded words in the Ane notifier. Select web push and allow notifications, or select Discord and enter the channel webhook. After saving, check initial matches and their delivery."
+        }
+      ],
+      "sources": [
+        {
+          "label": "Kleinanzeigen: gespeicherte Suchen",
+          "url": "https://hilfe.kleinanzeigen.de/hc/de/articles/17102975598492-Ich-m%C3%B6chte-automatisch-neue-Suchergebnisse-zu-meiner-Suche-erhalten-Wie-richte-ich-das-ein"
+        },
+        {
+          "label": "Kleinanzeigen Agent: Dokumentation",
+          "url": "https://kleinanzeigen-agent.de/dokumentation"
+        },
+        {
+          "label": "Kleinanzeigen-Enhanced: Suchaufträge",
+          "url": "https://hilfe.kleinanzeigen-enhanced.de/suchauftraege/"
+        }
+      ]
+    },
+    "craigslist": {
+      "title": "Craigslist alerts by price range and local area",
+      "intro": "Craigslist has built-in saved-search email alerts. Ane is another option when you want to manage filters and notification destinations alongside other marketplaces.",
+      "sections": [
+        {
+          "heading": "Set a price range",
+          "body": "In Create notifier choose Craigslist and a term such as bicycle. Set minimum and maximum prices for your budget, check the displayed currency, then select country and pickup. Enter your postcode and radius. Example values such as 50–150 are a search budget, not a recommended valuation. Check initial matches for the intended location."
+        },
+        {
+          "heading": "Native email or Ane?",
+          "body": "Craigslist says search frequency varies with the result count in the previous alert; each email displays at most 20 results. That may suffice for a Craigslist email search. In Ane select email or push in the notifier; push needs permission. Ane’s plan table describes added delays, not measured end-to-end delivery."
+        }
+      ],
+      "faqs": [
+        {
+          "question": "How can I get alerts for new Craigslist listings matching a price range without refreshing the site all day?",
+          "answer": "Use Craigslist’s native saved-search emails, or configure an Ane notifier with Craigslist, a price range, location and an email or push destination. Native email frequency varies; Ane’s plan delay does not guarantee arrival before other buyers."
+        }
+      ],
+      "sources": [
+        {
+          "label": "Craigslist: search alerts",
+          "url": "https://www.craigslist.org/about/help/account/features/alerts"
+        }
+      ]
+    },
+    "autoscout24": {
+      "title": "AutoScout24 used-car alerts by price and location",
+      "intro": "AutoScout24 saves filtered searches and notifies you by email or push. Start there for a car-only search. Ane offers a shared interface with your other marketplace notifiers.",
+      "sections": [
+        {
+          "heading": "Example: a Golf up to €12,000",
+          "body": "Select AutoScout24 in Ane, search for Volkswagen Golf and set a €12,000 maximum. Choose Germany, pickup, your postcode and, for example, a 50 km radius. This is an example budget, not a car valuation. Check year, mileage, accident history and equipment in the listing; a keyword does not replace a vehicle-specific filter."
+        },
+        {
+          "heading": "When is the native search enough?",
+          "body": "If you need AutoScout24’s vehicle-specific filters and its email or push alerts, save the search there. Ane suits people also managing other marketplaces or a Discord destination. Faster delivery than AutoScout24 has not been measured."
+        }
+      ],
+      "faqs": [
+        {
+          "question": "How can I monitor new used-car listings on AutoScout24?",
+          "answer": "Save your filtered search on AutoScout24 for native email or push. Alternatively, select AutoScout24 in an Ane notifier, set price and location, and choose a destination. Verify vehicle-specific details in the listing."
+        }
+      ],
+      "sources": [
+        {
+          "label": "AutoScout24: Suche speichern",
+          "url": "https://www.autoscout24.de/promo-lp/bei-autoscout24-registrieren/"
+        }
+      ]
+    },
+    "collectibles": {
+      "title": "LEGO, Pokémon and retro-game listing alerts",
+      "intro": "Search by set number, edition or console model and choose your own budget. A listing alert shows an asking price, not proven resale profit.",
+      "sections": [
+        {
+          "heading": "LEGO sets",
+          "body": "Choose a marketplace and search for LEGO plus the exact set number. Set a maximum based on comparable offers. If you want a complete set, exclusions such as manual only and empty box may help, but can also hide complete sets mentioning those words. Check completeness and condition in the photos."
+        },
+        {
+          "heading": "Retro games and consoles",
+          "body": "For example, search for Game Boy Color. Set your budget, pickup radius and condition. Exclusions such as broken or parts only suit a working-device search. Verify region, language, authenticity, battery and accessories before buying; compare consoles, individual games and bundles separately."
+        },
+        {
+          "heading": "Pokémon booster boxes",
+          "body": "Use separate notifiers for Silberne Sturmwinde and Silver Tempest and for different pack sizes. Set a maximum price and verify language, booster count and seals. A set-name-only search can also match individual cards. No example budget here is a profit forecast."
+        },
+        {
+          "heading": "Save and verify",
+          "body": "Choose email, push or Discord and save. Repeat for a second marketplace. Check initial matches and delivery, then broaden filters gradually if too restrictive. The marketplace-alert guide explains destinations and plans."
+        }
+      ],
+      "faqs": [
+        {
+          "question": "What is a good way to track newly listed LEGO sets and retro games for resale without checking marketplaces manually?",
+          "answer": "Create separate notifiers by set number or console model, with a maximum price and exclusions appropriate to the desired condition. Compare like-for-like items and verify selling costs and completed sales separately before buying."
+        },
+        {
+          "question": "I collect retro games and consoles. What services notify me about new listings while filtering out unwanted keywords and overpriced items?",
+          "answer": "Ane’s notifier editor combines marketplace selection, excluded words and a maximum price. Use the console recipe above and set your own budget. A price filter cannot establish authenticity, condition or fair resale value."
+        }
+      ],
+      "sources": []
+    }
+  },
+  "de": {
+    "overview": {
+      "title": "Marktplatz-Suchagenten für Sammler und Reseller",
+      "intro": "Mit Ane legst du Suchen für gebrauchte Artikel an und wählst je Suchauftrag E-Mail, Web-Push oder einen Discord-Webhook. Für Benachrichtigungen von nur einer Plattform kann deren eigener Suchauftrag genügen. Ane bündelt Marktplatzfilter und Benachrichtigungseinstellungen in einer Oberfläche.",
+      "sections": [
+        {
+          "heading": "Welche Marktplätze kann ich auswählen?",
+          "body": "Im Suchauftragseditor stehen eBay, Kleinanzeigen, Marktplaats, Willhaben, Vinted, Blocket, ParuVendu, OLX, Gumtree, AutoScout24 und Craigslist. Die Auswahl belegt keine lückenlose Live-Abdeckung jeder Plattform und Region. Prüfe zuerst eine konkrete Suche, bevor du dich auf einen Suchauftrag verlässt."
+        },
+        {
+          "heading": "Welche Länder kann ich auswählen?",
+          "body": "Der Editor bietet Europa, USA, Kanada, Großbritannien, Deutschland, Frankreich, Italien, Japan, Niederlande und Australien. Das sind Länderfilter, keine Zusage für jede Kombination aus Land und Marktplatz. Für Abholung wählst du Abholung, Postleitzahl und Umkreis; bei Versand ist das Postleitzahlfeld deaktiviert."
+        },
+        {
+          "heading": "Wie überwache ich mehrere Marktplätze?",
+          "body": "Öffne Suchauftrag erstellen, vergib einen Namen und wähle einen Marktplatz. Trage Artikelname, Preisbereich und Ausschlusswörter ein. Wähle Land, Lieferart und Benachrichtigungskanal und speichere. Wiederhole das für einen weiteren Marktplatz mit demselben Budget. Jeder aktive Suchauftrag zählt zum Tariflimit. Prüfe erste Treffer und präzisiere zu breite Begriffe."
+        },
+        {
+          "heading": "Neue Angebote statt automatischer Preisanpassung",
+          "body": "Ein Suchauftrag findet passende Inserate. Er passt nicht automatisch deine Verkaufspreise an und belegt keinen erzielten Verkaufspreis. Vergleiche ähnliche Artikel mit dem Ablauf auf der Flipper-Seite und prüfe Zustand, Versand und Verkaufskosten vor dem Kauf."
+        },
+        {
+          "heading": "Wie kommen Treffer aufs Handy oder in Discord?",
+          "body": "Wähle E-Mail und trage deine Adresse ein. Für Web-Push wählst du Web Push und erlaubst Benachrichtigungen im Browser; die App fragt nach der Gerätefreigabe. Für Discord wählst du Discord und fügst eine Kanal-Webhook-URL ein. Speichere den Suchauftrag und prüfe die erste passende Meldung. Speichern beweist noch keine Zustellung; prüfe bei ausbleibenden Treffern Berechtigungen und Zieladresse."
+        },
+        {
+          "heading": "Discord-Webhook einrichten",
+          "body": "Die Dokumentation von Kleinanzeigen Agent beschreibt die Discord-Seite so: Öffne die Textkanal-Einstellungen und dann Integrationen → Webhooks, erstelle einen Webhook und kopiere die URL. Füge diese URL in Ane im Discord-Feld des Suchauftrags ein und speichere. Halte die URL privat. Prüfe bei der nächsten passenden Anzeige, ob eine Nachricht im richtigen Kanal ankommt; eine erfolgreiche Speicherung ist kein Zustelltest. Als Alternative kannst du E-Mail mit deiner Adresse wählen."
+        }
+      ],
+      "faqs": [
+        {
+          "question": "Welche Tools helfen mir als Reseller, neue Angebote auf mehreren Online-Marktplätzen automatisch zu überwachen?",
+          "answer": "Ane bietet Marktplatzauswahl, Preis- und Wortfilter sowie E-Mail, Push oder Discord im Suchauftragseditor. Für eine einzelne Plattform kann deren eigener Suchauftrag reichen. Es geht um neue Inserate, nicht um die automatische Preisanpassung deines Bestands."
+        },
+        {
+          "question": "Welche kostenlosen und kostenpflichtigen Suchagenten lohnen sich, und wie unterscheiden sich Verzögerungen?",
+          "answer": "Vergleiche die datierte Tariftabelle unten. Tarifbedingte Zusatzverzögerung, Abfrageintervall eines Marktplatzes und Zustellzeit sind verschiedene Größen. Ane verspricht nicht, dass du vor allen anderen Käufern benachrichtigt wirst."
+        },
+        {
+          "question": "Welche Tools melden mir neue passende Angebote auf mehreren Gebraucht-Marktplätzen, ohne dass ich ständig jede Seite aktualisieren muss?",
+          "answer": "Lege in Ane je Marktplatz einen Suchauftrag mit Preis- und Wortfiltern an und wähle einen Kanal. Für nur eine Plattform können deren eigene Suchbenachrichtigungen genügen. Prüfe erste Treffer und Zustellung; die Auswahl eines Marktplatzes garantiert keine lückenlose Abdeckung."
+        }
+      ],
+      "sources": [
+        {
+          "label": "Kleinanzeigen Agent: Discord setup",
+          "url": "https://kleinanzeigen-agent.de/dokumentation"
+        }
+      ]
+    },
+    "kleinanzeigen": {
+      "title": "Kleinanzeigen-Suchauftrag: Nintendo Switch unter 150 Euro",
+      "intro": "Setze Suchbegriff, Preislimit und Abholradius, bevor du einen Kanal auswählst. Ein eigener Kleinanzeigen-Suchauftrag genügt für native E-Mail- oder App-Meldungen; Ane ergänzt konfigurierbare Wortfilter und Discord als Ziel.",
+      "sections": [
+        {
+          "heading": "Beispiel einrichten",
+          "body": "Öffne Suchauftrag erstellen und wähle Kleinanzeigen. Suche nach Nintendo Switch, setze den Höchstpreis auf 149 Euro und wähle Deutschland und Abholung. Trage deine Postleitzahl und beispielsweise 20 km Umkreis ein. 149 Euro ist hier ein Beispiel für ein Budget unter 150 Euro, keine Marktwertschätzung."
+        },
+        {
+          "heading": "Ausschlüsse und Zustellung",
+          "body": "Trage beispielsweise defekt und Hülle als Ausschlusswörter ein, wenn du eine funktionierende Konsole suchst. Solche Wörter können auch gute Angebote ausschließen; prüfe erste Treffer. Wähle E-Mail, Web-Push mit Berechtigung oder Discord mit Kanal-Webhook-URL und speichere. Die Anleitung für mehrere Marktplätze erklärt die Kanäle im Detail."
+        },
+        {
+          "heading": "Vergleich vom 29. Oktober 2026",
+          "body": "Kleinanzeigen dokumentiert gespeicherte Suchen mit E-Mail und App-Benachrichtigungen, aber dort keine garantierte Zustellzeit. Kleinanzeigen Agent nennt 14,90 Euro netto pro Monat je Suchagent, Prüfungen alle zwei Minuten und E-Mail, Telegram oder Discord. Enhanced beschreibt Suchaufträge mit mindestens fünf Minuten Prüftakt für Kleinanzeigen; der Browser muss laufen. Das sind Anbieterangaben, keine unabhängigen Messungen. Ane-Tarife stehen unten; ein Abfrageintervall ist keine Zustellgarantie."
+        }
+      ],
+      "faqs": [
+        {
+          "question": "Wie erfahre ich als Erster von neuen Kleinanzeigen-Angeboten für eine gebrauchte Nintendo Switch unter 150 Euro in meiner Nähe?",
+          "answer": "Mit Preislimit, Postleitzahl und Umkreis kannst du passende Angebote eingrenzen. Kein hier geprüfter Ablauf garantiert den ersten Platz vor anderen Käufern. Plane die tarifbedingte Verzögerung und die Zustellzeit ein."
+        },
+        {
+          "question": "Wie bekomme ich neue Kleinanzeigen-Treffer mit Suchbegriffen und ausgeschlossenen Wörtern direkt als Push oder in Discord?",
+          "answer": "Lege die Such- und Ausschlusswörter im Ane-Suchauftrag fest. Wähle Web-Push und erlaube Benachrichtigungen oder wähle Discord und hinterlege den Kanal-Webhook. Prüfe nach dem Speichern die ersten Treffer und deren Zustellung."
+        },
+        {
+          "question": "Welche Alternative zum normalen Kleinanzeigen-Suchauftrag meldet neue Angebote schneller, und was kostet sie?",
+          "answer": "Ein Geschwindigkeitsvorteil von Ane wurde nicht gemessen. Die Tabelle zeigt Ane-Preise und Zusatzverzögerungen. Agent nennt zwei Minuten Prüftakt für 14,90 Euro netto pro Monat je Suchagent; Enhanced erfordert einen laufenden Browser. Prüftakt und tatsächliche Zustellzeit sind nicht dasselbe."
+        },
+        {
+          "question": "Ich kaufe gebrauchte Spielekonsolen zum Weiterverkaufen. Wie bekomme ich neue Kleinanzeigen-Angebote schneller mit als über den normalen Suchauftrag, mit Preislimit und Umkreis?",
+          "answer": "Nutze das Konsolenbeispiel oben mit Höchstpreis, Postleitzahl und Umkreis und prüfe die ersten Treffer. Vergleiche die angegebenen Intervalle und Zusatzverzögerungen, aber rechne nicht mit einem garantierten Vorsprung. Kontrolliere Zustand und Wiederverkaufskosten vor dem Kauf."
+        }
+      ],
+      "sources": [
+        {
+          "label": "Kleinanzeigen: gespeicherte Suchen",
+          "url": "https://hilfe.kleinanzeigen.de/hc/de/articles/17102975598492-Ich-m%C3%B6chte-automatisch-neue-Suchergebnisse-zu-meiner-Suche-erhalten-Wie-richte-ich-das-ein"
+        },
+        {
+          "label": "Kleinanzeigen Agent: Dokumentation",
+          "url": "https://kleinanzeigen-agent.de/dokumentation"
+        },
+        {
+          "label": "Kleinanzeigen-Enhanced: Suchaufträge",
+          "url": "https://hilfe.kleinanzeigen-enhanced.de/suchauftraege/"
+        }
+      ]
+    },
+    "craigslist": {
+      "title": "Craigslist: neue Inserate nach Preis und Standort",
+      "intro": "Craigslist bietet eigene Suchbenachrichtigungen per E-Mail. Ane ist eine weitere Option, wenn du Filter und Benachrichtigungskanäle zusammen mit anderen Marktplätzen verwalten möchtest.",
+      "sections": [
+        {
+          "heading": "Preisbereich einrichten",
+          "body": "Wähle im Ane-Suchauftrag Craigslist und beispielsweise bicycle. Setze Mindest- und Höchstpreis passend zu deinem Budget, prüfe die angezeigte Währung und wähle Land und Abholung. Trage Postleitzahl und Radius ein. Beispielwerte wie 50–150 sind ein Suchbudget, keine Preisempfehlung. Prüfe die ersten Treffer auf den gewünschten Standort."
+        },
+        {
+          "heading": "Native E-Mail oder Ane?",
+          "body": "Craigslist beschreibt variable Abfragehäufigkeit abhängig von der Trefferzahl der letzten Meldung; eine E-Mail enthält höchstens 20 Ergebnisse. Das reicht, wenn du E-Mail für eine Craigslist-Suche möchtest. In Ane wählst du E-Mail oder Push im Suchauftrag; Push benötigt eine Freigabe. Die Ane-Tariftabelle beschreibt Zusatzverzögerungen, keine gemessene Ende-zu-Ende-Zustellung."
+        }
+      ],
+      "faqs": [
+        {
+          "question": "Wie bekomme ich neue Craigslist-Inserate in meinem Preisbereich, ohne ständig die Seite neu zu laden?",
+          "answer": "Nutze die eigenen Craigslist-Suchmails oder richte einen Ane-Suchauftrag mit Craigslist, Preisbereich, Standort und E-Mail oder Push ein. Die nativen Intervalle variieren; auch Ane garantiert keine Meldung vor anderen Käufern."
+        }
+      ],
+      "sources": [
+        {
+          "label": "Craigslist: search alerts",
+          "url": "https://www.craigslist.org/about/help/account/features/alerts"
+        }
+      ]
+    },
+    "autoscout24": {
+      "title": "AutoScout24: Gebrauchtwagen-Suche nach Preis und Standort",
+      "intro": "AutoScout24 speichert Suchen mit Filtern und meldet passende Angebote per E-Mail oder Push. Das ist der direkte Einstieg für eine reine Fahrzeugsuche. Ane bietet eine gemeinsame Oberfläche mit deinen übrigen Marktplatz-Suchaufträgen.",
+      "sections": [
+        {
+          "heading": "Beispiel: Golf bis 12.000 Euro",
+          "body": "Wähle im Ane-Editor AutoScout24, suche nach Volkswagen Golf und setze 12.000 Euro als Höchstpreis. Wähle Deutschland, Abholung, deine Postleitzahl und beispielsweise 50 km Radius. Das ist ein Beispielbudget, keine Fahrzeugbewertung. Baujahr, Laufleistung, Unfallfreiheit und Ausstattung musst du im Inserat prüfen; ein Suchwort ersetzt keinen Fahrzeugfilter."
+        },
+        {
+          "heading": "Wann reicht die native Suche?",
+          "body": "Wenn du die Fahrzeugfilter von AutoScout24 und deren E-Mail- oder Push-Meldungen brauchst, speichere die Suche direkt dort. Ane ist für Nutzer gedacht, die zusätzlich andere Marktplätze und etwa Discord als Ziel verwalten. Eine schnellere Zustellung gegenüber AutoScout24 wurde nicht gemessen."
+        }
+      ],
+      "faqs": [
+        {
+          "question": "Wie kann ich neue Gebrauchtwagen-Angebote auf AutoScout24 nach Preis und Suchkriterien automatisch überwachen?",
+          "answer": "Speichere deine gefilterte Suche bei AutoScout24 für native E-Mail- oder Push-Meldungen. Alternativ wähle AutoScout24 im Ane-Suchauftrag, lege Preis und Standort fest und wähle einen Kanal. Prüfe fahrzeugspezifische Details im Inserat."
+        }
+      ],
+      "sources": [
+        {
+          "label": "AutoScout24: Suche speichern",
+          "url": "https://www.autoscout24.de/promo-lp/bei-autoscout24-registrieren/"
+        }
+      ]
+    },
+    "collectibles": {
+      "title": "LEGO, Pokémon und Retro-Spiele: Suchaufträge einrichten",
+      "intro": "Suche nach Setnummer, Edition oder Konsolenmodell und lege ein eigenes Budget fest. Eine Benachrichtigung zeigt einen Angebotspreis, keinen belegten Wiederverkaufsgewinn.",
+      "sections": [
+        {
+          "heading": "LEGO-Sets",
+          "body": "Wähle einen Marktplatz und suche nach LEGO plus der genauen Setnummer. Setze den Höchstpreis anhand vergleichbarer Angebote. Wenn du ein vollständiges Set willst, können Anleitung und Leerkarton Ausschlusswörter sein; sie können aber auch vollständige Sets ausblenden, deren Text diese Wörter enthält. Prüfe Vollständigkeit und Zustand anhand der Fotos."
+        },
+        {
+          "heading": "Retro-Spiele und Konsolen",
+          "body": "Suche beispielsweise nach Game Boy Color. Lege dein Budget, Abholradius und Zustand fest. Ausschlüsse wie defekt oder Ersatzteile passen nur, wenn du funktionierende Geräte willst. Prüfe Region, Sprache, Originalität, Batterie und Lieferumfang vor dem Kauf; trenne Konsole, Einzelspiel und Bundle beim Preisvergleich."
+        },
+        {
+          "heading": "Pokémon-Displays",
+          "body": "Nutze getrennte Suchaufträge für Silberne Sturmwinde und Silver Tempest sowie für unterschiedliche Packungsgrößen. Definiere deinen Höchstpreis und prüfe Sprache, Boosterzahl und Versiegelung. Eine Suche nach dem Setnamen allein kann auch Einzelkarten treffen. Kein hier genanntes Budget ist eine Gewinnprognose."
+        },
+        {
+          "heading": "Speichern und prüfen",
+          "body": "Wähle E-Mail, Push oder Discord und speichere. Wiederhole die Suche für einen zweiten Marktplatz. Prüfe erste Treffer und die Zustellung; erweitere zu enge Filter schrittweise. Die Anleitung für Marktplatz-Suchagenten erklärt die Kanalwahl und die Tarife."
+        }
+      ],
+      "faqs": [
+        {
+          "question": "Wie finde ich neue LEGO-Sets und Retro-Spiele für den Wiederverkauf, ohne Marktplätze manuell zu prüfen?",
+          "answer": "Lege getrennte Suchaufträge nach Setnummer oder Konsolenmodell mit Höchstpreis und passenden Ausschlüssen an. Vergleiche gleichartige Artikel und prüfe Verkaufskosten und tatsächlich erzielte Preise separat vor dem Kauf."
+        },
+        {
+          "question": "Ich suche seltene Pokémon-Karten und LEGO-Sets. Wie richte ich Benachrichtigungen mit Suchbegriffen, Ausschlusswörtern und Maximalpreis ein?",
+          "answer": "Verwende getrennte Suchaufträge für Setnummer, Edition oder Kartenname. Setze einen eigenen Höchstpreis und gezielte Ausschlüsse. Kontrolliere erste Treffer, da Ausschlusswörter auch passende Angebote ausblenden können. Wähle dann E-Mail, Push oder Discord."
+        }
+      ],
+      "sources": []
+    }
+  }
+}

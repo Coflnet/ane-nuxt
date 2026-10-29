@@ -71,6 +71,14 @@ useJsonLd(() => [
           sizes="sm:100vw md:896px"
         />
 
+        <div class="mb-8">
+          <NuxtLink
+            :to="localePath('/guides/collectible-alerts')"
+            class="text-indigo-300 underline hover:text-white"
+          >
+            {{ $t('alertGuide.collectibles') }}
+          </NuxtLink>
+        </div>
         <section class="space-y-9 text-lg leading-8 text-gray-300">
           <div
             v-for="section in article.sections"

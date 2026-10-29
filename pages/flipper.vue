@@ -7,6 +7,19 @@
       />
     </h1>
 
+    <details class="mb-6 rounded-lg border border-gray-700 bg-gray-900 p-4 text-gray-300">
+      <summary class="cursor-pointer font-semibold text-white">
+        {{ $t('alertGuide.flipperTitle') }}
+      </summary>
+      <p class="mt-4 leading-7">
+        {{ $t('alertGuide.flipperBody') }}
+      </p>
+      <NuxtLink
+        :to="localePath('/subscriptions')"
+        class="mt-4 inline-block text-indigo-300 underline hover:text-white"
+      >{{ $t('alertGuide.plans') }}</NuxtLink>
+    </details>
+
     <!-- Flipper Tier Banner + Distance Sort & Location -->
     <UiDefaultContainer
       class="mb-4 p-4"

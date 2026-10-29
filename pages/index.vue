@@ -25,6 +25,14 @@
             <p class="text-lg text-gray-300 mb-8 max-w-lg">
               {{ $t('hero.description') }}
             </p>
+            <p class="mb-6">
+              <NuxtLink
+                :to="localePath('/marketplaces')"
+                class="text-indigo-300 underline hover:text-white focus-visible:outline focus-visible:outline-2"
+              >
+                {{ $t('alertGuide.hub') }}
+              </NuxtLink>
+            </p>
             <div class="mb-8 max-w-lg">
               <ProductSearch
                 @search="handleSearch"
@@ -91,6 +99,9 @@
         </div>
       </div>
     </section>
+    <div class="mx-auto max-w-6xl px-6 py-8">
+      <SubscriptionsPlanComparison />
+    </div>
 
     <!-- Stats Section -->
     <section class="py-12 bg-gray-900 border-y border-gray-800">
@@ -1333,6 +1344,13 @@ import { useCategories } from '~/composable/useCategories'
 import { searchRouteQuery } from '~/utils/searchQuery'
 
 const localePath = useLocalePath()
+const { t } = useI18n()
+useSeoMeta({
+  title: () => t('alertGuide.homeTitle'),
+  description: () => t('alertGuide.metaDescription'),
+  ogTitle: () => t('alertGuide.homeTitle'),
+  ogDescription: () => t('alertGuide.metaDescription'),
+})
 const userStore = import.meta.client ? useUserStore() : null
 const isLoggedIn = computed(() => userStore?.isLoggedIn ?? false)
 const heroCtaPath = computed(() => localePath(isLoggedIn.value ? '/filters/create' : '/overview'))

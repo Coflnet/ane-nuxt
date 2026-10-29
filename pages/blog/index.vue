@@ -10,9 +10,9 @@ useJsonLd(() => buildBlogListJsonLd(articles, absoluteUrl(route.path)))
 
 useSeoMeta({
   title: 'Flipping-Guides für Kleinanzeigen, eBay und Sammlerstücke | Ane Deals',
-  description: 'Wöchentliche Praxis-Guides zum Flippen auf Kleinanzeigen und eBay – Pokémon-Karten, Retro-Gaming, LEGO als Wertanlage und Verhandlungstaktiken.',
+  description: 'Praxis-Guides zum Flippen auf Kleinanzeigen und eBay – Pokémon-Karten, Retro-Gaming, LEGO als Wertanlage und Verhandlungstaktiken.',
   ogTitle: 'Flipping-Guides für Kleinanzeigen, eBay und Sammlerstücke | Ane Deals',
-  ogDescription: 'Wöchentliche Praxis-Guides zum Flippen auf Kleinanzeigen und eBay – Pokémon-Karten, Retro-Gaming, LEGO als Wertanlage und Verhandlungstaktiken.',
+  ogDescription: 'Praxis-Guides zum Flippen auf Kleinanzeigen und eBay – Pokémon-Karten, Retro-Gaming, LEGO als Wertanlage und Verhandlungstaktiken.',
 })
 
 useHead({
@@ -29,10 +29,10 @@ useHead({
             Flipping-Guides
           </p>
           <h1 class="max-w-3xl text-4xl font-bold leading-tight md:text-5xl">
-            Wöchentliche Notizen für saubere Flips und bessere Sammler-Funde
+            Notizen für saubere Flips und bessere Sammler-Funde
           </h1>
           <p class="mt-5 max-w-2xl text-lg text-gray-300">
-            Praxisnahe Guides aus dem deutschen Reseller-Umfeld – wöchentlich neu. Zukünftige Beiträge erscheinen erst zum Release-Datum in Sitemap und Routen.
+            Praxisnahe Guides aus dem deutschen Reseller-Umfeld.
           </p>
         </div>
         <NuxtImg
