@@ -174,6 +174,15 @@ const goToolsQuote = { ...automaticQuote, provider: 'GoTools', url: 'https://www
 const goToolsQuotes = [goToolsQuote,
   { ...goToolsQuote, mpn: '87 01 250', merchantSku: '18450', gtin: '4003773022022', url: 'https://www.gotools.de/marken/knipex/knipex-wasserpumpenzange-cobra-laenge-250-mm-spannweite-46-mm-poliert_127452_18450' },
   { ...goToolsQuote, mpn: '86 03 250', merchantSku: '18589', gtin: '4003773033837', url: 'https://www.gotools.de/werkstattbedarf/handwerkzeuge/sanitaerwerkzeuge/zangenschluessel/knipex-zangenschluessel-laenge-250-mm-spannweite-52-mm-verchromt-kunststoffueberzug_127591_18589' },
+  { ...goToolsQuote, mpn: '26 12 200', merchantSku: '18690', gtin: '4003773023142', url: 'https://www.gotools.de/marken/knipex/knipex-flachrundzange-laenge-200-mm-poliert-gerade-mehrkomponenten-huellen_127692_18690' },
+  { ...goToolsQuote, mpn: '26 15 200', merchantSku: '51163', gtin: '4003773035022', url: 'https://www.gotools.de/werkstattbedarf/handwerkzeuge/zangen/flachrundzangen-storchschnabelzangen/flachrundzange-storchschnabelzange/flachrundzange-knipex/knipex-flachrundzange-laenge-200-mm-verchromt-gerade-mehrkomponenten-huellen_160171_51163' },
+  { ...goToolsQuote, mpn: '11 06 160', merchantSku: '18576', gtin: '4003773021933', url: 'https://www.gotools.de/marken/knipex/knipex-abisolierzange-laenge-160-mm-vde-verchromt-mehrkomponenten-huellen_127578_18576' },
+  { ...goToolsQuote, mpn: '12 42 195', merchantSku: '18691', gtin: '4003773054580', url: 'https://www.gotools.de/marken/knipex/knipex-automatikabisolierzange-multistrip-10-laenge-195-mm-0-03-10-awg-32-7-mm_127693_18691' },
+  { ...goToolsQuote, mpn: '97 53 04', merchantSku: '18581', gtin: '4003773028017', url: 'https://www.gotools.de/marken/knipex/knipex-aderendhuelsenzange-gesamtlaenge-180-mm-0-08-10-0-16-0-awg-28-5-mm_127583_18581' },
+  { ...goToolsQuote, mpn: '12 12 02', merchantSku: '52547', gtin: '4003773048077', url: 'https://www.gotools.de/werkstattbedarf/handwerkzeuge/zangen/abisolierzangen/abisolierzange/praezisionsabisolierzange-knipex/knipex-praezisionsabisolierzange-laenge-195-mm-mehrkomponeten-huellen-0-03-2-08-awg-32-14-mm_161555_52547' },
+  { ...goToolsQuote, mpn: '03 01 180', merchantSku: '35540', gtin: '4003773013242', url: 'https://www.gotools.de/werkstattbedarf/handwerkzeuge/zangen/knipex-kombizange-laenge-180-mm-poliert-kunststoffueberzug_144548_35540' },
+  { ...goToolsQuote, mpn: '03 01 200', merchantSku: '57238', gtin: '4003773013259', url: 'https://www.gotools.de/werkstattbedarf/handwerkzeuge/zangen/knipex-kombizange-laenge-200-mm-poliert-kunststoffueberzug_166246_57238' },
+  { ...goToolsQuote, mpn: '97 53 14', merchantSku: '18659', gtin: '4003773041474', url: 'https://www.gotools.de/marken/knipex/knipex-aderendhuelsenzange-gesamtlaenge-180-mm-0-08-10-0-awg-28-7-mm-brueniert-mehrkomponenten-huellen_127661_18659' },
 ]
 
 test('every reviewed GoTools article binds its own URL, manufacturer number, GTIN and merchant SKU', async () => {
@@ -277,7 +286,8 @@ test('actual automatic markup labels unknown condition, source, currency and fre
     assert.match(automatic, /EUR/)
     assert.match(automatic, /not resale profit|kein Wiederverkaufsgewinn/)
     assert.match(automatic, /shipping cost unknown|Versandkosten unbekannt/)
-    assert.doesNotMatch(automatic, /shop-reference-gap|200|100 PLN/)
+    assert.doesNotMatch(automatic, /shop-reference-gap/)
+    for (const amount of [200, 100]) assert(!automatic.includes(formatHistoryPrice(amount, 'PLN', language)))
     const unavailable = await renderReference(language, { automatic: { status: 'temporarily_unavailable' } })
     assert.match(unavailable, /Retry store reference|Shop-Referenz erneut laden/)
     assert.match(unavailable, /role="status"/)
