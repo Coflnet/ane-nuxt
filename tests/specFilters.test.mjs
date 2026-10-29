@@ -243,23 +243,44 @@ test('millimetre inputs reject reversed and nonpositive ranges without emitting 
   finally { view.unmount() }
 })
 
-test('actual measurement controls require observed keys while unavailable deep links remain removable', async () => {
+test('actual selected measurement controls remain editable without returned buckets while unselected keys stay hidden', async () => {
   const source = await readFile(new URL('../pages/search.vue', import.meta.url), 'utf8')
   const declaration = source.slice(source.indexOf('const measurementRangeFilters = computed('), source.indexOf('const selectedScreenSizeMin'))
-  const route = Vue.reactive({ query: { attr_length_mm_min: '140', attr_length_mm_max: 'bad' } })
+  const scope = { q: 'Knipex', country: 'SE', platforms: 'Blocket', price_currency: 'SEK', includeIndividualOffers: 'true', attr_article_number: ['95 31 250', '95 32 320'] }
+  const route = Vue.reactive({ query: { ...scope, attr_length_mm_min: '140', attr_length_mm_max: 'bad' } })
   const buckets = Vue.ref({ wrench_size_mm: [{ value: '10', count: 2 }], length_mm: [{ value: '140', count: 0 }] })
   const controls = new Function('computed', 'route', 'attributeBuckets', 'specRangeNumber', 'MEASUREMENT_RANGE_KEYS', 'hasInvalidMeasurementRange', stripTypeScriptTypes(declaration) + '\nreturn { measurementRangeFilters, invalidMeasurementRange }')(
     Vue.computed, route, buckets, specRangeNumber, MEASUREMENT_RANGE_KEYS, hasInvalidMeasurementRange,
   )
   assert.equal(controls.measurementRangeFilters.value.find(f => f.key === 'wrench_size_mm').available, true)
   const length = controls.measurementRangeFilters.value.find(f => f.key === 'length_mm')
-  assert.equal(length.available, false)
+  assert.equal(length.available, true, 'a selected range must stay editable even when no positive facet value is returned')
+  assert.equal(controls.measurementRangeFilters.value.find(f => f.key === 'socket_size_mm').available, false)
   assert.equal(length.rawMax, 'bad')
   assert.equal(controls.invalidMeasurementRange.value, true)
-  route.query = { attr_length_mm_max: '200' }
+  route.query = { ...scope, attr_length_mm_max: '200' }
   buckets.value = { length_mm: [{ value: '200' }] }
   assert.equal(controls.measurementRangeFilters.value.find(f => f.key === 'length_mm').max, 200)
   assert.equal(controls.invalidMeasurementRange.value, false)
+  for (const responseBuckets of [{ length_mm: [{ value: '200', count: 0 }] }, {}]) {
+    buckets.value = responseBuckets
+    const selected = controls.measurementRangeFilters.value.find(f => f.key === 'length_mm')
+    assert.equal(selected.available, true, 'zero-result and unavailable responses must not hide the active editor')
+    assert.equal(selected.max, 200)
+    assert.equal(controls.measurementRangeFilters.value.find(f => f.key === 'wrench_size_mm').available, false)
+  }
+  const view = await mountRange({ title: 'Length', positive: true, selectedMax: 200, unit: 'mm', testId: 'length-mm' })
+  try {
+    assert.equal(Number(view.find('length-mm-max').value), 200)
+    await view.change('length-mm-max', '320')
+    route.query = withRangeParams(route.query, 'length_mm', view.emitted.at(-1))
+    assert.deepEqual(Vue.toRaw(route.query), { ...scope, attr_length_mm_max: '320' })
+    assert.equal(controls.measurementRangeFilters.value.find(f => f.key === 'length_mm').max, 320)
+    route.query = withRangeParams(route.query, 'length_mm', {})
+    assert.deepEqual(Vue.toRaw(route.query), scope)
+    assert.equal(controls.measurementRangeFilters.value.find(f => f.key === 'length_mm').available, false)
+  }
+  finally { view.unmount() }
 })
 
 test('bearing dimensions use canonical observed attributes without losing explicit part scope', () => {

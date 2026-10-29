@@ -1447,7 +1447,8 @@ const measurementRangeFilters = computed(() => MEASUREMENT_RANGE_KEYS.map(key =>
   max: specRangeNumber(`attr_${key}_max`, route.query[`attr_${key}_max`]) ?? undefined,
   rawMin: route.query[`attr_${key}_min`],
   rawMax: route.query[`attr_${key}_max`],
-  available: (attributeBuckets.value[key] ?? []).some(bucket => !!bucket.value && (bucket.count == null || bucket.count > 0)),
+  available: !!route.query[`attr_${key}_min`] || !!route.query[`attr_${key}_max`]
+    || (attributeBuckets.value[key] ?? []).some(bucket => !!bucket.value && (bucket.count == null || bucket.count > 0)),
 })))
 const invalidMeasurementRange = computed(() => hasInvalidMeasurementRange(route.query))
 const selectedScreenSizeMin = selectedNumber('attr_screen_size_min')
