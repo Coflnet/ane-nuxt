@@ -29,8 +29,11 @@ export function validAutomaticReference(value: unknown): value is AutomaticShopR
   const quote = value as AutomaticShopReference
   try {
     const url = new URL(quote.url)
-    return quote.provider === 'Lefeld' && url.origin === 'https://www.lefeld.de' && !url.username && !url.password && !url.search && !url.hash
-      && /^\/(?:knipex|bahco)-[a-zA-Z0-9%-]+$/.test(url.pathname)
+    return ((quote.provider === 'Lefeld' && url.origin === 'https://www.lefeld.de' && /^\/(?:knipex|bahco)-[a-zA-Z0-9%-]+$/.test(url.pathname))
+      || (quote.provider === 'GoTools' && url.href === 'https://www.gotools.de/werkstattbedarf/handwerkzeuge/zangen/knipex-kombizange-laenge-160-mm-poliert-kunststoffueberzug_144938_35930'
+        && quote.brand?.trim().toUpperCase() === 'KNIPEX' && quote.mpn?.replace(/[^a-z0-9]/gi, '') === '0301160'
+        && quote.gtin === '4003773013235' && quote.merchantSku === '35930'))
+      && !url.username && !url.password && !url.search && !url.hash
       && [quote.merchantSku, quote.brand, quote.mpn].every(field => typeof field === 'string' && field.trim().length > 0)
       && typeof quote.price === 'number' && Number.isFinite(quote.price) && quote.price > 0 && quote.currency === 'EUR'
       && ['InStock', 'LimitedAvailability'].includes(quote.availability) && ['new', 'unknown'].includes(quote.condition)

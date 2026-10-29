@@ -347,19 +347,23 @@
             <legend class="text-sm font-bold text-slate-300 uppercase tracking-wider px-1">
               {{ $t('storeReferenceFilter') }}
             </legend>
-            <label class="flex min-h-11 items-center gap-2 text-sm text-slate-300 cursor-pointer">
+            <label
+              v-for="store in ['Lefeld', 'GoTools']"
+              :key="store"
+              class="flex min-h-11 items-center gap-2 text-sm text-slate-300 cursor-pointer"
+            >
               <input
                 type="checkbox"
-                :checked="selectedStore.toLowerCase() === 'lefeld'"
+                :checked="selectedStore.toLowerCase() === store.toLowerCase()"
                 class="accent-cyan-400"
-                data-testid="store-reference-lefeld"
-                @change="toggleFilter('store', 'Lefeld')"
+                :data-testid="`store-reference-${store.toLowerCase()}`"
+                @change="toggleFilter('store', store)"
               >
-              <span>Lefeld</span>
+              <span>{{ store }}</span>
               <span
-                v-if="storeBuckets.length"
+                v-if="storeBuckets.find(bucket => bucket.value === store)"
                 class="text-xs text-slate-400"
-              >({{ storeBuckets[0]?.count }})</span>
+              >({{ storeBuckets.find(bucket => bucket.value === store)?.count }})</span>
             </label>
             <p class="mt-2 text-xs text-slate-400">
               {{ $t('storeReferenceFilterHint') }}
@@ -2374,7 +2378,7 @@ function applySearchResponse(response: SearchProductsResponse, append: boolean) 
       interpretation.value = (response as SearchProductsResponse & { interpretation?: SearchInterpretation | null })?.interpretation ?? null
 
       platformBuckets.value = response?.platformBuckets ?? []
-      storeBuckets.value = (response?.storeBuckets ?? []).filter(bucket => bucket.value === 'Lefeld' && (bucket.count ?? 0) > 0)
+      storeBuckets.value = (response?.storeBuckets ?? []).filter(bucket => ['Lefeld', 'GoTools'].includes(bucket.value ?? '') && (bucket.count ?? 0) > 0)
       currencyBuckets.value = response?.currencyBuckets ?? []
 
       // Use aggregation buckets if available (new backend), otherwise derive from products

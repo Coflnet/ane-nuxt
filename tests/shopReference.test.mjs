@@ -170,6 +170,29 @@ test('malformed preview schemas use the visible retry error and preserve the ent
 })
 
 const automaticQuote = { provider: 'Lefeld', url: 'https://www.lefeld.de/knipex-kombizange-03-01-160-160mm', merchantSku: '10024102;12433', brand: 'KNIPEX', mpn: '03 01 160', gtin: '4003773013235', price: 10.07, currency: 'EUR', availability: 'LimitedAvailability', condition: 'unknown', observedAt: '2026-10-28T15:26:24Z' }
+const goToolsQuote = { ...automaticQuote, provider: 'GoTools', url: 'https://www.gotools.de/werkstattbedarf/handwerkzeuge/zangen/knipex-kombizange-laenge-160-mm-poliert-kunststoffueberzug_144938_35930', merchantSku: '35930', price: 10.99 }
+
+test('GoTools automatic reference accepts only its reviewed URL paired with its provider', async () => {
+  assert.equal(validAutomaticReference(goToolsQuote), true)
+  assert.equal(validAutomaticReference({ ...goToolsQuote, brand: 'knipex', mpn: '03-01-160' }), true)
+  for (const change of [
+    { provider: 'Lefeld' }, { provider: 'Other' }, { url: automaticQuote.url },
+    { url: goToolsQuote.url.replace('www.gotools.de', 'www.gotools.de.evil.example') },
+    { url: goToolsQuote.url.replace('www.gotools.de', 'user:password@www.gotools.de') },
+    { url: goToolsQuote.url.replace('https:', 'http:') }, { url: goToolsQuote.url + '?ref=other' },
+    { url: goToolsQuote.url + '#price' }, { url: goToolsQuote.url.replace('_35930', '_35931') },
+    { currency: 'SEK' }, { availability: 'OutOfStock' }, { condition: 'used' },
+    { merchantSku: '144938' }, { brand: 'Bahco' }, { mpn: '03 01 180' },
+    { gtin: '4003773013242' }, { gtin: null },
+  ]) assert.equal(validAutomaticReference({ ...goToolsQuote, ...change }), false)
+  const page = await componentState(async () => ({ status: 'found', reference: goToolsQuote }), 'knipex-0301160')
+  try {
+    await page.mount()
+    assert.deepEqual(page.state.automatic.value.reference, goToolsQuote)
+    assert.equal(page.state.confirmed.value, false)
+  }
+  finally { page.stop() }
+})
 
 test('actual automatic handler loads by exact product ID on mount using GET, without manual input or confirmation', async () => {
   const page = await componentState(async () => ({ status: 'found', reference: automaticQuote }), 'knipex/03 01 160')
@@ -214,16 +237,18 @@ test('automatic reference rejects invalid source/price/condition and permits a u
 })
 
 test('actual automatic markup labels unknown condition, source, currency and freshness without an automatic profit calculation', async () => {
-  for (const language of ['en', 'de']) {
-    const html = await renderReference(language, { automatic: { status: 'found', reference: automaticQuote } })
+  for (const language of ['en', 'de']) for (const reference of [automaticQuote, goToolsQuote]) {
+    const html = await renderReference(language, { automatic: { status: 'found', reference } })
     const automatic = html.slice(html.indexOf('<section'), html.indexOf('</section>'))
-    assert.match(automatic, /Lefeld/)
+    assert.ok(automatic.includes(reference.provider))
+    assert.ok(automatic.includes(reference.url))
     assert.match(automatic, /03 01 160/)
     assert.match(automatic, /Condition unspecified|Zustand nicht angegeben/)
     assert.match(automatic, /2026-10-28T15:26:24Z/)
-    assert.match(automatic, /10[.,]07/)
+    assert.match(automatic, reference.provider === 'Lefeld' ? /10[.,]07/ : /10[.,]99/)
     assert.match(automatic, /EUR/)
     assert.match(automatic, /not resale profit|kein Wiederverkaufsgewinn/)
+    assert.match(automatic, /shipping cost unknown|Versandkosten unbekannt/)
     assert.doesNotMatch(automatic, /shop-reference-gap|200|100 PLN/)
     const unavailable = await renderReference(language, { automatic: { status: 'temporarily_unavailable' } })
     assert.match(unavailable, /Retry store reference|Shop-Referenz erneut laden/)

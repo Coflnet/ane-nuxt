@@ -107,16 +107,16 @@ test('store-only SSR deep link executes the real fetch and never invents a bucke
   finally { page.stop() }
 })
 
-test('observed store buckets use only positive Lefeld aggregation and retain unavailable selections', async () => {
-  const page = await searchPage({ store: 'Lefeld' })
+test('observed store buckets use only positive reviewed-store aggregation and retain unavailable selections', async () => {
+  const page = await searchPage({ store: 'GoTools' })
   try {
-    page.applySearchResponse({ priceCurrency: 'EUR', storeBuckets: [{ value: 'Lefeld', count: 3 }, { value: 'Other', count: 100 }] }, false)
-    assert.deepEqual(page.storeBuckets.value, [{ value: 'Lefeld', count: 3 }])
-    for (const storeBuckets of [undefined, [], [{ value: 'Lefeld', count: 0 }], [{ value: 'Lefeld', count: -1 }], [{ value: 'Other', count: 3 }]]) {
+    page.applySearchResponse({ priceCurrency: 'EUR', storeBuckets: [{ value: 'GoTools', count: 7 }, { value: 'Lefeld', count: 3 }, { value: 'Other', count: 100 }] }, false)
+    assert.deepEqual(page.storeBuckets.value, [{ value: 'GoTools', count: 7 }, { value: 'Lefeld', count: 3 }])
+    for (const storeBuckets of [undefined, [], [{ value: 'GoTools', count: 0 }], [{ value: 'GoTools', count: -1 }], [{ value: 'Lefeld', count: 0 }], [{ value: 'Other', count: 3 }]]) {
       page.applySearchResponse({ priceCurrency: 'EUR', storeBuckets, products: [{ stores: ['Lefeld'] }] }, false)
       assert.deepEqual(page.storeBuckets.value, [])
-      assert.equal(page.selectedStore.value, 'Lefeld')
-      assert.equal(page.buildSearchParams().store, 'Lefeld')
+      assert.equal(page.selectedStore.value, 'GoTools')
+      assert.equal(page.buildSearchParams().store, 'GoTools')
     }
   }
   finally { page.stop() }
@@ -155,15 +155,17 @@ test('select, unselect, back and reload change the actual request while preservi
 })
 
 test('a recognized case-insensitive deep link clears in one checkbox action', async () => {
-  const page = await searchPage({ q: 'Bahco', store: 'lefeld', price_currency: 'PLN' })
-  try {
-    assert.equal(page.requests[0].store, 'lefeld', 'the URL value is sent intact to API validation')
-    page.toggleFilter('store', 'Lefeld')
-    await Vue.nextTick()
-    assert.deepEqual(page.route.query, { q: 'Bahco', price_currency: 'PLN' })
-    assert.equal(page.requests.at(-1).store, undefined)
+  for (const store of ['Lefeld', 'GoTools']) {
+    const page = await searchPage({ q: 'Bahco', store: store.toLowerCase(), price_currency: 'PLN' })
+    try {
+      assert.equal(page.requests[0].store, store.toLowerCase(), 'the URL value is sent intact to API validation')
+      page.toggleFilter('store', store)
+      await Vue.nextTick()
+      assert.deepEqual(page.route.query, { q: 'Bahco', price_currency: 'PLN' })
+      assert.equal(page.requests.at(-1).store, undefined)
+    }
+    finally { page.stop() }
   }
-  finally { page.stop() }
 })
 
 test('unknown store remains visible and removable after API failure without broadening the failed request', async (t) => {
@@ -243,19 +245,19 @@ async function mountControls(page) {
   return { find: id => all().find(n => n.props['data-testid'] === id), all, stop: () => app.unmount() }
 }
 
-test('actual Lefeld checkbox and clear badge remain accessible and usable with zero observed references', async () => {
+for (const store of ['Lefeld', 'GoTools']) test(`actual ${store} checkbox and clear badge remain accessible and usable with zero observed references`, async () => {
   const page = await searchPage({ q: 'Bahco' })
   const controls = await mountControls(page)
   try {
-    const checkbox = controls.find('store-reference-lefeld')
+    const checkbox = controls.find('store-reference-' + store.toLowerCase())
     assert.equal(checkbox.props.type, 'checkbox')
     assert.match(checkbox.parent.props.class, /\bmin-h-11\b/)
     assert.equal(checkbox.props.checked, false)
     assert.ok(controls.all().some(n => n.props.role === 'status'))
     checkbox.props.onChange()
     await Vue.nextTick()
-    assert.equal(page.requests.at(-1).store, 'Lefeld')
-    assert.equal(controls.find('store-reference-lefeld').props.checked, true)
+    assert.equal(page.requests.at(-1).store, store)
+    assert.equal(controls.find('store-reference-' + store.toLowerCase()).props.checked, true)
     const badge = controls.find('active-store-reference')
     assert.match(badge.props.class, /\bmin-h-11\b/)
     assert.equal(badge.props['aria-label'], 'clearStoreReferenceFilter')
@@ -263,7 +265,30 @@ test('actual Lefeld checkbox and clear badge remain accessible and usable with z
     await Vue.nextTick()
     assert.deepEqual(page.route.query, { q: 'Bahco' })
     assert.equal(page.requests.at(-1).store, undefined)
-    assert.equal(controls.find('store-reference-lefeld').props.checked, false)
+    assert.equal(controls.find('store-reference-' + store.toLowerCase()).props.checked, false)
+  }
+  finally {
+    controls.stop()
+    page.stop()
+  }
+})
+
+test('GoTools selection preserves native currency and each rendered store count stays with its provider', async () => {
+  const page = await searchPage({ q: 'Knipex', store: 'GoTools', platforms: 'Blocket', country: 'SE' })
+  const controls = await mountControls(page)
+  try {
+    assert.equal(page.requests[0].store, 'GoTools')
+    assert.equal(page.requests[0].priceCurrency, 'SEK')
+    page.applySearchResponse({ priceCurrency: 'SEK', storeBuckets: [{ value: 'GoTools', count: 7 }, { value: 'Lefeld', count: 3 }] }, false)
+    await Vue.nextTick()
+    const text = n => [n.text ?? '', ...n.children.map(text)].join(' ')
+    assert.match(text(controls.find('store-reference-gotools').parent), /GoTools.*7/)
+    assert.match(text(controls.find('store-reference-lefeld').parent), /Lefeld.*3/)
+    controls.find('store-reference-lefeld').props.onChange()
+    await Vue.nextTick()
+    assert.equal(page.requests.at(-1).store, 'Lefeld')
+    assert.equal(page.requests.at(-1).priceCurrency, 'SEK')
+    assert.equal(controls.find('store-reference-gotools').props.checked, false)
   }
   finally {
     controls.stop()
