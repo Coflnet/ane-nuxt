@@ -4,6 +4,8 @@ import { getPublishedArticles } from '~/utils/articles'
 
 export default defineSitemapEventHandler(() => {
   const staticUrls: SitemapUrlInput[] = [
+    { loc: '/marketplaces', _i18nTransform: true },
+    { loc: '/guides/collectible-alerts', _i18nTransform: true },
     {
       loc: '/marketplaces/craigslist',
       _i18nTransform: true,

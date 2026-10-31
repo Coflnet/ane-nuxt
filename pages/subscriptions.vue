@@ -9,6 +9,8 @@
       </p>
     </div>
 
+    <SubscriptionsPlanComparison class="mb-8" />
+
     <!-- Discount Code Input -->
     <div class="max-w-md mx-auto mb-8">
       <div class="flex gap-2">

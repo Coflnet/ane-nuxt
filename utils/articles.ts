@@ -28,6 +28,10 @@ export const seoArticles: SeoArticle[] = [
     locale: 'de',
     sections: [
       {
+        heading: 'Suchauftrag-Rezept · Stand 29. Oktober 2026',
+        body: 'Nutze getrennte Suchaufträge für Silberne Sturmwinde und Silver Tempest sowie unterschiedliche Displaygrößen. Wähle Marktplatz, eigenes Preislimit und Benachrichtigungskanal. Kontrolliere bei Treffern Sprache, Boosterzahl und Versiegelung; der Setname allein kann auch Einzelkarten liefern. Ein Alert belegt keinen Wiederverkaufsgewinn.',
+      },
+      {
         heading: 'Den richtigen Suchbegriff treffen',
         body: 'Verkäufer beschreiben dasselbe Produkt mal als „Silberne Sturmwinde Display", mal als „Silver Tempest Booster Box", „36er Display" oder „18 Booster". Eine gute Suche kombiniert Setname, Format und typische Synonyme – ohne sich auf einen exakten Phrasenmatch zu verlassen. In Kleinanzeigen taucht ein guter Treffer oft mit Tippfehlern wie „Silberner Sturmwind" oder „Sturmwinde Booster Box" auf, in eBay häufiger mit Großbuchstaben und Set-Code „SWSH12". Ein Alert sollte beide Schreibweisen abdecken und Sprach- bzw. Akzentvarianten ignorieren.',
       },
@@ -88,6 +92,10 @@ export const seoArticles: SeoArticle[] = [
     locale: 'de',
     sections: [
       {
+        heading: 'Suchauftrag-Rezept · Stand 29. Oktober 2026',
+        body: 'Lege beispielsweise einen Suchauftrag für Game Boy Color an, wähle einen Marktplatz, Preislimit, Abholung und Umkreis. Schließe defekt nur aus, wenn du keine Reparaturgeräte suchst. Prüfe Region, Originalität, Zubehör und Funktion im Inserat. Wähle E-Mail, Push oder Discord und kontrolliere erste Treffer; die Zusatzverzögerung hängt vom Tarif ab.',
+      },
+      {
         heading: 'OVP schlägt Lose-Modul, fast immer',
         body: 'Ein loses N64-Modul „Ocarina of Time" liegt 2026 bei rund 25 €, mit OVP und Anleitung in PAL-Version aber bei 90–140 € – je nach Karton-Zustand. Diese Spreizung gilt für fast jedes Nintendo-Spiel der 90er und frühen 2000er. Auf dem Flohmarkt lohnt es sich, gezielt nach „mit Karton", „mit Anleitung" und „komplett" zu fragen – auch wenn die Verkäufer den Karton im Keller suchen müssen, kommt in 30–40 % der Fälle wirklich noch einer.',
       },
@@ -119,6 +127,10 @@ export const seoArticles: SeoArticle[] = [
     heroImage: '/DashboardPreview.webp',
     locale: 'de',
     sections: [
+      {
+        heading: 'Suchauftrag-Rezept · Stand 29. Oktober 2026',
+        body: 'Wähle in Ane einen Marktplatz, suche nach LEGO und der genauen Setnummer und setze dein eigenes Preislimit. Nutze Ausschlüsse wie Leerkarton nur bewusst: Auch vollständige Sets können dieses Wort erwähnen. Prüfe erste Treffer, Vollständigkeit und Zustand. Wähle E-Mail, Push oder Discord und kontrolliere die erste Zustellung. Ein Angebotspreis ist kein belegter Gewinn.',
+      },
       {
         heading: 'Modular Buildings sind die Blue-Chip-Klasse',
         body: 'Die Modular-Buildings-Reihe (z.B. 10182 „Café Corner", 10185 „Green Grocer") legt seit Jahren zwischen 8 und 14 % pro Jahr zu, wenn sie versiegelt bleibt. Das Café Corner ist mittlerweile bei 3.500–4.500 € MISB angekommen, vom UVP von 139,99 € im Jahr 2007. Wichtig: Die Modular-Reihe ist die einzige, bei der quasi jedes ältere EOL-Set langfristig gewinnt – bei anderen Themes ist die Trefferquote deutlich niedriger.',

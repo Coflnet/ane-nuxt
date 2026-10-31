@@ -15,6 +15,12 @@
 
     <!-- Main content sections -->
     <div class="space-y-8">
+      <MarketplacesAlertGuide
+        v-if="marketplaceName === 'kleinanzeigen' || marketplaceName === 'craigslist' || marketplaceName === 'autoscout24'"
+        :guide="marketplaceName"
+      />
+      <SubscriptionsPlanComparison />
+
       <MarketplacesIntroductionAndFeatures :marketplace-name="marketplaceName" />
 
       <MarketplacesHowItWorks :marketplace-name="marketplaceName" />
@@ -36,14 +42,14 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: () => t('aneMarketplaces', { name: t(`${marketplaceName.value}Marketplace`) }),
-  ogTitle: () => t('aneMarketplaces', { name: t(`${marketplaceName.value}Marketplace`) }),
-  description: () => t('aneDescription', { name: t(`${marketplaceName.value}Marketplace`) }),
-  ogDescription: () => t('aneDescription', { name: t(`${marketplaceName.value}Marketplace`) }),
+  title: () => t('aneMarketplaces', { name: t(`${marketplaceName.value}.name`) }),
+  ogTitle: () => t('aneMarketplaces', { name: t(`${marketplaceName.value}.name`) }),
+  description: () => t('aneDescription', { name: t(`${marketplaceName.value}.name`) }),
+  ogDescription: () => t('aneDescription', { name: t(`${marketplaceName.value}.name`) }),
 })
 
 useJsonLd(() => buildBreadcrumbJsonLd([
   { name: t('nav.home'), url: '/' },
-  { name: t(`${marketplaceName.value}Marketplace`), url: route.path },
+  { name: t(`${marketplaceName.value}.name`), url: route.path },
 ]))
 </script>

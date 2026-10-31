@@ -6,7 +6,6 @@
   "filterMatchAny": "Mindestens einen gewählten Wert erfüllen; andere Filter gelten weiterhin.",
   "XActiveFilters": "{amount} benutzerdefinierte Suchanfragen",
   "XMinuteDelay": "{amount} Minuten Verzögerung",
-  "noExtraDelay": "Keine zusätzliche Verzögerung",
   "actions": "Aktionen",
   "active": "Aktiv",
   "activeFilters": "Benutzerdefinierte Suchanfragen",
@@ -88,7 +87,7 @@
   "flipper": "Flipper",
   "appHeaderFlipper": "Flipper",
   "instantFlipperAccess": "Sofortiger Zugang zum Flipper-Feed",
-  "flipperTierPromo": "Upgrade auf Flipper für Echtzeit-Flips und schnellere Benachrichtigungen",
+  "flipperTierPromo": "Flipper bietet Zugriff auf den Flipper-Feed",
   "flipperTierPromoDetail": "Flipper-Mitglieder sehen Flips schneller und können Benachrichtigungen einrichten. Code EARLY für 69% Rabatt!",
   "flipNotification": "Flip-Benachrichtigung",
   "filterPausedInactive": "Pausiert, weil du 30 Tage inaktiv warst",
@@ -111,7 +110,7 @@
   "getStarted": "Schnell loslegen",
   "greatTryingAne": "Gratis Version zum Testen",
   "how": "Verwendung von",
-  "instantNotifications": "Erhalte sofortige Benachrichtigungen",
+  "instantNotifications": "Benachrichtigungen passend zu deinem Tarif",
   "invalidDiscordWebhook": "Bitte gib eine gültige Discord Webhook-URL ein",
   "invalidEmail": "Bitte gib eine gültige E-Mail-Adresse ein",
   "joinFreeToday": "Keine Zahlung erforderlich. Melde dich noch heute kostenlos an.",
@@ -157,8 +156,8 @@
   "privacy": "Datenschutz",
   "privacyPolicy": "Datenrichterklärung",
   "radiusEq": "z.B. {n}",
-  "realTimeAlerts": "Echtzeit Benachrichtigungen",
-  "receiveInstantAlerts": "\"Receive instant alerts when matching items are listed. Choose from email, discord, or push notifications.\"",
+  "realTimeAlerts": "Marktplatz-Benachrichtigungen",
+  "receiveInstantAlerts": "Erhalte Meldungen zu passenden Inseraten per E-Mail, Discord oder Push. Die Zusatzverzögerung hängt vom Tarif ab.",
   "referenceListingUrl": "Referenz-Angebots-URL",
   "referenceListingUrlPlaceholder": "Beliebige Angebots-URL einfügen",
   "referenceListingOptionalHelp": "Optional: Wähle einen Preis aus der Vorschau, um die Preisobergrenze dieses Filters zu setzen. Der gespeicherte Referenzpreis wird einmal täglich aktualisiert.",
@@ -323,7 +322,7 @@
       "text": "Verpasse nie wieder ein {deal}",
       "deal": "Schnäppchen"
     },
-    "description": "Erstelle benutzerdefinierte Benachrichtigungen für mehrere Marktplätze und erhalte sofortige Warnungen, wenn Artikel erscheinen, die deinen Kriterien entsprechen. Bleibe der Konkurrenz mit Echtzeit-Updates einen Schritt voraus.",
+    "description": "Erstelle Suchaufträge für gebrauchte Artikel auf mehreren Marktplätzen. Wähle Preis- und Wortfilter sowie E-Mail, Push oder Discord. Die Zusatzverzögerung hängt vom Tarif ab.",
     "startFree": "Kostenlos starten",
     "usersJoined": "Benutzer sind bereits beigetreten",
     "notification": {
@@ -352,7 +351,7 @@
   "features": {
     "badge": "Mächtige Funktionen",
     "title": "Alles, was Sie für die Marktplatzüberwachung benötigen",
-    "description": "Unsere Plattform hilft Ihnen, der Konkurrenz einen Schritt voraus zu sein, mit Echtzeit-Benachrichtigungen über mehrere Marktplätze, leistungsstarken Filtern und erweiterten Analysen.",
+    "description": "Preis- und Wortfilter sowie E-Mail, Push und Discord für deine Marktplatz-Suchaufträge.",
     "notifiers": {
       "title": "Benutzerdefinierte Benachrichtigungen",
       "description": "Erstellen Sie personalisierte Benachrichtigungen für bestimmte Artikel, Preisspannen oder Verkäufer auf jedem unterstützten Marktplatz. Werden Sie genau dann und so benachrichtigt, wie Sie es möchten.",
@@ -372,8 +371,8 @@
       }
     },
     "alerts": {
-      "title": "Sofortige Benachrichtigungen",
-      "description": "Erhalten Sie Benachrichtigungen in Echtzeit per E-Mail, Push-Benachrichtigungen und Discord, sobald passende Artikel gelistet werden. Verpassen Sie nie wieder ein Angebot.",
+      "title": "Marktplatz-Benachrichtigungen",
+      "description": "Erhalte Meldungen zu passenden Inseraten per E-Mail, Discord oder Push. Die Zusatzverzögerung hängt vom Tarif ab.",
       "benefits": {
         "first": "E-Mail-Benachrichtigungen",
         "second": "Push-Benachrichtigungen",
@@ -486,8 +485,7 @@
           "notifiers": "Bis zu 3 Suchaufträge",
           "filters": "Zugang zu mehreren Marktplätzen",
           "premiumSearches": "100 Premium-Suchen bei der Anmeldung",
-          "email": "Alle Benachrichtigungskanäle",
-          "updates": "Benachrichtigungen innerhalb von einer Stunde",
+          "updates": "60 Minuten Zusatzverzögerung",
           "analytics": "Erweiterte Analysen"
         },
         "cta": "Loslegen"
@@ -500,9 +498,8 @@
         "features": {
           "notifiers": "Bis zu 20 Suchaufträge",
           "filters": "Zugang zu allen Marktplätzen",
-          "notifications": "Alle Benachrichtigungskanäle",
           "premiumSearches": "3500 Premium-Suchanfragen",
-          "updates": "Benachrichtigungen innerhalb von 10 Minuten",
+          "updates": "10 Minuten Zusatzverzögerung",
           "priceCalculation": "Preisberechnung"
         },
         "cta": "Jetzt abonnieren"
@@ -515,8 +512,6 @@
         "features": {
           "notifiers": "Bis zu 500 Suchaufträge",
           "premiumSearches": "25.000 Premium-Suchanfragen",
-          "notifications": "Alle Benachrichtigungskanäle",
-          "updates": "Benachrichtigungen innerhalb einer Minute",
           "flipperAccess": "Sofortiger Zugang zum Flipper-Feed",
           "analytics": "Preisberechnung"
         },
@@ -537,11 +532,11 @@
     "items": {
       "first": {
         "question": "Welche Plattformen werden unterstützt?",
-        "answer": "Unser Service unterstützt eine breite Palette beliebter Online-Marktplätze, darunter Autoscout24, Kleinanzeigen und Craigslist. Wir erweitern kontinuierlich unsere Plattformintegrationen, um mehr Optionen anzubieten. Schreibe uns, wenn du eine bestimmte Plattform im Sinn hast!"
+        "answer": "Der Suchauftragseditor listet eBay, Kleinanzeigen, Marktplaats, Willhaben, Vinted, Blocket, ParuVendu, OLX, Gumtree, AutoScout24 und Craigslist. Prüfe die Marktplatz-Anleitung und eine Beispielsuche für deine Region; auswählbare Filter garantieren keine Live-Abdeckung."
       },
       "second": {
         "question": "Gibt es eine kostenlose Testversion?",
-        "answer": "Wir bieten eine völlig kostenlose Testversion an, für die keine Anmelde- oder Kreditkarteninformationen erforderlich sind. Erleben Sie die Leistungsfähigkeit unserer Plattform risikofrei und sehen Sie, wie wir Ihnen helfen können, das zu finden, wonach Sie suchen, bevor Sie sich für einen kostenpflichtigen Plan entscheiden."
+        "answer": "Es gibt einen kostenlosen Tarif mit bis zu drei aktiven Suchaufträgen. Die Tariftabelle zeigt Limits; zum Verwalten deiner Suchaufträge meldest du dich an."
       },
       "third": {
         "question": "Wie viele Marktplätze kann ich gleichzeitig überwachen?",
@@ -553,11 +548,11 @@
       },
       "fifth": {
         "question": "Wie schnell erhalte ich Benachrichtigungen?",
-        "answer": "Die Benachrichtigungsgeschwindigkeit hängt von Ihrer gewählten Stufe ab. Benutzer der kostenlosen Stufe erhalten Benachrichtigungen innerhalb von einer Stunde. Sammlerstufe innerhalb von 10 Minuten. Die Flipper-Stufe bietet Benachrichtigungen nahezu in Echtzeit."
+        "answer": "Die Tarifangaben beschreiben Zusatzverzögerungen: Free 60 Minuten, Sammler 10 Minuten. Abfrageintervalle und Zustellung können weitere Zeit benötigen; eine Meldung innerhalb einer Minute wird nicht garantiert."
       },
       "sixth": {
         "question": "Was bietet der Flipper-Plan?",
-        "answer": "Der Flipper-Plan ist jetzt verfügbar! Echtzeit-Flip-Benachrichtigungen, sofortiger Zugang zum Flipper-Feed und 500 Suchaufträge. Code EARLY für 69% Rabatt im ersten Monat."
+        "answer": "500 aktive Suchaufträge, Zugang zum Flipper-Feed. Aktuelle Listenpreise findest du in der Tariftabelle."
       }
     },
     "moreQuestions": "Haben Sie noch Fragen?",
@@ -585,7 +580,7 @@
   "craigslist": {
     "name": "Craigslist",
     "title": "Craigslist Filter & Benachrichtigungen: Optimierte Suche",
-    "subtitle": "Entdecken Sie verborgene Schätze auf Craigslist mit intelligenten Filtern und präzisen Benachrichtigungen",
+    "subtitle": "Passende Angebote mit Preis- und Wortfiltern finden. Die Zusatzverzögerung hängt vom Tarif ab.",
     "introduction": {
       "title": "Erschließen Sie das volle Potenzial von Craigslist",
       "bodyText": "Craigslist ist eine Fundgrube für lokale Angebote, doch die Suche nach den passenden Artikeln kann herausfordernd sein. Unsere Plattform revolutioniert diesen Prozess, indem Sie maßgeschneiderte Filter erstellen können, die exakt Ihren Interessen entsprechen und sicherstellen, dass Ihnen keine Top-Angebote entgehen."
@@ -594,14 +589,14 @@
       "title": "Warum Craigslist Filter nutzen? Ihre entscheidenden Vorteile:",
       "bodyText": "Unsere hochentwickelten Craigslist-Filter ermöglichen es Ihnen, relevante Angebote blitzschnell zu identifizieren und stets über die neuesten Einträge informiert zu sein.",
       "benefit1": "Effiziente und zielgerichtete lokale Artikelsuche",
-      "benefit2": "Sofortige Benachrichtigungen für exakt passende neue Angebote",
+      "benefit2": "Benachrichtigungen mit tarifabhängiger Zusatzverzögerung; siehe Tariftabelle",
       "benefit3": "Maximale Zeitersparnis durch automatisierte und intelligente Suchvorgänge"
     }
   },
   "kleinanzeigen": {
     "name": "Kleinanzeigen",
     "title": "Kleinanzeigen Filter & Benachrichtigungen: Effizient Top-Deals sichern",
-    "subtitle": "Finden Sie die besten Angebote auf Kleinanzeigen mit benutzerdefinierten Filtern und Echtzeit-Benachrichtigungen – seien Sie der Erste!",
+    "subtitle": "Passende Angebote mit Preis- und Wortfiltern finden. Die Zusatzverzögerung hängt vom Tarif ab.",
     "introduction": {
       "title": "Optimieren Sie Ihr Kleinanzeigen-Erlebnis auf Expertenniveau",
       "bodyText": "Kleinanzeigen ist ein führender Marktplatz für den lokalen An- und Verkauf. Unsere Plattform ermöglicht Ihnen die Einrichtung hochpersonalisierter Filter, die Ihnen helfen, blitzschnell zu finden, wonach Sie suchen, und Ihr Einkaufserlebnis auf maximale Effizienz zu trimmen."
@@ -610,14 +605,14 @@
       "title": "Warum Kleinanzeigen Filter verwenden? Ihre strategischen Vorteile:",
       "bodyText": "Mit unseren intelligenten Kleinanzeigen-Filtern navigieren Sie mühelos durch Angebote und bleiben stets über neue, für Sie relevante Artikel informiert – ein entscheidender Vorteil.",
       "benefit1": "Schnelle und präzise lokale Artikelsuche nach Ihren exakten Kriterien",
-      "benefit2": "Sofortige Benachrichtigungen bei neuen Angeboten (i.d.R. innerhalb einer Minute nach Veröffentlichung)",
+      "benefit2": "Benachrichtigungen mit tarifabhängiger Zusatzverzögerung; siehe Tariftabelle",
       "benefit3": "Automatisierte Suchen für maximale Zeitersparnis und Wettbewerbsvorsprung"
     }
   },
   "autoscout24": {
     "name": "Autoscout24",
     "title": "Autoscout24 Filter & Benachrichtigungen: Ihr Traumauto schneller und smarter finden",
-    "subtitle": "Finden Sie Ihr Traumauto auf Autoscout24 mit maßgeschneiderten Filtern und Echtzeit-Benachrichtigungen – verpassen Sie keine Chance!",
+    "subtitle": "Passende Angebote mit Preis- und Wortfiltern finden. Die Zusatzverzögerung hängt vom Tarif ab.",
     "introduction": {
       "title": "Revolutionieren Sie Ihre Autosuche auf Autoscout24",
       "bodyText": "Autoscout24 ist einer der größten Online-Automarktplätze Europas. Unsere Plattform unterstützt Sie dabei, personalisierte Hochleistungsfilter einzurichten, um das perfekte Fahrzeug zu finden, ohne wertvolle Zeit mit irrelevanten Angeboten zu verschwenden."
@@ -626,7 +621,7 @@
       "title": "Warum Autoscout24 Filter nutzen? Ihre überzeugenden Vorteile:",
       "bodyText": "Unsere Autoscout24-Filter ermöglichen es Ihnen, sich exakt auf die Fahrzeuge zu konzentrieren, die für Sie relevant sind, und stellen sicher, dass Ihnen kein Top-Angebot entgeht.",
       "benefit1": "Gezielte und effiziente Fahrzeugsuche nach Marke, Modell, Preis und Standort",
-      "benefit2": "Unverzügliche Benachrichtigungen bei neuen, exakt passenden Fahrzeugangeboten",
+      "benefit2": "Benachrichtigungen mit tarifabhängiger Zusatzverzögerung; siehe Tariftabelle",
       "benefit3": "Erhebliche Zeitersparnis durch automatische Überwachung Ihrer Wunschfahrzeuge"
     }
   },
@@ -643,7 +638,7 @@
     },
     "step3": {
       "title": "Sofort-Benachrichtigungen erhalten",
-      "description": "Erhalten Sie Echtzeit-Benachrichtigungen per E-Mail, Push-Benachrichtigungen oder Discord, sobald passende Artikel auf {name} erscheinen."
+      "description": "Erhalte passende Angebote auf {name} per E-Mail, Push oder Discord. Die Zusatzverzögerung hängt vom Tarif ab."
     }
   },
   "marketplacesFaq": {
@@ -663,7 +658,7 @@
   },
   "marketplacesFeatures": {
     "title": "Leistungsstarke Funktionen für {name}",
-    "description": "Unsere Plattform bietet umfassende Tools, um Ihr {name}-Erlebnis durch intelligente Automatisierung und Echtzeitüberwachung zu verbessern.",
+    "description": "Nutze Preis- und Wortfilter für deine Suche auf {name} und wähle deinen Benachrichtigungskanal.",
     "filtering": {
       "title": "Erweiterte Filterfunktionen",
       "description": "Erstellen Sie benutzerdefinierte Filter basierend auf Preisspanne, Standort, Schlüsselwörtern, Artikelzustand und mehr, um genau das zu finden, was Sie auf {name} benötigen."
@@ -694,8 +689,8 @@
   "createDescription": "Erstellen Sie benutzerdefinierte Filter, um Benachrichtigungen über neue Aktionen auf vielen Marktplätzen zu erhalten",
   "filtersDescription": "Verwalten Sie Ihre benutzerdefinierten Filter",
   "aneFilters": "ANE Filter",
-  "aneMarketplaces": "ANE {name}",
-  "aneDescription": "Erstellen Sie benutzerdefinierte Filter und erhalten Sie Benachrichtigungen für {name}. Verpassen Sie nie wieder großartige Angebote mit unseren fortschrittlichen Marktplatz-Überwachungstools.",
+  "aneMarketplaces": "{name}-Suchauftrag: Filter, Kanäle und Tarife | Ane",
+  "aneDescription": "Richte einen Suchauftrag für {name} mit Preislimit, Standort und Ausschlüssen ein. Vergleiche native Meldungen mit Ane und wähle E-Mail, Push oder Discord.",
   "XincludedPremiumSearches": "Premium-Suchen inklusive: {amount}",
   "appHeaderBeta": "Beta",
   "noAvailableFilters": "Deine verfügbaren Filter sind aufgebraucht. Aktualisiere dein Abo, um mehr Filter zu erstellen.",
@@ -717,7 +712,7 @@
   "setRadius": "Radius auswählen",
   "confirm": "Bestätigen",
   "overview": "Überblick",
-  "pushNotifications": "Alle Benachrichtigungskanäle",
+  "pushNotifications": "Push-Benachrichtigungen",
   "XPremiumSearchesOnSignUp": "{amount} Premium-Suchen bei der Registrierung",
   "copyReferralCode": "Empfehlungscode kopieren",
   "copyReferralCodeSuccess": "Empfehlungscode in die Zwischenablage kopiert",
@@ -1369,5 +1364,29 @@
   },
   "budgetCurrency": "Währung des Preislimits",
   "budgetCurrencyNote": "Dieses Preislimit gilt nur für Angebote in {currency}. Beträge werden nicht zwischen Währungen umgerechnet.",
-  "budgetReferenceCurrencyNote": "Die Währung entspricht deinem Referenzpreis. Entferne die Referenz, um sie zu ändern."
+  "budgetReferenceCurrencyNote": "Die Währung entspricht deinem Referenzpreis. Entferne die Referenz, um sie zu ändern.",
+  "alertGuide": {
+    "scrollTable": "Zum Vergleichen aller Spalten seitlich scrollen.",
+    "updated": "Stand:",
+    "sources": "Quellen",
+    "next": "Weiterführende Anleitungen",
+    "create": "Suchauftrag erstellen",
+    "hub": "Marktplatz-Suchagenten",
+    "plans": "Tarife vergleichen",
+    "collectibles": "Suchaufträge für LEGO, Pokémon und Retro-Spiele",
+    "collectiblesDescription": "Konkrete Suchbeispiele mit Setnummern, Preislimit und Ausschlusswörtern für Sammlerstücke. Anleitung für E-Mail, Push und Discord.",
+    "askingPrices": "Angebotspreise vergleichen",
+    "metaTitle": "Marktplatz-Suchagenten: Einrichtung, Kanäle und Tarife | Ane",
+    "metaDescription": "Gebrauchte Artikel mit Preis- und Wortfiltern suchen. Ane-Anleitungen für Kleinanzeigen, Craigslist, AutoScout24, E-Mail, Push und Discord.",
+    "homeTitle": "Ane: Suchaufträge für gebrauchte Artikel und Marktplatz-Alerts",
+    "tableTitle": "Im Repository aufgeführte Tarife",
+    "price": "Aufgeführter Monatspreis",
+    "searches": "Aktive Suchaufträge",
+    "delay": "Zusatzverzögerung",
+    "plan": "Tarif",
+    "termsNote": "Diese Preise und Limits aktiver Suchaufträge stehen zum oben genannten Datum im Ane-Repository. Prüfe die aktuellen Preise und den Endbetrag im Checkout. Der Benachrichtigungseditor bietet E-Mail, Web-Push und Discord.",
+    "timingNote": "Zusatzverzögerung ist kein Abfrageintervall und keine Zustellgarantie. Erkennung auf dem Marktplatz, Verarbeitung und Zustellung können zusätzliche Zeit benötigen. Push benötigt eine Freigabe, Discord einen Kanal-Webhook. Prüfe den Endpreis und mögliche Rabatte im Checkout.",
+    "flipperTitle": "Angebotspreise nachvollziehbar vergleichen · 29.10.2026",
+    "flipperBody": "Wähle einen Artikel und notiere Modell, Zustand, Lieferumfang, Standort und Zeitpunkt. Vergleiche mehrere möglichst gleiche Angebote und halte deren Preise und Versandkosten fest. Der Flipper-Feed stellt Inseratspreise einem Vergleichswert gegenüber; die Differenz ist kein erzielter Verkaufspreis und kein Gewinn. Ziehe für deine eigene Kalkulation Einkauf, Versand, Reparaturen, Verkaufsgebühren und Steuern ab. Prüfe tatsächlich verkaufte Vergleichsartikel separat. Ohne ausreichend ähnliche Angebote ist die Schätzung unsicher; ein günstiges Inserat kann Mängel haben."
+  }
 }

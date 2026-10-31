@@ -64,7 +64,6 @@ export const plans: Plan[] = [
     features: [
       { text: 'XActiveFilters', amount: 500, included: true },
       { text: 'pushNotifications', included: true },
-      { text: 'noExtraDelay', included: true },
       { text: 'XincludedPremiumSearches', amount: 25000, included: true },
       { text: 'instantFlipperAccess', included: true },
       { text: 'flipsDistanceSorting', included: true },
