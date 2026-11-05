@@ -432,7 +432,7 @@
               {{ $t('budgetCurrency') }}
               <select
                 :value="selectedPriceCurrency"
-                class="ml-2 rounded bg-slate-700 px-2 py-1"
+                class="min-h-11 sm:min-h-0 ml-2 rounded bg-slate-700 px-2 py-1"
                 data-testid="search-price-currency"
                 @change="onPriceCurrencySelect"
               >
@@ -444,10 +444,7 @@
                 >{{ currency }}</option>
               </select>
             </label>
-            <div
-              v-if="priceRangeMax > 0"
-              class="space-y-3"
-            >
+            <div class="space-y-3">
               <div class="flex items-center gap-2">
                 <div class="relative flex-1 min-w-0">
                   <span class="absolute left-2 top-1/2 -translate-y-1/2 text-slate-500 text-xs">{{ selectedPriceCurrency }}</span>
@@ -457,8 +454,8 @@
                     step="any"
                     :min="0"
                     :max="priceFilterMax"
-                    :placeholder="Math.floor(priceRangeMin).toString()"
-                    class="w-full pl-10 pr-1 py-1.5 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-slate-200 focus:border-blue-500/50 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    :placeholder="priceRangeMax > 0 ? Math.floor(priceRangeMin).toString() : '0'"
+                    class="min-h-11 sm:min-h-0 w-full pl-10 pr-1 py-1.5 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-slate-200 focus:border-blue-500/50 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     @focus="pinPriceCurrency"
                     @change="applyPriceFilter('min')"
                   >
@@ -471,79 +468,81 @@
                     type="number"
                     step="any"
                     :min="priceFilterMin"
-                    :placeholder="Math.ceil(priceRangeMax).toString()"
-                    class="w-full pl-10 pr-1 py-1.5 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-slate-200 focus:border-blue-500/50 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    :placeholder="priceRangeMax > 0 ? Math.ceil(priceRangeMax).toString() : '∞'"
+                    class="min-h-11 sm:min-h-0 w-full pl-10 pr-1 py-1.5 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-slate-200 focus:border-blue-500/50 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     @focus="pinPriceCurrency"
                     @change="applyPriceFilter('max')"
                   >
                 </div>
               </div>
               <!-- Dual range slider -->
-              <div class="relative h-6 flex items-center">
+              <div
+                v-if="priceRangeMax > priceRangeMin"
+                class="relative h-6 flex items-center"
+              >
                 <div class="absolute inset-x-0 h-1 bg-slate-700 rounded-full" />
                 <div
                   class="absolute h-1 bg-blue-500 rounded-full"
                   :style="{
-                    left: `${(priceFilterMin - priceRangeMin) / (priceRangeMax - priceRangeMin) * 100}%`,
-                    right: `${100 - (priceFilterMax - priceRangeMin) / (priceRangeMax - priceRangeMin) * 100}%`,
+                    left: `clamp(0%, ${(priceSliderMin - priceRangeMin) / (priceRangeMax - priceRangeMin) * 100}%, 100%)`,
+                    right: `clamp(0%, ${100 - (priceSliderMax - priceRangeMin) / (priceRangeMax - priceRangeMin) * 100}%, 100%)`,
                   }"
                 />
                 <input
-                  :value="priceFilterMin"
+                  :value="priceSliderMin"
                   type="range"
                   :min="Math.floor(priceRangeMin)"
                   :max="Math.ceil(priceRangeMax)"
                   :step="priceSliderStep"
                   class="absolute inset-x-0 w-full appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-blue-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-slate-900 [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-blue-500 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-slate-900"
-                  @input="(e: Event) => { priceFilterMin = Math.min(Number((e.target as HTMLInputElement).value), priceFilterMax - priceSliderStep) }"
+                  @input="(e: Event) => { priceFilterMin = Math.min(Number((e.target as HTMLInputElement).value), priceSliderMax - priceSliderStep) }"
                   @focus="pinPriceCurrency"
                   @change="applyPriceFilter('min')"
                 >
                 <input
-                  :value="priceFilterMax"
+                  :value="priceSliderMax"
                   type="range"
                   :min="Math.floor(priceRangeMin)"
                   :max="Math.ceil(priceRangeMax)"
                   :step="priceSliderStep"
                   class="absolute inset-x-0 w-full appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-blue-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-slate-900 [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-blue-500 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-slate-900"
-                  @input="(e: Event) => { priceFilterMax = Math.max(Number((e.target as HTMLInputElement).value), priceFilterMin + priceSliderStep) }"
+                  @input="(e: Event) => { priceFilterMax = Math.max(Number((e.target as HTMLInputElement).value), priceSliderMin + priceSliderStep) }"
                   @focus="pinPriceCurrency"
                   @change="applyPriceFilter('max')"
                 >
               </div>
-              <div class="flex justify-between text-xs text-slate-500">
+              <div
+                v-if="priceRangeMax > 0"
+                class="flex justify-between text-xs text-slate-500"
+              >
                 <span>{{ formatPrice(priceRangeMin) }}</span>
                 <span>{{ formatPrice(priceRangeMax) }}</span>
               </div>
             </div>
-            <div
-              v-else-if="loading"
-              class="space-y-3 animate-pulse"
-            >
-              <div class="flex items-center gap-2">
-                <div class="flex-1 h-8 bg-slate-700/50 rounded-lg" />
-                <span class="text-slate-500 text-xs">–</span>
-                <div class="flex-1 h-8 bg-slate-700/50 rounded-lg" />
-              </div>
-              <div class="h-6 bg-slate-700/30 rounded-full" />
-            </div>
-            <div
-              v-else
-              class="space-y-3 text-sm text-slate-400"
+            <p
+              v-if="loading || priceBoundsLoading"
+              class="mt-3 text-sm text-slate-400"
               role="status"
             >
-              <p>{{ $t('no_priced_results', 'No priced results are available for this search.') }}</p>
+              {{ $t('loading') }}
+            </p>
+            <div
+              v-else-if="priceRangeMax === 0"
+              class="mt-3 space-y-3 text-sm text-slate-400"
+              role="status"
+            >
+              <p>{{ priceBoundsError ? $t('priceRangeUnavailable') : $t('no_priced_results', 'No priced results are available for this search.') }}</p>
               <div class="flex flex-wrap gap-3">
                 <button
                   v-if="selectedMinPrice !== undefined || selectedMaxPrice !== undefined"
-                  class="text-blue-400 hover:text-blue-300"
+                  class="min-h-11 sm:min-h-0 text-blue-400 hover:text-blue-300"
                   @click="clearPriceFilter"
                 >
                   {{ $t('clear_price_filter', 'Clear price filter') }}
                 </button>
                 <button
-                  class="text-blue-400 hover:text-blue-300"
-                  @click="performSearch()"
+                  class="min-h-11 sm:min-h-0 text-blue-400 hover:text-blue-300"
+                  @click="loadPriceBounds(true)"
                 >
                   {{ $t('retry', 'Retry') }}
                 </button>
@@ -1285,6 +1284,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { searchProducts } from '~/src/api-client'
+import { client as apiClient } from '~/src/api-client/client.gen'
 import type { OpensearchProductAttribute as ProductAttribute, OpensearchProductDocument as ProductDocument, ServicesProductServiceFilterBucket as FilterBucket, SearchProductsResponse } from '~/src/api-client/types.gen'
 import { useCategories } from '~/composable/useCategories'
 import { useUserLocation } from '~/composable/useUserLocation'
@@ -1407,14 +1407,27 @@ const attributeBuckets = ref<Record<string, FilterBucket[]>>({})
 // Price range state
 const priceRangeMin = ref<number>(0)
 const priceRangeMax = ref<number>(0)
-const priceFilterMin = ref<number>(0)
-const priceFilterMax = ref<number>(1000)
+const priceFilterMin = ref<number | string>(selectedMinPrice.value ?? '')
+const priceFilterMax = ref<number | string>(selectedMaxPrice.value ?? '')
+const priceSliderMin = computed(() => priceFilterMin.value === '' ? priceRangeMin.value : Number(priceFilterMin.value))
+const priceSliderMax = computed(() => priceFilterMax.value === '' ? priceRangeMax.value : Number(priceFilterMax.value))
 const priceSliderStep = computed(() => {
   const range = priceRangeMax.value - priceRangeMin.value
   if (range <= 100) return 1
   if (range <= 1000) return 5
   if (range <= 5000) return 10
   return 50
+})
+
+// Independent price bounds state: pagination never supersedes this canonical scope.
+const priceBoundsLoading = ref(true)
+const priceBoundsError = ref(false)
+let priceBoundsScope = ''
+let priceBoundsRequest: AbortController | undefined
+let priceBoundsDisposed = false
+onScopeDispose(() => {
+  priceBoundsDisposed = true
+  priceBoundsRequest?.abort()
 })
 
 // Battery range filter state
@@ -1512,6 +1525,7 @@ function syncPrevQuery() {
 }
 
 // Share the existing supersession sequence with the initial client response/error watchers.
+const PAGE_SIZE = 20
 let searchSeq = 0
 
 // First results page: rendered server-side when the backend is quick, otherwise
@@ -1532,7 +1546,10 @@ const { data: initialSearch, loading: initialLoading, error: initialError } = us
     const labelsReady = selectedCategory.value
       ? Promise.all([fetchTopLevelCategories(), ensureGermanLabels()])
       : Promise.resolve()
-    const request = labelsReady.then(() => searchProducts({ query: buildSearchParams(0) }))
+    const request = labelsReady.then(() => {
+      const query: Record<string, string | number | string[] | boolean> = { ...buildSearchParams(0), includePriceBounds: false }
+      return searchProducts({ query })
+    })
     if (import.meta.server) {
       // Watchers do not run during SSR, so apply the result right here; otherwise
       // the server renders the category browser and the client swaps in results
@@ -1561,12 +1578,17 @@ watch(initialSearch, (resp) => {
     applySearchResponse(resp, false)
     hasSearched.value = true
     syncPrevQuery()
+    const initialScope = JSON.stringify(buildSearchParams())
+    onNuxtReady(() => {
+      if (JSON.stringify(buildSearchParams()) === initialScope && !manualLoading.value) void loadPriceBounds()
+    })
   }
 }, { immediate: true })
 
 // A failing first page must show the error state, not the category browser.
 watch(initialError, (err) => {
   if (err && searchSeq === 0 && routeHasSearchQuery(route.query)) {
+    resetPriceBounds()
     searchError.value = true
     hasSearched.value = true
     syncPrevQuery()
@@ -1779,7 +1801,6 @@ const alternativeQueries = computed(() => {
   return result
 })
 
-const PAGE_SIZE = 20
 const AUTO_LOAD_MAX = 100
 
 // Infinite scroll
@@ -2307,6 +2328,51 @@ function buildSearchParams(offset = 0) {
 
 const facetSearchScope = computed(() => JSON.stringify(buildSearchParams()))
 
+function resetPriceBounds() {
+  priceBoundsRequest?.abort()
+  priceBoundsScope = ''
+  priceBoundsLoading.value = false
+  priceBoundsError.value = false
+  priceRangeMin.value = 0
+  priceRangeMax.value = 0
+  priceFilterMin.value = selectedMinPrice.value ?? ''
+  priceFilterMax.value = selectedMaxPrice.value ?? ''
+}
+
+async function loadPriceBounds(force = false) {
+  if (priceBoundsDisposed || invalidMeasurementRange.value || zipResolving.value || !routeHasSearchQuery(route.query)) return
+  const params = buildSearchParams()
+  const scope = JSON.stringify(params)
+  if (!force && scope === priceBoundsScope) return
+  priceBoundsRequest?.abort()
+  const request = new AbortController()
+  priceBoundsRequest = request
+  priceBoundsScope = scope
+  priceBoundsLoading.value = true
+  priceBoundsError.value = false
+  const minDraft = priceFilterMin.value
+  const maxDraft = priceFilterMax.value
+  try {
+    await nextTick() // Commit the accepted results before starting the independent summary.
+    if (request.signal.aborted) return
+    const response = await $fetch<SearchProductsResponse>(new URL('/api/Product/search', apiClient.getConfig().baseURL).toString(), {
+      query: { ...params, offset: 0, limit: 0, priceBoundsOnly: true }, signal: request.signal, retry: 0,
+    })
+    if (request.signal.aborted || scope !== JSON.stringify(buildSearchParams())) return
+    if (response.priceCurrency !== selectedPriceCurrency.value) throw new Error('Price bounds currency mismatch')
+    priceRangeMin.value = response.priceMin == null ? 0 : Math.floor(response.priceMin)
+    priceRangeMax.value = response.priceMax == null ? 0 : Math.ceil(response.priceMax)
+    if (priceFilterMin.value === minDraft && minDraft === '' && selectedMinPrice.value === undefined) priceFilterMin.value = response.priceMin == null ? '' : priceRangeMin.value
+    if (priceFilterMax.value === maxDraft && maxDraft === '' && selectedMaxPrice.value === undefined) priceFilterMax.value = response.priceMax == null ? '' : priceRangeMax.value
+  }
+  catch {
+    if (!request.signal.aborted && scope === JSON.stringify(buildSearchParams())) priceBoundsError.value = true
+  }
+  finally {
+    if (priceBoundsRequest === request) priceBoundsLoading.value = false
+  }
+}
+
 async function loadAttributeValues(key: string, value: string): Promise<FilterBucket[]> {
   if (invalidMeasurementRange.value) return []
   const response = await searchProducts({ query: facetSearchParams(buildSearchParams(), key, value) })
@@ -2321,6 +2387,7 @@ async function loadAttributeValues(key: string, value: string): Promise<FilterBu
 async function performSearch(append = false) {
   if (import.meta.server) return
   if (invalidMeasurementRange.value) {
+    resetPriceBounds()
     searchSeq++
     allProducts.value = []
     totalResults.value = 0
@@ -2334,6 +2401,7 @@ async function performSearch(append = false) {
   const seq = ++searchSeq
 
   if (!append) {
+    resetPriceBounds()
     manualLoading.value = true
   }
   else {
@@ -2343,11 +2411,12 @@ async function performSearch(append = false) {
 
   try {
     const offset = append ? allProducts.value.length : 0
-    const params = buildSearchParams(offset)
+    const params: Record<string, string | number | string[] | boolean> = { ...buildSearchParams(offset), includePriceBounds: false }
     const response = await searchProducts({ query: params })
     if (seq !== searchSeq) return
     searchError.value = false
     applySearchResponse(response, append)
+    if (!append) void loadPriceBounds()
   }
   catch (e) {
     if (seq !== searchSeq) return
@@ -2481,32 +2550,6 @@ function applySearchResponse(response: SearchProductsResponse, append: boolean) 
         batteryRangeMax.value = Math.max(...numericValues)
         batteryFilterMin.value = selectedBatteryMin.value ?? batteryRangeMin.value
         batteryFilterMax.value = selectedBatteryMax.value ?? batteryRangeMax.value
-      }
-    }
-
-    // A completed search without priced hits must not retain a previous search's range.
-    priceRangeMin.value = 0
-    priceRangeMax.value = 0
-
-    // Update price range from aggregation
-    // The range uses the same native currency and source scope as the hits.
-    if (response?.priceCurrency === selectedPriceCurrency.value && response?.priceMin != null && response?.priceMax != null) {
-      priceRangeMin.value = Math.floor(response.priceMin)
-      priceRangeMax.value = Math.ceil(response.priceMax)
-      // Sync slider to URL values or full range
-      priceFilterMin.value = selectedMinPrice.value ?? priceRangeMin.value
-      priceFilterMax.value = selectedMaxPrice.value ?? priceRangeMax.value
-    }
-    else if (allProducts.value.length > 0) {
-      // Derive price range from product hits when aggregation is unavailable
-      const prices = allProducts.value
-        .map(p => nativeScopedPrice(p, selectedPriceCurrency.value))
-        .filter((p): p is number => p != null && p > 0)
-      if (prices.length > 0) {
-        priceRangeMin.value = Math.floor(Math.min(...prices))
-        priceRangeMax.value = Math.ceil(Math.max(...prices))
-        priceFilterMin.value = selectedMinPrice.value ?? priceRangeMin.value
-        priceFilterMax.value = selectedMaxPrice.value ?? priceRangeMax.value
       }
     }
   }
@@ -2786,6 +2829,7 @@ watch(() => route.query, () => {
     prevQuery.condition = currentCondition
   }
   else {
+    resetPriceBounds()
     searchSeq++
     manualLoading.value = false
     searchError.value = false

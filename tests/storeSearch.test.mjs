@@ -37,7 +37,7 @@ async function searchPage(query, { ssr = false, respond = () => ({ products: [],
   } }
   let initialRequest
   const state = {
-    ...Vue, route, router, attributeValues, buildSpecApiFilters, SPEC_RANGE_PARAMS, parseOfferFilterQuery, searchCurrency,
+    ...Vue, onNuxtReady() {}, resetPriceBounds() {}, loadPriceBounds() {}, route, router, attributeValues, buildSpecApiFilters, SPEC_RANGE_PARAMS, parseOfferFilterQuery, searchCurrency,
     nativeScopedPrice, hasInvalidMeasurementRange, resolveSearchCategoryParam,
     searchProducts: async ({ query }) => {
       requests.push(query)
@@ -84,11 +84,13 @@ const scopedQuery = { q: 'Bahco', store: 'Lefeld', platforms: 'Blocket,Ebay', co
 test('actual initial store request composes native currency, sources, category and repeated attributes', async () => {
   const page = await searchPage(scopedQuery)
   try {
-    assert.deepEqual(page.requests[0], { offset: 0, limit: 20, priceCurrency: 'SEK', query: 'Bahco', store: 'Lefeld',
+    assert.deepEqual(page.requests[0], { offset: 0, limit: 20, includePriceBounds: false, priceCurrency: 'SEK', query: 'Bahco', store: 'Lefeld',
       platforms: 'Blocket,Ebay', country: 'SE', category: 'Werkzeug', condition: 'used', minPrice: 10,
       attributes: ['article_number:111M-10', 'article_number:111M-13', 'length_mm_min:140'] })
     assert.equal(page.hasActiveFilters.value, true)
-    assert.deepEqual(page.buildSearchParams(20), { ...page.requests[0], offset: 20 })
+    const { includePriceBounds, ...canonical } = page.requests[0]
+    assert.equal(includePriceBounds, false)
+    assert.deepEqual(page.buildSearchParams(20), { ...canonical, offset: 20 })
   }
   finally { page.stop() }
 })

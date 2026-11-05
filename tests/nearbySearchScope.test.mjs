@@ -54,7 +54,7 @@ test('first SSR nearby request includes URL coordinates and radius with native a
   const page = await initialPage(nearby)
   assert.equal(page.requests.length, 1)
   assert.deepEqual(page.requests[0], {
-    offset: 0, limit: 20, priceCurrency: 'SEK', query: 'Knipex', includeIndividualOffers: 'true', platforms: 'Blocket',
+    offset: 0, limit: 20, includePriceBounds: false, priceCurrency: 'SEK', query: 'Knipex', includeIndividualOffers: 'true', platforms: 'Blocket',
     country: 'SE', lat: 59.3, lon: 18.1, maxDistanceKm: 25,
     attributes: ['article_number:95 31 250', 'article_number:95 32 320', 'length_mm_max:320'],
   })

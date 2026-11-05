@@ -1190,6 +1190,7 @@
   "browseAllCategories": "Alle Kategorien anzeigen",
   "searchFailed": "Suche fehlgeschlagen",
   "searchFailedHint": "Der Suchdienst hat nicht geantwortet. Bitte versuche es gleich noch einmal.",
+  "priceRangeUnavailable": "Preisspanne nicht verfügbar.",
   "retry": "Erneut versuchen",
   "sortRelevance": "Relevanz",
   "sortPriceAscShort": "Preis ↑",

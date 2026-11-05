@@ -29,7 +29,7 @@ test('currency survives offer URL edits, matches requests and similar search', (
   assert.equal(buildSimilarSearchQuery('camera', state).platforms, 'Blocket')
 })
 
-test('actual response handler requires honored currency and never derives a range from legacy EUR', async () => {
+test('actual primary response honors native hit currency and leaves bounds to the independent summary', async () => {
   const source = await readFile(new URL('../pages/search.vue', import.meta.url), 'utf8')
   const handler = source.match(/function applySearchResponse\([\s\S]*?\n\}/)[0]
   const state = Object.fromEntries(['allProducts', 'storeBuckets', 'platformBuckets', 'currencyBuckets', 'categoryBuckets', 'conditionBuckets'].map(key => [key, ref([])]))
@@ -40,8 +40,8 @@ test('actual response handler requires honored currency and never derives a rang
   const apply = new Function('state', 'nativeScopedPrice', `with (state) { ${stripTypeScriptTypes(handler)}; return applySearchResponse }`)(state, nativeScopedPrice)
   const product = { minPrice: 999, scopedMinPrice: 100, scopedPriceCurrency: 'SEK' }
   apply({ products: [product], priceCurrency: 'SEK', priceMin: 90, priceMax: 120 }, false)
-  assert.equal(state.priceRangeMin.value, 90)
-  assert.equal(state.priceRangeMax.value, 120)
+  assert.equal(state.priceRangeMin.value, 0)
+  assert.equal(state.priceRangeMax.value, 0)
   assert.equal(state.allProducts.value[0].scopedMinPrice, 100)
   apply({ products: [product], priceMin: 999, priceMax: 999 }, false)
   assert.equal(state.priceRangeMin.value, 0)
@@ -50,8 +50,8 @@ test('actual response handler requires honored currency and never derives a rang
   apply({ products: [{ minPrice: 999 }], priceCurrency: 'SEK' }, false)
   assert.equal(state.priceRangeMax.value, 0)
   apply({ products: [product], priceCurrency: 'SEK' }, false)
-  assert.equal(state.priceRangeMin.value, 100)
-  assert.equal(state.priceRangeMax.value, 100)
+  assert.equal(state.priceRangeMin.value, 0)
+  assert.equal(state.priceRangeMax.value, 0)
 })
 
 test('similar-offer links retain source currency country and nearby scope across reloads', () => {

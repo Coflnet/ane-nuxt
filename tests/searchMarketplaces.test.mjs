@@ -41,6 +41,7 @@ async function searchPage(query, respond = () => ({})) {
     const PAGE_SIZE = 20, urlToNumeric = ref({}), germanLabelBySlug = ref({});
     const resolveSearchCategoryParam = value => value;
     let searchSeq = 0;
+    const resetPriceBounds = () => {}, loadPriceBounds = () => {};
     const loadingMore = ref(false); const manualLoading = ref(false), searchError = ref(false), interpretation = ref(null);
     const allProducts = ref([{ id: 1 }, { id: 2 }]), totalResults = ref(0), categoryBuckets = ref([]), conditionBuckets = ref([]);
     ${stripTypeScriptTypes(code).replace('import.meta.server', 'false')}

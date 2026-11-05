@@ -1190,6 +1190,7 @@
   "browseAllCategories": "Show all categories",
   "searchFailed": "Search failed",
   "searchFailedHint": "The search service did not respond. Please try again in a moment.",
+  "priceRangeUnavailable": "Price range unavailable.",
   "retry": "Try again",
   "sortRelevance": "Relevance",
   "sortPriceAscShort": "Price ↑",
