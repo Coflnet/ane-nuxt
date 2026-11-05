@@ -189,8 +189,8 @@ test('a failed optional count lookup keeps unknown options selectable without fa
   const source = await readFile(new URL('../pages/search.vue', import.meta.url), 'utf8')
   const declaration = source.slice(source.indexOf('const availableAttributeBuckets = computed('), source.indexOf('// Battery range:'))
   const code = stripTypeScriptTypes(declaration) + '\nreturn availableAttributeBuckets'
-  const buckets = new Function('computed', 'activeAttributeFilters', 'attributeBuckets', 'rangeFilterAttrs', 'SPEC_ATTRIBUTE_KEYS', 'yearRangeFilters', code)(
-    computed, ref({ storage: ['256GB'] }), ref({ storage: [{ value: '128GB' }, { value: '256GB', count: 0 }, { value: '512GB', count: 0 }] }), new Set(), new Set(), ref([]),
+  const buckets = new Function('computed', 'activeAttributeFilters', 'attributeBuckets', 'rangeFilterAttrs', 'SPEC_ATTRIBUTE_KEYS', 'yearRangeFilters', 'interpretation', 'selectedCategory', 'urlToNumeric', code)(
+    computed, ref({ storage: ['256GB'] }), ref({ storage: [{ value: '128GB' }, { value: '256GB', count: 0 }, { value: '512GB', count: 0 }] }), new Set(), new Set(), ref([]), ref(null), ref(''), ref({}),
   )
   assert.deepEqual(buckets.value.storage.map(b => b.value), ['128GB', '256GB'])
   assert.equal(buckets.value.storage[0].count, undefined)
@@ -233,7 +233,7 @@ test('page retains facet discovery drafts through removal and remount and cancel
   const pending = []
   const fixture = {
     attributeBuckets: ref({ article_number: [{ value: '8070', count: 1 }] }), activeAttributeFilters: ref({}),
-    rangeFilterAttrs: new Set(), SPEC_ATTRIBUTE_KEYS: new Set(), yearRangeFilters: ref([]),
+    rangeFilterAttrs: new Set(), SPEC_ATTRIBUTE_KEYS: new Set(), yearRangeFilters: ref([]), interpretation: ref(null), selectedCategory: ref(''), urlToNumeric: ref({}),
     facetSearchScope: ref('A'), localizeAttrKey: key => key, localizeAttrValue: (_key, value) => value,
     loadAttributeValues: (_key, query) => new Promise(resolve => pending.push({ query, resolve })), toggleAttributeFilter() {},
   }
@@ -245,7 +245,7 @@ test('page retains facet discovery drafts through removal and remount and cancel
     return new Function('Vue', 'fixture', `const { ref, computed, reactive, watch, onMounted, onBeforeUnmount } = Vue; ${code}`)(Vue, fixture)
   }
   const field = compile(await readFile(new URL('../components/filters/AttributeFilter.vue', import.meta.url), 'utf8'), 'draft-field')
-  const parent = compile(`<script setup lang="ts">const { attributeBuckets, activeAttributeFilters, rangeFilterAttrs, SPEC_ATTRIBUTE_KEYS, yearRangeFilters, facetSearchScope, localizeAttrKey, localizeAttrValue, loadAttributeValues, toggleAttributeFilter } = fixture;\n${drafts}\n${buckets}</script><template><div>${loop}</div></template>`, 'draft-parent')
+  const parent = compile(`<script setup lang="ts">const { attributeBuckets, activeAttributeFilters, rangeFilterAttrs, SPEC_ATTRIBUTE_KEYS, yearRangeFilters, interpretation, selectedCategory, urlToNumeric, facetSearchScope, localizeAttrKey, localizeAttrValue, loadAttributeValues, toggleAttributeFilter } = fixture;\n${drafts}\n${buckets}</script><template><div>${loop}</div></template>`, 'draft-parent')
   const node = type => ({ type, tagName: type.toUpperCase(), props: {}, listeners: {}, children: [],
     addEventListener(name, fn) { this.listeners[name] = fn }, removeEventListener() {}, getRootNode: () => ({ activeElement: null }),
   })

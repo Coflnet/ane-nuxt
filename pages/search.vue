@@ -558,6 +558,7 @@
             v-model:draft="facetDrafts[attrKey]"
             :title="localizeAttrKey(attrKey)"
             :buckets="buckets"
+            :discover-on-focus="attrKey === 'artist' && buckets.length === 0"
             :selected="activeAttributeFilters[attrKey] ?? []"
             :scope="facetSearchScope"
             :format-value="value => localizeAttrValue(attrKey, value)"
@@ -1391,16 +1392,8 @@ const selectedCountryCode = ref<string>((route.query.country as string) || '')
 // Data state
 const allProducts = ref<ProductDocument[]>([])
 const totalResults = ref<number>(0)
-// The search API caps its hit count at 10000 (OpenSearch's default track_total_hits limit); at
-// that exact value the real count is >= 10000 but unknown, so show "10,000+" instead of a number
-// that would look like a precise (and possibly category-tile-contradicting) total.
-const SEARCH_TOTAL_CAP = 10000
 const { formatNumber } = useFormat()
-const formattedTotalResults = computed(() => (
-  totalResults.value >= SEARCH_TOTAL_CAP
-    ? `${formatNumber(SEARCH_TOTAL_CAP, locale.value)}+`
-    : totalResults.value.toString()
-))
+const formattedTotalResults = computed(() => formatNumber(totalResults.value, locale.value))
 const categoryBuckets = ref<FilterBucket[]>([])
 const conditionBuckets = ref<FilterBucket[]>([])
 const platformBuckets = ref<FilterBucket[]>([])
@@ -1630,6 +1623,10 @@ const availableAttributeBuckets = computed(() => {
     if (key === 'condition' || rangeFilterAttrs.has(key.toLowerCase()) || SPEC_ATTRIBUTE_KEYS.has(key.toLowerCase()) || yearRangeFilters.value.some(filter => filter.key === key && filter.bounds)) continue
     if (!result[key]) result[key] = value.map(entry => ({ value: entry }))
   }
+
+  const vinyl = interpretation.value?.productTypes?.includes('vinyl_records')
+    || (urlToNumeric.value[selectedCategory.value] || selectedCategory.value) === '543523'
+  if (vinyl && !result.artist) result.artist = []
 
   return result
 })
@@ -2142,6 +2139,7 @@ const attrKeyTranslationMap: Record<string, string> = {
   'game name': 'attr_game_name',
   'game_name': 'attr_game_name',
   'publisher': 'attr_publisher',
+  'artist': 'attr_artist',
   'series': 'attr_series',
   'issue_number': 'attr_issue_number',
   'cover_variant': 'attr_cover_variant',

@@ -66,9 +66,9 @@ export function useRaceableAsyncData<T>(
   // the client re-fetch to populate it.
   const loading = computed(() => asyncData.pending.value || (timedOut.value && data.value === null))
 
-  // After hydration, fill in any server-side timeout with a full client fetch.
+  // Wait for hydration to finish: an earlier refresh reuses the timed-out payload cache.
   if (import.meta.client) {
-    onMounted(() => {
+    onNuxtReady(() => {
       if (asyncData.data.value?.timedOut) {
         asyncData.refresh()
       }

@@ -1,9 +1,12 @@
 <template>
-  <div class="bg-slate-800/50 p-5 rounded-xl border border-slate-700/50">
+  <div class="bg-slate-800/50 p-4 sm:p-5 rounded-xl border border-slate-700/50">
     <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-3">
       {{ title }}
     </h3>
-    <p class="text-xs text-slate-400 mb-3">
+    <p
+      v-if="selected.length > 1"
+      class="text-xs text-slate-400 mb-3"
+    >
       {{ $t('filterMatchAny') }}
     </p>
     <input
@@ -12,7 +15,8 @@
       maxlength="100"
       :aria-label="$t('findFilterValue', { name: title })"
       :placeholder="$t('findFilterValue', { name: title })"
-      class="w-full mb-3 px-3 py-2 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-slate-200 focus:border-purple-500 focus:outline-none"
+      class="min-h-11 sm:min-h-0 w-full mb-3 px-3 py-2 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-slate-200 focus:border-purple-500 focus:outline-none"
+      @focus="discoverOnFocus && !found && !loading && load()"
     >
     <div
       class="flex flex-wrap gap-2 max-h-44 overflow-y-auto"
@@ -22,7 +26,7 @@
         v-for="bucket in visibleBuckets"
         :key="bucket.value!"
         type="button"
-        class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors min-w-0 max-w-full sm:max-w-[220px]"
+        class="min-h-11 sm:min-h-0 flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors min-w-0 max-w-full sm:max-w-[220px]"
         :class="selected.includes(bucket.value!) ? 'bg-purple-500/20 text-purple-400 font-medium' : 'text-slate-400 hover:bg-slate-700/50 hover:text-slate-200'"
         :aria-pressed="selected.includes(bucket.value!)"
         @click="$emit('select', bucket.value!)"
@@ -49,14 +53,14 @@
       {{ $t('filterValuesFailed') }}
       <button
         type="button"
-        class="text-purple-400 underline ml-1"
+        class="min-h-11 sm:min-h-0 min-w-11 sm:min-w-0 text-purple-400 underline ml-1"
         @click="load"
       >
         {{ $t('retry', 'Retry') }}
       </button>
     </p>
     <p
-      v-else-if="options.length === 0"
+      v-else-if="found !== null && options.length === 0"
       class="text-xs text-slate-400 mt-2"
       role="status"
     >
@@ -78,6 +82,7 @@ import type { ServicesProductServiceFilterBucket as FilterBucket } from '~/src/a
 const props = defineProps<{
   title: string
   draft?: string
+  discoverOnFocus?: boolean
   buckets: FilterBucket[]
   selected: string[]
   scope: string
@@ -108,7 +113,7 @@ let timer: ReturnType<typeof setTimeout> | undefined
 
 async function load() {
   const value = query.value.trim()
-  if (!value && !props.selected.length) return
+  if (!value && !props.selected.length && !props.discoverOnFocus) return
   const current = ++request
   loading.value = true
   error.value = false

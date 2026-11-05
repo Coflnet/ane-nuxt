@@ -885,6 +885,7 @@
   "attr_console_name": "Konsole",
   "attr_game_name": "Spielname",
   "attr_publisher": "Herausgeber",
+  "attr_artist": "Künstler",
   "attr_series": "Serie",
   "attr_cover_variant": "Cover-Variante",
   "attr_issue_number": "Heftnummer",
