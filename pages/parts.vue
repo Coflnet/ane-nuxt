@@ -525,7 +525,7 @@ async function choosePhoto(event: Event) {
     photoEstimate.value = null
     photoDirty.value = true
   }
-  catch { photoError.value = t('parts.photoReadError') }
+  catch { if (version === photoVersion) photoError.value = t('parts.photoReadError') }
 }
 
 async function analyzePhoto() {

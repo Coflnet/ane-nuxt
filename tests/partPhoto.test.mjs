@@ -185,3 +185,20 @@ test('a committed replacement aborts analysis started on the previous photo duri
   assert.equal(state.form.teeth, '40')
   assert.equal(state.photoLoading.value, false)
 })
+
+test('a stale failed photo decode cannot replace a successful newer selection with an error', async () => {
+  const { promise: oldDecode, reject: rejectOld } = Promise.withResolvers()
+  let calls = 0
+  const { state, run } = replacementPhotoState(() => ++calls === 1
+    ? oldDecode
+    : Promise.resolve({ width: 100, height: 100, close() {} }))
+  const oldSelection = run({ type: 'image/jpeg', size: 100 })
+  await run({ type: 'image/png', size: 100 })
+  assert.equal(state.photoBase64.value, 'replacement-photo')
+  assert.equal(state.photoError.value, '')
+  rejectOld(new Error('older synthetic image decode failed'))
+  await oldSelection
+  assert.equal(state.photoBase64.value, 'replacement-photo')
+  assert.equal(state.photoPreview.value, 'blob:replacement')
+  assert.equal(state.photoError.value, '', 'only the active selection may report a decode error')
+})
