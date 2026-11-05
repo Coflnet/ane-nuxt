@@ -11,6 +11,8 @@ import { shortcutFor } from '../utils/labelingShortcuts.ts'
 // Mount the actual compiled page with Vue's renderer. No Nuxt server, auth service or
 // image network is needed; button events and reactive DOM updates still run normally.
 async function mountPage(api) {
+  let leave
+  const listeners = new Map()
   const source = await readFile(new URL('../pages/labeling.vue', import.meta.url), 'utf8')
   const { descriptor } = parse(source)
   let code = stripTypeScriptTypes(compileScript(descriptor, { id: 'labeling-test', inlineTemplate: true }).content)
@@ -18,13 +20,14 @@ async function mountPage(api) {
     .replace(/^import .*$/gm, '')
     .replace('export default', 'return')
     .replaceAll('import.meta.server', 'false').replaceAll('import.meta.client', 'true')
-  const component = new Function('Vue', 'queue', 'sender', 'api', 'shortcutFor', `
+  const component = new Function('Vue', 'queue', 'sender', 'api', 'shortcutFor', 'registerLeave', `
     const { answer, BATCH_SIZE, createQueueState, enqueue, needsRefill, remaining, rollback, skip, undo, upcoming } = queue;
     const { createLabelSender } = sender;
     const useHead = () => {}, useSeoMeta = () => {}, useLocalePath = () => value => value;
+    const useI18n = () => ({ t: key => key }), onBeforeRouteLeave = registerLeave;
     const useLabelingApi = () => api, useUserStore = () => ({ isLoggedIn: true, token: 'test' });
     const labelingErrorStatus = () => 0, LabelingStatsPanel = { render: () => null };
-    ${code}`)(Vue, queue, sender, api, shortcutFor)
+    ${code}`)(Vue, queue, sender, api, shortcutFor, (guard) => { leave = guard })
   const node = (type, text = '') => ({ type, tagName: type.toUpperCase(), text, props: {}, children: [], parent: null, addEventListener() {}, removeEventListener() {}, getRootNode: () => ({ activeElement: null }) })
   const renderer = Vue.createRenderer({
     createElement: node, createText: text => node('#text', text), createComment: text => node('#comment', text),
@@ -54,7 +57,7 @@ async function mountPage(api) {
   app.config.warnHandler = (message) => {
     if (!message.includes('resolve component')) throw new Error(message)
   }
-  globalThis.window = { addEventListener() {}, removeEventListener() {}, getRootNode: () => ({ activeElement: null }) }
+  globalThis.window = { confirm: () => false, addEventListener: (name, fn) => listeners.set(name, fn), removeEventListener: name => listeners.delete(name), getRootNode: () => ({ activeElement: null }) }
   globalThis.Image = class {}
   globalThis.Document = class {}
   globalThis.ShadowRoot = class {}
@@ -70,7 +73,7 @@ async function mountPage(api) {
     await settle()
   }
   await settle()
-  return { root, all, find, click, settle, unmount: () => app.unmount() }
+  return { root, all, find, click, settle, listeners, leave: () => leave?.(), unmount: () => app.unmount() }
 }
 
 const diagnosticPair = n => ({ pairId: `p${n}`, groupKey: `secret-model-${n}`, similarity: 0.987, decision: 'secret-decision',
@@ -212,4 +215,144 @@ test('diagnostics can be retried without replacing the pair or its answer, and s
     delete globalThis.Document
     delete globalThis.ShadowRoot
   }
+})
+
+const deferred = () => {
+  let resolve, reject
+  const promise = new Promise((yes, no) => {
+    resolve = yes
+    reject = no
+  })
+  return { promise, resolve, reject }
+}
+const savedCount = view => view.find('labeling-session').children.find(n => n.type === 'span').text
+const reviewApi = label => ({
+  me: async () => ({ canLabel: true, userId: 'reviewer' }), stats: async () => null,
+  next: async () => [pair(1), pair(2)], label,
+})
+
+test('pending answers are not counted as saved; acknowledgement clears navigation protection', async () => {
+  const save = deferred()
+  const view = await mountPage(reviewApi(() => save.promise))
+  try {
+    assert.equal(view.find('labeling-save-status'), undefined)
+    await view.click('labeling-answer-1')
+    assert.equal(savedCount(view), '0')
+    assert.match(view.find('labeling-save-status').text, /labelingSaving/)
+    assert.equal(view.leave(), false)
+    let prevented = false
+    view.listeners.get('beforeunload')({ preventDefault() {
+      prevented = true
+    } })
+    assert.equal(prevented, true)
+    save.resolve()
+    await view.settle()
+    assert.equal(savedCount(view), '1')
+    assert.match(view.find('labeling-save-status').text, /labelingAllSaved/)
+    assert.equal(view.leave(), true)
+    prevented = false
+    view.listeners.get('beforeunload')({ preventDefault() {
+      prevented = true
+    } })
+    assert.equal(prevented, false)
+  }
+  finally { view.unmount() }
+})
+
+test('failed saves stay visible through another successful answer and retry acknowledges recovery', async () => {
+  const first = deferred()
+  let calls = 0
+  const view = await mountPage(reviewApi(() => ++calls === 1 ? first.promise : Promise.resolve()))
+  try {
+    await view.click('labeling-answer-1')
+    first.reject(new Error('temporary'))
+    await view.settle()
+    assert.equal(savedCount(view), '0')
+    assert.ok(view.find('labeling-save-error'))
+    await view.click('labeling-answer-3')
+    assert.equal(savedCount(view), '1')
+    assert.ok(view.find('labeling-save-error'))
+    assert.equal(view.find('labeling-save-status'), undefined)
+    assert.equal(view.leave(), false)
+    await view.click('labeling-retry')
+    assert.equal(savedCount(view), '2')
+    assert.equal(view.find('labeling-save-error'), undefined)
+    assert.match(view.find('labeling-save-status').text, /labelingAllSaved/)
+    assert.equal(view.leave(), true)
+  }
+  finally { view.unmount() }
+})
+
+test('undo and queued replacement count only the latest acknowledged answer and preserve post order', async () => {
+  const first = deferred(), second = deferred()
+  const calls = []
+  const view = await mountPage(reviewApi((...args) => {
+    calls.push(args)
+    return calls.length === 1 ? first.promise : second.promise
+  }))
+  try {
+    await view.click('labeling-answer-1')
+    await view.click('labeling-undo')
+    await view.click('labeling-answer-3')
+    assert.equal(calls.length, 1)
+    first.resolve()
+    await view.settle()
+    assert.deepEqual(calls.map(c => c[1]), ['same_item', 'different'])
+    assert.equal(savedCount(view), '0')
+    assert.match(view.find('labeling-save-status').text, /labelingSaving/)
+    second.resolve()
+    await view.settle()
+    assert.equal(savedCount(view), '1')
+    await view.click('labeling-undo')
+    assert.equal(savedCount(view), '1', 'undo reopens a pair but does not remove the saved server answer')
+    assert.equal(view.leave(), true)
+  }
+  finally { view.unmount() }
+})
+
+test('a save failure after undo remains recoverable without a duplicate pair', async () => {
+  const save = deferred()
+  const view = await mountPage(reviewApi(() => save.promise))
+  try {
+    await view.click('labeling-answer-1')
+    await view.click('labeling-undo')
+    save.reject(new Error('temporary'))
+    await view.settle()
+    assert.ok(view.find('labeling-save-error'))
+    assert.ok(view.find('labeling-retry'))
+    assert.equal(view.leave(), false)
+  }
+  finally { view.unmount() }
+})
+
+test('late failure beyond undo history returns the pair for retry and survives a reload attempt', async () => {
+  const first = deferred()
+  let calls = 0, batches = 0
+  const api = reviewApi(() => ++calls === 1 ? first.promise : Promise.resolve())
+  api.next = async () => {
+    batches++
+    return Array.from({ length: 53 }, (_, i) => pair(i + 1))
+  }
+  const view = await mountPage(api)
+  try {
+    for (let i = 0; i < 52; i++) await view.click('labeling-answer-3')
+    first.reject(new Error('late temporary failure'))
+    await view.settle()
+    assert.equal(savedCount(view), '51')
+    assert.ok(view.find('labeling-save-error'))
+    // Reload/filter must not discard the only retryable copy of a failed answer.
+    const batchesBeforeFilter = batches
+    await view.click('labeling-diagnostics-toggle')
+    const input = view.all().find(n => n.props.id === 'labeling-group-filter')
+    input.props['onUpdate:modelValue']('another group')
+    view.all().find(n => n.type === 'form').props.onSubmit({ preventDefault() {} })
+    await view.settle()
+    assert.equal(batches, batchesBeforeFilter)
+    await view.click('labeling-skip')
+    assert.ok(view.find('labeling-retry'))
+    await view.click('labeling-retry')
+    assert.equal(savedCount(view), '52')
+    assert.equal(view.find('labeling-save-error'), undefined)
+  }
+  finally { view.unmount() }
 })

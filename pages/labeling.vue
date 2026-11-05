@@ -78,7 +78,7 @@
 
         <button
           type="button"
-          class="text-sm text-indigo-300 underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-400"
+          class="min-h-11 text-sm text-indigo-300 underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-400"
           data-testid="labeling-diagnostics-toggle"
           :aria-expanded="showDiagnostics"
           :disabled="diagnosticsLoading"
@@ -116,6 +116,7 @@
           </div>
           <button
             type="submit"
+            :disabled="unfinishedSaves"
             class="bg-slate-700 text-slate-100 hover:bg-slate-600 px-3 py-2 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-400"
           >
             {{ $t('labelingFilterApply') }}
@@ -124,6 +125,7 @@
             v-if="activeFilter"
             type="button"
             class="bg-slate-700 text-slate-100 hover:bg-slate-600 px-3 py-2 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-400"
+            :disabled="unfinishedSaves"
             @click="clearFilter"
           >
             {{ $t('labelingFilterClear') }}
@@ -133,12 +135,21 @@
             type="button"
             class="text-sm text-indigo-300 hover:text-indigo-200 underline px-1 py-2 max-w-full break-words text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-400"
             data-testid="labeling-suggest-group"
+            :disabled="unfinishedSaves"
             @click="useSuggestedGroup"
           >
             {{ $t('labelingFilterUseCurrent') }}: {{ suggestedGroup }}
           </button>
         </form>
 
+        <p
+          v-if="pendingSaves || (savedCount && !saveFailed)"
+          class="text-sm text-slate-300"
+          role="status"
+          data-testid="labeling-save-status"
+        >
+          {{ $t(pendingSaves ? 'labelingSaving' : 'labelingAllSaved') }}
+        </p>
         <p
           v-if="saveFailed"
           class="text-sm text-red-200 bg-red-950 border border-red-800 rounded-lg px-3 py-2"
@@ -180,6 +191,7 @@
               <button
                 type="button"
                 class="bg-indigo-600 text-white hover:bg-indigo-700 px-4 py-2 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-300"
+                :disabled="unfinishedSaves"
                 data-testid="labeling-reload"
                 @click="reload"
               >
@@ -188,7 +200,7 @@
               <button
                 v-if="canUndo"
                 type="button"
-                class="bg-slate-700 text-slate-100 hover:bg-slate-600 px-4 py-2 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-400"
+                class="min-h-11 bg-slate-700 text-slate-100 hover:bg-slate-600 px-4 py-2 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-400"
                 @click="undoLast"
               >
                 {{ $t('labelingUndo') }} (Z)
@@ -198,7 +210,7 @@
               class="text-sm text-slate-400 mt-4"
               data-testid="labeling-session"
             >
-              {{ $t('labelingSession') }}: <span class="text-white tabular-nums">{{ sessionCount }}</span>
+              {{ $t('labelingSession') }}: <span class="text-white tabular-nums">{{ savedCount }}</span>
             </p>
           </template>
         </div>
@@ -305,7 +317,7 @@
           <button
             v-if="currentReview.failed && currentReview.label"
             type="button"
-            class="bg-indigo-600 text-white px-4 py-2 rounded-lg"
+            class="min-h-11 bg-indigo-600 text-white px-4 py-2 rounded-lg"
             data-testid="labeling-retry"
             @click="submit(currentReview.label)"
           >
@@ -339,7 +351,7 @@
           <div class="flex items-center justify-between gap-3 text-sm">
             <button
               type="button"
-              class="bg-slate-800 text-slate-200 hover:bg-slate-700 px-3 py-2 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-400"
+              class="min-h-11 bg-slate-800 text-slate-200 hover:bg-slate-700 px-3 py-2 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-400"
               :disabled="!canUndo"
               data-testid="labeling-undo"
               @click="undoLast"
@@ -348,7 +360,7 @@
             </button>
             <button
               type="button"
-              class="bg-slate-800 text-slate-200 hover:bg-slate-700 px-3 py-2 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-400"
+              class="min-h-11 bg-slate-800 text-slate-200 hover:bg-slate-700 px-3 py-2 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-400"
               :disabled="remainingCount < 2"
               data-testid="labeling-skip"
               @click="skipCurrent"
@@ -359,7 +371,7 @@
               class="text-slate-400"
               data-testid="labeling-session"
             >
-              {{ $t('labelingSession') }}: <span class="text-white tabular-nums">{{ sessionCount }}</span>
+              {{ $t('labelingSession') }}: <span class="text-white tabular-nums">{{ savedCount }}</span>
             </p>
           </div>
         </template>
@@ -392,6 +404,7 @@ import { shortcutFor } from '~/utils/labelingShortcuts'
 useSeoMeta({ title: 'Photo pair labeling', robots: 'noindex, nofollow' })
 useHead({ meta: [{ name: 'robots', content: 'noindex, nofollow' }] })
 
+const { t } = useI18n()
 const localePath = useLocalePath()
 const userStore = useUserStore()
 const api = useLabelingApi()
@@ -405,13 +418,12 @@ const copied = ref(false)
 const state = ref<LabelingQueueState>(createQueueState())
 const loading = ref(false)
 const loadFailed = ref(false)
-const saveFailed = ref(false)
 const exhausted = ref(false)
 let generation = 0
 
 const stats = ref<LabelingStats | null>(null)
 const statsFailed = ref(false)
-const sessionCount = ref(0)
+const pendingSaves = ref(0)
 const imageFailed = reactive<Record<string, boolean>>({ a: false, b: false })
 // What each side's <img> shows: the archived copy (as object URL) when there is one, else the marketplace hotlink.
 const photoSrc = reactive<Record<string, string>>({ a: '', b: '' })
@@ -422,8 +434,19 @@ const showDiagnostics = ref(false)
 const diagnosticsLoading = ref(false)
 const diagnosticsFailed = ref(false)
 // Exposure belongs to this pair review, including undo/retry; it is never a global preference.
-const reviews = reactive(new Map<string, { diagnostic: boolean, label?: LabelAnswer, failed?: boolean, attempt: number }>())
+const reviews = reactive(new Map<string, { diagnostic: boolean, label?: LabelAnswer, failed?: boolean, saved?: boolean, attempt: number }>())
 const currentReview = computed(() => reviewFor(current.value?.pairId))
+const savedCount = computed(() => [...reviews.values()].filter(review => review.saved).length)
+const saveFailed = computed(() => [...reviews.values()].some(review => review.failed))
+const unfinishedSaves = computed(() => pendingSaves.value > 0 || saveFailed.value)
+const confirmNavigation = () => !unfinishedSaves.value || window.confirm(t('labelingLeaveUnsaved'))
+onBeforeRouteLeave(confirmNavigation)
+function beforeUnload(event: BeforeUnloadEvent) {
+  if (unfinishedSaves.value) {
+    event.preventDefault()
+    event.returnValue = ''
+  }
+}
 
 function reviewFor(pairId?: string) {
   if (!pairId) return { diagnostic: false, attempt: 0 }
@@ -521,6 +544,7 @@ async function loadBatch() {
 }
 
 async function reload() {
+  if (unfinishedSaves.value) return
   generation++
   loading.value = false
   exhausted.value = false
@@ -534,25 +558,25 @@ function submit(label: LabelAnswer) {
   const review = currentReview.value
   review.label = label
   review.failed = false
+  review.saved = false
   const attempt = ++review.attempt
   const reviewMode = review.diagnostic ? 'diagnostic' : 'blind'
   const result = answer(state.value, label)
   if (!result.answered) return
   state.value = result.state
-  saveFailed.value = false
-  sessionCount.value++
+  pendingSaves.value++
   const pairId = result.answered.pair.pairId
   sender(pairId, label, reviewMode).then(() => {
-    if (sessionCount.value % STATS_EVERY === 0) loadStats()
+    if (review.attempt !== attempt) return
+    review.saved = true
+    if (savedCount.value % STATS_EVERY === 0) loadStats()
   }).catch(() => {
     if (review.attempt !== attempt) return
     review.failed = true
     const rolled = rollback(state.value, pairId)
-    if (!rolled.restored) return
-    state.value = rolled.state
-    sessionCount.value = Math.max(0, sessionCount.value - 1)
-    saveFailed.value = true
-  })
+    // A slow failure can outlive the bounded undo history; keep it retryable.
+    state.value = enqueue(rolled.state, [result.answered!.pair])
+  }).finally(() => { pendingSaves.value-- })
   if (needsRefill(state.value)) loadBatch()
 }
 
@@ -568,11 +592,10 @@ function undoLast() {
   const result = undo(state.value)
   if (!result.restored) return
   state.value = result.state
-  sessionCount.value = Math.max(0, sessionCount.value - 1)
-  saveFailed.value = false
 }
 
 function applyFilter() {
+  if (unfinishedSaves.value) return
   activeFilter.value = filterInput.value.trim()
   reload()
 }
@@ -690,6 +713,7 @@ watch(() => current.value?.pairId, (pairId) => {
 
 onMounted(async () => {
   window.addEventListener('keydown', onKeydown)
+  window.addEventListener('beforeunload', beforeUnload)
   if (!userStore.isLoggedIn || !userStore.token) {
     access.value = 'signedOut'
     return
@@ -707,7 +731,10 @@ onMounted(async () => {
 })
 
 onBeforeUnmount(() => {
-  if (import.meta.client) window.removeEventListener('keydown', onKeydown)
+  if (import.meta.client) {
+    window.removeEventListener('keydown', onKeydown)
+    window.removeEventListener('beforeunload', beforeUnload)
+  }
   for (const promise of archivedBlobs.values()) promise.then(objectUrl => URL.revokeObjectURL(objectUrl)).catch(() => {})
   archivedBlobs.clear()
 })
