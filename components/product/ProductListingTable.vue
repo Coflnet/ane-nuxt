@@ -180,7 +180,7 @@
         class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
         @click.self="closeReportDialog"
       >
-        <div class="bg-slate-800 rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl border border-slate-700">
+        <div class="max-h-[calc(100dvh-2rem)] overflow-y-auto bg-slate-800 rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl border border-slate-700">
           <h3 class="text-lg font-bold text-white mb-4">
             Report Listing
           </h3>
@@ -209,7 +209,7 @@
             >
               <button
                 type="button"
-                class="w-full flex items-center gap-3 text-left"
+                class="min-h-11 sm:min-h-0 w-full flex items-center gap-3 text-left"
                 data-testid="report-same-product"
                 @click="sameProductOpen = !sameProductOpen"
               >
@@ -226,14 +226,14 @@
                 <input
                   v-model="otherProductInput"
                   type="text"
-                  class="flex-1 min-w-0 bg-slate-900 border border-slate-600 rounded-lg p-2 text-white placeholder-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  class="min-h-11 sm:min-h-0 flex-1 min-w-0 bg-slate-900 border border-slate-600 rounded-lg p-2 text-white placeholder-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Paste an ane.deals product link or id"
                   data-testid="report-other-product"
                   @keydown.enter.prevent="submitReport('SameProductAs')"
                 >
                 <button
                   type="button"
-                  class="px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+                  class="min-h-11 sm:min-h-0 px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
                   data-testid="report-same-product-confirm"
                   :disabled="!otherProductId || submittingReport"
                   @click="submitReport('SameProductAs')"
@@ -296,13 +296,13 @@
 
           <div class="flex gap-3 justify-end">
             <button
-              class="px-4 py-2 text-slate-400 hover:text-white transition-colors"
+              class="min-h-11 sm:min-h-0 px-4 py-2 text-slate-400 hover:text-white transition-colors"
               @click="closeReportDialog"
             >
               Cancel
             </button>
             <button
-              class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
+              class="min-h-11 sm:min-h-0 px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
               :disabled="!selectedIssueType || submittingReport"
               @click="submitReport()"
             >

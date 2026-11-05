@@ -39,7 +39,7 @@
         {{ $t('budgetCurrency') }}
         <select
           :value="state.priceCurrency || ''"
-          class="ml-2 rounded bg-slate-800 px-2 py-2"
+          class="min-h-11 sm:min-h-0 ml-2 rounded bg-slate-800 px-2 py-2"
           @change="emit('change', { ...state, priceCurrency: ($event.target as HTMLSelectElement).value || undefined })"
         >
           <option
@@ -57,7 +57,7 @@
       <!-- EU shipping -->
       <button
         type="button"
-        class="px-4 py-2 rounded-full text-sm font-medium border transition-colors inline-flex items-center gap-2"
+        class="min-h-11 sm:min-h-0 px-4 py-2 rounded-full text-sm font-medium border transition-colors inline-flex items-center gap-2"
         :class="active === 'eu' ? 'bg-blue-600 text-white border-blue-500/60' : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border-slate-600/50'"
         :aria-pressed="active === 'eu'"
         data-testid="offer-filter-eu"
@@ -75,7 +75,7 @@
         <button
           ref="nearbyButton"
           type="button"
-          class="px-4 py-2 rounded-full text-sm font-medium border transition-colors inline-flex items-center gap-2"
+          class="min-h-11 sm:min-h-0 px-4 py-2 rounded-full text-sm font-medium border transition-colors inline-flex items-center gap-2"
           :class="active === 'nearby' ? 'bg-blue-600 text-white border-blue-500/60' : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border-slate-600/50'"
           :aria-pressed="active === 'nearby'"
           aria-haspopup="dialog"
@@ -101,7 +101,7 @@
             </p>
             <button
               type="button"
-              class="text-slate-400 hover:text-white"
+              class="min-h-11 min-w-11 sm:min-h-0 sm:min-w-0 inline-flex items-center justify-center text-slate-400 hover:text-white"
               :aria-label="$t('product.filters.close')"
               @click="closePanels(true)"
             >
@@ -122,7 +122,7 @@
             <select
               id="offer-zip-country"
               v-model="zipCountry"
-              class="w-full px-3 py-2 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-slate-200 focus:border-blue-500/50 focus:outline-none"
+              class="min-h-11 sm:min-h-0 w-full px-3 py-2 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-slate-200 focus:border-blue-500/50 focus:outline-none"
             >
               <option
                 v-for="code in countryChoices"
@@ -145,13 +145,13 @@
                 inputmode="numeric"
                 autocomplete="postal-code"
                 :placeholder="$t('product.filters.zipPlaceholder')"
-                class="w-full min-w-0 px-3 py-2 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-slate-200 placeholder-slate-500 focus:border-blue-500/50 focus:outline-none"
+                class="min-h-11 sm:min-h-0 w-full min-w-0 px-3 py-2 bg-slate-700/50 border border-slate-600/50 rounded-lg text-sm text-slate-200 placeholder-slate-500 focus:border-blue-500/50 focus:outline-none"
                 :aria-invalid="!!shownZipError"
                 aria-describedby="offer-zip-error"
               >
               <button
                 type="submit"
-                class="px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white disabled:opacity-50"
+                class="min-h-11 min-w-11 sm:min-h-0 sm:min-w-0 px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white disabled:opacity-50"
                 :disabled="!zip.trim() || loading"
                 :aria-label="$t('product.filters.zipSubmit')"
               >
@@ -174,7 +174,7 @@
           </p>
           <button
             type="button"
-            class="w-full px-3 py-2 rounded-lg text-sm bg-slate-700/50 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-600/50 inline-flex items-center justify-center gap-2 disabled:opacity-50"
+            class="min-h-11 sm:min-h-0 w-full px-3 py-2 rounded-lg text-sm bg-slate-700/50 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-600/50 inline-flex items-center justify-center gap-2 disabled:opacity-50"
             :disabled="locating"
             @click="useMyLocation"
           >
@@ -200,7 +200,7 @@
         <button
           ref="moreButton"
           type="button"
-          class="px-4 py-2 rounded-full text-sm font-medium border transition-colors inline-flex items-center gap-2"
+          class="min-h-11 sm:min-h-0 px-4 py-2 rounded-full text-sm font-medium border transition-colors inline-flex items-center gap-2"
           :class="moreCount ? 'bg-slate-700 text-white border-blue-500/40' : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border-slate-600/50'"
           aria-haspopup="dialog"
           :aria-expanded="moreOpen"
@@ -226,7 +226,7 @@
             <label
               v-for="option in platformOptions"
               :key="option.name"
-              class="flex items-center gap-2 py-1 text-sm text-slate-200 cursor-pointer"
+              class="flex min-h-11 sm:min-h-0 items-center gap-2 py-1 text-sm text-slate-200 cursor-pointer"
             >
               <input
                 type="checkbox"
@@ -248,7 +248,7 @@
             <label
               v-for="option in countryOptions"
               :key="option.code"
-              class="flex items-center gap-2 py-1 text-sm text-slate-200 cursor-pointer"
+              class="flex min-h-11 sm:min-h-0 items-center gap-2 py-1 text-sm text-slate-200 cursor-pointer"
             >
               <input
                 type="checkbox"
@@ -269,7 +269,7 @@
       <button
         v-if="anyActive"
         type="button"
-        class="px-3 py-2 text-sm text-slate-400 hover:text-white underline-offset-2 hover:underline"
+        class="min-h-11 sm:min-h-0 px-3 py-2 text-sm text-slate-400 hover:text-white underline-offset-2 hover:underline"
         @click="emit('change', emptyOfferFilter())"
       >
         {{ $t('product.filters.reset') }}
@@ -283,7 +283,7 @@
       {{ shownZipError }}
       <button
         type="button"
-        class="underline ml-2"
+        class="min-h-11 sm:min-h-0 underline ml-2"
         @click="emit('change', state)"
       >
         {{ $t('retry') }}

@@ -17,8 +17,8 @@ async function componentState(respond = async () => fixture, productId) {
   const script = stripTypeScriptTypes(descriptor.scriptSetup.content.replace(/^import .*$/gm, '').replace(/const props = defineProps<.*>\(\)/, ''))
   const calls = []
   const props = Vue.reactive({ offers: [...offers], productId })
-  let mounted
-  const factory = new Function('ref', 'computed', 'watch', 'props', 'useI18n', 'apiClient', '$fetch', 'lowestSameCurrencyOffer', 'referenceWebUrl', 'parseHistoryCurrency', 'onMounted', 'validAutomaticReference', `
+  let mounted, scheduled
+  const factory = new Function('ref', 'computed', 'watch', 'props', 'useI18n', 'apiClient', '$fetch', 'lowestSameCurrencyOffer', 'referenceWebUrl', 'parseHistoryCurrency', 'onMounted', 'validAutomaticReference', 'onScopeDispose', 'setTimeout', 'clearTimeout', 'AUTOMATIC_REFERENCE_MAX_AGE_MS', `
     ${script}
     return { url, loading, error, preview, observedAt, selectedSelector, currencyLabel, confirmed, selectedPrice, currency, lowestOffer, clearPreview, loadPreview, automatic, automaticLoading, loadAutomatic };
   `)
@@ -26,8 +26,11 @@ async function componentState(respond = async () => fixture, productId) {
   const state = scope.run(() => factory(Vue.ref, Vue.computed, Vue.watch, props, () => ({ t: key => key, locale: Vue.ref('en') }), { getConfig: () => ({ baseURL: 'https://ane.example' }) }, async (url, options) => {
     calls.push({ url, options })
     return respond()
-  }, lowestSameCurrencyOffer, referenceWebUrl, parseHistoryCurrency, (callback) => { mounted = callback }, validAutomaticReference))
-  return { state, calls, props, mount: () => mounted(), stop: () => scope.stop() }
+  }, lowestSameCurrencyOffer, referenceWebUrl, parseHistoryCurrency, (callback) => { mounted = callback }, validAutomaticReference, Vue.onScopeDispose, (callback, delay) => {
+    scheduled = { callback, delay }
+    return 1
+  }, () => { scheduled = undefined }, 15 * 60_000))
+  return { state, calls, props, mount: () => mounted(), stop: () => scope.stop(), scheduled: () => scheduled, expire: () => scheduled.callback() }
 }
 
 test('comparison uses explicit same-currency loaded offers and never cached EUR or unknown amounts', () => {
@@ -169,7 +172,7 @@ test('malformed preview schemas use the visible retry error and preserve the ent
   }
 })
 
-const automaticQuote = { provider: 'Lefeld', url: 'https://www.lefeld.de/knipex-kombizange-03-01-160-160mm', merchantSku: '10024102;12433', brand: 'KNIPEX', mpn: '03 01 160', gtin: '4003773013235', price: 10.07, currency: 'EUR', availability: 'LimitedAvailability', condition: 'unknown', observedAt: '2026-10-28T15:26:24Z' }
+const automaticQuote = { provider: 'Lefeld', url: 'https://www.lefeld.de/knipex-kombizange-03-01-160-160mm', merchantSku: '10024102;12433', brand: 'KNIPEX', mpn: '03 01 160', gtin: '4003773013235', price: 10.07, currency: 'EUR', availability: 'LimitedAvailability', condition: 'unknown', observedAt: new Date().toISOString() }
 const goToolsQuote = { ...automaticQuote, provider: 'GoTools', url: 'https://www.gotools.de/werkstattbedarf/handwerkzeuge/zangen/knipex-kombizange-laenge-160-mm-poliert-kunststoffueberzug_144938_35930', merchantSku: '35930', price: 10.99 }
 const goToolsQuotes = [goToolsQuote,
   { ...goToolsQuote, mpn: '87 01 250', merchantSku: '18450', gtin: '4003773022022', url: 'https://www.gotools.de/marken/knipex/knipex-wasserpumpenzange-cobra-laenge-250-mm-spannweite-46-mm-poliert_127452_18450' },
@@ -281,7 +284,7 @@ test('actual automatic markup labels unknown condition, source, currency and fre
     assert.ok(automatic.includes(reference.url))
     assert.ok(automatic.includes(reference.mpn))
     assert.match(automatic, /Condition unspecified|Zustand nicht angegeben/)
-    assert.match(automatic, /2026-10-28T15:26:24Z/)
+    assert.ok(automatic.includes(reference.observedAt))
     assert.match(automatic, reference.provider === 'Lefeld' ? /10[.,]07/ : /10[.,]99/)
     assert.match(automatic, /EUR/)
     assert.match(automatic, /not resale profit|kein Wiederverkaufsgewinn/)
@@ -292,4 +295,46 @@ test('actual automatic markup labels unknown condition, source, currency and fre
     assert.match(unavailable, /Retry store reference|Shop-Referenz erneut laden/)
     assert.match(unavailable, /role="status"/)
   }
+})
+
+test('automatic quote rejects future and fifteen-minute-old observations at exact boundaries', () => {
+  const now = Date.now()
+  for (const age of [-1, 15 * 60_000, 16 * 60_000]) {
+    assert.equal(validAutomaticReference({ ...automaticQuote, observedAt: new Date(now - age).toISOString() }, now), false)
+  }
+  for (const age of [0, 15 * 60_000 - 1]) {
+    assert.equal(validAutomaticReference({ ...automaticQuote, observedAt: new Date(now - age).toISOString() }, now), true)
+  }
+})
+
+test('mounted automatic quote expires after remaining lifetime without losing manual input and releases timer on stop', async () => {
+  const reference = { ...automaticQuote, observedAt: new Date(Date.now() - 14 * 60_000).toISOString() }
+  const page = await componentState(async () => ({ status: 'found', reference }), 'knipex-0301160')
+  try {
+    page.state.url.value = fixture.url
+    await page.mount()
+    assert.equal(page.state.automatic.value.status, 'found')
+    assert(page.scheduled()?.delay > 59_000 && page.scheduled()?.delay <= 60_000)
+    page.expire()
+    assert.equal(page.state.automatic.value.status, 'temporarily_unavailable')
+    assert.equal(page.state.automatic.value.reference, undefined)
+    assert.equal(page.state.url.value, fixture.url)
+    assert.equal(page.calls.length, 1, 'expiry offers an explicit retry instead of background retailer requests')
+  }
+  finally { page.stop() }
+  assert.equal(page.scheduled(), undefined)
+})
+
+test('automatic reference resolving after unmount creates no timer or visible state', async () => {
+  let resolve
+  const response = new Promise((done) => {
+    resolve = done
+  })
+  const page = await componentState(() => response, 'knipex-0301160')
+  const pending = page.mount()
+  page.stop()
+  resolve({ status: 'found', reference: automaticQuote })
+  await pending
+  assert.equal(page.scheduled(), undefined)
+  assert.equal(page.state.automatic.value, null)
 })

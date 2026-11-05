@@ -54,7 +54,7 @@
             <select
               v-model="sortMode"
               :disabled="!isFlipperTier"
-              class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-40 focus:border-blue-500 focus:outline-none disabled:cursor-not-allowed"
+              class="min-h-11 sm:min-h-0 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-40 focus:border-blue-500 focus:outline-none disabled:cursor-not-allowed"
             >
               <option value="newest">
                 {{ $t('sortNewest') }}
@@ -78,12 +78,12 @@
                 type="text"
                 :disabled="!isFlipperTier"
                 :placeholder="$t('zipCodePlaceholder')"
-                class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-32 focus:border-blue-500 focus:outline-none disabled:cursor-not-allowed"
+                class="min-h-11 sm:min-h-0 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-32 focus:border-blue-500 focus:outline-none disabled:cursor-not-allowed"
                 @keydown.enter="geocodeZip"
               >
               <button
                 :disabled="!isFlipperTier"
-                class="flex items-center gap-1 text-xs text-white px-3 py-1.5 rounded-lg bg-gray-700 hover:bg-gray-600 border border-gray-600 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                class="min-h-11 sm:min-h-0 flex items-center gap-1 text-xs text-white px-3 py-1.5 rounded-lg bg-gray-700 hover:bg-gray-600 border border-gray-600 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                 @click="useDeviceLocation"
               >
                 <Icon
@@ -111,7 +111,7 @@
             {{ locationError }}
           </div>
           <div
-            v-if="sortMode === 'distance' && filters.maxDistance > 0"
+            v-if="sortMode === 'distance'"
             class="flex flex-col gap-1"
           >
             <label class="text-xs text-gray-400">{{ $t('maxDistance') }}</label>
@@ -121,7 +121,7 @@
                 type="number"
                 :disabled="!isFlipperTier"
                 placeholder="∞"
-                class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-24 focus:border-blue-500 focus:outline-none disabled:cursor-not-allowed"
+                class="min-h-11 sm:min-h-0 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-24 focus:border-blue-500 focus:outline-none disabled:cursor-not-allowed"
               >
               <span class="text-xs text-gray-400">km</span>
             </div>
@@ -149,7 +149,7 @@
           <label class="text-xs text-gray-400">{{ $t('currency', 'Currency') }}</label>
           <select
             v-model="filters.currency"
-            class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-36 focus:border-blue-500 focus:outline-none"
+            class="min-h-11 sm:min-h-0 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-36 focus:border-blue-500 focus:outline-none"
           >
             <option value="EUR">
               EUR
@@ -206,7 +206,7 @@
             v-model="filters.search"
             type="text"
             :placeholder="$t('searchFlips')"
-            class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-48 focus:border-blue-500 focus:outline-none"
+            class="min-h-11 sm:min-h-0 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-48 focus:border-blue-500 focus:outline-none"
           >
         </div>
         <div class="flex flex-col gap-1">
@@ -216,7 +216,7 @@
             type="number"
             :disabled="!hasSelectedCurrency"
             placeholder="0"
-            class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-24 focus:border-blue-500 focus:outline-none disabled:opacity-50"
+            class="min-h-11 sm:min-h-0 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-24 focus:border-blue-500 focus:outline-none disabled:opacity-50"
           >
         </div>
         <div class="flex flex-col gap-1">
@@ -226,7 +226,7 @@
             type="number"
             :disabled="!hasSelectedCurrency"
             placeholder="0"
-            class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-24 focus:border-blue-500 focus:outline-none disabled:opacity-50"
+            class="min-h-11 sm:min-h-0 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-24 focus:border-blue-500 focus:outline-none disabled:opacity-50"
           >
         </div>
         <div class="flex flex-col gap-1">
@@ -235,7 +235,7 @@
             v-model.number="filters.minRefs"
             type="number"
             placeholder="0"
-            class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-24 focus:border-blue-500 focus:outline-none"
+            class="min-h-11 sm:min-h-0 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-24 focus:border-blue-500 focus:outline-none"
           >
         </div>
         <div class="flex flex-col gap-1">
@@ -244,19 +244,19 @@
             v-model="filters.category"
             type="text"
             :placeholder="$t('allCategories')"
-            class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-36 focus:border-blue-500 focus:outline-none"
+            class="min-h-11 sm:min-h-0 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-36 focus:border-blue-500 focus:outline-none"
           >
         </div>
         <button
           v-if="hasActiveFilters"
-          class="text-xs text-gray-400 hover:text-white px-2 py-1.5 rounded-lg bg-gray-800 border border-gray-700 hover:border-gray-500 transition-colors"
+          class="min-h-11 sm:min-h-0 text-xs text-gray-400 hover:text-white px-2 py-1.5 rounded-lg bg-gray-800 border border-gray-700 hover:border-gray-500 transition-colors"
           @click="clearFilters"
         >
           {{ $t('clearFilters') }}
         </button>
         <button
           v-if="hasActiveFilters"
-          class="flex items-center gap-1.5 text-xs text-white px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 transition-colors font-medium"
+          class="min-h-11 sm:min-h-0 flex items-center gap-1.5 text-xs text-white px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 transition-colors font-medium"
           @click="showSaveFilterDialog = true"
         >
           <Icon
@@ -266,7 +266,7 @@
           {{ $t('saveFilterNotify') }}
         </button>
         <div class="ml-auto flex items-center gap-3">
-          <label class="flex items-center gap-1.5 text-xs text-gray-400 cursor-pointer select-none">
+          <label class="flex min-h-11 sm:min-h-0 items-center gap-1.5 text-xs text-gray-400 cursor-pointer select-none">
             <input
               v-model="autoScroll"
               type="checkbox"

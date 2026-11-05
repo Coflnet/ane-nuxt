@@ -197,15 +197,21 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, onScopeDispose, ref, watch } from 'vue'
 import { client as apiClient } from '~/src/api-client/client.gen'
 import { formatHistoryPrice, parseHistoryCurrency } from '~/utils/priceHistory'
-import { lowestSameCurrencyOffer, referenceWebUrl, validAutomaticReference, type AutomaticShopResult, type ShopOffer, type ShopPreview } from '~/utils/shopReference'
+import { AUTOMATIC_REFERENCE_MAX_AGE_MS, lowestSameCurrencyOffer, referenceWebUrl, validAutomaticReference, type AutomaticShopResult, type ShopOffer, type ShopPreview } from '~/utils/shopReference'
 
 const props = defineProps<{ offers: ShopOffer[], productId?: string }>()
 const { t, locale } = useI18n()
 const automatic = ref<AutomaticShopResult | null>(null)
 const automaticLoading = ref(false)
+let automaticExpiry: ReturnType<typeof setTimeout> | undefined
+let automaticDisposed = false
+onScopeDispose(() => {
+  automaticDisposed = true
+  clearTimeout(automaticExpiry)
+})
 onMounted(loadAutomatic)
 
 async function loadAutomatic() {
@@ -214,10 +220,15 @@ async function loadAutomatic() {
   try {
     const endpoint = new URL(`/api/Product/${encodeURIComponent(props.productId)}/shop-reference`, apiClient.getConfig().baseURL ?? 'https://ane.coflnet.com').toString()
     const result = await $fetch<AutomaticShopResult>(endpoint, { method: 'GET' })
+    if (automaticDisposed) return
     if (!result || !['found', 'not_found', 'unsupported', 'temporarily_unavailable'].includes(result.status)
       || (result.status === 'found' && !validAutomaticReference(result.reference))
       || (result.status !== 'found' && result.reference)) throw new Error('Invalid store reference')
+    clearTimeout(automaticExpiry)
     automatic.value = result
+    if (result.reference) automaticExpiry = setTimeout(() => {
+      automatic.value = { status: 'temporarily_unavailable' }
+    }, Date.parse(result.reference.observedAt) + AUTOMATIC_REFERENCE_MAX_AGE_MS - Date.now())
   }
   catch { automatic.value = { status: 'temporarily_unavailable' } }
   finally { automaticLoading.value = false }

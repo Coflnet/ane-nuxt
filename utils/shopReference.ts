@@ -38,8 +38,11 @@ const goToolsArticles = [
   { mpn: '975314', gtin: '4003773041474', merchantSku: '18659', url: 'https://www.gotools.de/marken/knipex/knipex-aderendhuelsenzange-gesamtlaenge-180-mm-0-08-10-0-awg-28-7-mm-brueniert-mehrkomponenten-huellen_127661_18659' },
 ]
 
+// Same fifteen-minute lifetime as ProductStoreReferencePolicy in AneCore.
+export const AUTOMATIC_REFERENCE_MAX_AGE_MS = 15 * 60_000
+
 /** The automatic source must remain a dated, exact-article store quote, separate from manual comparisons. */
-export function validAutomaticReference(value: unknown): value is AutomaticShopReference {
+export function validAutomaticReference(value: unknown, now = Date.now()): value is AutomaticShopReference {
   if (!value || typeof value !== 'object') return false
   const quote = value as AutomaticShopReference
   try {
@@ -53,6 +56,7 @@ export function validAutomaticReference(value: unknown): value is AutomaticShopR
         && typeof quote.price === 'number' && Number.isFinite(quote.price) && quote.price > 0 && quote.currency === 'EUR'
         && ['InStock', 'LimitedAvailability'].includes(quote.availability) && ['new', 'unknown'].includes(quote.condition)
         && typeof quote.observedAt === 'string' && Number.isFinite(Date.parse(quote.observedAt))
+        && Date.parse(quote.observedAt) <= now && Date.parse(quote.observedAt) + AUTOMATIC_REFERENCE_MAX_AGE_MS > now
   }
   catch { return false }
 }
