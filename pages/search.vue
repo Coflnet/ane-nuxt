@@ -1597,10 +1597,8 @@ watch(initialError, (err) => {
 
 // Compute available category buckets — use server-provided aggregation counts directly
 const availableCategoryBuckets = computed(() => {
-  const apiSlug = toApiSlug(selectedCategory.value).toLowerCase()
   if (selectedCategory.value) {
-    // If a category is already selected, show only that one (compare with resolved API slug)
-    return categoryBuckets.value.filter(b => b.value?.toLowerCase() === apiSlug || b.value?.toLowerCase() === selectedCategory.value.toLowerCase())
+    return categoryBuckets.value.filter(b => b.value && isCategorySelected(b.value))
   }
 
   // Use server-side aggregation counts (already computed across ALL matching docs)
@@ -2244,9 +2242,8 @@ function localizeCategory(cat: string): string {
 
 function isCategorySelected(bucketValue: string): boolean {
   if (!selectedCategory.value) return false
-  const urlLower = selectedCategory.value.toLowerCase()
-  const apiSlug = toApiSlug(selectedCategory.value)
-  return bucketValue.toLowerCase() === urlLower || bucketValue.toLowerCase() === apiSlug.toLowerCase()
+  const category = resolveSearchCategoryParam(selectedCategory.value, urlToNumeric.value, germanLabelBySlug.value)
+  return resolveSearchCategoryParam(bucketValue, urlToNumeric.value, germanLabelBySlug.value).toLowerCase() === category.toLowerCase()
 }
 
 function localizeCondition(cond: string): string {
@@ -2583,7 +2580,7 @@ function toggleIndividualOffers() {
 }
 
 function toggleFilter(type: 'category' | 'condition' | 'includePartOffers' | 'store', value: string) {
-  if (route.query[type] === value || (type === 'store' && selectedStore.value.toLowerCase() === value.toLowerCase())) {
+  if (route.query[type] === value || (type === 'category' && isCategorySelected(value)) || (type === 'store' && selectedStore.value.toLowerCase() === value.toLowerCase())) {
     router.push({ query: queryWithoutKeys(type) })
     return
   }
