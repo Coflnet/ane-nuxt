@@ -143,3 +143,36 @@ test('individual-offer recovery preserves all URL criteria, sharing, history and
   }
   finally { state.stop() }
 })
+
+for (const locale of ['en', 'de']) {
+  test(`${locale} tool-offer guidance renders in the existing checkbox and recovery without enabling the option`, async () => {
+    const Vue = await import('vue')
+    const { renderToString } = await import('vue/server-renderer')
+    const messages = JSON.parse(await readFile(new URL(`../locales/${locale}.json`, import.meta.url), 'utf8'))
+    const checkboxAt = source.indexOf('data-testid="include-individual-offers"')
+    const recoveryAt = source.indexOf('data-testid="include-individual-offers-recovery"')
+    const checkbox = source.slice(source.lastIndexOf('<label', checkboxAt), source.indexOf('</label>', checkboxAt) + 8)
+    const recovery = source.slice(source.lastIndexOf('<button', recoveryAt), source.indexOf('</button>', recoveryAt) + 9)
+    const criteria = { q: 'Knipex', country: 'DE', platforms: 'Kleinanzeigen', price_currency: 'EUR', price_max: '200' }
+    const state = searchState(criteria)
+    try {
+      const app = Vue.createSSRApp({
+        render: Vue.compile(`<section>${checkbox}${recovery}</section>`),
+        setup: () => ({
+          includeIndividualOffers: state.includeIndividualOffers, includePartOffers: state.includePartOffers,
+          toggleIndividualOffers: state.toggleIndividualOffers, includeIndividualOffersInSearch: state.includeIndividualOffersInSearch,
+        }),
+      })
+      app.config.globalProperties.$t = key => messages[key] || key
+      const html = await renderToString(app)
+      assert.equal(html.split(messages.includeIndividualOffers).length - 1, 2, 'Checkbox and recovery use the same action label')
+      assert.match(messages.includeIndividualOffers, locale === 'en' ? /more tools/i : /mehr werkzeuge/i)
+      assert.match(html, locale === 'en' ? /tools with few offers/i : /Werkzeuge mit wenigen Angeboten/)
+      assert(!/<input[^>]*\schecked[=>\s]/.test(html))
+      assert.deepEqual(state.route.query, criteria)
+      assert.equal(state.includeIndividualOffers.value, false)
+      assert.deepEqual(state.requests, [])
+    }
+    finally { state.stop() }
+  })
+}

@@ -26,3 +26,8 @@ test('nearest sorting exposes a radius from the unlimited default and after clea
 test('other sort modes leave the radius control hidden', async () => {
   assert.doesNotMatch(await radiusHtml('newest', 0), /type="number"/)
 })
+
+test('an active radius remains editable after switching to newest or reference-gap sorting', async () => {
+  for (const mode of ['newest', 'profit'])
+    assert.match(await radiusHtml(mode, 25), /type="number"/)
+})

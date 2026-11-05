@@ -111,7 +111,7 @@
             {{ locationError }}
           </div>
           <div
-            v-if="sortMode === 'distance'"
+            v-if="sortMode === 'distance' || filters.maxDistance > 0"
             class="flex flex-col gap-1"
           >
             <label class="text-xs text-gray-400">{{ $t('maxDistance') }}</label>
@@ -165,7 +165,7 @@
               {{ currency }}
             </option>
             <option
-              v-if="hasUnknownCurrency"
+              v-if="hasUnknownCurrency || filters.currency === 'UNKNOWN'"
               value="UNKNOWN"
             >
               {{ $t('unknownCurrency', 'Unknown currency') }}
@@ -308,7 +308,7 @@
         </div>
       </div>
       <div
-        v-if="filteredItems.length === 0 && !loading"
+        v-if="filteredItems.length === 0 && !loading && !feedError"
         class="text-center py-12 text-slate-400"
       >
         {{ $t('noFlipsFound') }}
@@ -318,6 +318,20 @@
         >
           {{ $t('flipSources.empty') }}
         </p>
+      </div>
+      <div
+        v-if="feedError && !loading"
+        role="alert"
+        class="text-center py-6 text-slate-400"
+      >
+        <p>{{ $t('unidentifiedLoadFailed') }}</p>
+        <button
+          type="button"
+          class="mt-3 min-h-11 min-w-11 rounded-lg bg-slate-700 px-4 py-2 text-white hover:bg-slate-600"
+          @click="loadFlips()"
+        >
+          {{ $t('retry') }}
+        </button>
       </div>
       <div
         v-if="loading"
@@ -515,6 +529,7 @@ const FREE_REPLAY_COMPLETION_BUFFER_MS = 3000
 
 const items = ref<Flip[]>([])
 const loading = ref(true)
+const feedError = ref(false)
 const scrollContainer = ref<HTMLElement | null>(null)
 const route = useRoute()
 const userStore = useUserStore()
@@ -523,6 +538,7 @@ const localePath = useLocalePath()
 const replayQueue = ref<Flip[]>([])
 const hasInitializedFeed = ref(false)
 
+let feedRequestSeq = 0
 let removeWheelHandler: (() => void) | null = null
 let refreshInterval: ReturnType<typeof setInterval> | null = null
 let replayTimer: ReturnType<typeof setTimeout> | null = null
@@ -636,7 +652,7 @@ function getFlipCurrency(item: Flip): string {
   return /^[A-Z]{3}$/.test(currency) ? currency : !currency && legacyEuroPlatforms.has(item.listing?.platform ?? '') ? 'EUR' : ''
 }
 
-const availableCurrencies = computed(() => [...new Set(items.value.map(getFlipCurrency).filter(currency => currency && currency !== 'EUR'))].sort())
+const availableCurrencies = computed(() => [...new Set([filters.currency, ...items.value.map(getFlipCurrency)].filter(currency => /^[A-Z]{3}$/.test(currency) && currency !== 'EUR'))].sort())
 const hasUnknownCurrency = computed(() => items.value.some(item => !getFlipCurrency(item)))
 const hasSelectedCurrency = computed(() => !['*', 'UNKNOWN'].includes(filters.currency) && /^[A-Z]{3}$/.test(filters.currency))
 
@@ -1068,6 +1084,8 @@ function restartRefreshLoop() {
 }
 
 function resetFeedState() {
+  feedRequestSeq++
+  feedError.value = false
   items.value = []
   replayQueue.value = []
   loading.value = true
@@ -1077,10 +1095,12 @@ function resetFeedState() {
 }
 
 async function loadFlips(isRefresh = false) {
+  const seq = ++feedRequestSeq
   if (!isRefresh) loading.value = true
 
   try {
     await userStore.checkAuth(useFirebaseAuth()!)
+    if (seq !== feedRequestSeq) return
     if (feedTier.value === 'free' && !nextFreeBackfillAt)
       nextFreeBackfillAt = Date.now() + FREE_BACKFILL_INTERVAL_MS
     const headers = getAuthHeaders()
@@ -1091,6 +1111,8 @@ async function loadFlips(isRefresh = false) {
       ...(headers ? { headers } : {}),
     })
 
+    if (seq !== feedRequestSeq) return
+    feedError.value = false
     const newItems = (Array.isArray(response) ? response : Array.from(response ?? [])) as Flip[]
     if (!newItems.length && !isRefresh && items.value.length === 0) {
       items.value = []
@@ -1101,14 +1123,12 @@ async function loadFlips(isRefresh = false) {
     await appendIncomingFlips(newItems)
   }
   catch (error) {
+    if (seq !== feedRequestSeq) return
     console.error('Failed to load flips:', error)
-    if (!isRefresh) {
-      items.value = []
-      replayQueue.value = []
-    }
+    feedError.value = true
   }
   finally {
-    if (!isRefresh) loading.value = false
+    if (seq === feedRequestSeq) loading.value = false
   }
 }
 
