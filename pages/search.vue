@@ -558,7 +558,7 @@
             v-model:draft="facetDrafts[attrKey]"
             :title="localizeAttrKey(attrKey)"
             :buckets="buckets"
-            :discover-on-focus="attrKey === 'artist' && buckets.length === 0"
+            :discover-on-focus="buckets.length === 0"
             :selected="activeAttributeFilters[attrKey] ?? []"
             :scope="facetSearchScope"
             :format-value="value => localizeAttrValue(attrKey, value)"
@@ -1624,9 +1624,11 @@ const availableAttributeBuckets = computed(() => {
     if (!result[key]) result[key] = value.map(entry => ({ value: entry }))
   }
 
-  const vinyl = interpretation.value?.productTypes?.includes('vinyl_records')
-    || (urlToNumeric.value[selectedCategory.value] || selectedCategory.value) === '543523'
-  if (vinyl && !result.artist) result.artist = []
+  const category = urlToNumeric.value[selectedCategory.value] || selectedCategory.value
+  const types = interpretation.value?.productTypes ?? []
+  if ((types.includes('vinyl_records') || category === '543523') && !result.artist) result.artist = []
+  if ((types.includes('comics') || category === 'ane-comics') && !result.series) result.series = []
+  if ((types.includes('books') || ['784', '543543'].includes(category)) && !result.language) result.language = []
 
   return result
 })
