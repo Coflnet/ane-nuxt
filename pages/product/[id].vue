@@ -735,7 +735,7 @@
         </div>
 
         <div
-          v-if="offerFilterActive && matches.length === 0 && !matchesLoading && matchesLoaded"
+          v-if="offerFilterActive && matches.length === 0 && !matchesLoading && matchesLoaded && !matchesError && !zipError"
           class="p-8 text-center"
           data-testid="offer-filter-empty"
         >
@@ -778,7 +778,7 @@
             {{ $t('searchFailed') }}
           </p>
           <button
-            class="text-blue-400 hover:text-blue-300 text-sm font-medium disabled:opacity-50"
+            class="min-h-11 min-w-11 sm:min-h-0 sm:min-w-0 text-blue-400 hover:text-blue-300 text-sm font-medium disabled:opacity-50"
             data-testid="load-more-offers"
             :disabled="matchesLoading"
             @click="loadMatches(matchesError !== 'initial')"

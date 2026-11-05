@@ -2669,6 +2669,8 @@ async function lookupZipCode() {
       composable: '$fetch',
     })
 
+    if (zipCodeInput.value?.trim() !== zip) return
+
     if (!locationData || (locationData.lat === 0 && locationData.lon === 0)) {
       zipError.value = 'ZIP code not found'
       zipResolving.value = false
@@ -2698,6 +2700,7 @@ async function lookupZipCode() {
     }
   }
   catch (err) {
+    if (zipCodeInput.value?.trim() !== zip) return
     console.error('ZIP lookup error:', err)
     zipError.value = 'Could not resolve ZIP code'
     zipResolving.value = false
@@ -2724,6 +2727,7 @@ function clearDistanceFilter() {
   delete query.max_distance
   delete query.zip
   delete query.country
+  zipResolving.value = false
   userLocation.value = null
   locationName.value = ''
   zipCodeInput.value = ''

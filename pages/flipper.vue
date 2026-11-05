@@ -28,7 +28,7 @@
       <!-- Promo banner for non-flipper users -->
       <div
         v-if="!isFlipperTier"
-        class="flex items-center justify-between flex-wrap gap-3 mb-4 pb-4 border-b border-indigo-500/20"
+        class="flex items-center justify-between flex-wrap gap-3"
       >
         <div>
           <p class="text-white font-medium">
@@ -47,14 +47,13 @@
       </div>
 
       <!-- Sort & Location controls -->
-      <div :class="{ 'opacity-60 pointer-events-none select-none': !isFlipperTier }">
+      <div v-if="isFlipperTier">
         <div class="flex flex-wrap gap-3 items-end">
           <div class="flex flex-col gap-1">
             <label class="text-xs text-gray-400">{{ $t('sortBy') }}</label>
             <select
               v-model="sortMode"
-              :disabled="!isFlipperTier"
-              class="min-h-11 sm:min-h-0 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-40 focus:border-blue-500 focus:outline-none disabled:cursor-not-allowed"
+              class="min-h-11 sm:min-h-0 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-40 focus:border-blue-500 focus:outline-none"
             >
               <option value="newest">
                 {{ $t('sortNewest') }}
@@ -63,7 +62,7 @@
                 value="profit"
                 :disabled="!hasSelectedCurrency"
               >
-                {{ $t('product.sortReferenceGap') }}
+                {{ $t(referenceMode === 'retail' ? 'retailFlips.sortGap' : 'product.sortReferenceGap') }}
               </option>
               <option value="distance">
                 {{ $t('sortDistance') }}
@@ -76,14 +75,12 @@
               <input
                 v-model="locationZip"
                 type="text"
-                :disabled="!isFlipperTier"
                 :placeholder="$t('zipCodePlaceholder')"
-                class="min-h-11 sm:min-h-0 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-32 focus:border-blue-500 focus:outline-none disabled:cursor-not-allowed"
+                class="min-h-11 sm:min-h-0 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-32 focus:border-blue-500 focus:outline-none"
                 @keydown.enter="geocodeZip"
               >
               <button
-                :disabled="!isFlipperTier"
-                class="min-h-11 sm:min-h-0 flex items-center gap-1 text-xs text-white px-3 py-1.5 rounded-lg bg-gray-700 hover:bg-gray-600 border border-gray-600 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                class="min-h-11 sm:min-h-0 flex items-center gap-1 text-xs text-white px-3 py-1.5 rounded-lg bg-gray-700 hover:bg-gray-600 border border-gray-600 transition-colors"
                 @click="useDeviceLocation"
               >
                 <Icon
@@ -119,59 +116,57 @@
               <input
                 v-model.number="filters.maxDistance"
                 type="number"
-                :disabled="!isFlipperTier"
                 placeholder="∞"
-                class="min-h-11 sm:min-h-0 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-24 focus:border-blue-500 focus:outline-none disabled:cursor-not-allowed"
+                class="min-h-11 sm:min-h-0 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-24 focus:border-blue-500 focus:outline-none"
               >
               <span class="text-xs text-gray-400">km</span>
             </div>
           </div>
         </div>
-        <div
-          v-if="!isFlipperTier"
-          class="mt-2 flex items-center gap-2"
-        >
-          <Icon
-            name="tabler:lock"
-            class="w-4 h-4 text-indigo-400"
-          />
-          <span class="text-xs text-indigo-400">
-            {{ $t('distanceSortFlipperOnly') }}
-          </span>
-        </div>
       </div>
+    </UiDefaultContainer>
+
+    <UiDefaultContainer
+      v-if="retailReferenceFlipsEnabled"
+      class="mb-4 p-4"
+    >
+      <div class="flex flex-wrap gap-3 items-end">
+        <label class="flex flex-col gap-1 text-xs text-gray-400">
+          {{ $t('retailFlips.mode') }}
+          <select
+            v-model="referenceMode"
+            class="min-h-11 rounded-lg bg-gray-800 border border-gray-700 px-3 text-sm text-white"
+          >
+            <option value="sold">{{ $t('retailFlips.sold') }}</option>
+            <option value="retail">{{ $t('retailFlips.retail') }}</option>
+          </select>
+        </label>
+        <label
+          v-if="referenceMode === 'retail'"
+          class="flex flex-col gap-1 text-xs text-gray-400"
+        >
+          {{ $t('retailFlips.provider') }}
+          <select
+            v-model="referenceProvider"
+            class="min-h-11 rounded-lg bg-gray-800 border border-gray-700 px-3 text-sm text-white"
+          >
+            <option value="">{{ $t('flipSources.all') }}</option>
+            <option value="Lefeld">Lefeld</option>
+            <option value="GoTools">GoTools</option>
+          </select>
+        </label>
+      </div>
+      <p
+        v-if="referenceMode === 'retail'"
+        class="mt-3 text-xs text-gray-400"
+      >
+        {{ $t('retailFlips.scope') }}
+      </p>
     </UiDefaultContainer>
 
     <!-- Filters -->
     <UiDefaultContainer class="mb-4 p-4">
       <div class="flex flex-wrap gap-3 items-end">
-        <div class="flex flex-col gap-1">
-          <label class="text-xs text-gray-400">{{ $t('currency', 'Currency') }}</label>
-          <select
-            v-model="filters.currency"
-            class="min-h-11 sm:min-h-0 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-36 focus:border-blue-500 focus:outline-none"
-          >
-            <option value="EUR">
-              EUR
-            </option>
-            <option value="*">
-              {{ $t('allCurrencies', 'All currencies') }}
-            </option>
-            <option
-              v-for="currency in availableCurrencies"
-              :key="currency"
-              :value="currency"
-            >
-              {{ currency }}
-            </option>
-            <option
-              v-if="hasUnknownCurrency || filters.currency === 'UNKNOWN'"
-              value="UNKNOWN"
-            >
-              {{ $t('unknownCurrency', 'Unknown currency') }}
-            </option>
-          </select>
-        </div>
         <details class="w-48 max-w-full rounded-lg border border-gray-700 bg-gray-800 text-sm text-white">
           <summary class="flex min-h-11 sm:min-h-0 items-center cursor-pointer px-3 py-1.5">
             {{ $t('product.filters.marketplaces') }}{{ filters.platforms.length ? ` (${filters.platforms.length})` : `: ${$t('flipSources.all')}` }}
@@ -210,7 +205,7 @@
           >
         </div>
         <div class="flex flex-col gap-1">
-          <label class="text-xs text-gray-400">{{ $t('product.minReferenceGap') }}<span v-if="hasSelectedCurrency"> ({{ filters.currency }})</span></label>
+          <label class="text-xs text-gray-400">{{ $t(referenceMode === 'retail' ? 'retailFlips.minGap' : 'product.minReferenceGap') }}<span v-if="hasSelectedCurrency"> ({{ filters.currency }})</span></label>
           <input
             v-model.number="filters.minProfit"
             type="number"
@@ -219,34 +214,71 @@
             class="min-h-11 sm:min-h-0 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-24 focus:border-blue-500 focus:outline-none disabled:opacity-50"
           >
         </div>
-        <div class="flex flex-col gap-1">
-          <label class="text-xs text-gray-400">{{ $t('product.minReferenceGapPercent') }}</label>
-          <input
-            v-model.number="filters.minMarginPct"
-            type="number"
-            :disabled="!hasSelectedCurrency"
-            placeholder="0"
-            class="min-h-11 sm:min-h-0 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-24 focus:border-blue-500 focus:outline-none disabled:opacity-50"
-          >
-        </div>
-        <div class="flex flex-col gap-1">
-          <label class="text-xs text-gray-400">{{ $t('minRefs') }}</label>
-          <input
-            v-model.number="filters.minRefs"
-            type="number"
-            placeholder="0"
-            class="min-h-11 sm:min-h-0 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-24 focus:border-blue-500 focus:outline-none"
-          >
-        </div>
-        <div class="flex flex-col gap-1">
-          <label class="text-xs text-gray-400">{{ $t('category') }}</label>
-          <input
-            v-model="filters.category"
-            type="text"
-            :placeholder="$t('allCategories')"
-            class="min-h-11 sm:min-h-0 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-36 focus:border-blue-500 focus:outline-none"
-          >
-        </div>
+        <details class="w-full rounded-lg border border-gray-700 bg-gray-800 text-sm text-white">
+          <summary class="flex min-h-11 items-center cursor-pointer px-3 py-1.5">
+            {{ $t('product.filters.moreFilters') }}
+          </summary>
+          <div class="flex flex-wrap gap-3 items-end p-3">
+            <div class="flex flex-col gap-1">
+              <label class="text-xs text-gray-400">{{ $t('currency', 'Currency') }}</label>
+              <select
+                v-model="filters.currency"
+                class="min-h-11 sm:min-h-0 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-36 focus:border-blue-500 focus:outline-none"
+              >
+                <option value="EUR">
+                  EUR
+                </option>
+                <option value="*">
+                  {{ $t('allCurrencies', 'All currencies') }}
+                </option>
+                <option
+                  v-for="currency in availableCurrencies"
+                  :key="currency"
+                  :value="currency"
+                >
+                  {{ currency }}
+                </option>
+                <option
+                  v-if="hasUnknownCurrency || filters.currency === 'UNKNOWN'"
+                  value="UNKNOWN"
+                >
+                  {{ $t('unknownCurrency', 'Unknown currency') }}
+                </option>
+              </select>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs text-gray-400">{{ $t(referenceMode === 'retail' ? 'retailFlips.minGapPercent' : 'product.minReferenceGapPercent') }}</label>
+              <input
+                v-model.number="filters.minMarginPct"
+                type="number"
+                :disabled="!hasSelectedCurrency"
+                placeholder="0"
+                class="min-h-11 sm:min-h-0 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-24 focus:border-blue-500 focus:outline-none disabled:opacity-50"
+              >
+            </div>
+            <div
+              v-if="referenceMode !== 'retail'"
+              class="flex flex-col gap-1"
+            >
+              <label class="text-xs text-gray-400">{{ $t('minRefs') }}</label>
+              <input
+                v-model.number="filters.minRefs"
+                type="number"
+                placeholder="0"
+                class="min-h-11 sm:min-h-0 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-24 focus:border-blue-500 focus:outline-none"
+              >
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs text-gray-400">{{ $t('category') }}</label>
+              <input
+                v-model="filters.category"
+                type="text"
+                :placeholder="$t('allCategories')"
+                class="min-h-11 sm:min-h-0 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-36 focus:border-blue-500 focus:outline-none"
+              >
+            </div>
+          </div>
+        </details>
         <button
           v-if="hasActiveFilters"
           class="min-h-11 sm:min-h-0 text-xs text-gray-400 hover:text-white px-2 py-1.5 rounded-lg bg-gray-800 border border-gray-700 hover:border-gray-500 transition-colors"
@@ -255,7 +287,7 @@
           {{ $t('clearFilters') }}
         </button>
         <button
-          v-if="hasActiveFilters"
+          v-if="hasActiveFilters && referenceMode !== 'retail'"
           class="min-h-11 sm:min-h-0 flex items-center gap-1.5 text-xs text-white px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 transition-colors font-medium"
           @click="showSaveFilterDialog = true"
         >
@@ -311,7 +343,7 @@
         v-if="filteredItems.length === 0 && !loading && !feedError"
         class="text-center py-12 text-slate-400"
       >
-        {{ $t('noFlipsFound') }}
+        {{ $t(referenceMode === 'retail' ? 'retailFlips.empty' : 'noFlipsFound') }}
         <p
           v-if="filters.platforms.length"
           class="mt-2 text-sm"
@@ -501,6 +533,7 @@
 </template>
 
 <script setup lang="ts">
+import { getRetailPriceGap } from '~/utils/retailFlip'
 import { ref, reactive, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import { client as apiClient } from '~/src/api-client/client.gen'
 import { addFilter, getFlips, getSubscription, type PaymentControllerActiveSubscription as ActiveSubscription, type Flip, type ClientModelTargetType } from '~/src/api-client'
@@ -548,6 +581,10 @@ let liveReconnectAttempt = 0
 let allowLiveReconnect = false
 let nextFreeBackfillAt: number | null = null
 
+const retailReferenceFlipsEnabled = String(useRuntimeConfig().public.retailReferenceFlipsEnabled) === 'true'
+const referenceMode = ref<'sold' | 'retail'>('sold')
+const referenceProvider = ref<'' | 'Lefeld' | 'GoTools'>('')
+
 const selectedCategory = computed(() => {
   const category = route.query.category
   return typeof category === 'string' && category.trim() !== '' ? category : '1'
@@ -587,6 +624,7 @@ const filterNotifyType = ref<'firebase' | 'discord' | 'email' | 'none'>('firebas
 const filterNotifyTarget = ref('')
 
 async function saveFlipFilter() {
+  if (referenceMode.value === 'retail') return
   if (!filterName.value.trim()) return
   if (!userStore.token) {
     await navigateTo(localePath('/login') + '?redirectTo=' + encodeURIComponent(route.fullPath))
@@ -657,6 +695,7 @@ const hasUnknownCurrency = computed(() => items.value.some(item => !getFlipCurre
 const hasSelectedCurrency = computed(() => !['*', 'UNKNOWN'].includes(filters.currency) && /^[A-Z]{3}$/.test(filters.currency))
 
 function hasComparableFlip(item: Flip): boolean {
+  if (item.referenceMode === 'retail') return getRetailPriceGap(item) !== null
   const currency = getFlipCurrency(item)
   if (!/^[A-Z]{3}$/.test(currency)) return false
   if (currency === 'EUR') return true
@@ -710,14 +749,17 @@ function useDeviceLocation() {
 }
 
 async function geocodeZip() {
-  if (!locationZip.value.trim()) return
+  const zip = locationZip.value.trim()
+  if (!zip) return
   locationError.value = ''
 
   try {
-    const query = encodeURIComponent(locationZip.value.trim())
+    const query = encodeURIComponent(zip)
     const result = await $fetch<Array<{ lat: string, lon: string, display_name: string }>>(`https://nominatim.openstreetmap.org/search?postalcode=${query}&format=json&limit=1`, {
       headers: { 'User-Agent': 'ane.deals' },
     })
+
+    if (locationZip.value.trim() !== zip) return
 
     if (result.length === 0) {
       locationError.value = useI18n().t('zipNotFound')
@@ -738,6 +780,7 @@ async function geocodeZip() {
     if (sortMode.value !== 'distance') sortMode.value = 'distance'
   }
   catch {
+    if (locationZip.value.trim() !== zip) return
     locationError.value = useI18n().t('zipNotFound')
   }
 }
@@ -969,6 +1012,11 @@ async function enqueueReplayFlips(flips: Flip[]) {
 }
 
 async function appendIncomingFlips(flips: Flip[]) {
+  if (referenceMode.value === 'retail') {
+    const current = new Map(flips.map(flip => [getFlipKey(flip), flip]))
+    items.value = items.value.map(flip => current.get(getFlipKey(flip)) ?? flip)
+    replayQueue.value = replayQueue.value.map(flip => current.get(getFlipKey(flip)) ?? flip)
+  }
   const incoming = prepareIncomingFlips(flips)
   if (incoming.length === 0) return
 
@@ -1020,7 +1068,7 @@ function scheduleLiveReconnect() {
 }
 
 async function connectLiveFlips() {
-  if (feedTier.value === 'free') return
+  if (referenceMode.value === 'retail' || feedTier.value === 'free') return
   if (liveSocket && (liveSocket.readyState === WebSocket.OPEN || liveSocket.readyState === WebSocket.CONNECTING)) return
 
   const url = buildLiveFlipsUrl()
@@ -1035,6 +1083,7 @@ async function connectLiveFlips() {
   }
 
   socket.onmessage = (event) => {
+    if (liveSocket !== socket || referenceMode.value === 'retail') return
     try {
       const message = JSON.parse(event.data) as LiveFlipMessage
       if (message.type !== 'flip' || !message.flip) return
@@ -1095,23 +1144,26 @@ function resetFeedState() {
 }
 
 async function loadFlips(isRefresh = false) {
+  if (!retailReferenceFlipsEnabled) referenceMode.value = 'sold'
   const seq = ++feedRequestSeq
+  const mode = referenceMode.value
+  const provider = referenceProvider.value
   if (!isRefresh) loading.value = true
 
   try {
     await userStore.checkAuth(useFirebaseAuth()!)
-    if (seq !== feedRequestSeq) return
+    if (seq !== feedRequestSeq || mode !== referenceMode.value || provider !== referenceProvider.value) return
     if (feedTier.value === 'free' && !nextFreeBackfillAt)
       nextFreeBackfillAt = Date.now() + FREE_BACKFILL_INTERVAL_MS
     const headers = getAuthHeaders()
     const response = await getFlips({
       composable: '$fetch',
       path: { category: selectedCategory.value },
-      query: { limit: FEED_LIMIT },
+      query: { limit: FEED_LIMIT, ...(mode === 'retail' ? { referenceMode: mode, ...(provider ? { referenceProvider: provider } : {}) } : {}) },
       ...(headers ? { headers } : {}),
     })
 
-    if (seq !== feedRequestSeq) return
+    if (seq !== feedRequestSeq || mode !== referenceMode.value || provider !== referenceProvider.value) return
     feedError.value = false
     const newItems = (Array.isArray(response) ? response : Array.from(response ?? [])) as Flip[]
     if (!newItems.length && !isRefresh && items.value.length === 0) {
@@ -1123,12 +1175,12 @@ async function loadFlips(isRefresh = false) {
     await appendIncomingFlips(newItems)
   }
   catch (error) {
-    if (seq !== feedRequestSeq) return
+    if (seq !== feedRequestSeq || mode !== referenceMode.value || provider !== referenceProvider.value) return
     console.error('Failed to load flips:', error)
     feedError.value = true
   }
   finally {
-    if (seq === feedRequestSeq) loading.value = false
+    if (seq === feedRequestSeq && mode === referenceMode.value && provider === referenceProvider.value) loading.value = false
   }
 }
 
@@ -1144,9 +1196,12 @@ const filteredItems = computed(() => {
   let result = items.value.filter((item) => {
     const listing = item.listing
     if (filters.platforms.length && !filters.platforms.includes(listing?.platform ?? '')) return false
-    const profit = item.potentialProfit ?? 0
+    const retailGap = item.referenceMode === 'retail' ? getRetailPriceGap(item) : null
+    if (referenceMode.value === 'retail' ? retailGap === null : item.referenceMode === 'retail') return false
+    if (referenceMode.value === 'retail' && referenceProvider.value && item.retailReference?.provider !== referenceProvider.value) return false
+    const profit = retailGap ?? item.potentialProfit ?? 0
     const price = listing?.price ?? 0
-    const median = item.medianPrice ?? 0
+    const median = retailGap !== null ? item.retailReference?.price ?? 0 : item.medianPrice ?? 0
     const marginPct = price > 0 ? ((median - price) / price) * 100 : 0
     const refs = item.recentSells?.length ?? 0
     const currency = getFlipCurrency(item)
@@ -1164,7 +1219,7 @@ const filteredItems = computed(() => {
       if (filters.minProfit > 0 && profit < filters.minProfit) return false
       if (filters.minMarginPct > 0 && marginPct < filters.minMarginPct) return false
     }
-    if (filters.minRefs > 0 && refs < filters.minRefs) return false
+    if (referenceMode.value !== 'retail' && filters.minRefs > 0 && refs < filters.minRefs) return false
 
     if (filters.search) {
       const query = filters.search.toLowerCase()
@@ -1193,7 +1248,7 @@ const filteredItems = computed(() => {
       const leftValid = hasComparableFlip(left)
       const rightValid = hasComparableFlip(right)
       if (leftValid !== rightValid) return leftValid ? -1 : 1
-      return leftValid ? (right.potentialProfit ?? 0) - (left.potentialProfit ?? 0) : 0
+      return leftValid ? (getRetailPriceGap(right) ?? right.potentialProfit ?? 0) - (getRetailPriceGap(left) ?? left.potentialProfit ?? 0) : 0
     })
   }
   else if (sortMode.value === 'distance' && userLocation.value) {
@@ -1237,13 +1292,13 @@ onBeforeUnmount(() => {
   clearLiveReconnectTimer()
 })
 
-watch([feedTier, selectedCategory, () => userStore.token], async ([nextTier, nextCategory, nextToken], [previousTier, previousCategory, previousToken]) => {
+watch([feedTier, selectedCategory, () => userStore.token, referenceMode, referenceProvider], async ([nextTier, nextCategory, nextToken, nextMode, nextProvider], [previousTier, previousCategory, previousToken, previousMode, previousProvider]) => {
   if (!hasInitializedFeed.value) return
 
   if (nextToken !== previousToken)
     await syncCurrentPlan()
 
-  if (nextTier === previousTier && nextCategory === previousCategory && nextToken === previousToken)
+  if (nextTier === previousTier && nextCategory === previousCategory && nextToken === previousToken && nextMode === previousMode && nextProvider === previousProvider)
     return
 
   await refreshFeed()

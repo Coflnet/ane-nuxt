@@ -39,6 +39,7 @@ const loadSource = stripTypeScriptTypes(source.match(/async function loadFlips\(
 function feedState(initial = []) {
   const requests = []
   const state = {
+    retailReferenceFlipsEnabled: true, referenceMode: Vue.ref('sold'), referenceProvider: Vue.ref(''),
     items: Vue.ref(initial), replayQueue: Vue.ref([]), loading: Vue.ref(false), feedError: Vue.ref(false),
     filters: { search: 'camera', currency: 'GBP', platforms: ['Gumtree'], minRefs: 2 },
     userStore: { checkAuth: async () => {} }, useFirebaseAuth: () => null,
@@ -182,5 +183,64 @@ test('a current refresh clears loading when it supersedes a still-pending initia
   requests[1].resolve([latest])
   await refresh
   assert.deepEqual(state.items.value, [latest])
+  assert.equal(state.loading.value, false)
+})
+
+test('retail requests separate reference provider from marketplace filtering and sold wire stays unchanged', async () => {
+  const { state, requests, run } = feedState()
+  state.referenceMode.value = 'retail'
+  state.referenceProvider.value = 'Lefeld'
+  const pending = run()
+  await Promise.resolve()
+  assert.deepEqual(requests[0].options.query, { limit: 100, referenceMode: 'retail', referenceProvider: 'Lefeld' })
+  assert.deepEqual(state.filters.platforms, ['Gumtree'])
+  requests[0].resolve([])
+  await pending
+  state.referenceMode.value = 'sold'
+  const sold = run()
+  await Promise.resolve()
+  assert.deepEqual(requests[1].options.query, { limit: 100 })
+  requests[1].resolve([])
+  await sold
+})
+
+for (const change of ['mode', 'provider']) {
+  for (const outcome of ['success', 'failure']) {
+    test(`in-flight retail ${outcome} cannot commit after ${change} changes before watcher refresh`, async () => {
+      const { state, requests, run } = feedState()
+      state.referenceMode.value = 'retail'
+      state.referenceProvider.value = 'Lefeld'
+      const old = run()
+      await Promise.resolve()
+      if (change === 'mode') state.referenceMode.value = 'sold'
+      else state.referenceProvider.value = 'GoTools'
+      if (outcome === 'success') requests[0].resolve([{ listing: { id: 'old' } }])
+      else requests[0].reject(new Error('old request failed'))
+      await old
+      assert.deepEqual(state.items.value, [])
+      assert.equal(state.feedError.value, false)
+      assert.equal(state.loading.value, true)
+      const current = run()
+      await Promise.resolve()
+      requests[1].resolve([{ listing: { id: 'current' } }])
+      await current
+      assert.equal(state.items.value[0].listing.id, 'current')
+      assert.equal(state.loading.value, false)
+    })
+  }
+}
+
+test('disabled retail capability keeps the sold request even if an unavailable mode was selected', async () => {
+  const { state, requests, run } = feedState()
+  state.retailReferenceFlipsEnabled = false
+  state.referenceMode.value = 'retail'
+  state.referenceProvider.value = 'GoTools'
+  const pending = run()
+  await Promise.resolve()
+  assert.equal(state.referenceMode.value, 'sold')
+  assert.deepEqual(requests[0].options.query, { limit: 100 })
+  requests[0].resolve([])
+  await pending
+  assert.equal(state.feedError.value, false)
   assert.equal(state.loading.value, false)
 })

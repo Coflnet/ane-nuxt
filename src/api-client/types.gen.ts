@@ -234,7 +234,26 @@ export type FilterControllerDetailedLocation = {
     country?: string | null;
 };
 
+export type RetailReference = {
+    knownProductId?: string | null;
+    provider?: string | null;
+    url?: string | null;
+    merchantSku?: string | null;
+    brand?: string | null;
+    mpn?: string | null;
+    gtin?: string | null;
+    price?: number | null;
+    currency?: string | null;
+    availability?: string | null;
+    condition?: string | null;
+    observedAt?: string | null;
+    expiresAt?: string | null;
+};
+
 export type Flip = {
+    referenceMode?: 'sold' | 'retail' | null;
+    retailReference?: RetailReference | null;
+    retailPriceGap?: number | null;
     category?: string | null;
     listing?: Listing;
     serializedListing?: string | null;
@@ -2840,6 +2859,8 @@ export type GetFlipsData = {
     };
     query?: {
         limit?: number;
+        referenceMode?: 'retail';
+        referenceProvider?: 'Lefeld' | 'GoTools';
     };
     url: '/api/flips/{category}';
 };

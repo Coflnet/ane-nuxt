@@ -2,7 +2,8 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import { stripTypeScriptTypes } from 'node:module'
 import test from 'node:test'
-import { ref } from 'vue'
+import { ref, compile, createSSRApp } from 'vue'
+import { renderToString } from 'vue/server-renderer'
 import { listingIdentityKey } from '../utils/listingIdentity.ts'
 import { buildProductResourceUrl } from '../utils/productApiUrl.ts'
 import { buildMatchesParams, emptyOfferFilter } from '../utils/offerFilters.ts'
@@ -116,3 +117,38 @@ test('explicit report identity refresh502 preserves rows and error so the open r
   await request
   assert.deepEqual(s.matches.value, [], 'ordinary filter failures keep their existing clearing behavior')
 })
+
+const emptyAt = source.indexOf('v-if="offerFilterActive && matches.length === 0')
+const emptyTemplate = source.slice(source.lastIndexOf('<div', emptyAt), source.indexOf('\n        <div\n          v-if="matchesHasMore', emptyAt))
+async function renderFilteredEmpty(s) {
+  const app = createSSRApp({ render: compile(emptyTemplate), setup: () => ({
+    ...s, offerFilterActive: true, offerFilterNearby: false, similarSearchHref: '/search',
+    emptyOfferFilter, onOfferFilterChange() {},
+  }) })
+  app.component('NuxtLink', { template: '<a><slot /></a>' })
+  app.component('Icon', { render: () => null })
+  app.config.globalProperties.$t = key => key
+  return renderToString(app)
+}
+
+for (const statusCode of [503, 400]) {
+  test(`failed filtered offers (${statusCode}) never claim a successful empty search and preserve retry scope`, async () => {
+    const s = state()
+    s.offerFilter.value = { ...emptyOfferFilter(), countries: ['DE'], zip: '10115', zipCountry: 'DE' }
+    const requestedFilter = JSON.parse(JSON.stringify(s.offerFilter.value))
+    const loading = s.loadMatches()
+    s.pending.shift().reject({ statusCode })
+    await loading
+    assert.equal(s.matchesLoaded.value, true)
+    assert.deepEqual(JSON.parse(JSON.stringify(s.offerFilter.value)), requestedFilter)
+    assert.doesNotMatch(await renderFilteredEmpty(s), /data-testid="offer-filter-empty"/)
+    const failedUrl = s.calls.at(-1).href
+    const retry = s.loadMatches()
+    assert.equal(s.calls.at(-1).href, failedUrl)
+    s.pending.shift().resolve([])
+    await retry
+    assert.equal(s.matchesError.value, null)
+    assert.equal(s.zipError.value, '')
+    assert.match(await renderFilteredEmpty(s), /data-testid="offer-filter-empty"/)
+  })
+}

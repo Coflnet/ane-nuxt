@@ -23,7 +23,7 @@
         v-if="hasComparablePrices && profit > 0"
         class="absolute top-3 right-3 bg-green-500/90 backdrop-blur-sm text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-lg max-w-[calc(100%_-_1.5rem)] text-right"
       >
-        {{ $t(isAuction ? 'product.referenceGapAtBid' : 'product.referenceGap') }}: +{{ formattedProfit }}
+        {{ $t(isRetail ? 'retailFlips.gap' : isAuction ? 'product.referenceGapAtBid' : 'product.referenceGap') }}: +{{ formattedProfit }}
       </div>
     </div>
 
@@ -69,6 +69,7 @@
             />
           </button>
           <button
+            v-if="!isRetail"
             class="w-7 h-7 rounded-md bg-gray-700/50 hover:bg-blue-500/20 text-gray-400 hover:text-blue-400 flex items-center justify-center transition-colors"
             title="Show References"
             @click="showReferences = !showReferences"
@@ -87,7 +88,7 @@
           <span class="text-white font-bold text-lg">{{ formattedPrice }}</span>
         </div>
         <div class="flex justify-between items-center">
-          <span class="text-gray-400 text-xs">{{ $t('product.referenceMedian') }}</span>
+          <span class="text-gray-400 text-xs">{{ $t(isRetail ? 'retailFlips.price' : 'product.referenceMedian') }}</span>
           <span
             v-if="hasComparablePrices"
             class="text-green-400 font-semibold"
@@ -100,8 +101,26 @@
       </div>
 
       <p class="text-xs text-gray-400 mb-4">
-        {{ $t('product.referenceContext') }}
+        {{ $t(isRetail ? 'retailFlips.context' : 'product.referenceContext') }}
         <span v-if="isAuction">{{ $t('product.auctionBidContext') }}</span>
+      </p>
+
+      <p
+        v-if="isRetail"
+        class="text-xs text-gray-400 mb-4"
+      >
+        <template v-if="hasComparablePrices">
+          <a
+            v-if="retailUrl"
+            :href="retailUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-blue-400 underline"
+          >{{ item.retailReference?.provider }}</a>
+          <span v-else>{{ item.retailReference?.provider }}</span>
+          · <time :datetime="item.retailReference?.observedAt ?? undefined">{{ formatDistanceToNow(new Date(item.retailReference!.observedAt!), { addSuffix: true, ...dateFnsLocale }) }}</time>
+        </template>
+        <span v-else>{{ $t('retailFlips.expired') }}</span>
       </p>
 
       <!-- Category & Location -->
@@ -122,7 +141,7 @@
 
       <!-- References List -->
       <div
-        v-if="showReferences && hasComparablePrices && item.recentSells?.length"
+        v-if="!isRetail && showReferences && hasComparablePrices && item.recentSells?.length"
         class="mb-4 bg-gray-900/50 rounded p-2 max-h-40 overflow-y-auto"
       >
         <div class="text-xs font-semibold text-gray-400 mb-2 border-b border-gray-700 pb-1">
@@ -316,7 +335,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted, onBeforeUnmount, watch } from 'vue'
+import { getRetailPriceGap, getRetailReferenceUrl } from '~/utils/retailFlip'
 import { getPlatformUrl } from '~/utils/flipMarketplaceUrl'
 import { parseHistoryCurrency } from '~/utils/priceHistory'
 import type { Flip, FlipSale as SoldFor } from '~/src/api-client/types.gen'
@@ -344,7 +364,26 @@ const emit = defineEmits<{
 }>()
 
 const isAuction = computed(() => props.item.listing?.priceKind?.split(',').some(kind => kind.trim() === 'Auction') ?? false)
-const profit = computed(() => props.item.potentialProfit ?? 0)
+const isRetail = computed(() => props.item.referenceMode === 'retail')
+const quoteNow = ref(Date.now())
+let expiryTimer: ReturnType<typeof setTimeout> | undefined
+function scheduleQuoteExpiry() {
+  clearTimeout(expiryTimer)
+  quoteNow.value = Date.now()
+  if (getRetailPriceGap(props.item, quoteNow.value) === null) return
+  const expiry = Date.parse(props.item.retailReference?.expiresAt ?? '')
+  if (expiry > quoteNow.value) {
+    expiryTimer = setTimeout(() => {
+      quoteNow.value = Date.now()
+    }, expiry - quoteNow.value)
+  }
+}
+onMounted(scheduleQuoteExpiry)
+watch(() => props.item.retailReference, scheduleQuoteExpiry)
+onBeforeUnmount(() => clearTimeout(expiryTimer))
+const retailGap = computed(() => getRetailPriceGap(props.item, quoteNow.value))
+const retailUrl = computed(() => getRetailReferenceUrl(props.item.retailReference?.provider, props.item.retailReference?.url))
+const profit = computed(() => isRetail.value ? retailGap.value ?? 0 : props.item.potentialProfit ?? 0)
 const legacyEuroPlatforms = new Set(['Kleinanzeigen', 'Marktplaats', 'Willhaben'])
 const currencyKeyMarker = String.fromCharCode(31) + 'currency:'
 const listingCurrency = computed(() => {
@@ -352,6 +391,7 @@ const listingCurrency = computed(() => {
   return /^[A-Z]{3}$/.test(currency) ? currency : !currency && legacyEuroPlatforms.has(props.item.listing?.platform ?? '') ? 'EUR' : ''
 })
 const hasComparablePrices = computed(() => {
+  if (isRetail.value) return retailGap.value !== null
   if (listingCurrency.value === 'EUR') return true
   if (!/^[A-Z]{3}$/.test(listingCurrency.value)) return false
   const sells = props.item.recentSells ?? []
@@ -489,6 +529,6 @@ const formattedPrice = computed(() => {
 })
 
 const formattedMedian = computed(() => {
-  return formatAmount(props.item.medianPrice, listingCurrency.value)
+  return formatAmount(isRetail.value ? props.item.retailReference?.price : props.item.medianPrice, listingCurrency.value)
 })
 </script>

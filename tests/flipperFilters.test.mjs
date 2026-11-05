@@ -19,7 +19,7 @@ test('actual feed currency logic preserves explicit normalized currency and only
 
 const saveSource = source.slice(source.indexOf('async function saveFlipFilter()'), source.indexOf('// --- Filters (persisted'))
 const save = new Function('filterName', 'userStore', 'hasSelectedCurrency', 'filters', 'filterNotifyType', 'filterNotifyTarget', 'addFilter', 'showSaveFilterDialog', 'push', 'useI18n',
-  stripTypeScriptTypes(saveSource) + '\nreturn saveFlipFilter')
+  'const referenceMode = { value: \'sold\' };\n' + stripTypeScriptTypes(saveSource) + '\nreturn saveFlipFilter')
 
 test('actual save handler persists percentage threshold and selected comparison currency', async () => {
   for (const currency of ['EUR', 'PLN']) {
@@ -54,7 +54,7 @@ function feedHarness(platforms = []) {
   const items = { value: [] }
   const filters = { platforms, currency: '*', search: '', minProfit: 0, minMarginPct: 0, minRefs: 0, category: '', maxDistance: 0 }
   const select = new Function('computed', 'items', 'filters', 'getFlipCurrency', 'hasSelectedCurrency', 'sortMode', 'userLocation',
-    filteredSource + '\nreturn filteredItems')(
+    'const referenceMode = { value: \'sold\' };\n' + filteredSource + '\nreturn filteredItems')(
     callback => callback, items, filters, item => getCurrency(item, legacy), { value: false }, { value: 'newest' }, { value: null })
   return { items, filters, select }
 }

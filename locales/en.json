@@ -1,4 +1,19 @@
 {
+  "retailFlips": {
+    "empty": "No currently verified retail comparisons. Refresh to check again.",
+    "minGapPercent": "Min. retail price gap (% of asking price)",
+    "mode": "Comparison basis",
+    "sold": "Listing history",
+    "retail": "Retail reference · new condition",
+    "provider": "Reference retailer",
+    "scope": "New items · retailer prices checked within 15 minutes. Live updates and alerts are unavailable.",
+    "gap": "Retail price gap",
+    "minGap": "Min. retail price gap",
+    "sortGap": "Retail price gap",
+    "price": "Retail reference price",
+    "context": "Retail asking price for a new item. The price gap excludes fees and costs and is not resale profit.",
+    "expired": "Retail reference expired or not comparable. Refresh for a fresh quote."
+  },
   "individualOfferLabel": "Individual offer",
   "individualOfferPrice": "Listed amount",
   "unspecificGroupPriceHint": "Offers may cover different editions or packages. Check the individual offer details.",

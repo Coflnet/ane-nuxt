@@ -71,6 +71,7 @@ export default defineNuxtConfig({
     // was hanging SSR and taking the site down). Override: NUXT_API_INTERNAL_BASE_URL.
     apiInternalBaseUrl: 'http://aneapi:8000',
     public: {
+      retailReferenceFlipsEnabled: false,
       // Browser-facing API base — the public load balancer on ane.coflnet.com.
       // Override: NUXT_PUBLIC_API_BASE_URL.
       apiBaseUrl: 'https://ane.coflnet.com',

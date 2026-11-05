@@ -1,4 +1,19 @@
 {
+  "retailFlips": {
+    "empty": "Keine aktuell verifizierten Händlervergleiche. Zum erneuten Prüfen neu laden.",
+    "minGapPercent": "Min. Händlerpreisdifferenz (% des Angebotspreises)",
+    "mode": "Vergleichsbasis",
+    "sold": "Angebotsverlauf",
+    "retail": "Händlerreferenz · Zustand neu",
+    "provider": "Referenzhändler",
+    "scope": "Neuware · Händlerpreise höchstens 15 Minuten alt. Live-Updates und Benachrichtigungen sind nicht verfügbar.",
+    "gap": "Händlerpreisdifferenz",
+    "minGap": "Min. Händlerpreisdifferenz",
+    "sortGap": "Händlerpreisdifferenz",
+    "price": "Händlerreferenzpreis",
+    "context": "Händlerangebotspreis für Neuware. Die Differenz berücksichtigt keine Gebühren oder Kosten und ist kein Wiederverkaufsgewinn.",
+    "expired": "Händlerreferenz abgelaufen oder nicht vergleichbar. Für einen aktuellen Preis neu laden."
+  },
   "individualOfferLabel": "Einzelangebot",
   "individualOfferPrice": "Angezeigter Betrag",
   "unspecificGroupPriceHint": "Angebote können verschiedene Editionen oder Pakete umfassen. Prüfe die einzelnen Angebotsdetails.",
