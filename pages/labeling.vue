@@ -244,8 +244,6 @@
                 <div
                   v-else
                   class="text-sm text-slate-400 text-center px-4"
-                  role="img"
-                  :aria-label="$t('labelingPhotoFailed')"
                   :data-testid="`labeling-placeholder-${side.key}`"
                 >
                   <Icon
@@ -253,6 +251,15 @@
                     class="size-10 mb-2"
                   />
                   <p>{{ $t('labelingPhotoFailed') }}</p>
+                  <button
+                    v-if="side.data.archivedImageUrl"
+                    type="button"
+                    class="min-h-11 text-indigo-300 hover:text-indigo-200 underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-400"
+                    :data-testid="`labeling-photo-retry-${side.key}`"
+                    @click="resolvePhoto(side.key, current.pairId)"
+                  >
+                    {{ $t('labelingPhotoRetry') }}
+                  </button>
                 </div>
               </div>
               <figcaption class="flex items-center justify-between gap-3 mt-2 text-sm">
@@ -424,8 +431,7 @@ let generation = 0
 const stats = ref<LabelingStats | null>(null)
 const statsFailed = ref(false)
 const pendingSaves = ref(0)
-const imageFailed = reactive<Record<string, boolean>>({ a: false, b: false })
-// What each side's <img> shows: the archived copy (as object URL) when there is one, else the marketplace hotlink.
+// Review only the immutable archived copy, fetched with the reviewer's existing bearer.
 const photoSrc = reactive<Record<string, string>>({ a: '', b: '' })
 const photoLoading = reactive<Record<string, boolean>>({ a: false, b: false })
 const archivedBlobs = new Map<string, Promise<string>>()
@@ -637,7 +643,6 @@ watch(() => upcoming(state.value)?.pairId, () => {
   if (!next || import.meta.server) return
   for (const side of [next.a, next.b]) {
     if (side.archivedImageUrl) archivedObjectUrl(side.archivedImageUrl).catch(() => {})
-    else if (side.imageUrl) new Image().src = side.imageUrl
   }
 })
 
@@ -665,38 +670,27 @@ function pruneArchived() {
 
 async function resolvePhoto(key: 'a' | 'b', pairId: string) {
   const side = current.value?.[key]
-  imageFailed[key] = false
   photoSrc[key] = ''
-  if (!side) return
-  if (side.archivedImageUrl) {
-    photoLoading[key] = true
-    try {
-      const objectUrl = await archivedObjectUrl(side.archivedImageUrl)
-      if (current.value?.pairId !== pairId) return
-      photoSrc[key] = objectUrl
-      return
-    }
-    catch {
-      // fall back to the marketplace image below
-    }
-    finally {
-      if (current.value?.pairId === pairId) photoLoading[key] = false
-    }
-    if (current.value?.pairId !== pairId) return
+  photoLoading[key] = false
+  if (!side?.archivedImageUrl) return
+  photoLoading[key] = true
+  try {
+    const objectUrl = await archivedObjectUrl(side.archivedImageUrl)
+    if (current.value?.pairId === pairId) photoSrc[key] = objectUrl
   }
-  if (side.imageUrl) photoSrc[key] = side.imageUrl
-  else imageFailed[key] = true
+  catch {
+    // Keep the pair available for skip or retry without requesting a live image.
+  }
+  finally {
+    if (current.value?.pairId === pairId) photoLoading[key] = false
+  }
 }
 
-// A broken archived copy falls back to the hotlink; a broken hotlink shows "Image unavailable".
 function onPhotoError(key: 'a' | 'b') {
-  const side = current.value?.[key]
-  if (side?.archivedImageUrl && side.imageUrl && photoSrc[key] !== side.imageUrl) {
-    photoSrc[key] = side.imageUrl
-    return
-  }
+  const archivedUrl = current.value?.[key].archivedImageUrl
+  if (archivedUrl) archivedBlobs.delete(archivedUrl)
+  URL.revokeObjectURL(photoSrc[key])
   photoSrc[key] = ''
-  imageFailed[key] = true
 }
 
 watch(() => current.value?.pairId, (pairId) => {

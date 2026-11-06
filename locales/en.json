@@ -1247,6 +1247,7 @@
   "labelingPhotoA": "Offer A",
   "labelingPhotoB": "Offer B",
   "labelingOpenOffer": "Open offer",
+  "labelingPhotoRetry": "Retry image",
   "labelingPhotoFailed": "Image unavailable",
   "labelingGroup": "Group",
   "labelingShowDiagnostics": "Reveal diagnostics and offer details",

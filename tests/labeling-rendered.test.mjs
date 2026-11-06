@@ -58,7 +58,9 @@ async function mountPage(api) {
     if (!message.includes('resolve component')) throw new Error(message)
   }
   globalThis.window = { confirm: () => false, addEventListener: (name, fn) => listeners.set(name, fn), removeEventListener: name => listeners.delete(name), getRootNode: () => ({ activeElement: null }) }
-  globalThis.Image = class {}
+  globalThis.Image = class {
+    set src(value) { throw new Error(`Unexpected live image preload: ${value}`) }
+  }
   globalThis.Document = class {}
   globalThis.ShadowRoot = class {}
   app.mount(root)
@@ -353,6 +355,90 @@ test('late failure beyond undo history returns the pair for retry and survives a
     await view.click('labeling-retry')
     assert.equal(savedCount(view), '52')
     assert.equal(view.find('labeling-save-error'), undefined)
+  }
+  finally { view.unmount() }
+})
+
+const archivedPair = n => ({
+  ...pair(n),
+  a: { ...pair(n).a, archivedImageUrl: `/api/labeling/p${n}/photo/a` },
+  b: { ...pair(n).b, archivedImageUrl: `/api/labeling/p${n}/photo/b` },
+})
+
+test('missing archives never display or preload live images, and skip does not save a label', async () => {
+  const calls = []
+  const view = await mountPage(reviewApi((...args) => calls.push(args)))
+  try {
+    assert.ok(view.find('labeling-placeholder-a'))
+    assert.ok(view.find('labeling-placeholder-b'))
+    assert.equal(view.find('labeling-photo-a'), undefined)
+    assert.equal(view.find('labeling-photo-retry-a'), undefined)
+    await view.click('labeling-skip')
+    assert.ok(view.find('labeling-placeholder-a'))
+    assert.deepEqual(calls, [])
+  }
+  finally { view.unmount() }
+})
+
+test('archive fetch and decode failures retry the archive and preserve an unfinished answer', async () => {
+  const photos = [], labels = []
+  let fail = true
+  const api = reviewApi(async (...args) => {
+    labels.push(args)
+    throw new Error('save unavailable')
+  })
+  api.next = async () => [archivedPair(1), archivedPair(2)]
+  api.photo = async (url) => {
+    photos.push(url)
+    if (fail) throw new Error('archive unavailable')
+    return new Blob(['synthetic test image'])
+  }
+  const view = await mountPage(api)
+  try {
+    assert.deepEqual(new Set(photos), new Set([
+      '/api/labeling/p1/photo/a', '/api/labeling/p1/photo/b',
+      '/api/labeling/p2/photo/a', '/api/labeling/p2/photo/b',
+    ]))
+    assert.ok(view.find('labeling-placeholder-a'))
+    assert.equal(view.find('labeling-photo-a'), undefined)
+    await view.click('labeling-answer-1')
+    await view.click('labeling-skip')
+    assert.ok(view.find('labeling-previous-answer'))
+    assert.ok(view.find('labeling-save-error'))
+    assert.equal(view.leave(), false)
+    fail = false
+    await view.click('labeling-photo-retry-a')
+    assert.match(view.find('labeling-photo-a').props.src, /^blob:/)
+    view.find('labeling-photo-a').props.onError()
+    await view.settle()
+    assert.ok(view.find('labeling-placeholder-a'))
+    const beforeRetry = photos.length
+    await view.click('labeling-photo-retry-a')
+    assert.equal(photos.length, beforeRetry + 1, 'decode retry fetches a new archived blob')
+    assert.equal(photos.at(-1), '/api/labeling/p1/photo/a')
+    assert.match(view.find('labeling-photo-a').props.src, /^blob:/)
+    assert.ok(view.find('labeling-previous-answer'))
+    assert.ok(view.find('labeling-save-error'))
+    assert.equal(view.leave(), false)
+    assert.deepEqual(labels, [['p1', 'same_item', 'blind']])
+  }
+  finally { view.unmount() }
+})
+
+test('a late archive response cannot replace the next pair or its missing-archive placeholder', async () => {
+  const pending = deferred()
+  const api = reviewApi(async () => {})
+  api.next = async () => [archivedPair(1), pair(2)]
+  api.photo = () => pending.promise
+  const view = await mountPage(api)
+  try {
+    assert.ok(view.find('labeling-photo-loading-a'))
+    await view.click('labeling-skip')
+    assert.ok(view.find('labeling-placeholder-a'))
+    pending.resolve(new Blob(['synthetic test image']))
+    await view.settle()
+    assert.ok(view.find('labeling-placeholder-a'))
+    assert.equal(view.find('labeling-photo-a'), undefined)
   }
   finally { view.unmount() }
 })
