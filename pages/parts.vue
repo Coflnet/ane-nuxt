@@ -32,7 +32,7 @@
     >
       <div class="space-y-6 lg:col-span-2">
         <section
-          class="rounded-xl border border-slate-700 bg-slate-800/60 p-5"
+          class="rounded-xl border border-slate-700 bg-slate-800/60 p-3 sm:p-5"
           :aria-label="t('parts.describe')"
         >
           <h2 class="mb-4 text-lg font-semibold text-white">
@@ -96,7 +96,9 @@
         </section>
 
         <section
-          class="rounded-xl border border-slate-700 bg-slate-800/60 p-5"
+          id="part-measurements"
+          tabindex="-1"
+          class="scroll-mt-6 rounded-xl border border-slate-700 bg-slate-800/60 p-3 sm:p-5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-400"
           :aria-label="t('parts.measure')"
         >
           <h2 class="text-lg font-semibold text-white">
@@ -168,7 +170,7 @@
 
       <aside class="space-y-5">
         <section
-          class="rounded-xl border border-slate-700 bg-slate-800/60 p-5"
+          class="rounded-xl border border-slate-700 bg-slate-800/60 p-3 sm:p-5"
           :aria-label="t('parts.photo')"
         >
           <h2 class="text-lg font-semibold text-white">
@@ -227,7 +229,7 @@
             </p>
           </div>
         </section>
-        <div class="sticky top-4 rounded-xl border border-slate-700 bg-slate-800 p-5">
+        <div class="sticky top-4 rounded-xl border border-slate-700 bg-slate-800 p-3 sm:p-5">
           <button
             type="submit"
             class="w-full rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white hover:bg-blue-500 disabled:opacity-60"
@@ -287,7 +289,7 @@
         <article
           v-for="hit in results.items"
           :key="hit.id"
-          class="rounded-xl border border-slate-700 bg-slate-800/60 p-5"
+          class="rounded-xl border border-slate-700 bg-slate-800/60 p-3 sm:p-5"
           data-testid="part-result"
         >
           <NuxtLink
@@ -335,10 +337,10 @@
         <p>{{ t('parts.noResults') }}</p><p class="mt-2 text-sm text-slate-400">
           {{ t('parts.noResultsHint') }}
         </p>
-        <NuxtLink
-          :to="localePath({ path: '/search', query: searchRouteQuery(form.q || form.partNumber || form.machine, true) })"
-          class="mt-4 inline-block text-blue-300"
-        >{{ t('parts.tryCatalog') }} →</NuxtLink>
+        <a
+          href="#part-measurements"
+          class="mt-4 inline-flex min-h-11 items-center text-blue-300"
+        >{{ t('parts.reviewMeasurements') }} →</a>
       </div>
     </section>
   </div>

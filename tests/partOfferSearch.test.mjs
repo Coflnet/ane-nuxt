@@ -89,12 +89,12 @@ test('a flag-only shared link searches and false or malformed flags keep normal 
   finally { state.stop() }
 })
 
-test('parts catalogue links carry editable form text and explicitly include individual offers', async () => {
+test('the explicit parts catalogue link carries editable form text and includes individual offers', async () => {
   const parts = await readFile(new URL('../pages/parts.vue', import.meta.url), 'utf8')
   const expression = parts.match(/data-testid="parts-individual-offers"/)
   assert.ok(expression)
   const queries = [...parts.matchAll(/query: (searchRouteQuery\(form\.q \|\| form\.partNumber \|\| form\.machine, true\))/g)]
-  assert.equal(queries.length, 2, 'main link and empty-state recovery share the same search')
+  assert.equal(queries.length, 1, 'the broad catalogue link remains separate from in-form empty-state recovery')
   const query = new Function('form', 'searchRouteQuery', `return ${queries[0][1]}`)
   const form = partFormFromQuery({ q: '  Getriebe  ', partNumber: '6203' })
   assert.deepEqual(query(form, searchRouteQuery), { q: 'Getriebe', includePartOffers: 'true' })
@@ -176,3 +176,42 @@ for (const locale of ['en', 'de']) {
     finally { state.stop() }
   })
 }
+
+test('empty photo and measurement searches return to editable criteria without a broad catalogue request', async () => {
+  const { compile } = await import('@vue/compiler-dom')
+  const { parse } = await import('@vue/compiler-sfc')
+  const Vue = await import('vue')
+  const { renderToString } = await import('@vue/server-renderer')
+  const parts = await readFile(new URL('../pages/parts.vue', import.meta.url), 'utf8')
+  const template = parse(parts).descriptor.template.content
+  const render = new Function('Vue', compile(template, { mode: 'function', isCustomElement: tag => tag === 'NuxtLink' }).code)(Vue)
+  for (const query of [
+    { class: 'gear', teeth: '43', boreMm: '8.5', outerDiameterMm: '44' },
+    { class: 'gear', mode: 'fragment', teeth_observed: '8', arc_degrees: '125', boreMm: '8.5' },
+    { class: 'bearing', part_key: '6203-2RS', innerDiameterMm: '17', outerDiameterMm: '40', widthMm: '12' },
+  ]) {
+    const form = partFormFromQuery(query)
+    const before = { ...form }
+    const state = {
+      t: key => key, localePath: value => value, searchRouteQuery, form, examples: [], partClasses: [], identityFields: ['part_key'],
+      measurementFields: Object.keys(query).filter(key => !['class', 'mode', 'part_key'].includes(key)), toothed: form.class === 'gear',
+      photoBase64: 'synthetic-photo', photoPreview: 'blob:synthetic', photoEstimate: null, photoError: '', photoLoading: false,
+      hasSearched: true, results: { items: [] }, loading: false, error: '',
+      clearInferred() {}, onClassChange() {}, choosePhoto() {}, analyzePhoto() {},
+      search() { throw new Error('Recovery must preserve criteria without submitting a broad search') },
+      reset() { throw new Error('Recovery must preserve criteria without resetting the form') },
+    }
+    const html = await renderToString(Vue.createSSRApp({ render: () => render(state, []) }))
+    const empty = html.split('data-testid="parts-empty"')[1]
+    const href = empty?.match(/<a[^>]+href="(#[^"]+)"/)?.[1]
+    assert.ok(href, 'empty-state action returns within the current form')
+    assert.match(html, new RegExp(`id="${href.slice(1)}"[^>]*tabindex="-1"`), 'local destination is focusable')
+    assert.match(empty, /parts.reviewMeasurements/)
+    assert.ok(!empty.includes('/search'), 'empty recovery cannot silently discard numeric constraints')
+    assert.deepEqual(form, before)
+    assert.match(html, /src="blob:synthetic"/, 'the selected photo remains available')
+    for (const key of state.measurementFields) {
+      assert.match(html, new RegExp(`data-testid="parts-${key}"[^>]*value="${query[key]}"`))
+    }
+  }
+})

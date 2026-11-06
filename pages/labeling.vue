@@ -234,6 +234,7 @@
                   referrerpolicy="no-referrer"
                   class="w-full h-full object-contain"
                   :data-testid="`labeling-photo-${side.key}`"
+                  @load="onPhotoLoad(side.key, $event)"
                   @error="onPhotoError(side.key)"
                 >
                 <div
@@ -326,7 +327,7 @@
             type="button"
             class="min-h-11 bg-indigo-600 text-white px-4 py-2 rounded-lg"
             data-testid="labeling-retry"
-            @click="submit(currentReview.label)"
+            @click="submit(currentReview.label, true)"
           >
             {{ $t('labelingRetry') }}
           </button>
@@ -340,7 +341,8 @@
               v-for="option in answerOptions"
               :key="option.label"
               type="button"
-              class="flex items-center gap-3 text-left bg-slate-700 text-slate-100 hover:bg-slate-600 px-4 py-3 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-400"
+              class="flex items-center gap-3 text-left bg-slate-700 text-slate-100 hover:bg-slate-600 px-4 py-3 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-400"
+              :disabled="!photosReady"
               :data-testid="`labeling-answer-${option.key}`"
               @click="submit(option.label)"
             >
@@ -433,7 +435,9 @@ const statsFailed = ref(false)
 const pendingSaves = ref(0)
 // Review only the immutable archived copy, fetched with the reviewer's existing bearer.
 const photoSrc = reactive<Record<string, string>>({ a: '', b: '' })
+// Loading includes browser decode, not just fetching an archived blob.
 const photoLoading = reactive<Record<string, boolean>>({ a: false, b: false })
+const photosReady = computed(() => !!photoSrc.a && !!photoSrc.b && !photoLoading.a && !photoLoading.b)
 const archivedBlobs = new Map<string, Promise<string>>()
 
 const showDiagnostics = ref(false)
@@ -559,8 +563,8 @@ async function reload() {
   await Promise.all([loadBatch(), loadStats()])
 }
 
-function submit(label: LabelAnswer) {
-  if (!current.value) return
+function submit(label: LabelAnswer, retry = false) {
+  if (!current.value || (!retry && !photosReady.value)) return
   const review = currentReview.value
   review.label = label
   review.failed = false
@@ -680,10 +684,12 @@ async function resolvePhoto(key: 'a' | 'b', pairId: string) {
   }
   catch {
     // Keep the pair available for skip or retry without requesting a live image.
-  }
-  finally {
     if (current.value?.pairId === pairId) photoLoading[key] = false
   }
+}
+
+function onPhotoLoad(key: 'a' | 'b', event: Event) {
+  if ((event.target as HTMLImageElement).currentSrc === photoSrc[key]) photoLoading[key] = false
 }
 
 function onPhotoError(key: 'a' | 'b') {
@@ -691,6 +697,7 @@ function onPhotoError(key: 'a' | 'b') {
   if (archivedUrl) archivedBlobs.delete(archivedUrl)
   URL.revokeObjectURL(photoSrc[key])
   photoSrc[key] = ''
+  photoLoading[key] = false
 }
 
 watch(() => current.value?.pairId, (pairId) => {

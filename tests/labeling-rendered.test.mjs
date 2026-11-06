@@ -8,9 +8,11 @@ import * as queue from '../utils/labelingQueue.ts'
 import * as sender from '../utils/labelingSender.ts'
 import { shortcutFor } from '../utils/labelingShortcuts.ts'
 
+const photoLoadEvent = photo => ({ target: { currentSrc: photo.props.src } })
+
 // Mount the actual compiled page with Vue's renderer. No Nuxt server, auth service or
 // image network is needed; button events and reactive DOM updates still run normally.
-async function mountPage(api) {
+async function mountPage(api, autoLoadPhotos = true) {
   let leave
   const listeners = new Map()
   const source = await readFile(new URL('../pages/labeling.vue', import.meta.url), 'utf8')
@@ -25,7 +27,7 @@ async function mountPage(api) {
     const { createLabelSender } = sender;
     const useHead = () => {}, useSeoMeta = () => {}, useLocalePath = () => value => value;
     const useI18n = () => ({ t: key => key }), onBeforeRouteLeave = registerLeave;
-    const useLabelingApi = () => api, useUserStore = () => ({ isLoggedIn: true, token: 'test' });
+    const useLabelingApi = () => ({ photo: async () => new Blob(['synthetic fixture']), ...api }), useUserStore = () => ({ isLoggedIn: true, token: 'test' });
     const labelingErrorStatus = () => 0, LabelingStatsPanel = { render: () => null };
     ${code}`)(Vue, queue, sender, api, shortcutFor, (guard) => { leave = guard })
   const node = (type, text = '') => ({ type, tagName: type.toUpperCase(), text, props: {}, children: [], parent: null, addEventListener() {}, removeEventListener() {}, getRootNode: () => ({ activeElement: null }) })
@@ -65,7 +67,10 @@ async function mountPage(api) {
   globalThis.ShadowRoot = class {}
   app.mount(root)
   const settle = async () => {
-    for (let i = 0; i < 8; i++) await Vue.nextTick()
+    for (let i = 0; i < 8; i++) {
+      await Vue.nextTick()
+      if (autoLoadPhotos) for (const photo of all().filter(n => n.type === 'img')) photo.props.onLoad?.(photoLoadEvent(photo))
+    }
   }
   const all = (n = root) => [n, ...n.children.flatMap(child => all(child))]
   const find = id => all().find(n => n.props['data-testid'] === id)
@@ -79,8 +84,8 @@ async function mountPage(api) {
 }
 
 const diagnosticPair = n => ({ pairId: `p${n}`, groupKey: `secret-model-${n}`, similarity: 0.987, decision: 'secret-decision',
-  a: { platform: 'source-a', imageUrl: '/a.png', listingUrl: '/offer-a' },
-  b: { platform: 'source-b', imageUrl: '/b.png', listingUrl: '/offer-b' } })
+  a: { platform: 'source-a', imageUrl: '/a.png', archivedImageUrl: `/api/labeling/p${n}/photo/a`, listingUrl: '/offer-a' },
+  b: { platform: 'source-b', imageUrl: '/b.png', archivedImageUrl: `/api/labeling/p${n}/photo/b`, listingUrl: '/offer-b' } })
 
 const pair = (n) => {
   const { pairId, a, b } = diagnosticPair(n)
@@ -359,15 +364,15 @@ test('late failure beyond undo history returns the pair for retry and survives a
   finally { view.unmount() }
 })
 
-const archivedPair = n => ({
-  ...pair(n),
-  a: { ...pair(n).a, archivedImageUrl: `/api/labeling/p${n}/photo/a` },
-  b: { ...pair(n).b, archivedImageUrl: `/api/labeling/p${n}/photo/b` },
+const unarchivedPair = n => ({
+  ...pair(n), a: { ...pair(n).a, archivedImageUrl: undefined }, b: { ...pair(n).b, archivedImageUrl: undefined },
 })
 
 test('missing archives never display or preload live images, and skip does not save a label', async () => {
   const calls = []
-  const view = await mountPage(reviewApi((...args) => calls.push(args)))
+  const api = reviewApi((...args) => calls.push(args))
+  api.next = async () => [unarchivedPair(1), unarchivedPair(2)]
+  const view = await mountPage(api)
   try {
     assert.ok(view.find('labeling-placeholder-a'))
     assert.ok(view.find('labeling-placeholder-b'))
@@ -382,12 +387,12 @@ test('missing archives never display or preload live images, and skip does not s
 
 test('archive fetch and decode failures retry the archive and preserve an unfinished answer', async () => {
   const photos = [], labels = []
-  let fail = true
+  let fail = false
   const api = reviewApi(async (...args) => {
     labels.push(args)
     throw new Error('save unavailable')
   })
-  api.next = async () => [archivedPair(1), archivedPair(2)]
+  api.next = async () => [pair(1), pair(2)]
   api.photo = async (url) => {
     photos.push(url)
     if (fail) throw new Error('archive unavailable')
@@ -399,10 +404,14 @@ test('archive fetch and decode failures retry the archive and preserve an unfini
       '/api/labeling/p1/photo/a', '/api/labeling/p1/photo/b',
       '/api/labeling/p2/photo/a', '/api/labeling/p2/photo/b',
     ]))
-    assert.ok(view.find('labeling-placeholder-a'))
-    assert.equal(view.find('labeling-photo-a'), undefined)
     await view.click('labeling-answer-1')
     await view.click('labeling-skip')
+    fail = true
+    view.find('labeling-photo-a').props.onError()
+    view.find('labeling-photo-b').props.onError()
+    await view.settle()
+    await view.click('labeling-photo-retry-a')
+    assert.ok(view.find('labeling-placeholder-a'))
     assert.ok(view.find('labeling-previous-answer'))
     assert.ok(view.find('labeling-save-error'))
     assert.equal(view.leave(), false)
@@ -428,7 +437,7 @@ test('archive fetch and decode failures retry the archive and preserve an unfini
 test('a late archive response cannot replace the next pair or its missing-archive placeholder', async () => {
   const pending = deferred()
   const api = reviewApi(async () => {})
-  api.next = async () => [archivedPair(1), pair(2)]
+  api.next = async () => [pair(1), unarchivedPair(2)]
   api.photo = () => pending.promise
   const view = await mountPage(api)
   try {
@@ -441,4 +450,169 @@ test('a late archive response cannot replace the next pair or its missing-archiv
     assert.equal(view.find('labeling-photo-a'), undefined)
   }
   finally { view.unmount() }
+})
+
+const key = async (view, value) => {
+  view.listeners.get('keydown')({ key: value, preventDefault() {} })
+  await view.settle()
+}
+const answersDisabled = view => ['1', '2', '3', '4'].every(n => view.find(`labeling-answer-${n}`)?.props.disabled === true)
+
+test('new button and hotkey answers require both browser-loaded archived photos', async () => {
+  const photos = deferred(), labels = []
+  const api = reviewApi(async (...args) => {
+    labels.push(args)
+  })
+  api.photo = () => photos.promise
+  const view = await mountPage(api, false)
+  try {
+    assert.ok(answersDisabled(view), 'blob fetch still pending')
+    await key(view, '1')
+    await view.click('labeling-answer-2')
+    assert.deepEqual(labels, [])
+    photos.resolve(new Blob(['synthetic fixture']))
+    await view.settle()
+    assert.ok(view.find('labeling-photo-a'))
+    assert.ok(answersDisabled(view), 'blob URL alone does not prove browser decode/load')
+    await key(view, '3')
+    assert.deepEqual(labels, [])
+    view.find('labeling-photo-a').props.onLoad(photoLoadEvent(view.find('labeling-photo-a')))
+    await view.settle()
+    assert.ok(answersDisabled(view), 'only one of two photos has loaded')
+    await key(view, '4')
+    assert.deepEqual(labels, [])
+    view.find('labeling-photo-b').props.onLoad(photoLoadEvent(view.find('labeling-photo-b')))
+    await view.settle()
+    assert.equal(answersDisabled(view), false)
+    await key(view, '1')
+    assert.deepEqual(labels, [['p1', 'same_item', 'blind']])
+    assert.ok(answersDisabled(view), 'each new pair must load its own photos')
+  }
+  finally { view.unmount() }
+})
+
+test('missing or rejected archives block new labels while skip remains usable', async () => {
+  for (const missing of [true, false]) {
+    const labels = []
+    const api = reviewApi(async (...args) => {
+      labels.push(args)
+    })
+    api.next = async () => [missing ? { ...pair(1), b: unarchivedPair(1).b } : pair(1), pair(2)]
+    if (!missing) api.photo = async () => {
+      throw new Error('archive fetch failed')
+    }
+    const view = await mountPage(api)
+    try {
+      assert.ok(answersDisabled(view))
+      for (const value of ['1', '2', '3', '4']) await key(view, value)
+      await view.click('labeling-answer-1')
+      assert.deepEqual(labels, [])
+      const before = view.find('labeling-pair')
+      await key(view, 's')
+      assert.notEqual(view.find('labeling-pair'), before, 'skip moves to the next pair without a label')
+      assert.deepEqual(labels, [])
+    }
+    finally { view.unmount() }
+  }
+})
+
+test('decode failure blocks new labels until the retried archive loads, and undo remains usable', async () => {
+  const labels = []
+  const view = await mountPage(reviewApi(async (...args) => {
+    labels.push(args)
+  }), false)
+  try {
+    assert.ok(answersDisabled(view), 'both browser loads are pending')
+    view.find('labeling-photo-a').props.onLoad(photoLoadEvent(view.find('labeling-photo-a')))
+    view.find('labeling-photo-b').props.onError()
+    await view.settle()
+    assert.ok(view.find('labeling-placeholder-b'))
+    assert.ok(answersDisabled(view))
+    await key(view, '1')
+    assert.deepEqual(labels, [])
+    await view.click('labeling-photo-retry-b')
+    assert.ok(answersDisabled(view), 'retry must also await decode/load')
+    view.find('labeling-photo-b').props.onLoad(photoLoadEvent(view.find('labeling-photo-b')))
+    await view.settle()
+    await view.click('labeling-answer-3')
+    assert.deepEqual(labels, [['p1', 'different', 'blind']])
+    await key(view, 'z')
+    assert.ok(view.find('labeling-previous-answer'))
+    assert.ok(answersDisabled(view), 'undo restores review state but does not bypass loading')
+  }
+  finally { view.unmount() }
+})
+
+test('failed-save retry resends the prior label when an archived photo later becomes unavailable', async () => {
+  const labels = []
+  let fail = true
+  const view = await mountPage(reviewApi(async (...args) => {
+    labels.push(args)
+    if (fail) throw new Error('save failed')
+  }))
+  try {
+    await view.click('labeling-answer-2')
+    await view.click('labeling-skip')
+    view.find('labeling-photo-b').props.onError()
+    await view.settle()
+    assert.ok(answersDisabled(view))
+    await key(view, '3')
+    await view.click('labeling-answer-4')
+    assert.deepEqual(labels, [['p1', 'same_model_other_variant', 'blind']])
+    assert.ok(view.find('labeling-previous-answer'))
+    assert.equal(view.leave(), false)
+    fail = false
+    await view.click('labeling-retry')
+    assert.deepEqual(labels[1], labels[0])
+    assert.equal(view.find('labeling-save-error'), undefined)
+    assert.equal(view.leave(), true)
+  }
+  finally { view.unmount() }
+})
+
+test('a retained load callback cannot mark a different current archive loaded after skip, undo or retry', async () => {
+  for (const transition of ['skip', 'undo', 'retry']) {
+    const labels = []
+    const view = await mountPage(reviewApi(async (...args) => {
+      labels.push(args)
+    }), false)
+    try {
+      if (transition === 'undo') {
+        for (const side of ['a', 'b']) {
+          const photo = view.find(`labeling-photo-${side}`)
+          photo.props.onLoad(photoLoadEvent(photo))
+        }
+        await view.settle()
+        await view.click('labeling-answer-1')
+      }
+      const oldPhoto = view.find('labeling-photo-a')
+      const oldLoad = oldPhoto.props.onLoad
+      const oldEvent = photoLoadEvent(oldPhoto)
+      if (transition === 'skip') await key(view, 's')
+      else if (transition === 'undo') await key(view, 'z')
+      else {
+        oldPhoto.props.onError()
+        await view.settle()
+        await view.click('labeling-photo-retry-a')
+      }
+      const currentA = view.find('labeling-photo-a')
+      const currentB = view.find('labeling-photo-b')
+      assert.notEqual(currentA.props.src, oldEvent.target.currentSrc, transition)
+      currentB.props.onLoad(photoLoadEvent(currentB))
+      await view.settle()
+      assert.ok(answersDisabled(view), `${transition}: current A still awaits its load`)
+      const before = [...labels]
+      oldLoad(oldEvent)
+      await view.settle()
+      assert.ok(answersDisabled(view), `${transition}: old currentSrc must not clear the new loading state`)
+      await key(view, '3')
+      assert.deepEqual(labels, before)
+      currentA.props.onLoad(photoLoadEvent(currentA))
+      await view.settle()
+      assert.equal(answersDisabled(view), false, `${transition}: valid current load enables answers`)
+      await key(view, '3')
+      assert.deepEqual(labels.at(-1), [transition === 'skip' ? 'p2' : 'p1', 'different', 'blind'])
+    }
+    finally { view.unmount() }
+  }
 })
