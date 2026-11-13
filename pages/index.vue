@@ -99,9 +99,6 @@
         </div>
       </div>
     </section>
-    <div class="mx-auto max-w-6xl px-6 py-8">
-      <SubscriptionsPlanComparison />
-    </div>
 
     <!-- Stats Section -->
     <section class="py-12 bg-gray-900 border-y border-gray-800">
