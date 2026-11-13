@@ -50,7 +50,7 @@ test('explicit budgets remain exact outside the observed range and an emptied fi
   assert.equal(state.route.query.price_currency, 'SEK')
 })
 
-async function lifecycle(query = { priceCurrency: 'SEK', platforms: 'Blocket' }, deferReady = false) {
+async function lifecycle(query = { priceCurrency: 'SEK', platforms: 'Blocket' }, deferReady = false, buildParams) {
   const route = reactive({ query: { ...query } })
   const requests = [], boundsRequests = [], readyCallbacks = []
   const initialData = ref(null), initialError = ref(null), initialLoading = ref(true)
@@ -60,7 +60,7 @@ async function lifecycle(query = { priceCurrency: 'SEK', platforms: 'Blocket' },
     apiClient: { getConfig: () => ({ baseURL: 'https://fixture.invalid' }) },
     $fetch: (url, options) => new Promise((resolve, reject) => boundsRequests.push({ url, ...options, resolve, reject })), zipResolving: ref(false), selectedCategory: ref(''),
     routeHasSearchQuery: () => true,
-    buildSearchParams: () => ({ ...route.query }),
+    buildSearchParams: offset => buildParams ? buildParams(route.query, offset) : { ...route.query },
     fetchTopLevelCategories: async () => {}, ensureGermanLabels: async () => {}, syncPrevQuery: () => {},
     loadingMore: ref(false), manualLoading: ref(false), searchError: ref(false), hasSearched: ref(false),
     allProducts: ref([]), totalResults: ref(0),
@@ -422,4 +422,94 @@ test('dragging a price slider keeps the opposite empty budget bound unbounded', 
     assert.equal(budget.route.query[`price_${field}`], String(value))
     assert.equal(budget.route.query[`price_${field === 'min' ? 'max' : 'min'}`], undefined)
   }
+})
+
+
+test('failed appended page preserves results and exact filter scope; retry cannot append twice while active', async () => {
+  const filters = { query: 'Knipex', platforms: 'Blocket', country: 'SE', priceCurrency: 'SEK', minPrice: 10, maxPrice: 500,
+    attributes: ['article_number:95 31 250', 'length_mm_max:320'], condition: 'used', sortBy: 'price_asc', lat: 59.3, lon: 18.1, maxDistanceKm: 25 }
+  const page = await lifecycle(filters, false, (query, offset = 0) => ({ ...query, offset, limit: 20 }))
+  try {
+    const first = Array.from({ length: 20 }, (_, id) => ({ id: `first-${id}` }))
+    page.requests[0].resolve({ priceCurrency: 'SEK', products: first, total: 40 })
+    await new Promise(resolve => setImmediate(resolve))
+    const failed = page.performSearch(true)
+    page.requests[1].reject(new Error('fixture page failure'))
+    await failed
+    assert.equal(page.searchError.value, true)
+    assert.deepEqual(page.allProducts.value, first)
+    assert.equal(page.totalResults.value, 40)
+    assert.deepEqual(page.route.query, filters)
+    assert.deepEqual(page.requests[1].query, { ...filters, offset: 20, limit: 20, includePriceBounds: false })
+
+    const retry = page.performSearch(true)
+    await page.performSearch(true)
+    assert.equal(page.requests.length, 3, 'an active append suppresses another click')
+    assert.deepEqual(page.requests[2].query, page.requests[1].query)
+    const second = Array.from({ length: 20 }, (_, id) => ({ id: `second-${id}` }))
+    page.requests[2].resolve({ priceCurrency: 'SEK', products: second, total: 40 })
+    await retry
+    assert.deepEqual(page.allProducts.value, [...first, ...second])
+    assert.equal(new Set(page.allProducts.value.map(product => product.id)).size, 40)
+    assert.equal(page.searchError.value, false)
+    assert.deepEqual(page.route.query, filters)
+  }
+  finally { page.stop() }
+})
+
+test('new filter search clears an old pagination error while a superseded append failure cannot restore it', async () => {
+  const page = await lifecycle()
+  try {
+    page.requests[0].resolve({ priceCurrency: 'SEK', products: [{ id: 'first' }], total: 40 })
+    await new Promise(resolve => setImmediate(resolve))
+    const append = page.performSearch(true)
+    page.searchError.value = true
+    page.route.query = { priceCurrency: 'GBP', platforms: 'Gumtree', country: 'GB', attributes: ['brand:Canon'] }
+    const latest = page.performSearch()
+    assert.equal(page.searchError.value, false)
+    page.requests[2].resolve({ priceCurrency: 'GBP', products: [{ id: 'current' }], total: 1 })
+    await latest
+    page.requests[1].reject(new Error('superseded append'))
+    await append
+    assert.equal(page.searchError.value, false)
+    assert.deepEqual(page.allProducts.value, [{ id: 'current' }])
+  }
+  finally { page.stop() }
+})
+
+test('actual pagination control exposes a readable retry below the auto-load threshold and disables it during retry', async () => {
+  const Vue = await import('vue')
+  const { renderToString } = await import('vue/server-renderer')
+  const template = source.slice(source.indexOf('<!-- Load More / Pagination -->'), source.indexOf('<!-- Infinite scroll sentinel'))
+  for (const language of ['en', 'de']) {
+    const messages = JSON.parse(await readFile(new URL(`../locales/${language}.json`, import.meta.url), 'utf8'))
+    for (const [searchError, loadingMore] of [[false, false], [true, false], [true, true]]) {
+      const app = Vue.createSSRApp({ render: Vue.compile(template), setup: () => ({ canLoadMore: true, searchError, loadingMore,
+        loading: false, allProducts: Array.from({ length: 20 }), AUTO_LOAD_MAX: 100, formattedTotalResults: '40', loadMore() {} }) })
+      app.config.globalProperties.$t = key => messages[key] || key
+      const html = await renderToString(app)
+      assert.equal(html.includes('data-testid="search-load-more"'), searchError)
+      if (searchError) {
+        assert(html.includes('role="alert"'))
+        assert(html.includes(messages.loadMoreFailed))
+        assert.equal(/<button[^>]*\sdisabled(?:[\s=>])/.test(html), loadingMore)
+        if (!loadingMore) assert(html.includes(messages.retry))
+      }
+    }
+  }
+})
+
+test('actual scroll observer waits for explicit retry after pagination failure', () => {
+  let observerCallback, calls = 0
+  const searchError = ref(true)
+  const state = { scrollObserver: null, canLoadMore: ref(true), searchError, loadingMore: ref(false),
+    allProducts: ref(Array.from({ length: 20 })), AUTO_LOAD_MAX: 100, loadMore: () => calls++,
+    IntersectionObserver: class { constructor(callback) { observerCallback = callback } disconnect() {} },
+  }
+  new Function('state', `with (state) { ${functionSource('setupScrollObserver')}; setupScrollObserver() }`)(state)
+  observerCallback([{ isIntersecting: true }])
+  assert.equal(calls, 0)
+  searchError.value = false
+  observerCallback([{ isIntersecting: true }])
+  assert.equal(calls, 1)
 })

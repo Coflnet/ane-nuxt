@@ -1203,6 +1203,7 @@
   "noResultsHint": "Prüfe die Schreibweise, verwende weniger Wörter oder entferne Filter.",
   "tryQuery": "„{query}“ versuchen",
   "browseAllCategories": "Alle Kategorien anzeigen",
+  "loadMoreFailed": "Weitere Ergebnisse konnten nicht geladen werden. Ergebnisse und Filter bleiben erhalten.",
   "searchFailed": "Suche fehlgeschlagen",
   "searchFailedHint": "Der Suchdienst hat nicht geantwortet. Bitte versuche es gleich noch einmal.",
   "priceRangeUnavailable": "Preisspanne nicht verfügbar.",

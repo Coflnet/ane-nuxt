@@ -1022,21 +1022,31 @@
 
             <!-- Load More / Pagination -->
             <div
-              v-if="canLoadMore && allProducts.length >= AUTO_LOAD_MAX"
-              class="flex justify-center mt-8"
+              v-if="canLoadMore && (searchError || allProducts.length >= AUTO_LOAD_MAX)"
+              class="flex flex-col items-center gap-3 mt-8"
             >
+              <p
+                v-if="searchError"
+                role="alert"
+                class="text-center text-sm text-slate-300"
+              >
+                {{ $t('loadMoreFailed') }}
+              </p>
               <button
+                type="button"
+                data-testid="search-load-more"
                 class="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                :disabled="loadingMore"
+                :disabled="loadingMore || loading"
                 @click="loadMore"
               >
                 <span v-if="loadingMore">{{ $t('loading', 'Loading...') }}</span>
+                <span v-else-if="searchError">{{ $t('retry') }}</span>
                 <span v-else>{{ $t('loadMore', 'Load More') }} ({{ allProducts.length }} / {{ formattedTotalResults }})</span>
               </button>
             </div>
             <!-- Infinite scroll sentinel (auto-loads until AUTO_LOAD_MAX) -->
             <div
-              v-if="canLoadMore && allProducts.length < AUTO_LOAD_MAX"
+              v-if="canLoadMore && !searchError && allProducts.length < AUTO_LOAD_MAX"
               ref="scrollSentinel"
               class="flex justify-center mt-8 py-4"
             >
@@ -1808,7 +1818,7 @@ let scrollObserver: IntersectionObserver | null = null
 function setupScrollObserver() {
   if (scrollObserver) scrollObserver.disconnect()
   scrollObserver = new IntersectionObserver((entries) => {
-    if (entries[0]?.isIntersecting && canLoadMore.value && !loadingMore.value && allProducts.value.length < AUTO_LOAD_MAX) {
+    if (entries[0]?.isIntersecting && canLoadMore.value && !searchError.value && !loadingMore.value && allProducts.value.length < AUTO_LOAD_MAX) {
       loadMore()
     }
   }, { rootMargin: '200px' })
@@ -2399,6 +2409,7 @@ async function performSearch(append = false) {
 
   if (!append) {
     resetPriceBounds()
+    searchError.value = false
     manualLoading.value = true
   }
   else {
@@ -2418,8 +2429,8 @@ async function performSearch(append = false) {
   catch (e) {
     if (seq !== searchSeq) return
     console.warn('Search failed', e)
+    searchError.value = true
     if (!append) {
-      searchError.value = true
       allProducts.value = []
       totalResults.value = 0
     }
