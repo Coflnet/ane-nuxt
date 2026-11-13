@@ -964,6 +964,9 @@
     "unknown": "Unbekannt"
   },
   "product": {
+    "similarStyles": "Ähnliche Stile",
+    "similarStyleHint": "Optisch ähnlich; Modell und Variante prüfen.",
+    "similarStylesFailed": "Ähnliche Stile konnten nicht geladen werden. Deine Filter bleiben erhalten.",
     "broadHistoryTitle": "Aufzeichnungen gemischter Angebote",
     "broadHistoryHint": "Diese Aufzeichnungen können verschiedene Editionen und Pakete zusammenfassen. Sie sind kein vergleichbarer Preisverlauf eines exakt bestimmten Produkts. Prüfe die einzelnen Angebote.",
     "broadHistoryRecords": "Aufzeichnungen gemischter Angebote anzeigen (keine vergleichbaren Preise)",

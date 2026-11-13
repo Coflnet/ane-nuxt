@@ -833,6 +833,24 @@
         </div>
       </div>
 
+      <section v-if="stylesEligible && (stylesLoading || similarStyles.length || stylesError)" class="mt-8">
+        <h2 class="text-2xl font-bold text-white mb-4">{{ $t('product.similarStyles') }}</h2>
+        <p v-if="stylesLoading" role="status" class="text-slate-400">{{ $t('loading') }}</p>
+        <div v-else-if="similarStyles.length" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <NuxtLink v-for="style in similarStyles" :key="style.id ?? undefined"
+            :to="{ path: localePath(`/product/${style.id}`), query: buildOfferFilterQuery(offerFilter) }"
+            class="bg-slate-900 rounded-xl border border-slate-800 p-4">
+            <ProductImage :src="style.imageUrl" image-class="w-full h-40 object-contain" />
+            <p class="text-white mt-2">{{ style.name }}</p>
+            <p class="text-sm text-slate-400">{{ $t('product.similarStyleHint') }}</p>
+          </NuxtLink>
+        </div>
+        <div v-else-if="stylesError" role="status" class="text-slate-400">
+          <p>{{ $t('product.similarStylesFailed') }}</p>
+          <button type="button" class="mt-2 text-blue-400" @click="loadSimilarStyles">{{ $t('retry') }}</button>
+        </div>
+      </section>
+
       <!-- SEO Description -->
       <div class="mt-8 bg-slate-900/50 rounded-xl border border-slate-800 p-6 space-y-4">
         <p class="text-sm text-slate-400 leading-relaxed">
@@ -932,6 +950,7 @@
 </template>
 
 <script setup lang="ts">
+import { hasClothingStyleReference } from '~/utils/productStyles'
 import { getProduct, reportProductIssue, getPriceHistory, getPriceStats } from '~/src/api-client'
 import type { ModelsIssueType as IssueType, ModelsProductMatch as ProductMatch, PricePoint, ServicesPriceHistoryStats as PriceHistoryStats } from '~/src/api-client/types.gen'
 import ProductListingTable from '~/components/product/ProductListingTable.vue'
@@ -1086,6 +1105,32 @@ const nameSubtitle = computed(() =>
   isCasePage.value ? null : localizedSubtitle(relations.value?.localizedNames, locale.value, product.value?.name))
 
 // Secondary, non-SEO data — always fetched on the client after mount.
+const stylesEligible = computed(() => !isUnidentifiedMediaPage.value && hasClothingStyleReference(product.value))
+const similarStyles = ref<ProductWithOffers[]>([])
+const stylesError = ref(false)
+const stylesLoading = ref(false)
+let stylesRequest: AbortController | undefined
+async function loadSimilarStyles() {
+  stylesRequest?.abort()
+  similarStyles.value = []
+  stylesError.value = false
+  stylesLoading.value = false
+  if (!stylesEligible.value) return
+  const request = new AbortController()
+  stylesRequest = request
+  stylesLoading.value = true
+  try {
+    const result = await $fetch<ProductWithOffers[]>(buildProductResourceUrl(API_BASE, productId, 'alternatives', {
+      ...buildMatchesParams(offerFilter.value), mode: 'style', limit: 3,
+    }), { signal: request.signal })
+    if (!request.signal.aborted) similarStyles.value = result
+  }
+  catch { if (!request.signal.aborted) stylesError.value = true }
+  finally { if (!request.signal.aborted) stylesLoading.value = false }
+}
+onBeforeUnmount(() => stylesRequest?.abort())
+watch(() => [stylesEligible.value, JSON.stringify(offerFilter.value)], () => { loadSimilarStyles() })
+
 const relatedProducts = ref<ProductWithOffers[]>([])
 const matches = ref<(ProductMatch & OfferMatchExtras)[]>([])
 const unavailableCount = ref(0)
@@ -1664,6 +1709,7 @@ async function submitProductReport() {
 // client so the server only waits on the SEO-critical product/price data.
 onMounted(async () => {
   checkMainImageLoaded()
+  loadSimilarStyles()
   fetchProductRelations(API_BASE, productId, url => $fetch(url)).then((result) => {
     relations.value = result
   })

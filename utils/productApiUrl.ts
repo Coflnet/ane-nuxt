@@ -10,6 +10,7 @@
  */
 
 export interface ProductResourceUrlParams {
+  mode?: 'style'
   priceCurrency?: string
   zip?: string
   lat?: number
@@ -31,6 +32,7 @@ export interface ProductResourceUrlParams {
 
 function buildQueryString(params: ProductResourceUrlParams): string {
   const search = new URLSearchParams()
+  if (params.mode) search.append('mode', params.mode)
   if (params.priceCurrency) search.append('priceCurrency', params.priceCurrency)
   if (params.zip) search.append('zip', params.zip)
   if (params.lat) search.append('lat', params.lat.toString())
