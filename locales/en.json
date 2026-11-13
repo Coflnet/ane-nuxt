@@ -1413,5 +1413,22 @@
     "timingNote": "Added delay is not a polling interval or a delivery guarantee. Marketplace detection, processing and delivery can add time. Push requires permission and Discord requires a channel webhook. Check the final charge and any discounts at checkout.",
     "flipperTitle": "Compare asking prices reproducibly · 29 October 2026",
     "flipperBody": "Choose an item and record model, condition, included accessories, location and observation time. Compare several similar listings and record their asking prices and shipping costs. The Flipper feed compares a listing price with a reference value; the difference is neither a completed-sale price nor profit. For your own calculation, subtract purchase, shipping, repairs, selling fees and taxes. Check completed comparable sales separately. Estimates are uncertain without sufficiently similar offers; a low asking price can reflect defects."
-  }
+  },
+  "labelingCohortIntro": "Fixed review batch. Save its receipt before answering; keep the saved file for export reconciliation.",
+  "labelingCohortSave": "Save batch receipt",
+  "labelingCohortSaved": "Download requested. Check the saved file; this receipt does not certify independent review.",
+  "labelingCohortSaveFirst": "Answers unlock after saving the batch receipt.",
+  "labelingCohortLoadFailed": "This fixed batch could not be loaded. Keep the link and retry; a read-limit conflict needs an operator to review the capture window.",
+  "labelingCohortInvalid": "Invalid fixed-batch link. Keep its values and ask the operator for a complete mode, UTC window and policy fingerprint.",
+  "labelingCohortSetup": "Fixed review batch",
+  "labelingCohortMode": "Admissions to review",
+  "labelingCohortEnforce": "Automatic decisions (enforce)",
+  "labelingCohortShadow": "Proposed matches (shadow)",
+  "labelingCohortFrom": "From (UTC, inclusive)",
+  "labelingCohortUntil": "Until (UTC, exclusive)",
+  "labelingCohortWindowHelp": "Choose a closed interval of up to seven days. This selects up to 50 admissions under one recorded policy, without scores or uncertainty ordering.",
+  "labelingCohortStart": "Load fixed batch",
+  "labelingCohortNormalQueue": "Return to usual queue",
+  "labelingCohortMultiplePolicies": "This window contains more than one recorded policy. Shorten the interval and retry; your inputs have been kept.",
+  "labelingCohortEmpty": "No reviewable admissions in this window. Try another closed interval or mode."
 }

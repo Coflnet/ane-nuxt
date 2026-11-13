@@ -1,3 +1,4 @@
+import type { LabelingCohort } from '~/utils/labelingCohort'
 import { useApiBaseUrl } from '~/utils/apiBaseUrl'
 import type { LabelAnswer, LabelingPair, ReviewMode } from '~/utils/labelingQueue'
 import { useUserStore } from '~/stores/user'
@@ -48,10 +49,10 @@ export function useLabelingApi() {
   return {
     photo,
     me: () => request<LabelingMe>('/me'),
-    next: (count: number, groupKey: string) => request<LabelingPair[]>('/next', { query: { count, groupKey } }),
+    next: (count: number, groupKey: string, cohort?: LabelingCohort | null) => request<LabelingPair[]>('/next', { query: cohort ? { count, ...cohort } : { count, groupKey } }),
     diagnostics: (pairId: string) => request<LabelingPair>(`/${encodeURIComponent(pairId)}/diagnostics`),
-    label: async (pairId: string, label: LabelAnswer, reviewMode?: ReviewMode): Promise<void> => {
-      await request<unknown>(`/${encodeURIComponent(pairId)}/label`, { method: 'POST', body: { label, ...(reviewMode ? { reviewMode } : {}) } })
+    label: async (pairId: string, label: LabelAnswer, reviewMode?: ReviewMode, captureCommitment?: string): Promise<void> => {
+      await request<unknown>(`/${encodeURIComponent(pairId)}/label`, { method: 'POST', body: { label, ...(reviewMode ? { reviewMode } : {}), ...(captureCommitment ? { captureCommitment } : {}) } })
     },
     stats: () => request<LabelingStats>('/stats'),
   }

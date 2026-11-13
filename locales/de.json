@@ -1413,5 +1413,22 @@
     "timingNote": "Zusatzverzögerung ist kein Abfrageintervall und keine Zustellgarantie. Erkennung auf dem Marktplatz, Verarbeitung und Zustellung können zusätzliche Zeit benötigen. Push benötigt eine Freigabe, Discord einen Kanal-Webhook. Prüfe den Endpreis und mögliche Rabatte im Checkout.",
     "flipperTitle": "Angebotspreise nachvollziehbar vergleichen · 29.10.2026",
     "flipperBody": "Wähle einen Artikel und notiere Modell, Zustand, Lieferumfang, Standort und Zeitpunkt. Vergleiche mehrere möglichst gleiche Angebote und halte deren Preise und Versandkosten fest. Der Flipper-Feed stellt Inseratspreise einem Vergleichswert gegenüber; die Differenz ist kein erzielter Verkaufspreis und kein Gewinn. Ziehe für deine eigene Kalkulation Einkauf, Versand, Reparaturen, Verkaufsgebühren und Steuern ab. Prüfe tatsächlich verkaufte Vergleichsartikel separat. Ohne ausreichend ähnliche Angebote ist die Schätzung unsicher; ein günstiges Inserat kann Mängel haben."
-  }
+  },
+  "labelingCohortIntro": "Feste Bewertungsgruppe. Speichere den Beleg vor der ersten Antwort und bewahre ihn für den Abgleich mit dem Export auf.",
+  "labelingCohortSave": "Gruppenbeleg speichern",
+  "labelingCohortSaved": "Download angefordert. Prüfe die gespeicherte Datei; der Beleg bestätigt keine unabhängige Bewertung.",
+  "labelingCohortSaveFirst": "Antworten werden nach dem Speichern des Gruppenbelegs freigeschaltet.",
+  "labelingCohortLoadFailed": "Diese feste Gruppe konnte nicht geladen werden. Behalte den Link und versuche es erneut; bei einem Leselimit-Konflikt muss ein Betreiber das Erfassungszeitfenster prüfen.",
+  "labelingCohortInvalid": "Ungültiger Gruppenlink. Behalte seine Werte und bitte den Betreiber um Modus, UTC-Zeitfenster und Richtlinien-Fingerabdruck.",
+  "labelingCohortSetup": "Feste Bewertungsgruppe",
+  "labelingCohortMode": "Zu bewertende Freigaben",
+  "labelingCohortEnforce": "Automatische Entscheidungen (Enforce)",
+  "labelingCohortShadow": "Vorgeschlagene Zuordnungen (Shadow)",
+  "labelingCohortFrom": "Von (UTC, einschließlich)",
+  "labelingCohortUntil": "Bis (UTC, ausschließlich)",
+  "labelingCohortWindowHelp": "Wähle ein abgeschlossenes Zeitfenster von höchstens sieben Tagen. Es werden bis zu 50 Freigaben derselben erfassten Richtlinie ohne Modellwerte oder Unsicherheitssortierung ausgewählt.",
+  "labelingCohortStart": "Feste Gruppe laden",
+  "labelingCohortNormalQueue": "Zur normalen Warteschlange",
+  "labelingCohortMultiplePolicies": "Dieses Zeitfenster enthält mehrere erfasste Richtlinien. Verkürze es und versuche es erneut; deine Eingaben bleiben erhalten.",
+  "labelingCohortEmpty": "Keine bewertbaren Freigaben in diesem Zeitfenster. Versuche ein anderes abgeschlossenes Zeitfenster oder einen anderen Modus."
 }

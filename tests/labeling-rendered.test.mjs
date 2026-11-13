@@ -6,13 +6,14 @@ import { parse, compileScript } from '@vue/compiler-sfc'
 import * as Vue from 'vue'
 import * as queue from '../utils/labelingQueue.ts'
 import * as sender from '../utils/labelingSender.ts'
+import * as cohort from '../utils/labelingCohort.ts'
 import { shortcutFor } from '../utils/labelingShortcuts.ts'
 
 const photoLoadEvent = photo => ({ target: { currentSrc: photo.props.src } })
 
 // Mount the actual compiled page with Vue's renderer. No Nuxt server, auth service or
 // image network is needed; button events and reactive DOM updates still run normally.
-async function mountPage(api, autoLoadPhotos = true) {
+async function mountPage(api, autoLoadPhotos = true, search = '') {
   let leave
   const listeners = new Map()
   const source = await readFile(new URL('../pages/labeling.vue', import.meta.url), 'utf8')
@@ -22,15 +23,16 @@ async function mountPage(api, autoLoadPhotos = true) {
     .replace(/^import .*$/gm, '')
     .replace('export default', 'return')
     .replaceAll('import.meta.server', 'false').replaceAll('import.meta.client', 'true')
-  const component = new Function('Vue', 'queue', 'sender', 'api', 'shortcutFor', 'registerLeave', `
+  const component = new Function('Vue', 'queue', 'sender', 'cohort', 'api', 'shortcutFor', 'registerLeave', `
     const { answer, BATCH_SIZE, createQueueState, enqueue, needsRefill, remaining, rollback, skip, undo, upcoming } = queue;
     const { createLabelSender } = sender;
+    const { freezeCohort, parseCohortQuery } = cohort;
     const useHead = () => {}, useSeoMeta = () => {}, useLocalePath = () => value => value;
     const useI18n = () => ({ t: key => key }), onBeforeRouteLeave = registerLeave;
     const useLabelingApi = () => ({ photo: async () => new Blob(['synthetic fixture']), ...api }), useUserStore = () => ({ isLoggedIn: true, token: 'test' });
     const labelingErrorStatus = () => 0, LabelingStatsPanel = { render: () => null };
-    ${code}`)(Vue, queue, sender, api, shortcutFor, (guard) => { leave = guard })
-  const node = (type, text = '') => ({ type, tagName: type.toUpperCase(), text, props: {}, children: [], parent: null, addEventListener() {}, removeEventListener() {}, getRootNode: () => ({ activeElement: null }) })
+    ${code}`)(Vue, queue, sender, cohort, api, shortcutFor, (guard) => { leave = guard })
+  const node = (type, text = '') => ({ type, tagName: type.toUpperCase(), text, props: {}, children: [], get options() { return this.children.filter(child => child.type === 'option') }, parent: null, addEventListener() {}, removeEventListener() {}, getRootNode: () => ({ activeElement: null }) })
   const renderer = Vue.createRenderer({
     createElement: node, createText: text => node('#text', text), createComment: text => node('#comment', text),
     setText: (n, text) => { n.text = text }, setElementText: (n, text) => {
@@ -59,7 +61,7 @@ async function mountPage(api, autoLoadPhotos = true) {
   app.config.warnHandler = (message) => {
     if (!message.includes('resolve component')) throw new Error(message)
   }
-  globalThis.window = { confirm: () => false, addEventListener: (name, fn) => listeners.set(name, fn), removeEventListener: name => listeners.delete(name), getRootNode: () => ({ activeElement: null }) }
+  globalThis.window = { location: { search }, confirm: () => false, addEventListener: (name, fn) => listeners.set(name, fn), removeEventListener: name => listeners.delete(name), getRootNode: () => ({ activeElement: null }) }
   globalThis.Image = class {
     set src(value) { throw new Error(`Unexpected live image preload: ${value}`) }
   }
@@ -169,7 +171,7 @@ test('group filtering records diagnostic exposure even when details are hidden',
     const input = view.all().find(n => n.props.id === 'labeling-group-filter')
     input.props['onUpdate:modelValue']('chosen model')
     await view.settle()
-    view.all().find(n => n.type === 'form').props.onSubmit({ preventDefault() {} })
+    input.parent.parent.props.onSubmit({ preventDefault() {} })
     await view.settle()
     assert.equal(batches.at(-1)[1], 'chosen model')
     assert.equal(view.find('labeling-group'), undefined)
@@ -352,7 +354,7 @@ test('late failure beyond undo history returns the pair for retry and survives a
     await view.click('labeling-diagnostics-toggle')
     const input = view.all().find(n => n.props.id === 'labeling-group-filter')
     input.props['onUpdate:modelValue']('another group')
-    view.all().find(n => n.type === 'form').props.onSubmit({ preventDefault() {} })
+    input.parent.parent.props.onSubmit({ preventDefault() {} })
     await view.settle()
     assert.equal(batches, batchesBeforeFilter)
     await view.click('labeling-skip')
@@ -615,4 +617,131 @@ test('a retained load callback cannot mark a different current archive loaded af
     }
     finally { view.unmount() }
   }
+})
+
+test('fixed batch freezes one blind response, requires receipt before hotkeys/buttons and binds votes to capture', async () => {
+  const query = '?cohortMode=enforce&from=2026-11-13T00:00:00Z&until=2026-11-14T00:00:00Z&policyFingerprint=' + 'a'.repeat(64)
+  const calls = [], requests = []
+  let blob
+  const create = URL.createObjectURL
+  URL.createObjectURL = value => { if (value.type === 'application/json') blob = value; return create(value) }
+  const previousDocument = globalThis.document
+  globalThis.document = { createElement: () => ({ click() {} }) }
+  const view = await mountPage({
+    me: async () => ({ canLabel: true, userId: 'reviewer' }), stats: async () => null,
+    next: async (...args) => { requests.push(args); return [{ ...pair(1), captureCommitment: 'b'.repeat(64), cohortPolicyFingerprint: 'a'.repeat(64) }] },
+    diagnostics: async () => { throw new Error('must remain blind') },
+    label: async (...args) => { calls.push(args) },
+  }, true, query)
+  try {
+    assert.equal(requests.length, 1)
+    assert.equal(requests[0][0], 50)
+    assert.equal(requests[0][2].cohortMode, 'enforce')
+    assert.equal(view.find('labeling-diagnostics-toggle').props.disabled, true)
+    await view.click('labeling-answer-1')
+    assert.equal(calls.length, 0)
+    await view.click('labeling-cohort-save')
+    const receipt = JSON.parse(await blob.text())
+    assert.deepEqual(receipt.pairs, [{ pairId: 'p1', captureCommitment: 'b'.repeat(64) }])
+    assert.equal(receipt.pairs[0].similarity, undefined)
+    await view.click('labeling-answer-1')
+    assert.deepEqual(calls, [['p1', 'same_item', 'blind', 'b'.repeat(64)]])
+    assert.equal(requests.length, 1)
+    assert.equal(view.find('labeling-reload'), undefined, 'a frozen batch uses explicit new selection instead of an ineffective reload')
+  }
+  finally { view.unmount(); URL.createObjectURL = create; globalThis.document = previousDocument }
+})
+
+test('invalid cohort links fail without fetching a normal queue', async () => {
+  let next = 0
+  const view = await mountPage({ me: async () => ({ canLabel: true, userId: 'reviewer' }),
+    stats: async () => null, next: async () => { next++; return [] } }, true, '?cohortMode=enforce')
+  try { assert.equal(next, 0); assert.ok(view.find('labeling-cohort-error')) }
+  finally { view.unmount() }
+})
+
+test('reviewer starts a closed-window batch in the existing form without a policy fingerprint or diagnostics', async () => {
+  const requests = []
+  const view = await mountPage({
+    me: async () => ({ canLabel: true, userId: 'reviewer' }), stats: async () => null,
+    next: async (...args) => {
+      requests.push(args)
+      return args[2] ? [{ ...pair(2), captureCommitment: 'b'.repeat(64), cohortPolicyFingerprint: 'a'.repeat(64) }] : [pair(1)]
+    },
+  })
+  try {
+    const input = view.all().find(n => n.props.placeholder === '2026-11-13T00:00:00Z')
+    input.props['onUpdate:modelValue']('2026-11-13T00:00:00Z')
+    view.all().find(n => n.props.placeholder === '2026-11-14T00:00:00Z').props['onUpdate:modelValue']('2026-11-14T00:00:00Z')
+    await view.settle()
+    view.find('labeling-cohort-start').parent.props.onSubmit({ preventDefault() {} })
+    await view.settle()
+    assert.deepEqual(requests.at(-1), [50, '', { cohortMode: 'shadow_admitted', from: '2026-11-13T00:00:00Z', until: '2026-11-14T00:00:00Z', policyFingerprint: '' }])
+    assert.ok(view.find('labeling-cohort'))
+    assert.equal(view.find('labeling-answer-1').props.disabled, true)
+    assert.equal(view.find('labeling-diagnostics-toggle').props.disabled, true)
+  }
+  finally { view.unmount() }
+})
+
+test('late normal diagnostics cannot enter a same-ID cohort and prior browser exposure remains sticky before any vote', async () => {
+  const reveal = deferred()
+  const calls = []
+  const reused = pair(1)
+  let blob
+  const create = URL.createObjectURL
+  URL.createObjectURL = value => { if (value.type === 'application/json') blob = value; return create(value) }
+  const previousDocument = globalThis.document
+  globalThis.document = { createElement: () => ({ click() {} }) }
+  const view = await mountPage({
+    me: async () => ({ canLabel: true, userId: 'reviewer' }), stats: async () => null,
+    next: async (_count, _group, selected) => {
+      if (selected) Object.assign(reused, { captureCommitment: 'b'.repeat(64), cohortPolicyFingerprint: 'a'.repeat(64) })
+      return [reused]
+    },
+    diagnostics: async () => reveal.promise,
+    label: async (...args) => { calls.push(args) },
+  })
+  try {
+    await view.click('labeling-diagnostics-toggle')
+    assert.equal(calls.length, 0)
+    view.find('labeling-cohort-start').parent.props.onSubmit({ preventDefault() {} })
+    await view.settle()
+    assert.ok(view.find('labeling-cohort'))
+    await view.click('labeling-cohort-save')
+    const receipt = JSON.parse(await blob.text())
+    assert.deepEqual(receipt.pairs, [{ pairId: 'p1', captureCommitment: 'b'.repeat(64) }])
+    reveal.resolve(diagnosticPair(1))
+    await view.settle()
+    assert.equal(reused.similarity, undefined)
+    assert.equal(reused.groupKey, undefined)
+    assert.equal(view.find('labeling-group'), undefined)
+    assert.equal(view.find('labeling-diagnostics-error'), undefined)
+    assert.equal(view.find('labeling-diagnostics-toggle').props.disabled, true)
+    assert.match(view.find('labeling-review-mode').text, /labelingDiagnosticReview/)
+    await view.click('labeling-answer-1')
+    assert.deepEqual(calls, [['p1', 'same_item', 'diagnostic', 'b'.repeat(64)]])
+  }
+  finally { view.unmount(); URL.createObjectURL = create; globalThis.document = previousDocument }
+})
+
+test('same pair stays diagnostically exposed after viewing normal diagnostics and entering a fresh cohort response', async () => {
+  const view = await mountPage({
+    me: async () => ({ canLabel: true, userId: 'reviewer' }), stats: async () => null,
+    next: async (_count, _group, selected) => [selected
+      ? { ...pair(1), captureCommitment: 'b'.repeat(64), cohortPolicyFingerprint: 'a'.repeat(64) }
+      : pair(1)],
+    diagnostics: async () => diagnosticPair(1),
+  })
+  try {
+    await view.click('labeling-diagnostics-toggle')
+    assert.ok(view.find('labeling-group'))
+    assert.match(view.find('labeling-review-mode').text, /labelingDiagnosticReview/)
+    view.find('labeling-cohort-start').parent.props.onSubmit({ preventDefault() {} })
+    await view.settle()
+    assert.ok(view.find('labeling-cohort'))
+    assert.equal(view.find('labeling-group'), undefined)
+    assert.match(view.find('labeling-review-mode').text, /labelingDiagnosticReview/)
+  }
+  finally { view.unmount() }
 })

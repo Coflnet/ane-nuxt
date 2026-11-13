@@ -19,6 +19,8 @@ export interface LabelingPair {
   groupKey?: string | null
   clusterSeoId?: string | null
   textSeoId?: string | null
+  captureCommitment?: string | null
+  cohortPolicyFingerprint?: string | null
   createdAt?: string | null
   a: LabelingSide
   b: LabelingSide

@@ -76,12 +76,100 @@
           {{ $t('labelingRule') }}
         </p>
 
+        <details class="rounded-lg bg-slate-800 p-3 text-sm text-slate-200">
+          <summary>{{ $t('labelingCohortSetup') }}</summary>
+          <form
+            class="mt-3 grid gap-2"
+            @submit.prevent="startCohort"
+          >
+            <label>{{ $t('labelingCohortMode') }}
+              <select
+                v-model="cohortModeInput"
+                class="block w-full bg-slate-900 p-2"
+              >
+                <option value="enforce">{{ $t('labelingCohortEnforce') }}</option>
+                <option value="shadow_admitted">{{ $t('labelingCohortShadow') }}</option>
+              </select>
+            </label>
+            <label>{{ $t('labelingCohortFrom') }}
+              <input
+                v-model="cohortFromInput"
+                required
+                type="text"
+                class="block w-full bg-slate-900 p-2"
+                placeholder="2026-11-13T00:00:00Z"
+              >
+            </label>
+            <label>{{ $t('labelingCohortUntil') }}
+              <input
+                v-model="cohortUntilInput"
+                required
+                type="text"
+                class="block w-full bg-slate-900 p-2"
+                placeholder="2026-11-14T00:00:00Z"
+              >
+            </label>
+            <p>{{ $t('labelingCohortWindowHelp') }}</p>
+            <button
+              type="submit"
+              :disabled="unfinishedSaves || loading"
+              class="min-h-11 text-indigo-300 underline"
+              data-testid="labeling-cohort-start"
+            >
+              {{ $t('labelingCohortStart') }}
+            </button>
+            <button
+              v-if="cohort"
+              type="button"
+              :disabled="unfinishedSaves || loading"
+              class="min-h-11 text-indigo-300 underline"
+              @click="normalQueue"
+            >
+              {{ $t('labelingCohortNormalQueue') }}
+            </button>
+          </form>
+        </details>
+
+        <section
+          v-if="cohort"
+          class="rounded-lg bg-slate-800 p-3 text-sm text-slate-200"
+          data-testid="labeling-cohort"
+        >
+          <p>{{ $t('labelingCohortIntro') }}</p>
+          <p
+            v-if="cohortManifest?.pairs.length === 0"
+            role="status"
+          >
+            {{ $t('labelingCohortEmpty') }}
+          </p>
+          <button
+            type="button"
+            :disabled="!cohortManifest"
+            class="min-h-11 text-indigo-300 underline"
+            data-testid="labeling-cohort-save"
+            @click="saveCohort"
+          >
+            {{ $t('labelingCohortSave') }}
+          </button>
+          <p role="status">
+            {{ $t(cohortSaved ? 'labelingCohortSaved' : 'labelingCohortSaveFirst') }}
+          </p>
+        </section>
+        <p
+          v-if="cohortError"
+          role="alert"
+          class="text-amber-300"
+          data-testid="labeling-cohort-error"
+        >
+          {{ cohortError }}
+        </p>
+
         <button
           type="button"
           class="min-h-11 text-sm text-indigo-300 underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-400"
           data-testid="labeling-diagnostics-toggle"
           :aria-expanded="showDiagnostics"
-          :disabled="diagnosticsLoading"
+          :disabled="diagnosticsLoading || !!cohort"
           @click="toggleDiagnostics"
         >
           {{ $t(showDiagnostics ? 'labelingHideDiagnostics' : 'labelingShowDiagnostics') }}
@@ -189,6 +277,7 @@
             </p>
             <div class="flex justify-center gap-2">
               <button
+                v-if="!cohortManifest"
                 type="button"
                 class="bg-indigo-600 text-white hover:bg-indigo-700 px-4 py-2 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-300"
                 :disabled="unfinishedSaves"
@@ -342,7 +431,7 @@
               :key="option.label"
               type="button"
               class="flex items-center gap-3 text-left bg-slate-700 text-slate-100 hover:bg-slate-600 px-4 py-3 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-400"
-              :disabled="!photosReady"
+              :disabled="!photosReady || (!!cohort && !cohortSaved)"
               :data-testid="`labeling-answer-${option.key}`"
               @click="submit(option.label)"
             >
@@ -406,6 +495,8 @@ import { useUserStore } from '~/stores/user'
 import { answer, BATCH_SIZE, createQueueState, enqueue, needsRefill, remaining, rollback, skip, undo, upcoming } from '~/utils/labelingQueue'
 import type { LabelAnswer, LabelingQueueState } from '~/utils/labelingQueue'
 import { createLabelSender } from '~/utils/labelingSender'
+import { freezeCohort, parseCohortQuery } from '~/utils/labelingCohort'
+import type { LabelingCohort } from '~/utils/labelingCohort'
 import { shortcutFor } from '~/utils/labelingShortcuts'
 
 // Never indexed. Everything that depends on the visitor is resolved in onMounted,
@@ -419,6 +510,49 @@ const userStore = useUserStore()
 const api = useLabelingApi()
 
 const STATS_EVERY = 5
+const cohort = ref<LabelingCohort | null>(null)
+const cohortManifest = ref<ReturnType<typeof freezeCohort> | null>(null)
+const cohortSaved = ref(false)
+const cohortError = ref('')
+const cohortModeInput = ref<LabelingCohort['cohortMode']>('shadow_admitted')
+const cohortFromInput = ref('')
+const cohortUntilInput = ref('')
+
+async function startCohort() {
+  if (unfinishedSaves.value || loading.value) return
+  try {
+    const query = new URLSearchParams({ cohortMode: cohortModeInput.value, from: cohortFromInput.value, until: cohortUntilInput.value })
+    const selected = parseCohortQuery(query.toString())
+    cohortManifest.value = null
+    cohortSaved.value = false
+    cohortError.value = ''
+    cohort.value = selected
+    activeFilter.value = ''
+    showDiagnostics.value = false
+    await reload()
+  }
+  catch { cohortError.value = t('labelingCohortInvalid') }
+}
+
+async function normalQueue() {
+  if (unfinishedSaves.value || loading.value) return
+  cohort.value = null
+  cohortManifest.value = null
+  cohortSaved.value = false
+  cohortError.value = ''
+  await reload()
+}
+
+function saveCohort() {
+  if (!cohortManifest.value) return
+  const url = URL.createObjectURL(new Blob([JSON.stringify(cohortManifest.value, null, 2)], { type: 'application/json' }))
+  const link = document.createElement('a')
+  link.href = url
+  link.download = 'labeling-fixed-batch.json'
+  link.click()
+  setTimeout(() => URL.revokeObjectURL(url), 1000)
+  cohortSaved.value = true
+}
 
 const access = ref<'checking' | 'signedOut' | 'notEnabled' | 'ready'>('checking')
 const userId = ref('')
@@ -465,6 +599,7 @@ function reviewFor(pairId?: string) {
 }
 
 function toggleDiagnostics() {
+  if (cohort.value) return
   showDiagnostics.value = !showDiagnostics.value
   if (showDiagnostics.value && current.value) {
     currentReview.value.diagnostic = true
@@ -474,18 +609,19 @@ function toggleDiagnostics() {
 
 async function loadDiagnostics() {
   const pair = current.value
-  if (!pair || diagnosticsLoading.value || pair.similarity != null) return
+  if (!pair || cohort.value || diagnosticsLoading.value || pair.similarity != null) return
+  const mine = generation
   diagnosticsLoading.value = true
   diagnosticsFailed.value = false
   try {
     const details = await api.diagnostics(pair.pairId)
-    if (current.value?.pairId === pair.pairId) Object.assign(pair, details)
+    if (mine === generation && current.value === pair && !cohort.value) Object.assign(pair, details)
   }
   catch {
-    if (current.value?.pairId === pair.pairId) diagnosticsFailed.value = true
+    if (mine === generation && current.value === pair && !cohort.value) diagnosticsFailed.value = true
   }
   finally {
-    if (current.value?.pairId === pair.pairId) diagnosticsLoading.value = false
+    if (mine === generation && current.value === pair) diagnosticsLoading.value = false
   }
 }
 const filterInput = ref('')
@@ -512,7 +648,9 @@ const answerOptions: { key: string, label: LabelAnswer, text: string, hint?: str
   { key: '4', label: 'unsure', text: 'labelingUnsure' },
 ]
 
-const sender = createLabelSender((pairId, label, reviewMode) => api.label(pairId, label, reviewMode))
+const sender = createLabelSender((pairId, label, reviewMode) => cohortManifest.value
+  ? api.label(pairId, label, reviewMode, cohortManifest.value.pairs.find(pair => pair.pairId === pairId)?.captureCommitment)
+  : api.label(pairId, label, reviewMode))
 
 function formatScore(value?: number | null) {
   return typeof value === 'number' ? value.toFixed(3) : '-'
@@ -529,12 +667,17 @@ async function loadStats() {
 }
 
 async function loadBatch() {
-  if (loading.value || exhausted.value || access.value !== 'ready') return
+  if (loading.value || exhausted.value || access.value !== 'ready' || (cohort.value && cohortManifest.value)) return
   loading.value = true
   const mine = generation
   try {
-    const batch = await api.next(BATCH_SIZE, activeFilter.value)
+    const batch = cohort.value ? await api.next(50, '', cohort.value) : await api.next(BATCH_SIZE, activeFilter.value)
     if (mine !== generation) return
+    if (cohort.value) {
+      cohortManifest.value = freezeCohort(cohort.value, batch)
+      cohortSaved.value = false
+      exhausted.value = true
+    }
     const before = state.value
     state.value = enqueue(before, batch)
     const added = state.value.queue.length + (state.value.current ? 1 : 0)
@@ -544,6 +687,7 @@ async function loadBatch() {
   }
   catch (error) {
     if (mine !== generation) return
+    if (cohort.value) cohortError.value = t((error as { data?: { error?: string } }).data?.error === 'cohort_multiple_policies' ? 'labelingCohortMultiplePolicies' : 'labelingCohortLoadFailed')
     if (labelingErrorStatus(error) === 403) access.value = 'notEnabled'
     else loadFailed.value = true
     exhausted.value = true
@@ -554,8 +698,10 @@ async function loadBatch() {
 }
 
 async function reload() {
-  if (unfinishedSaves.value) return
+  if (unfinishedSaves.value || (cohort.value && cohortManifest.value)) return
   generation++
+  diagnosticsLoading.value = false
+  diagnosticsFailed.value = false
   loading.value = false
   exhausted.value = false
   loadFailed.value = false
@@ -564,7 +710,7 @@ async function reload() {
 }
 
 function submit(label: LabelAnswer, retry = false) {
-  if (!current.value || (!retry && !photosReady.value)) return
+  if (!current.value || (cohort.value && !cohortSaved.value) || (!retry && !photosReady.value)) return
   const review = currentReview.value
   review.label = label
   review.failed = false
@@ -728,7 +874,22 @@ onMounted(async () => {
     access.value = labelingErrorStatus(error) === 401 ? 'signedOut' : 'notEnabled'
     return
   }
-  if (access.value === 'ready') await reload()
+  if (access.value === 'ready') {
+    try {
+      cohort.value = parseCohortQuery(window.location?.search ?? '')
+    }
+    catch {
+      cohortError.value = t('labelingCohortInvalid')
+      exhausted.value = true
+      return
+    }
+    const until = new Date()
+    until.setUTCHours(0, 0, 0, 0)
+    cohortUntilInput.value = cohort.value?.until ?? until.toISOString()
+    cohortFromInput.value = cohort.value?.from ?? new Date(until.getTime() - 86400000).toISOString()
+    cohortModeInput.value = cohort.value?.cohortMode ?? 'shadow_admitted'
+    await reload()
+  }
 })
 
 onBeforeUnmount(() => {
