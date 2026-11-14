@@ -1246,6 +1246,7 @@
   "labelingNotEnabledTitle": "Dieses Konto ist nicht für die Beurteilung freigeschaltet",
   "labelingNotEnabledText": "Schicke deine Nutzer-ID an die Administration, damit dein Konto freigeschaltet werden kann.",
   "labelingUserId": "Deine Nutzer-ID",
+  "labelingAccountCheckFailed": "Dein Konto konnte nicht geprüft werden. Bitte versuche es erneut.",
   "labelingChecking": "Dein Konto wird geprüft...",
   "labelingRule": "Beurteile das Produkt, nicht das Foto. Zustand, Größe und Hintergrund spielen keine Rolle.",
   "labelingPhotoA": "Angebot A",

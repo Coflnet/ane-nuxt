@@ -28,11 +28,13 @@ export interface LabelingStats {
 export function useLabelingApi() {
   const userStore = useUserStore()
 
-  function request<T>(path: string, options: { method?: 'GET' | 'POST', query?: Record<string, string | number>, body?: unknown } = {}): Promise<T> {
+  function request<T>(path: string, options: { method?: 'GET' | 'POST', query?: Record<string, string | number>, body?: unknown, timeout?: number, retry?: number } = {}): Promise<T> {
     return $fetch(`${useApiBaseUrl()}/api/labeling${path}`, {
       method: options.method ?? 'GET',
       query: options.query,
       body: options.body as Record<string, unknown> | undefined,
+      timeout: options.timeout,
+      retry: options.retry,
       headers: { Authorization: `Bearer ${userStore.token}` },
     }) as Promise<T>
   }
@@ -48,7 +50,7 @@ export function useLabelingApi() {
 
   return {
     photo,
-    me: () => request<LabelingMe>('/me'),
+    me: () => request<LabelingMe>('/me', { timeout: 10_000, retry: 0 }),
     next: (count: number, groupKey: string, cohort?: LabelingCohort | null) => request<LabelingPair[]>('/next', { query: cohort ? { count, ...cohort } : { count, groupKey } }),
     diagnostics: (pairId: string) => request<LabelingPair>(`/${encodeURIComponent(pairId)}/diagnostics`),
     label: async (pairId: string, label: LabelAnswer, reviewMode?: ReviewMode, captureCommitment?: string): Promise<void> => {

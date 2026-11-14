@@ -1246,6 +1246,7 @@
   "labelingNotEnabledTitle": "This account is not enabled for labeling",
   "labelingNotEnabledText": "Send your user id to the administrator so they can enable your account.",
   "labelingUserId": "Your user id",
+  "labelingAccountCheckFailed": "Could not check your account. Please try again.",
   "labelingChecking": "Checking your account...",
   "labelingRule": "Judge the product, not the photo. Condition, size and background do not matter.",
   "labelingPhotoA": "Offer A",

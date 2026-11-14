@@ -16,6 +16,23 @@
     </p>
 
     <section
+      v-else-if="access === 'error'"
+      class="bg-slate-800 rounded-xl p-6 max-w-xl"
+      role="alert"
+      data-testid="labeling-account-error"
+    >
+      <p class="text-slate-300 mb-4">{{ $t('labelingAccountCheckFailed') }}</p>
+      <button
+        type="button"
+        class="min-h-11 bg-indigo-600 text-white px-4 py-2 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-300"
+        data-testid="labeling-account-retry"
+        @click="checkAccount"
+      >
+        {{ $t('retry') }}
+      </button>
+    </section>
+
+    <section
       v-else-if="access === 'signedOut'"
       class="bg-slate-800 rounded-xl p-6 max-w-xl"
       data-testid="labeling-signed-out"
@@ -554,7 +571,7 @@ function saveCohort() {
   cohortSaved.value = true
 }
 
-const access = ref<'checking' | 'signedOut' | 'notEnabled' | 'ready'>('checking')
+const access = ref<'checking' | 'signedOut' | 'notEnabled' | 'ready' | 'error'>('checking')
 const userId = ref('')
 const copied = ref(false)
 
@@ -858,9 +875,8 @@ watch(() => current.value?.pairId, (pairId) => {
   pruneArchived()
 })
 
-onMounted(async () => {
-  window.addEventListener('keydown', onKeydown)
-  window.addEventListener('beforeunload', beforeUnload)
+async function checkAccount() {
+  access.value = 'checking'
   if (!userStore.isLoggedIn || !userStore.token) {
     access.value = 'signedOut'
     return
@@ -871,7 +887,7 @@ onMounted(async () => {
     access.value = me.canLabel ? 'ready' : 'notEnabled'
   }
   catch (error) {
-    access.value = labelingErrorStatus(error) === 401 ? 'signedOut' : 'notEnabled'
+    access.value = labelingErrorStatus(error) === 401 ? 'signedOut' : 'error'
     return
   }
   if (access.value === 'ready') {
@@ -890,6 +906,12 @@ onMounted(async () => {
     cohortModeInput.value = cohort.value?.cohortMode ?? 'shadow_admitted'
     await reload()
   }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', onKeydown)
+  window.addEventListener('beforeunload', beforeUnload)
+  void checkAccount()
 })
 
 onBeforeUnmount(() => {

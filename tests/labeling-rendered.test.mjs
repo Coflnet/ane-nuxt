@@ -745,3 +745,37 @@ test('same pair stays diagnostically exposed after viewing normal diagnostics an
   }
   finally { view.unmount() }
 })
+
+
+test('account lookup failure offers retry and opens the queue after recovery', async () => {
+  let checks = 0, batches = 0
+  const view = await mountPage({
+    me: async () => { if (++checks === 1) throw { statusCode: 503 }; return { canLabel: true, userId: 'reviewer' } },
+    stats: async () => null,
+    next: async () => { batches++; return [pair(1)] },
+  })
+  try {
+    assert.ok(view.find('labeling-account-error'))
+    assert.equal(view.find('labeling-not-enabled'), undefined)
+    assert.equal(batches, 0)
+    await view.click('labeling-account-retry')
+    assert.equal(checks, 2)
+    assert.equal(batches, 1)
+    assert.equal(view.find('labeling-account-error'), undefined)
+    assert.ok(view.find('labeling-answer-1'))
+  }
+  finally { view.unmount() }
+})
+
+test('a completed account denial still shows the actual user id without loading pairs', async () => {
+  let batches = 0
+  const view = await mountPage({ me: async () => ({ canLabel: false, userId: 'reviewer-not-enabled' }),
+    next: async () => { batches++; return [] } })
+  try {
+    assert.ok(view.find('labeling-not-enabled'))
+    assert.equal(view.find('labeling-user-id').text, 'reviewer-not-enabled')
+    assert.equal(view.find('labeling-account-error'), undefined)
+    assert.equal(batches, 0)
+  }
+  finally { view.unmount() }
+})
