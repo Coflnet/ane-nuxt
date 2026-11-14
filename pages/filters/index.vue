@@ -11,7 +11,15 @@
         <UiFooterLabel :label="$t('manageFilters')" />
       </div>
 
-      <UiCreateFilterButton />
+      <div class="flex flex-wrap items-center gap-4 mt-4 md:mt-0">
+        <NuxtLink
+          :to="localePath({ path: '/filters/create', query: { mode: 'style' } })"
+          class="text-indigo-300 underline"
+        >
+          {{ $t('styleSearch.title') }}
+        </NuxtLink>
+        <UiCreateFilterButton />
+      </div>
     </div>
 
     <UiDefaultContainer class="p-6">
@@ -52,6 +60,7 @@ import type { FilterFace } from '~/types/FilterType'
 import { isDisabledByError, isPausedForInactivity, parseSearchState } from '~/utils/filterState'
 
 const { t } = useI18n()
+const localePath = useLocalePath()
 const filterStore = useFilterStore()
 
 const filters = computed(() => {

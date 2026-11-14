@@ -31,7 +31,7 @@
           <img
             v-if="thumbDataUrl"
             :src="thumbDataUrl"
-            class="w-full h-full object-cover"
+            class="w-full h-full object-contain"
             alt="reference"
           >
           <span
@@ -58,24 +58,132 @@
         </button>
       </div>
 
-      <!-- Threshold slider -->
-      <div class="flex-grow w-full">
-        <label class="block text-sm mb-1">
-          {{ $t('visualSimilarity.threshold') }}: {{ threshold.toFixed(2) }}
-        </label>
-        <input
-          v-model.number="threshold"
-          type="range"
-          min="0.5"
-          max="0.95"
-          step="0.01"
-          class="w-full"
-          :disabled="!hasCollectorPlan"
+      <div
+        v-if="isStyle && sourceDataUrl"
+        class="w-full md:w-64"
+      >
+        <p class="text-sm mb-2">
+          {{ $t('styleSearch.cropHint') }}
+        </p>
+        <div
+          class="relative inline-block touch-none select-none"
+          @pointerdown="startCrop"
+          @pointermove="moveCrop"
+          @pointerup="endCrop"
+          @pointercancel="endCrop"
         >
-        <div class="flex justify-between text-xs text-light">
-          <span>{{ $t('visualSimilarity.broader') }}</span>
-          <span>{{ $t('visualSimilarity.stricter') }}</span>
+          <img
+            :src="sourceDataUrl"
+            class="max-h-64 max-w-full pointer-events-none"
+            :alt="$t('styleSearch.reference')"
+            draggable="false"
+          >
+          <div
+            v-if="crop"
+            class="absolute border-2 border-white bg-indigo-500/20 pointer-events-none"
+            :style="{ left: `${crop.x * 100}%`, top: `${crop.y * 100}%`, width: `${crop.w * 100}%`, height: `${crop.h * 100}%` }"
+          />
         </div>
+        <div class="flex gap-3 text-sm mt-2">
+          <button
+            type="button"
+            class="underline"
+            :disabled="!crop || preparing"
+            @click="applyCrop"
+          >
+            {{ $t('styleSearch.applyCrop') }}
+          </button>
+          <button
+            type="button"
+            class="underline"
+            :disabled="preparing"
+            @click="useFullImage"
+          >
+            {{ $t('styleSearch.fullImage') }}
+          </button>
+        </div>
+      </div>
+      <!-- Threshold controls -->
+      <div class="flex-grow w-full">
+        <template v-if="isStyle">
+          <label
+            class="block text-sm mb-1"
+            for="style-garment"
+          >{{ $t('styleSearch.garmentType') }}</label>
+          <select
+            id="style-garment"
+            v-model="garmentType"
+            class="w-full bg-dark border border-secondary rounded p-2"
+            required
+            @change="typeConfirmed = true"
+          >
+            <option value="">
+              {{ $t('styleSearch.chooseType') }}
+            </option>
+            <option
+              v-for="type in garmentTypes"
+              :key="type"
+              :value="type"
+            >
+              {{ $t(`styleSearch.types.${type}`) }}
+            </option>
+          </select>
+          <p class="text-xs mt-1">
+            {{ $t('styleSearch.confirmType') }}
+          </p>
+          <label class="block text-sm mt-2"><input
+            v-model="typeConfirmed"
+            type="checkbox"
+            :disabled="!garmentType"
+          > {{ $t('styleSearch.typeConfirmed') }}</label>
+          <label
+            for="style-size"
+            class="block text-sm mt-3"
+          >{{ $t('styleSearch.size') }}</label>
+          <input
+            id="style-size"
+            v-model="size"
+            class="w-full bg-dark border border-secondary rounded p-2"
+            :placeholder="$t('styleSearch.sizeHint')"
+          >
+          <label
+            for="style-threshold"
+            class="block text-sm mt-3"
+          >{{ $t('styleSearch.matchRange') }}</label>
+          <select
+            id="style-threshold"
+            v-model.number="threshold"
+            class="w-full bg-dark border border-secondary rounded p-2"
+          >
+            <option :value="0.70">
+              {{ $t('styleSearch.broader') }}
+            </option>
+            <option :value="0.80">
+              {{ $t('styleSearch.balanced') }}
+            </option>
+            <option :value="0.88">
+              {{ $t('styleSearch.closer') }}
+            </option>
+          </select>
+        </template>
+        <template v-else>
+          <label class="block text-sm mb-1">
+            {{ $t('visualSimilarity.threshold') }}: {{ threshold.toFixed(2) }}
+          </label>
+          <input
+            v-model.number="threshold"
+            type="range"
+            min="0.5"
+            max="0.95"
+            step="0.01"
+            class="w-full"
+            :disabled="!hasCollectorPlan"
+          >
+          <div class="flex justify-between text-xs text-light">
+            <span>{{ $t('visualSimilarity.broader') }}</span>
+            <span>{{ $t('visualSimilarity.stricter') }}</span>
+          </div>
+        </template>
         <p
           v-if="error"
           class="text-danger text-xs mt-2"
@@ -86,7 +194,7 @@
             type="button"
             class="underline ml-2"
             :disabled="preparing || !hasCollectorPlan"
-            @click="prepareImage(pendingFile)"
+            @click="prepareImage(pendingFile, crop)"
           >
             {{ $t('retry') }}
           </button>
@@ -126,10 +234,13 @@
 <script setup lang="ts">
 const props = defineProps<{
   modelValue: string // serialized JSON payload (or empty string)
+  styleMode?: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
+  (e: 'ready', value: boolean): void
+  (e: 'dirty'): void
 }>()
 
 const userStore = useUserStore()
@@ -138,7 +249,33 @@ const hasCollectorPlan = computed(() => {
   return product === 'collector' || product === 'flipper'
 })
 
+const garmentTypes = ['jacket', 'coat', 'dress', 'shirt', 'tshirt', 'sweatshirt', 'sweater', 'trousers', 'jeans', 'shorts', 'skirt', 'shoes', 'boots', 'bag'] as const
+const garmentType = ref('')
+const typeConfirmed = ref(false)
+const size = ref('')
+const savedStyle = ref(false)
+const isStyle = computed(() => props.styleMode || savedStyle.value)
+const sourceDataUrl = ref('')
+const sourceFile = shallowRef<File | null>(null)
+const crop = ref<{ x: number, y: number, w: number, h: number } | null>(null)
+let cropStart: { x: number, y: number } | null = null
+const cropPending = ref(false)
+
+interface StyleExample {
+  sourceListingId: string
+  sourcePlatform: string
+  sourceImageUrl: string
+  emb: number[]
+  provenance: Record<string, unknown>
+  positive: boolean
+}
+const examples = ref<StyleExample[]>([])
+
 interface Payload {
+  examples?: StyleExample[]
+  mode?: 'style'
+  garmentType?: string
+  size?: string
   threshold: number
   emb: number[]
   thumb: string
@@ -146,7 +283,7 @@ interface Payload {
   provenance?: Record<string, unknown>
 }
 
-const threshold = ref(0.7)
+const threshold = ref(props.styleMode ? 0.8 : 0.7)
 const thumbDataUrl = ref<string>('')
 const embedding = ref<number[]>([])
 const thumbBase64 = ref<string>('')
@@ -169,7 +306,12 @@ function loadFromValue(raw: string) {
   }
   try {
     const p = JSON.parse(raw) as Payload
-    threshold.value = p.threshold ?? 0.7
+    threshold.value = p.threshold ?? (props.styleMode ? 0.8 : 0.7)
+    examples.value = (p.examples ?? []).slice(0, 4)
+    savedStyle.value = p.mode === 'style'
+    garmentType.value = p.garmentType ?? ''
+    typeConfirmed.value = !!p.garmentType
+    size.value = p.size ?? ''
     embedding.value = p.emb ?? []
     thumbBase64.value = p.thumb ?? ''
     thumbMime.value = p.thumbMime ?? 'image/jpeg'
@@ -186,6 +328,7 @@ watch(() => props.modelValue, loadFromValue, { immediate: true })
 function serializedPayload() {
   if (!hasEmbedding.value) return ''
   const payload: Payload = {
+    ...(isStyle.value ? { ...(examples.value.length ? { examples: examples.value } : {}), mode: 'style' as const, garmentType: garmentType.value, ...(size.value.trim() ? { size: size.value.trim() } : {}) } : {}),
     threshold: threshold.value,
     emb: embedding.value,
     thumb: thumbBase64.value,
@@ -199,7 +342,8 @@ function emitPayload() {
   emit('update:modelValue', serializedPayload())
 }
 
-watch(threshold, emitPayload)
+watch([threshold, garmentType, size], emitPayload)
+watch(() => !preparing.value && !error.value && !cropPending.value && (isStyle.value ? hasEmbedding.value && !!provenance.value && !!garmentType.value && typeConfirmed.value : !hasEmbedding.value || !!provenance.value), ready => emit('ready', ready), { immediate: true })
 
 function cancelPreparation() {
   preparation?.abort()
@@ -216,6 +360,11 @@ function resetImage() {
   thumbBase64.value = ''
   embedding.value = []
   provenance.value = undefined
+  examples.value = []
+  sourceDataUrl.value = ''
+  sourceFile.value = null
+  crop.value = null
+  cropPending.value = false
 }
 
 function clear() {
@@ -230,6 +379,11 @@ async function onFileSelected(ev: Event) {
   if (!file) return
   input.value = ''
 
+  emit('dirty')
+  typeConfirmed.value = false
+  sourceFile.value = file
+  crop.value = null
+  cropPending.value = false
   await prepareImage(file)
 }
 
@@ -243,7 +397,7 @@ function refreshReference() {
   }
 }
 
-async function prepareImage(file: File) {
+async function prepareImage(file: File, selectedCrop: typeof crop.value = null) {
   if (!hasCollectorPlan.value) {
     error.value = useI18n().t('visualSimilarity.collectorRequired')
     return
@@ -256,12 +410,13 @@ async function prepareImage(file: File) {
   try {
     preparing.value = true
     // Resize/compress to ~256x256 JPEG to keep payload small
-    const compressed = await compressImage(file, 256, 0.85)
+    const compressed = await compressImage(file, 256, 0.85, selectedCrop)
     if (preparation !== current) return
+    if (isStyle.value && !selectedCrop) sourceDataUrl.value = compressed.dataUrl
 
     // Ask backend to embed it (single CLIP call, stored on the filter)
     const apiToken = userStore.token ? `Bearer ${userStore.token}` : ''
-    const res = await $fetch<Partial<Payload> & { embedding?: number[] }>(
+    const res = await $fetch<Partial<Payload> & { embedding?: number[], suggestedGarmentType?: string }>(
       'https://ane.coflnet.com/api/filters/visual-similarity/prepare',
       {
         method: 'POST',
@@ -270,6 +425,7 @@ async function prepareImage(file: File) {
         body: {
           imageBase64: compressed.base64,
           imageMime: 'image/jpeg',
+          ...(isStyle.value ? { mode: 'style' } : {}),
           threshold: threshold.value,
         },
       },
@@ -282,8 +438,11 @@ async function prepareImage(file: File) {
     thumbDataUrl.value = compressed.dataUrl
     thumbBase64.value = compressed.base64
     thumbMime.value = 'image/jpeg'
+    examples.value = []
     embedding.value = emb
     provenance.value = res.provenance
+    if (!garmentType.value && garmentTypes.includes(res.suggestedGarmentType as typeof garmentTypes[number])) garmentType.value = res.suggestedGarmentType!
+    cropPending.value = false
     pendingFile.value = null
     emitPayload()
   }
@@ -303,12 +462,44 @@ async function prepareImage(file: File) {
   }
 }
 
+function cropPoint(event: PointerEvent) {
+  const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
+  return { x: Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width)), y: Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height)) }
+}
+function startCrop(event: PointerEvent) {
+  if (preparing.value) return
+  const target = event.currentTarget as HTMLElement
+  target.setPointerCapture(event.pointerId)
+  emit('dirty')
+  cropStart = cropPoint(event)
+}
+function moveCrop(event: PointerEvent) {
+  if (!cropStart) return
+  const point = cropPoint(event)
+  crop.value = { x: Math.min(point.x, cropStart.x), y: Math.min(point.y, cropStart.y), w: Math.abs(point.x - cropStart.x), h: Math.abs(point.y - cropStart.y) }
+  cropPending.value = true
+}
+function endCrop() {
+  cropStart = null
+  if (crop.value && (crop.value.w < 0.01 || crop.value.h < 0.01)) {
+    crop.value = null
+    cropPending.value = false
+  }
+}
+function applyCrop() {
+  if (sourceFile.value && crop.value) void prepareImage(sourceFile.value, crop.value)
+}
+function useFullImage() {
+  crop.value = null
+  if (sourceFile.value) void prepareImage(sourceFile.value)
+}
+
 interface CompressedImage {
   base64: string
   dataUrl: string
 }
 
-async function compressImage(file: File, maxDim: number, quality: number): Promise<CompressedImage> {
+async function compressImage(file: File, maxDim: number, quality: number, selectedCrop: typeof crop.value = null): Promise<CompressedImage> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.onerror = () => reject(new Error('FileReader failed'))
@@ -316,9 +507,13 @@ async function compressImage(file: File, maxDim: number, quality: number): Promi
       const img = new Image()
       img.onerror = () => reject(new Error('Image decode failed'))
       img.onload = () => {
-        const scale = Math.min(1, maxDim / Math.max(img.width, img.height))
-        const w = Math.round(img.width * scale)
-        const h = Math.round(img.height * scale)
+        const sx = (selectedCrop?.x ?? 0) * img.width
+        const sy = (selectedCrop?.y ?? 0) * img.height
+        const sw = (selectedCrop?.w ?? 1) * img.width
+        const sh = (selectedCrop?.h ?? 1) * img.height
+        const scale = Math.min(1, maxDim / Math.max(sw, sh))
+        const w = Math.max(1, Math.round(sw * scale))
+        const h = Math.max(1, Math.round(sh * scale))
         const canvas = document.createElement('canvas')
         canvas.width = w
         canvas.height = h
@@ -327,7 +522,7 @@ async function compressImage(file: File, maxDim: number, quality: number): Promi
           reject(new Error('Canvas 2D context unavailable'))
           return
         }
-        ctx.drawImage(img, 0, 0, w, h)
+        ctx.drawImage(img, sx, sy, sw, sh, 0, 0, w, h)
         const dataUrl = canvas.toDataURL('image/jpeg', quality)
         const base64 = dataUrl.split(',')[1] ?? ''
         resolve({ base64, dataUrl })

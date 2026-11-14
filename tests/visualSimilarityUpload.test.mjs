@@ -9,13 +9,13 @@ const proof = { model_id: 'synthetic/model', model_revision: 'a'.repeat(40), mod
 const previous = JSON.stringify({ threshold: 0.7, emb: [1, 0], thumb: 'previous', thumbMime: 'image/jpeg' })
 const file = { name: 'replacement.png', base64: 'replacement' }
 
-async function createFilter(value = previous, plan = 'collector') {
+async function createFilter(value = previous, plan = 'collector', styleMode = false) {
   const { descriptor } = parse(await readFile(new URL('../components/filters/VisualSimilarityFilter.vue', import.meta.url), 'utf8'))
   const code = stripTypeScriptTypes(compileScript(descriptor, { id: 'visual-upload-test' }).content)
     .replace(/import\s*\{([^}]*)\}\s*from\s*['"]vue['"]/g, (_, names) => `const {${names.replace(/\bas\b/g, ':')}} = __vue`)
     .replace('export default', 'return')
-  const pending = [], emitted = [], cleanup = []
-  const props = reactive({ modelValue: value })
+  const pending = [], emitted = [], events = [], cleanup = [], draws = []
+  const props = reactive({ modelValue: value, styleMode })
   const user = reactive({ currentPlan: { product: plan }, token: 'local-test-token' })
   class Reader {
     readAsDataURL(input) {
@@ -45,7 +45,8 @@ async function createFilter(value = previous, plan = 'collector') {
   }
   const document = { createElement() {
     let image
-    return { getContext: () => ({ drawImage: (value) => {
+    return { getContext: () => ({ drawImage: (value, ...coordinates) => {
+      draws.push(coordinates)
       image = value
     } }), toDataURL: () => `data:image/jpeg;base64,${image.value.split(',')[1]}` }
   } }
@@ -54,11 +55,13 @@ async function createFilter(value = previous, plan = 'collector') {
     (url, options) => new Promise((resolve, reject) => pending.push({ url, options, resolve, reject })), Reader, Photo, document, UploadedFile,
   )
   const effects = effectScope()
-  const state = effects.run(() => component.setup(props, { expose() {}, emit: (_, payload) => {
+  const state = effects.run(() => component.setup(props, { expose() {}, emit: (event, payload) => {
+    events.push([event, payload])
+    if (event !== 'update:modelValue') return
     emitted.push(payload)
     props.modelValue = payload
   } }))
-  return { state, props, pending, emitted,
+  return { state, props, pending, emitted, events, draws,
     select: (input = file) => state.onFileSelected({ target: { files: [input], value: input.name } }),
     stop: () => {
       cleanup.forEach(fn => fn())
@@ -205,5 +208,88 @@ test('a backend response without checkpoint proof cannot replace an active refer
   assert.equal(field.props.modelValue, previous)
   assert.equal(field.state.error.value, 'visualSimilarity.refreshFailed')
   assert.equal(field.state.pendingFile.value.name, 'replacement.png')
+  field.stop()
+})
+
+test('style upload sends the mode, suggests an editable canonical type, and requires confirmation', async () => {
+  const field = await createFilter('', 'collector', true)
+  const attempt = field.select()
+  await settle()
+  assert.equal(field.pending[0].options.body.mode, 'style')
+  assert.equal(field.events.filter(([event]) => event === 'ready').at(-1)[1], false)
+  field.pending[0].resolve({ emb: [1, 0], provenance: proof, suggestedGarmentType: 'jacket' })
+  await attempt
+  await nextTick()
+  assert.equal(field.state.garmentType.value, 'jacket')
+  assert.equal(field.events.filter(([event]) => event === 'ready').at(-1)[1], false)
+  field.state.typeConfirmed.value = true
+  field.state.size.value = ' M '
+  await nextTick()
+  assert.equal(field.events.filter(([event]) => event === 'ready').at(-1)[1], true)
+  assert.deepEqual(JSON.parse(field.props.modelValue), { mode: 'style', garmentType: 'jacket', size: 'M', threshold: 0.8, emb: [1, 0], thumb: 'replacement', thumbMime: 'image/jpeg', provenance: proof })
+  field.state.garmentType.value = 'coat'
+  await nextTick()
+  assert.equal(JSON.parse(field.props.modelValue).garmentType, 'coat')
+  field.stop()
+})
+
+test('style crop embeds exactly the selected rectangle and remains unready after failure', async () => {
+  const field = await createFilter('', 'collector', true)
+  const attempt = field.select()
+  await settle()
+  field.pending[0].resolve({ emb: [1, 0], provenance: proof })
+  await attempt
+  field.state.garmentType.value = 'dress'
+  field.state.typeConfirmed.value = true
+  await nextTick()
+  field.state.crop.value = { x: 0.25, y: 0, w: 0.5, h: 1 }
+  field.state.cropPending.value = true
+  field.state.applyCrop()
+  await settle()
+  assert.deepEqual(field.draws.at(-1), [128, 0, 256, 256, 0, 0, 256, 256])
+  field.pending[1].reject(new Error('Temporary error'))
+  await settle()
+  assert.equal(field.events.filter(([event]) => event === 'ready').at(-1)[1], false)
+  assert.equal(JSON.parse(field.props.modelValue).thumb, 'replacement')
+  assert.equal(field.state.sourceFile.value.name, file.name)
+  field.stop()
+})
+
+test('unknown suggested types cannot make a style reference ready', async () => {
+  const field = await createFilter('', 'collector', true)
+  const attempt = field.select()
+  await settle()
+  field.pending[0].resolve({ emb: [1, 0], provenance: proof, suggestedGarmentType: 'unknown' })
+  await attempt
+  assert.equal(field.state.garmentType.value, '')
+  assert.equal(field.events.filter(([event]) => event === 'ready').at(-1)[1], false)
+  field.stop()
+})
+
+test('loaded style preferences survive parent updates and threshold edits, bounded to four', async () => {
+  const example = { emb: [0, 1], provenance: proof, sourceListingId: 'source-id', sourcePlatform: 'Ebay', sourceImageUrl: 'https://images.example.test/garment.jpg', positive: true }
+  const raw = { ...JSON.parse(previous), mode: 'style', garmentType: 'jacket', provenance: proof, examples: Array.from({ length: 5 }, () => example) }
+  const field = await createFilter(JSON.stringify(raw), 'collector', true)
+  field.state.threshold.value = 0.88
+  await nextTick()
+  assert.equal(JSON.parse(field.props.modelValue).examples.length, 4)
+  field.props.modelValue = JSON.stringify({ ...JSON.parse(field.props.modelValue), examples: [{ ...example, positive: false }] })
+  await nextTick()
+  field.state.size.value = 'L'
+  await nextTick()
+  assert.deepEqual(JSON.parse(field.props.modelValue).examples, [{ ...example, positive: false }])
+  field.stop()
+})
+
+test('a new reference image clears previous style preferences', async () => {
+  const raw = { ...JSON.parse(previous), mode: 'style', garmentType: 'jacket', provenance: proof, examples: [{ emb: [0, 1], provenance: proof, sourceListingId: 'source-id', sourcePlatform: 'Ebay', sourceImageUrl: 'https://images.example.test/garment.jpg', positive: false }] }
+  const field = await createFilter(JSON.stringify(raw), 'collector', true)
+  const attempt = field.select()
+  await settle()
+  field.pending[0].resolve({ emb: [1, 0], provenance: proof })
+  await attempt
+  assert.equal(JSON.parse(field.props.modelValue).examples, undefined)
+  field.state.clear()
+  assert.equal(field.state.examples.value.length, 0)
   field.stop()
 })

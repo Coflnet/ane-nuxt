@@ -51,13 +51,12 @@ export const useFilterStore = defineStore('filter', () => {
   async function saveFilter(filterToCreate: ListingListener) {
     try {
       if (!userStore.token) {
-        console.error('No token found, can not add filter')
-        return
+        throw new Error('No token found, can not add filter')
       }
 
       const apiToken = `Bearer ${userStore.token}`
 
-      await addFilter({
+      return await addFilter({
         composable: '$fetch',
         headers: { Authorization: apiToken },
         body: filterToCreate as unknown as typeof filterToCreate,
@@ -80,7 +79,7 @@ export const useFilterStore = defineStore('filter', () => {
     await loadFilters()
   }
 
-  async function testFilter(filter: ListingListener): Promise<StoredListing[] | null> {
+  async function testFilter(filter: ListingListener, signal?: AbortSignal): Promise<StoredListing[] | null> {
     try {
       if (!userStore.token) {
         console.error('No token found, can not test filter')
@@ -90,6 +89,7 @@ export const useFilterStore = defineStore('filter', () => {
       const apiToken = `Bearer ${userStore.token}`
       const listings = await callTestFilter({
         composable: '$fetch',
+        signal,
         headers: { Authorization: apiToken },
         body: filter as unknown as typeof filter,
       })

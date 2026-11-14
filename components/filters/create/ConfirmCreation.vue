@@ -12,6 +12,7 @@
       aria-label="Save Filter"
       type="submit"
       :proccessing="saving"
+      :disabled="disabled"
     >
       {{ isNewFilter ? $t('createFilter') : $t('updateFilter') }}
     </UiButton>
@@ -19,5 +20,5 @@
 </template>
 
 <script setup lang="ts">
-defineProps({ isNewFilter: Boolean, saving: Boolean })
+defineProps({ isNewFilter: Boolean, saving: Boolean, disabled: Boolean })
 </script>
