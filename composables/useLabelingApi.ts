@@ -58,7 +58,7 @@ export function useLabelingApi() {
     label: async (pairId: string, label: LabelAnswer, reviewMode?: ReviewMode, captureCommitment?: string): Promise<void> => {
       await request<unknown>(`/${encodeURIComponent(pairId)}/label`, { method: 'POST', body: { label, ...(reviewMode ? { reviewMode } : {}), ...(captureCommitment ? { captureCommitment } : {}) } })
     },
-    stats: () => request<LabelingStats>('/stats', { timeout: 10_000 }),
+    stats: () => request<LabelingStats>('/stats', { query: { includeArchive: 'false' }, timeout: 10_000 }),
   }
 }
 

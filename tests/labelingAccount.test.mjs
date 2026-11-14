@@ -57,3 +57,30 @@ test('a stalled pair request times out once and a manual retry succeeds', { time
     await new Promise(resolve => server.close(resolve))
   }
 })
+
+test('statistics requests skip archive aggregation and preserve returned counts and rights', async () => {
+  const stats = { candidates: 12, labeled: 4, byLabel: { same_item: 4 }, excludedByRights: 2,
+    rights: [{ host: 'synthetic.example', status: 'allowed', checkedAt: '2026-11-14T00:00:00Z' }] }
+  const requests = []
+  const server = createServer((request, response) => {
+    requests.push(request.url)
+    response.writeHead(200, { 'Content-Type': 'application/json' })
+    response.end(JSON.stringify(stats))
+  })
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve))
+  try {
+    const source = readFileSync(new URL('../composables/useLabelingApi.ts', import.meta.url), 'utf8')
+    const code = stripTypeScriptTypes(source).replace(/^import .*$/gm, '').replace(/^export /gm, '')
+    const api = new Function('useApiBaseUrl', 'useUserStore', '$fetch', `${code}; return useLabelingApi()`)(
+      () => `http://127.0.0.1:${server.address().port}`, () => ({ token: 'synthetic' }), ofetch)
+    assert.deepEqual(await api.stats(), stats)
+    assert.equal(requests.length, 1)
+    const url = new URL(requests[0], 'http://localhost')
+    assert.equal(url.pathname, '/api/labeling/stats')
+    assert.equal(url.searchParams.get('includeArchive'), 'false')
+  }
+  finally {
+    server.closeAllConnections()
+    await new Promise(resolve => server.close(resolve))
+  }
+})
