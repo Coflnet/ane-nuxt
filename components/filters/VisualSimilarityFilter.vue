@@ -1,14 +1,19 @@
 <template>
   <div class="my-4">
-    <div class="flex items-center mb-2">
+    <div
+      v-if="!isStyle || !hasCollectorPlan"
+      class="flex items-center mb-2"
+    >
       <UiHeaderLabel
+        v-if="!isStyle"
         class="mt-1"
-        :label="isStyle ? $t('styleSearch.referencePhoto') : $t('visualSimilarity.title')"
+        :label="$t('visualSimilarity.title')"
         :sm="true"
         :accent="true"
       />
       <UiTooltipHover
-        :text="isStyle ? $t('styleSearch.info') : $t('visualSimilarity.info')"
+        v-if="!isStyle"
+        :text="$t('visualSimilarity.info')"
         class="mr-2 mt-1"
       >
         <UiQuestionMarkIcon />
@@ -25,7 +30,7 @@
       <!-- Reference image upload + preview -->
       <div class="flex-shrink-0">
         <label
-          class="block w-32 h-32 border-2 border-dashed border-secondary rounded cursor-pointer flex items-center justify-center overflow-hidden bg-dark"
+          class="block w-40 h-40 border-2 border-dashed border-secondary rounded cursor-pointer flex items-center justify-center overflow-hidden bg-dark"
           :class="{ 'opacity-50 cursor-not-allowed': !hasCollectorPlan || preparing }"
         >
           <img
@@ -41,6 +46,7 @@
             {{ $t('visualSimilarity.uploadHint') }}
           </span>
           <input
+            :aria-label="$t('styleSearch.referencePhoto')"
             type="file"
             accept="image/*"
             class="hidden"
@@ -56,35 +62,40 @@
         >
           {{ $t('remove') }}
         </button>
-      </div>
-
-      <div
-        v-if="isStyle && sourceDataUrl"
-        class="w-full md:w-64"
-      >
-        <p class="text-sm mb-2">
-          {{ $t('styleSearch.cropHint') }}
-        </p>
-        <div
-          class="relative inline-block touch-none select-none"
-          @pointerdown="startCrop"
-          @pointermove="moveCrop"
-          @pointerup="endCrop"
-          @pointercancel="endCrop"
+        <details
+          v-if="isStyle && sourceDataUrl"
+          class="w-full md:w-64"
         >
-          <img
-            :src="sourceDataUrl"
-            class="max-h-64 max-w-full pointer-events-none"
-            :alt="$t('styleSearch.reference')"
-            draggable="false"
-          >
+          <summary class="cursor-pointer text-sm mb-2">
+            {{ $t('styleSearch.editPhoto') }}
+          </summary>
+          <p class="text-sm mb-2">
+            {{ $t('styleSearch.cropHint') }}
+          </p>
           <div
-            v-if="crop"
-            class="absolute border-2 border-white bg-indigo-500/20 pointer-events-none"
-            :style="{ left: `${crop.x * 100}%`, top: `${crop.y * 100}%`, width: `${crop.w * 100}%`, height: `${crop.h * 100}%` }"
-          />
-        </div>
-        <div class="flex gap-3 text-sm mt-2">
+            class="relative inline-block touch-none select-none"
+            @pointerdown="startCrop"
+            @pointermove="moveCrop"
+            @pointerup="endCrop"
+            @pointercancel="endCrop"
+          >
+            <img
+              :src="sourceDataUrl"
+              class="max-h-64 max-w-full pointer-events-none"
+              :alt="$t('styleSearch.reference')"
+              draggable="false"
+            >
+            <div
+              v-if="crop"
+              class="absolute border-2 border-white bg-indigo-500/20 pointer-events-none"
+              :style="{ left: `${crop.x * 100}%`, top: `${crop.y * 100}%`, width: `${crop.w * 100}%`, height: `${crop.h * 100}%` }"
+            />
+          </div>
+        </details>
+        <div
+          v-if="isStyle && crop"
+          class="flex gap-3 text-sm mt-2"
+        >
           <button
             type="button"
             class="underline"
@@ -103,69 +114,73 @@
           </button>
         </div>
       </div>
+
       <!-- Threshold controls -->
       <div class="flex-grow w-full">
-        <template v-if="isStyle">
-          <label
-            class="block text-sm mb-1"
-            for="style-garment"
-          >{{ $t('styleSearch.garmentType') }}</label>
-          <select
-            id="style-garment"
-            v-model="garmentType"
-            class="w-full bg-dark border border-secondary rounded p-2"
-            required
-            @change="typeConfirmed = true"
-          >
-            <option value="">
-              {{ $t('styleSearch.chooseType') }}
-            </option>
-            <option
-              v-for="type in garmentTypes"
-              :key="type"
-              :value="type"
+        <div
+          v-if="isStyle"
+          class="grid grid-cols-2 gap-x-3 max-w-md"
+        >
+          <div>
+            <label
+              class="block text-sm mb-1"
+              for="style-garment"
+            >{{ $t('styleSearch.garmentType') }}</label>
+            <select
+              id="style-garment"
+              v-model="garmentType"
+              class="w-full bg-dark border border-secondary rounded p-2"
+              required
             >
-              {{ $t(`styleSearch.types.${type}`) }}
-            </option>
-          </select>
-          <p class="text-xs mt-1">
-            {{ $t('styleSearch.confirmType') }}
-          </p>
-          <label class="block text-sm mt-2"><input
-            v-model="typeConfirmed"
-            type="checkbox"
-            :disabled="!garmentType"
-          > {{ $t('styleSearch.typeConfirmed') }}</label>
-          <label
-            for="style-size"
-            class="block text-sm mt-3"
-          >{{ $t('styleSearch.size') }}</label>
-          <input
-            id="style-size"
-            v-model="size"
-            class="w-full bg-dark border border-secondary rounded p-2"
-            :placeholder="$t('styleSearch.sizeHint')"
-          >
-          <label
-            for="style-threshold"
-            class="block text-sm mt-3"
-          >{{ $t('styleSearch.matchRange') }}</label>
-          <select
-            id="style-threshold"
-            v-model.number="threshold"
-            class="w-full bg-dark border border-secondary rounded p-2"
-          >
-            <option :value="0.70">
-              {{ $t('styleSearch.broader') }}
-            </option>
-            <option :value="0.80">
-              {{ $t('styleSearch.balanced') }}
-            </option>
-            <option :value="0.88">
-              {{ $t('styleSearch.closer') }}
-            </option>
-          </select>
-        </template>
+              <option value="">
+                {{ $t('styleSearch.chooseType') }}
+              </option>
+              <option
+                v-for="type in garmentTypes"
+                :key="type"
+                :value="type"
+              >
+                {{ $t(`styleSearch.types.${type}`) }}
+              </option>
+            </select>
+          </div>
+          <div>
+            <label
+              for="style-size"
+              class="block text-sm mb-1"
+            >{{ $t('styleSearch.size') }}</label>
+            <input
+              id="style-size"
+              v-model="size"
+              class="w-full bg-dark border border-secondary rounded p-2"
+              :placeholder="$t('styleSearch.sizeHint')"
+            >
+          </div>
+          <details class="mt-3 col-span-2">
+            <summary class="cursor-pointer text-sm">
+              {{ $t('styleSearch.moreOptions') }}
+            </summary>
+            <label
+              for="style-threshold"
+              class="block text-sm mt-3"
+            >{{ $t('styleSearch.matchRange') }}</label>
+            <select
+              id="style-threshold"
+              v-model.number="threshold"
+              class="w-full bg-dark border border-secondary rounded p-2"
+            >
+              <option :value="0.70">
+                {{ $t('styleSearch.broader') }}
+              </option>
+              <option :value="0.80">
+                {{ $t('styleSearch.balanced') }}
+              </option>
+              <option :value="0.88">
+                {{ $t('styleSearch.closer') }}
+              </option>
+            </select>
+          </details>
+        </div>
         <template v-else>
           <label class="block text-sm mb-1">
             {{ $t('visualSimilarity.threshold') }}: {{ threshold.toFixed(2) }}
@@ -206,7 +221,7 @@
           {{ $t('visualSimilarity.preparing') }}
         </p>
         <p
-          v-else-if="hasEmbedding && provenance"
+          v-else-if="!isStyle && hasEmbedding && provenance"
           class="text-success text-xs mt-2"
         >
           {{ $t('visualSimilarity.ready') }}
@@ -251,7 +266,6 @@ const hasCollectorPlan = computed(() => {
 
 const garmentTypes = ['jacket', 'coat', 'dress', 'shirt', 'tshirt', 'sweatshirt', 'sweater', 'trousers', 'jeans', 'shorts', 'skirt', 'shoes', 'boots', 'bag'] as const
 const garmentType = ref('')
-const typeConfirmed = ref(false)
 const size = ref('')
 const savedStyle = ref(false)
 const isStyle = computed(() => props.styleMode || savedStyle.value)
@@ -310,7 +324,6 @@ function loadFromValue(raw: string) {
     examples.value = (p.examples ?? []).slice(0, 4)
     savedStyle.value = p.mode === 'style'
     garmentType.value = p.garmentType ?? ''
-    typeConfirmed.value = !!p.garmentType
     size.value = p.size ?? ''
     embedding.value = p.emb ?? []
     thumbBase64.value = p.thumb ?? ''
@@ -343,7 +356,7 @@ function emitPayload() {
 }
 
 watch([threshold, garmentType, size], emitPayload)
-watch(() => !preparing.value && !error.value && !cropPending.value && (isStyle.value ? hasEmbedding.value && !!provenance.value && !!garmentType.value && typeConfirmed.value : !hasEmbedding.value || !!provenance.value), ready => emit('ready', ready), { immediate: true })
+watch(() => !preparing.value && !error.value && !cropPending.value && (isStyle.value ? hasEmbedding.value && !!provenance.value && !!garmentType.value : !hasEmbedding.value || !!provenance.value), ready => emit('ready', ready), { immediate: true })
 
 function cancelPreparation() {
   preparation?.abort()
@@ -380,7 +393,6 @@ async function onFileSelected(ev: Event) {
   input.value = ''
 
   emit('dirty')
-  typeConfirmed.value = false
   sourceFile.value = file
   crop.value = null
   cropPending.value = false

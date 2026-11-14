@@ -240,3 +240,11 @@ test('changing a listing preference replaces its vector and polarity even when f
     assert.deepEqual(updated.slice(1), examples.slice(1))
   }
 })
+
+test('explicitly saving with notifications off preserves the existing None choice', async () => {
+  const fixture = serializer('Unknown')
+  const request = await fixture.create()
+  assert.equal(request.targetType, 'Unknown')
+  assert.equal(fixture.pushConnections, 0)
+  assert.deepEqual(fixture.userStore.notificationSettings, { discord: { webhookUrl: 'unchanged' }, email: { address: 'unchanged' } })
+})

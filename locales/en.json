@@ -1434,6 +1434,11 @@
   "labelingCohortMultiplePolicies": "This window contains more than one recorded policy. Shorten the interval and retry; your inputs have been kept.",
   "labelingCohortEmpty": "No reviewable admissions in this window. Try another closed interval or mode.",
   "styleSearch": {
+    "editPhoto": "Edit photo",
+    "moreOptions": "More options",
+    "moreFilters": "More filters",
+    "notifications": "Notifications off · Choose a channel",
+    "saveAlert": "Save alert",
     "referencePhoto": "Reference photo",
     "info": "Matches can differ in brand, colour or details. If image matching is unavailable, we retry checks for up to 24 hours.",
     "savedEarlierVersion": "The previous version was saved. Your newer changes are still here and need to be saved.",

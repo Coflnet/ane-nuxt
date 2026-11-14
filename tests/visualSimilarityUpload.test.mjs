@@ -211,7 +211,7 @@ test('a backend response without checkpoint proof cannot replace an active refer
   field.stop()
 })
 
-test('style upload sends the mode, suggests an editable canonical type, and requires confirmation', async () => {
+test('style upload sends the mode, suggests an editable canonical type and automatically becomes ready', async () => {
   const field = await createFilter('', 'collector', true)
   const attempt = field.select()
   await settle()
@@ -221,8 +221,7 @@ test('style upload sends the mode, suggests an editable canonical type, and requ
   await attempt
   await nextTick()
   assert.equal(field.state.garmentType.value, 'jacket')
-  assert.equal(field.events.filter(([event]) => event === 'ready').at(-1)[1], false)
-  field.state.typeConfirmed.value = true
+  assert.equal(field.events.filter(([event]) => event === 'ready').at(-1)[1], true)
   field.state.size.value = ' M '
   await nextTick()
   assert.equal(field.events.filter(([event]) => event === 'ready').at(-1)[1], true)
@@ -240,7 +239,6 @@ test('style crop embeds exactly the selected rectangle and remains unready after
   field.pending[0].resolve({ emb: [1, 0], provenance: proof })
   await attempt
   field.state.garmentType.value = 'dress'
-  field.state.typeConfirmed.value = true
   await nextTick()
   field.state.crop.value = { x: 0.25, y: 0, w: 0.5, h: 1 }
   field.state.cropPending.value = true
@@ -291,5 +289,19 @@ test('a new reference image clears previous style preferences', async () => {
   assert.equal(JSON.parse(field.props.modelValue).examples, undefined)
   field.state.clear()
   assert.equal(field.state.examples.value.length, 0)
+  field.stop()
+})
+
+test('saved style reference is ready on reload and its type stays editable', async () => {
+  const raw = { ...JSON.parse(previous), mode: 'style', garmentType: 'jacket', provenance: proof }
+  const field = await createFilter(JSON.stringify(raw), 'collector', true)
+  assert.equal(field.events.filter(([event]) => event === 'ready').at(-1)[1], true)
+  field.state.garmentType.value = ''
+  await nextTick()
+  assert.equal(field.events.filter(([event]) => event === 'ready').at(-1)[1], false)
+  field.state.garmentType.value = 'coat'
+  await nextTick()
+  assert.equal(field.events.filter(([event]) => event === 'ready').at(-1)[1], true)
+  assert.equal(JSON.parse(field.props.modelValue).garmentType, 'coat')
   field.stop()
 })

@@ -1,10 +1,18 @@
 <template>
   <div>
+    <h1
+      v-if="styleMode"
+      class="text-2xl mb-6"
+    >
+      {{ $t('styleSearch.title') }}
+    </h1>
     <FiltersCreateHeader
+      v-else
       :is-new-filter="isNewFilter"
       :item-id="filterId"
     />
     <UiButton
+      v-if="!styleMode"
       :primary="true"
       :proccessing="savingFilter"
       :disabled="!visualReady || feedbackPending"
@@ -15,7 +23,7 @@
       {{ isNewFilter ? $t('createFilter') : $t('updateFilter') }}
     </UiButton>
 
-    <UiDefaultContainer class="mb-6 p-6">
+    <UiDefaultContainer class="mb-6 p-3 sm:p-6">
       <form
         class="overflow-visible"
         @submit.prevent="saveFilter"
@@ -24,29 +32,14 @@
           :disabled="savingFilter"
           class="min-w-0"
         >
-          <div class="flex gap-3 mb-4">
-            <button
-              type="button"
-              class="underline"
-              :aria-pressed="!styleMode"
-              @click="setStyleMode(false)"
-            >
-              {{ $t('styleSearch.keywordSearch') }}
-            </button>
-            <button
-              type="button"
-              class="underline"
-              :aria-pressed="styleMode"
-              @click="setStyleMode(true)"
-            >
-              {{ $t('styleSearch.title') }}
-            </button>
-          </div>
+          <button
+            type="button"
+            class="text-sm underline mb-4"
+            @click="setStyleMode(!styleMode)"
+          >
+            {{ styleMode ? $t('styleSearch.keywordSearch') : $t('styleSearch.title') }}
+          </button>
           <template v-if="styleMode">
-            <h2 class="text-xl mb-2">
-              {{ $t('styleSearch.title') }}
-            </h2>
-            <p>{{ $t('styleSearch.intro') }}</p>
             <FiltersVisualSimilarityFilter
               v-model="filter.visualSimilarity"
               :style-mode="true"
@@ -58,42 +51,56 @@
             v-else
             v-model="filter"
           />
-          <FiltersSearchValueMarketplaceFilter v-model="filter" />
-
-          <FiltersPriceConditionFilter v-model="filter" />
-          <FiltersCreateCountrySection :model-value="filter" />
-
-          <!-- Dont worry about this, this whole system needs to get reworked by akwav -->
-          <div
-            v-for="option in filterStore.getFilterOptions"
-            :key="option.name"
+          <component
+            :is="styleMode ? 'details' : 'div'"
+            class="mb-4"
           >
-            <FiltersKleinanzeigenCategoryFilter
-              v-if="option.name === 'KleinanzeigenKategorie' && filter.marketplace == 'kleinanzeigen'"
-              :filter="filter"
-              :options="option.value.options"
-            />
-          </div>
-          <UiExpandOption class="mt-1 ">
-            <FiltersKeywordFilter
-              class="my-4"
-              :model-value="filter.blacklist"
-              :label="$t('blackKeywords')"
-              :footer="$t('addblacklistKeywords')"
-              :place-holder="$t('addBlackListPressEnter')"
-            />
-            <FiltersWhitelistFilter
-              class="my-4"
-              :model-value="filter.keywords"
-            />
-            <FiltersFuzzyFilter :model-value="filter" />
-            <FiltersVisualSimilarityFilter
-              v-if="!styleMode"
-              v-model="filter.visualSimilarity"
-              @ready="visualReady = $event"
-              @dirty="referenceDirty = true"
-            />
-          </UiExpandOption>
+            <summary
+              v-if="styleMode"
+              class="cursor-pointer text-sm"
+            >
+              {{ $t('styleSearch.moreFilters') }}
+            </summary>
+            <FiltersSearchValueMarketplaceFilter v-model="filter" />
+
+            <FiltersPriceConditionFilter v-model="filter" />
+            <FiltersCreateCountrySection :model-value="filter" />
+
+            <!-- Dont worry about this, this whole system needs to get reworked by akwav -->
+            <div
+              v-for="option in filterStore.getFilterOptions"
+              :key="option.name"
+            >
+              <FiltersKleinanzeigenCategoryFilter
+                v-if="option.name === 'KleinanzeigenKategorie' && filter.marketplace == 'kleinanzeigen'"
+                :filter="filter"
+                :options="option.value.options"
+              />
+            </div>
+            <component
+              :is="styleMode ? 'div' : UiExpandOption"
+              class="mt-1"
+            >
+              <FiltersKeywordFilter
+                class="my-4"
+                :model-value="filter.blacklist"
+                :label="$t('blackKeywords')"
+                :footer="$t('addblacklistKeywords')"
+                :place-holder="$t('addBlackListPressEnter')"
+              />
+              <FiltersWhitelistFilter
+                class="my-4"
+                :model-value="filter.keywords"
+              />
+              <FiltersFuzzyFilter :model-value="filter" />
+              <FiltersVisualSimilarityFilter
+                v-if="!styleMode"
+                v-model="filter.visualSimilarity"
+                @ready="visualReady = $event"
+                @dirty="referenceDirty = true"
+              />
+            </component>
+          </component>
           <div
             v-if="styleMode"
             class="mb-4"
@@ -120,9 +127,6 @@
             <p v-else-if="previewDone && !matches.length">
               {{ $t('styleSearch.empty') }}
             </p>
-            <p v-else-if="!visualReady">
-              {{ $t('styleSearch.prepareFirst') }}
-            </p>
             <p v-if="feedbackPending">
               {{ $t('styleSearch.feedbackLoading') }}
             </p>
@@ -147,14 +151,14 @@
               :disabled="feedbackPending || savingFilter"
               @click="clearFeedback"
             >
-              {{ $t('styleSearch.clearFeedback') }} ({{ exampleCount }}/4)
+              {{ $t('styleSearch.clearFeedback') }}
             </button>
             <p v-if="exampleCount >= 4">
               {{ $t('styleSearch.feedbackLimit') }}
             </p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+            <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 mt-4">
               <article
-                v-for="match in matches"
+                v-for="match in matches.slice(0, 3)"
                 :key="`${match.listingData?.platform}-${match.listingData?.id}`"
                 class="rounded border border-slate-600 p-3"
               >
@@ -168,41 +172,63 @@
                     :src="match.listingData.imageUrls[0]"
                     :alt="match.listingData.title ?? ''"
                     loading="lazy"
-                    class="w-full h-48 object-contain"
+                    class="w-full h-32 object-contain"
                   >
-                  <h3>{{ match.listingData?.title }}</h3>
+                  <h3 class="line-clamp-2 text-sm">{{ match.listingData?.title }}</h3>
                 </a>
                 <p>{{ useFormat().formatCurrency(match.listingData?.price ?? 0, match.listingData?.currency ?? '', locale) }}</p>
                 <div class="flex gap-3 mt-2">
                   <button
                     type="button"
-                    class="underline"
+                    class="min-h-11 min-w-11 p-2 rounded hover:bg-slate-700"
                     :disabled="!visualReady || feedbackPending || savingFilter || (exampleCount >= 4 && feedbackChoice(match.listingData) === undefined)"
+                    :aria-label="$t('styleSearch.moreLike')"
+                    :title="$t('styleSearch.moreLike')"
                     :aria-pressed="feedbackChoice(match.listingData) === true"
                     :class="{ 'bg-indigo-700 px-2 rounded font-semibold': feedbackChoice(match.listingData) === true }"
                     @click="match.listingData && addFeedback(match.listingData, true)"
                   >
-                    {{ $t('styleSearch.moreLike') }}
+                    <Icon
+                      name="tabler:thumb-up"
+                      aria-hidden="true"
+                    />
                   </button>
                   <button
                     type="button"
-                    class="underline"
+                    class="min-h-11 min-w-11 p-2 rounded hover:bg-slate-700"
                     :disabled="!visualReady || feedbackPending || savingFilter || (exampleCount >= 4 && feedbackChoice(match.listingData) === undefined)"
+                    :aria-label="$t('styleSearch.notRelevant')"
+                    :title="$t('styleSearch.notRelevant')"
                     :aria-pressed="feedbackChoice(match.listingData) === false"
                     :class="{ 'bg-indigo-700 px-2 rounded font-semibold': feedbackChoice(match.listingData) === false }"
                     @click="match.listingData && addFeedback(match.listingData, false)"
                   >
-                    {{ $t('styleSearch.notRelevant') }}
+                    <Icon
+                      name="tabler:thumb-down"
+                      aria-hidden="true"
+                    />
                   </button>
                 </div>
               </article>
             </div>
           </div>
 
-          <FiltersNotificationSettingsFilter v-model="filter" />
+          <component
+            :is="styleMode ? 'details' : 'div'"
+            class="mt-4"
+          >
+            <summary
+              v-if="styleMode"
+              class="cursor-pointer text-sm"
+            >
+              {{ notificationSummary }}
+            </summary>
+            <FiltersNotificationSettingsFilter v-model="filter" />
+          </component>
 
           <FiltersCreateConfirmCreation
             :is-new-filter="isNewFilter"
+            :save-label="styleMode ? $t('styleSearch.saveAlert') : undefined"
             :saving="savingFilter"
             :disabled="!visualReady || feedbackPending"
           />
@@ -219,6 +245,7 @@
 </template>
 
 <script setup lang="ts">
+import { UiExpandOption } from '#components'
 import lodash from 'lodash'
 import { getMessaging, getToken } from 'firebase/messaging'
 import { useFirebaseApp } from 'vuefire'
@@ -312,6 +339,15 @@ const filter = ref<Filter>({
   referenceSelector: '',
   referenceAdditionalSelectors: [],
   referenceLastRefreshedAt: '',
+})
+
+const notificationSummary = computed(() => {
+  switch (filter.value.notificationType) {
+    case 'Email': return t('email')
+    case 'DiscordWebhook': return 'Discord'
+    case 'FireBase': return t('pushNotifications')
+    default: return t('styleSearch.notifications')
+  }
 })
 
 watch(() => filter.value.visualSimilarity, () => {

@@ -1434,6 +1434,11 @@
   "labelingCohortMultiplePolicies": "Dieses Zeitfenster enthält mehrere erfasste Richtlinien. Verkürze es und versuche es erneut; deine Eingaben bleiben erhalten.",
   "labelingCohortEmpty": "Keine bewertbaren Freigaben in diesem Zeitfenster. Versuche ein anderes abgeschlossenes Zeitfenster oder einen anderen Modus.",
   "styleSearch": {
+    "editPhoto": "Foto bearbeiten",
+    "moreOptions": "Weitere Optionen",
+    "moreFilters": "Weitere Filter",
+    "notifications": "Benachrichtigungen aus · Kanal wählen",
+    "saveAlert": "Alarm speichern",
     "referencePhoto": "Referenzfoto",
     "info": "Treffer können sich bei Marke, Farbe oder Details unterscheiden. Ist der Bildabgleich nicht verfügbar, versuchen wir die Prüfung bis zu 24 Stunden erneut.",
     "savedEarlierVersion": "Die vorherige Version wurde gespeichert. Deine neueren Änderungen sind weiterhin hier und noch nicht gespeichert.",

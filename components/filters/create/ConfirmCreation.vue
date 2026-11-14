@@ -14,11 +14,11 @@
       :proccessing="saving"
       :disabled="disabled"
     >
-      {{ isNewFilter ? $t('createFilter') : $t('updateFilter') }}
+      {{ saveLabel || (isNewFilter ? $t('createFilter') : $t('updateFilter')) }}
     </UiButton>
   </div>
 </template>
 
 <script setup lang="ts">
-defineProps({ isNewFilter: Boolean, saving: Boolean, disabled: Boolean })
+defineProps({ isNewFilter: Boolean, saving: Boolean, disabled: Boolean, saveLabel: String })
 </script>
