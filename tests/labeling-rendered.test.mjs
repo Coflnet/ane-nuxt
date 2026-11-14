@@ -779,3 +779,100 @@ test('a completed account denial still shows the actual user id without loading 
   }
   finally { view.unmount() }
 })
+
+test('pair loading follows account success and reviewing does not fetch collapsed stats', async () => {
+  let deliverPairs, statsCalls = 0, saves = 0
+  const pendingPairs = new Promise(resolve => { deliverPairs = resolve })
+  const view = await mountPage({
+    me: async () => ({ canLabel: true, userId: 'reviewer' }),
+    next: () => pendingPairs,
+    stats: () => { statsCalls++; return new Promise(() => {}) },
+    label: async () => { saves++ },
+  })
+  try {
+    const text = () => view.all().map(node => node.text).join(' ')
+    assert.match(text(), /labelingLoadingPairs/)
+    assert.doesNotMatch(text(), /labelingChecking/)
+    assert.equal(statsCalls, 0)
+    deliverPairs(Array.from({ length: 8 }, (_, index) => pair(index + 1)))
+    await view.settle()
+    assert.ok(view.find('labeling-answer-1'))
+    assert.doesNotMatch(text(), /labelingLoadingPairs/)
+    for (let i = 0; i < 5; i++) await view.click('labeling-answer-1')
+    assert.equal(saves, 5)
+    assert.equal(statsCalls, 0, 'five successful saves must not fetch collapsed statistics')
+    assert.ok(view.find('labeling-answer-1'))
+  }
+  finally { view.unmount() }
+})
+
+test('expanding statistics fetches on demand and a failed fetch can be retried', async () => {
+  let statsCalls = 0
+  const view = await mountPage({
+    me: async () => ({ canLabel: true, userId: 'reviewer' }),
+    next: async () => [pair(1)],
+    stats: async () => { if (++statsCalls === 1) throw new Error('temporary'); return { candidates: 1 } },
+  })
+  try {
+    assert.equal(statsCalls, 0)
+    view.find('labeling-stats-toggle').props.onToggle({ target: { open: true } })
+    await view.settle()
+    assert.equal(statsCalls, 1)
+    assert.ok(view.find('labeling-stats-retry'))
+    assert.ok(view.find('labeling-answer-1'), 'statistics failure must leave the pair available')
+    await view.click('labeling-stats-retry')
+    assert.equal(statsCalls, 2)
+    assert.equal(view.find('labeling-stats-retry'), undefined)
+    assert.ok(view.find('labeling-answer-1'))
+  }
+  finally { view.unmount() }
+})
+
+test('pair lookup failure shows a recoverable error without claiming the queue is empty', async () => {
+  let batches = 0
+  const view = await mountPage({
+    me: async () => ({ canLabel: true, userId: 'reviewer' }),
+    next: async () => { if (++batches === 1) throw new Error('temporary'); return [pair(1)] },
+    stats: async () => { throw new Error('unexpected statistics request') },
+  })
+  try {
+    assert.ok(view.find('labeling-load-error'))
+    assert.doesNotMatch(view.all().map(node => node.text).join(' '), /labelingEmptyTitle|labelingEmptyText|labelingChecking|labelingLoadingPairs/)
+    assert.equal(view.find('labeling-reload').text, 'retry')
+    await view.click('labeling-reload')
+    assert.equal(batches, 2)
+    assert.equal(view.find('labeling-load-error'), undefined)
+    assert.ok(view.find('labeling-answer-1'))
+  }
+  finally { view.unmount() }
+})
+
+
+test('reopening pending statistics shares one fetch and later saves can refresh them', async () => {
+  let deliverStats, statsCalls = 0, saves = 0
+  const pendingStats = new Promise(resolve => { deliverStats = resolve })
+  const view = await mountPage({
+    me: async () => ({ canLabel: true, userId: 'reviewer' }),
+    next: async () => Array.from({ length: 8 }, (_, index) => pair(index + 1)),
+    stats: () => ++statsCalls === 1 ? pendingStats : Promise.resolve({ candidates: 8 }),
+    label: async () => { saves++ },
+  })
+  try {
+    const toggle = open => view.find('labeling-stats-toggle').props.onToggle({ target: { open } })
+    toggle(true)
+    await view.settle()
+    assert.ok(view.all().some(node => node.props.role === 'status' && node.text === 'loading'))
+    toggle(false)
+    toggle(true)
+    await view.settle()
+    assert.equal(statsCalls, 1, 'reopening must share the existing statistics request')
+    deliverStats({ candidates: 8 })
+    await view.settle()
+    assert.equal(view.all().some(node => node.props.role === 'status' && node.text === 'loading'), false)
+    for (let i = 0; i < 5; i++) await view.click('labeling-answer-1')
+    assert.equal(saves, 5)
+    assert.equal(statsCalls, 2, 'completed requests must release the guard for later updates')
+    assert.equal(view.find('labeling-stats-retry'), undefined)
+  }
+  finally { view.unmount() }
+})

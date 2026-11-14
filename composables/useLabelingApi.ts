@@ -33,8 +33,8 @@ export function useLabelingApi() {
       method: options.method ?? 'GET',
       query: options.query,
       body: options.body as Record<string, unknown> | undefined,
-      timeout: options.timeout,
-      retry: options.retry,
+      timeout: options.timeout ?? 15_000,
+      retry: options.retry ?? 0,
       headers: { Authorization: `Bearer ${userStore.token}` },
     }) as Promise<T>
   }
@@ -44,6 +44,8 @@ export function useLabelingApi() {
     const absolute = /^https?:\/\//.test(url) ? url : `${useApiBaseUrl()}${url}`
     return $fetch<Blob>(absolute, {
       responseType: 'blob',
+      timeout: 15_000,
+      retry: 0,
       headers: { Authorization: `Bearer ${userStore.token}` },
     })
   }
@@ -56,7 +58,7 @@ export function useLabelingApi() {
     label: async (pairId: string, label: LabelAnswer, reviewMode?: ReviewMode, captureCommitment?: string): Promise<void> => {
       await request<unknown>(`/${encodeURIComponent(pairId)}/label`, { method: 'POST', body: { label, ...(reviewMode ? { reviewMode } : {}), ...(captureCommitment ? { captureCommitment } : {}) } })
     },
-    stats: () => request<LabelingStats>('/stats'),
+    stats: () => request<LabelingStats>('/stats', { timeout: 10_000 }),
   }
 }
 

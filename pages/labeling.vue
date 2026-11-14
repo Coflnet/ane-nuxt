@@ -282,14 +282,14 @@
               class="text-slate-400"
               role="status"
             >
-              {{ $t('labelingChecking') }}
+              {{ $t('labelingLoadingPairs') }}
             </p>
           </template>
           <template v-else>
-            <h2 class="text-lg font-semibold text-white mb-1">
+            <h2 v-if="!loadFailed" class="text-lg font-semibold text-white mb-1">
               {{ $t('labelingEmptyTitle') }}
             </h2>
-            <p class="text-slate-400 mb-4">
+            <p v-if="!loadFailed" class="text-slate-400 mb-4">
               {{ $t('labelingEmptyText') }}
             </p>
             <div class="flex justify-center gap-2">
@@ -301,7 +301,7 @@
                 data-testid="labeling-reload"
                 @click="reload"
               >
-                {{ $t('labelingReload') }}
+                {{ $t(loadFailed ? 'retry' : 'labelingReload') }}
               </button>
               <button
                 v-if="canUndo"
@@ -493,10 +493,32 @@
       </div>
 
       <aside class="min-w-0">
-        <LabelingStatsPanel
-          :stats="stats"
-          :failed="statsFailed"
-        />
+        <details
+          data-testid="labeling-stats-toggle"
+          @toggle="toggleStats"
+        >
+          <summary class="cursor-pointer rounded-lg bg-slate-800 p-4 text-slate-200">
+            {{ $t('labelingStatsTitle') }}
+          </summary>
+          <p v-if="statsOpen && statsLoading" role="status" class="p-4 text-slate-400">
+            {{ $t('loading') }}
+          </p>
+          <LabelingStatsPanel
+            v-if="statsOpen"
+            :stats="stats"
+            :failed="statsFailed"
+          />
+          <button
+            v-if="statsOpen && statsFailed"
+            type="button"
+            class="min-h-11 text-indigo-300 underline"
+            data-testid="labeling-stats-retry"
+            :disabled="statsLoading"
+            @click="loadStats"
+          >
+            {{ $t('retry') }}
+          </button>
+        </details>
       </aside>
     </div>
   </div>
@@ -583,6 +605,8 @@ let generation = 0
 
 const stats = ref<LabelingStats | null>(null)
 const statsFailed = ref(false)
+const statsOpen = ref(false)
+const statsLoading = ref(false)
 const pendingSaves = ref(0)
 // Review only the immutable archived copy, fetched with the reviewer's existing bearer.
 const photoSrc = reactive<Record<string, string>>({ a: '', b: '' })
@@ -673,13 +697,24 @@ function formatScore(value?: number | null) {
   return typeof value === 'number' ? value.toFixed(3) : '-'
 }
 
+function toggleStats(event: Event) {
+  statsOpen.value = (event.target as HTMLDetailsElement).open
+  if (statsOpen.value && !stats.value) void loadStats()
+}
+
 async function loadStats() {
+  if (statsLoading.value) return
+  statsLoading.value = true
+  statsFailed.value = false
   try {
     stats.value = await api.stats()
     statsFailed.value = false
   }
   catch {
     statsFailed.value = true
+  }
+  finally {
+    statsLoading.value = false
   }
 }
 
@@ -723,7 +758,7 @@ async function reload() {
   exhausted.value = false
   loadFailed.value = false
   state.value = createQueueState()
-  await Promise.all([loadBatch(), loadStats()])
+  await loadBatch()
 }
 
 function submit(label: LabelAnswer, retry = false) {
@@ -742,7 +777,7 @@ function submit(label: LabelAnswer, retry = false) {
   sender(pairId, label, reviewMode).then(() => {
     if (review.attempt !== attempt) return
     review.saved = true
-    if (savedCount.value % STATS_EVERY === 0) loadStats()
+    if (statsOpen.value && savedCount.value % STATS_EVERY === 0) loadStats()
   }).catch(() => {
     if (review.attempt !== attempt) return
     review.failed = true

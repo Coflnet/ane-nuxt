@@ -30,3 +30,30 @@ test('a stalled account request times out once and a manual retry succeeds', { t
     await new Promise(resolve => server.close(resolve))
   }
 })
+
+test('a stalled pair request times out once and a manual retry succeeds', { timeout: 25_000 }, async () => {
+  let requests = 0
+  const server = createServer((request, response) => {
+    assert.equal(new URL(request.url, 'http://localhost').pathname, '/api/labeling/next')
+    if (++requests === 1) return
+    response.writeHead(200, { 'Content-Type': 'application/json' })
+    response.end(JSON.stringify([{ pairId: 'synthetic-pair' }]))
+  })
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve))
+  try {
+    const source = readFileSync(new URL('../composables/useLabelingApi.ts', import.meta.url), 'utf8')
+    const code = stripTypeScriptTypes(source).replace(/^import .*$/gm, '').replace(/^export /gm, '')
+    const api = new Function('useApiBaseUrl', 'useUserStore', '$fetch', `${code}; return useLabelingApi()`)(
+      () => `http://127.0.0.1:${server.address().port}`, () => ({ token: 'synthetic' }), ofetch)
+    const start = performance.now()
+    await assert.rejects(api.next(8, ''), error => /timeout|timed out|aborted/i.test(String(error)))
+    assert.ok(performance.now() - start < 20_000, 'pair lookup must leave its loading state promptly')
+    assert.equal(requests, 1, 'automatic retries must not extend the pair deadline')
+    assert.deepEqual(await api.next(8, ''), [{ pairId: 'synthetic-pair' }])
+    assert.equal(requests, 2)
+  }
+  finally {
+    server.closeAllConnections()
+    await new Promise(resolve => server.close(resolve))
+  }
+})

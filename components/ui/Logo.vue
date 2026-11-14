@@ -7,6 +7,7 @@
       class="w-11 h-11 rounded-md bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold p-1"
     >
       <svg
+        class="size-full"
         width="321"
         height="200"
         viewBox="0 0 321 200"
