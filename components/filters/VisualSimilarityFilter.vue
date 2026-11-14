@@ -393,6 +393,7 @@ async function onFileSelected(ev: Event) {
   input.value = ''
 
   emit('dirty')
+  if (isStyle.value && hasEmbedding.value) garmentType.value = ''
   sourceFile.value = file
   crop.value = null
   cropPending.value = false

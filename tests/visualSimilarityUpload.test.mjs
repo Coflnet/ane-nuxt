@@ -305,3 +305,29 @@ test('saved style reference is ready on reload and its type stays editable', asy
   assert.equal(JSON.parse(field.props.modelValue).garmentType, 'coat')
   field.stop()
 })
+
+test('replacement style photos get their own garment suggestion while retries keep manual edits', async () => {
+  const raw = { ...JSON.parse(previous), mode: 'style', garmentType: 'jacket', provenance: proof }
+  const field = await createFilter(JSON.stringify(raw), 'collector', true)
+  let attempt = field.select()
+  await settle()
+  field.pending[0].resolve({ emb: [0, 1], provenance: proof, suggestedGarmentType: 'dress' })
+  await attempt
+  await nextTick()
+  assert.equal(field.state.garmentType.value, 'dress')
+  assert.equal(field.events.filter(([event]) => event === 'ready').at(-1)[1], true)
+  attempt = field.select()
+  await settle()
+  field.pending[1].resolve({ emb: [1, 0], provenance: proof })
+  await attempt
+  await nextTick()
+  assert.equal(field.state.garmentType.value, '')
+  assert.equal(field.events.filter(([event]) => event === 'ready').at(-1)[1], false)
+  field.state.garmentType.value = 'coat'
+  attempt = field.state.prepareImage(file)
+  await settle()
+  field.pending[2].resolve({ emb: [1, 0], provenance: proof, suggestedGarmentType: 'dress' })
+  await attempt
+  assert.equal(field.state.garmentType.value, 'coat')
+  field.stop()
+})
