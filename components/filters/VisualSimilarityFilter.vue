@@ -3,12 +3,12 @@
     <div class="flex items-center mb-2">
       <UiHeaderLabel
         class="mt-1"
-        :label="$t('visualSimilarity.title')"
+        :label="isStyle ? $t('styleSearch.referencePhoto') : $t('visualSimilarity.title')"
         :sm="true"
         :accent="true"
       />
       <UiTooltipHover
-        :text="$t('visualSimilarity.info')"
+        :text="isStyle ? $t('styleSearch.info') : $t('visualSimilarity.info')"
         class="mr-2 mt-1"
       >
         <UiQuestionMarkIcon />
