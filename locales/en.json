@@ -777,6 +777,7 @@
   "mediumFuzzy": "Medium Fuzziness",
   "fuzzyInfo": "Amount of letters that can be different from your search value: ( Switch -> Swtich ) \n NOTE: changing this value can cause your search to match other products. This setting is restricted to paid tiers",
   "visualSimilarity": {
+    "planError": "Could not check your plan.",
     "title": "Visual Similarity",
     "info": "Upload a reference image to check primary-image similarity (CLIP cosine similarity) after the other filters match. If the image service is temporarily unavailable, notifications may arrive without this check. Collectors tier or higher.",
     "uploadHint": "Click to upload reference image",

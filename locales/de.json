@@ -776,6 +776,7 @@
   "mediumFuzzy": "Mittlere Toleranz",
   "fuzzyInfo": "Anzahl der Buchstaben, die sich von deinem Suchwert unterscheiden dürfen: (z.B. Auto -> Auot, entspricht Niedriger Toleranz) \n Vorsicht! Suchwerte mit Toleranz können andere Produkte mit einschließen. Diese Einstellung ist wegen des Rechenaufwands nur für zahlende Nutzer verfügbar.",
   "visualSimilarity": {
+    "planError": "Dein Tarif konnte nicht geprüft werden.",
     "title": "Visuelle Ähnlichkeit",
     "info": "Lade ein Referenzbild hoch, um die Ähnlichkeit des Hauptbilds (CLIP Cosine-Ähnlichkeit) zu prüfen, nachdem die anderen Filter passen. Ist der Bilddienst vorübergehend nicht verfügbar, können Benachrichtigungen ohne diese Prüfung eintreffen. Sammler-Tier oder höher.",
     "uploadHint": "Klicken, um Referenzbild hochzuladen",

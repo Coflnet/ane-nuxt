@@ -1,25 +1,23 @@
 <template>
   <div class="my-4">
     <div
-      v-if="!isStyle || !hasCollectorPlan"
+      v-if="!isStyle"
       class="flex items-center mb-2"
     >
       <UiHeaderLabel
-        v-if="!isStyle"
         class="mt-1"
         :label="$t('visualSimilarity.title')"
         :sm="true"
         :accent="true"
       />
       <UiTooltipHover
-        v-if="!isStyle"
         :text="$t('visualSimilarity.info')"
         class="mr-2 mt-1"
       >
         <UiQuestionMarkIcon />
       </UiTooltipHover>
       <div
-        v-if="!hasCollectorPlan"
+        v-if="!hasCollectorPlan && !checkingPlan && !planError"
         class="ml-2 px-2 py-0.5 bg-blue-500 text-white text-xs font-semibold rounded-full"
       >
         {{ $t('pricing.plans.collector.name') }}
@@ -30,7 +28,7 @@
       <!-- Reference image upload + preview -->
       <div class="flex-shrink-0">
         <label
-          class="block w-40 h-40 border-2 border-dashed border-secondary rounded cursor-pointer flex items-center justify-center overflow-hidden bg-dark"
+          class="relative w-40 h-40 border-2 border-dashed border-secondary rounded cursor-pointer flex items-center justify-center overflow-hidden bg-dark focus-within:ring-2 focus-within:ring-indigo-400"
           :class="{ 'opacity-50 cursor-not-allowed': !hasCollectorPlan || preparing }"
         >
           <img
@@ -43,17 +41,38 @@
             v-else
             class="text-light text-xs text-center px-2"
           >
-            {{ $t('visualSimilarity.uploadHint') }}
+            {{ $t(checkingPlan ? 'loading' : planError ? 'visualSimilarity.planError' : !hasCollectorPlan ? 'visualSimilarity.collectorRequired' : 'visualSimilarity.uploadHint') }}
           </span>
           <input
             :aria-label="$t('styleSearch.referencePhoto')"
             type="file"
             accept="image/*"
-            class="hidden"
+            class="sr-only"
             :disabled="!hasCollectorPlan || preparing"
             @change="onFileSelected"
           >
         </label>
+        <p
+          v-if="planError && thumbDataUrl"
+          class="text-sm mt-2"
+        >
+          {{ $t('visualSimilarity.planError') }}
+        </p>
+        <button
+          v-if="planError"
+          type="button"
+          class="underline mt-2"
+          @click="loadPlan"
+        >
+          {{ $t('retry') }}
+        </button>
+        <NuxtLink
+          v-else-if="!checkingPlan && !hasCollectorPlan"
+          :to="localePath('/subscriptions')"
+          class="underline text-sm"
+        >
+          {{ $t('pricing.plans.collector.name') }}
+        </NuxtLink>
         <button
           v-if="thumbDataUrl"
           type="button"
@@ -259,9 +278,31 @@ const emit = defineEmits<{
 }>()
 
 const userStore = useUserStore()
+const localePath = useLocalePath()
+const checkingPlan = ref(true)
+const planError = ref(false)
 const hasCollectorPlan = computed(() => {
   const product = userStore.currentPlan?.product
-  return product === 'collector' || product === 'flipper'
+  return !checkingPlan.value && !planError.value && (product === 'collector' || product === 'flipper')
+})
+
+async function loadPlan() {
+  const token = userStore.token
+  checkingPlan.value = true
+  planError.value = false
+  try {
+    await userStore.getSubscriptionEndDate()
+  }
+  catch {
+    if (token === userStore.token) planError.value = true
+  }
+  finally {
+    if (token === userStore.token) checkingPlan.value = false
+  }
+}
+
+onMounted(() => {
+  watch(() => userStore.token, loadPlan, { immediate: true })
 })
 
 const garmentTypes = ['jacket', 'coat', 'dress', 'shirt', 'tshirt', 'sweatshirt', 'sweater', 'trousers', 'jeans', 'shorts', 'skirt', 'shoes', 'boots', 'bag'] as const

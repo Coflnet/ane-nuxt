@@ -16,7 +16,7 @@ async function createFilter(value = previous, plan = 'collector', styleMode = fa
     .replace('export default', 'return')
   const pending = [], emitted = [], events = [], cleanup = [], draws = []
   const props = reactive({ modelValue: value, styleMode })
-  const user = reactive({ currentPlan: { product: plan }, token: 'local-test-token' })
+  const user = reactive({ currentPlan: { product: plan }, token: 'local-test-token', getSubscriptionEndDate: async () => {} })
   class Reader {
     readAsDataURL(input) {
       queueMicrotask(() => {
@@ -50,8 +50,8 @@ async function createFilter(value = previous, plan = 'collector', styleMode = fa
       image = value
     } }), toDataURL: () => `data:image/jpeg;base64,${image.value.split(',')[1]}` }
   } }
-  const component = new Function('__vue', 'ref', 'shallowRef', 'computed', 'watch', 'onBeforeUnmount', 'useUserStore', 'useI18n', '$fetch', 'FileReader', 'Image', 'document', 'File', code)(
-    await import('vue'), ref, shallowRef, computed, watch, fn => cleanup.push(fn), () => user, () => ({ t: key => key }),
+  const component = new Function('__vue', 'ref', 'shallowRef', 'computed', 'watch', 'onBeforeUnmount', 'onMounted', 'useUserStore', 'useLocalePath', 'useI18n', '$fetch', 'FileReader', 'Image', 'document', 'File', code)(
+    await import('vue'), ref, shallowRef, computed, watch, fn => cleanup.push(fn), fn => fn(), () => user, () => path => path, () => ({ t: key => key }),
     (url, options) => new Promise((resolve, reject) => pending.push({ url, options, resolve, reject })), Reader, Photo, document, UploadedFile,
   )
   const effects = effectScope()

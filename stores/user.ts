@@ -312,6 +312,9 @@ export const useUserStore = defineStore('user', () => {
     user.value = null
     isAuthenticated.value = false
     token.value = null
+    currentPlan.value = null
+    subscriptionStartDate.value = ''
+    noPremium.value = null
     // the cached invite link belongs to the signed-out account
     userReferralCode.value = ''
 
@@ -378,14 +381,24 @@ export const useUserStore = defineStore('user', () => {
   }
 
   async function getSubscriptionEndDate() {
-    const apiToken = `Bearer ${token.value}`
-    const result = await getSubscription({ composable: '$fetch', headers: { Authorization: apiToken } })
-    if (result.length == 0) {
-      noPremium.value = true
-      return
-    }
+    const requestToken = token.value
+    currentPlan.value = null
+    subscriptionStartDate.value = ''
+    noPremium.value = null
+    if (!requestToken) return
 
-    subscriptionStartDate.value = result[0]?.createdAt ?? ''
+    const result = await getSubscription({
+      composable: '$fetch',
+      headers: { Authorization: `Bearer ${requestToken}` },
+      signal: AbortSignal.timeout(8000),
+    })
+    if (token.value !== requestToken) return
+
+    const active = result.filter(subscription => !subscription.endsAt || Date.parse(subscription.endsAt) > Date.now())
+    currentPlan.value = active.find(subscription => subscription.product === 'flipper')
+      ?? active.find(subscription => subscription.product === 'collector') ?? active[0] ?? null
+    subscriptionStartDate.value = currentPlan.value?.createdAt ?? ''
+    noPremium.value = currentPlan.value === null
   }
 
   function getTimeTillSubscriptionRenewal(startDateString: string) {
@@ -464,6 +477,7 @@ export const useUserStore = defineStore('user', () => {
     loadFilterCache,
     signInWithEmailPassword,
     loadRemainingSearches,
+    getSubscriptionEndDate,
     generateReferralCode,
     useRefferalCode,
     getUserData,
