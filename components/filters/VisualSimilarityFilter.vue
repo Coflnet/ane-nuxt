@@ -288,7 +288,7 @@ async function loadPlan() {
   checkingPlan.value = true
   planError.value = false
   try {
-    await userStore.getSubscriptionEndDate()
+    await userStore.ensureEntitlements()
   }
   catch {
     if (token === userStore.token) planError.value = true

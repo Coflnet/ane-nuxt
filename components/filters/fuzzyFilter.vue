@@ -38,5 +38,16 @@ import type { Filter } from '~/types/FilterType'
 
 const model = defineModel<Filter>()
 
-const hasBasicPlan = useUserStore().effectiveTier === 'free'
+const userStore = useUserStore()
+const hasBasicPlan = computed(() => userStore.effectiveTier === 'free')
+
+function loadEntitlements() {
+  // a failed lookup keeps the gate locked; the tier cannot be known
+  userStore.ensureEntitlements().catch(error => console.error('Failed to load entitlements:', error))
+}
+
+onMounted(() => {
+  loadEntitlements()
+  watch(() => userStore.token, loadEntitlements)
+})
 </script>

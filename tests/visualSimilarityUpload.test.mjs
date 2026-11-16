@@ -16,7 +16,7 @@ async function createFilter(value = previous, plan = 'collector', styleMode = fa
     .replace('export default', 'return')
   const pending = [], emitted = [], events = [], cleanup = [], draws = []
   const props = reactive({ modelValue: value, styleMode })
-  const user = reactive({ currentPlan: { product: plan }, get effectiveTier() { return plan === 'collector' || plan === 'flipper' ? plan : 'free' }, token: 'local-test-token', getSubscriptionEndDate: async () => {} })
+  const user = reactive({ currentPlan: { product: plan }, get effectiveTier() { return plan === 'collector' || plan === 'flipper' ? plan : 'free' }, token: 'local-test-token', ensureEntitlements: async () => {} })
   class Reader {
     readAsDataURL(input) {
       queueMicrotask(() => {

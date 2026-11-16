@@ -31,7 +31,17 @@ import type { Filter } from '~/types/FilterType'
 import type { Options } from '~/constants/CreateFilterConstants'
 import { marketplaces, frequency } from '~/constants/CreateFilterConstants'
 
-const hasBasicPlan = useUserStore().effectiveTier === 'free'
+const userStore = useUserStore()
+const hasBasicPlan = computed(() => userStore.effectiveTier === 'free')
+
+function loadEntitlements() {
+  userStore.ensureEntitlements().catch(error => console.error('Failed to load entitlements:', error))
+}
+
+onMounted(() => {
+  loadEntitlements()
+  watch(() => userStore.token, loadEntitlements)
+})
 
 const premiumMarkets = ref(false)
 const model = defineModel<Filter>()
@@ -56,7 +66,7 @@ watch(selectedMarketplaces, (_) => {
     premiumMarkets.value = true
     // the default value or every 10 minutes
     model.value!.frequency = '*/20 * * * *'
-    if (useUserStore().effectiveTier === 'free')
+    if (userStore.effectiveTier === 'free')
       model.value!.frequency = '0 */6 * * *'
   }
 }, { deep: true })

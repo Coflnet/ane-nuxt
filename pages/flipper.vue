@@ -863,7 +863,7 @@ function getAuthHeaders() {
 async function syncCurrentPlan() {
   await userStore.checkAuth(useFirebaseAuth()!)
   try {
-    await userStore.refreshEntitlements()
+    await userStore.ensureEntitlements()
   }
   catch (error) {
     console.error('Failed to refresh current plan:', error)

@@ -31,8 +31,8 @@ async function field(filename, model) {
     .replace(/import\s*\{([^}]*)\}\s*from\s*['"]vue['"]/g, (_, names) => `const {${names.replace(/\bas\b/g, ':')}} = __vue`)
     .replace(/import\s*\{([^}]*)\}\s*from\s*['"]~\/constants\/CreateFilterConstants['"]/g, (_, names) => `const {${names}} = __constants`)
     .replace('export default', 'return')
-  const component = new Function('__vue', '__constants', 'ref', 'computed', 'watch', 'useUserStore', code)(
-    { ...vue, useModel: () => model }, { marketplaces, frequency: [], condidtion: [] }, ref, computed, watch, () => ({ currentPlan: { product: 'collector' } }),
+  const component = new Function('__vue', '__constants', 'ref', 'computed', 'watch', 'useUserStore', 'onMounted', code)(
+    { ...vue, useModel: () => model }, { marketplaces, frequency: [], condidtion: [] }, ref, computed, watch, () => ({ currentPlan: { product: 'collector' }, ensureEntitlements: async () => {} }), fn => fn(),
   )
   const scope = effectScope()
   const state = scope.run(() => component.setup({}, { expose() {}, emit() {} }))

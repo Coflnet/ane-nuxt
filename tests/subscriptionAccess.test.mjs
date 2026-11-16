@@ -3,7 +3,9 @@ import { readFile } from 'node:fs/promises'
 import { stripTypeScriptTypes } from 'node:module'
 import test from 'node:test'
 import { createPinia, defineStore } from 'pinia'
-import { computed, ref } from 'vue'
+import { compileScript, parse } from 'vue/compiler-sfc'
+import * as vue from 'vue'
+import { computed, effectScope, nextTick, reactive, ref, watch } from 'vue'
 
 const source = await readFile(new URL('../stores/user.ts', import.meta.url), 'utf8')
 const code = stripTypeScriptTypes(source).replace(/^import .*$/gm, '').replace('export const useUserStore', 'const useUserStore')
@@ -63,6 +65,9 @@ test('failed refresh clears cached entitlement and rejects so a retry can recove
   const store = createStore(async () => {
     if (fail) throw new Error('offline')
     return [{ product: 'collector' }]
+  }, async () => {
+    if (fail) throw new Error('access offline')
+    return { tier: 'free' }
   })
   await assert.rejects(store.getSubscriptionEndDate(), /offline/)
   assert.equal(store.currentPlan, null)
@@ -146,13 +151,99 @@ test('refreshEntitlements keeps the previous tier while loading and clears it wi
   assert.equal(store.effectiveTier, 'free')
 })
 
-test('a failing subscription lookup still applies the ownership grant and rethrows', async () => {
+test('a failing subscription lookup does not throw when access loaded', async () => {
   const store = createStore(async () => {
     throw new Error('500')
   }, async () => ({ tier: 'flipper', until: '2999-01-01T00:00:00Z', source: 'ownership' }))
-  await assert.rejects(store.getSubscriptionEndDate(), /500/)
+  await store.getSubscriptionEndDate()
   assert.equal(store.effectiveTier, 'flipper')
   assert.equal(store.currentPlan, null)
+  await store.ensureEntitlements()
+})
+
+test('a failing access lookup is fine when the subscription loaded', async () => {
+  const store = createStore(async () => [{ product: 'flipper' }], async () => {
+    throw new Error('down')
+  })
+  await store.refreshEntitlements()
+  assert.equal(store.effectiveTier, 'flipper')
+})
+
+test('both lookups failing reports the error and ensureEntitlements retries', async () => {
+  let fail = true
+  const store = createStore(async () => {
+    if (fail) throw new Error('sub down')
+    return []
+  }, async () => {
+    if (fail) throw new Error('access down')
+    return { tier: 'flipper', source: 'ownership' }
+  })
+  await assert.rejects(store.ensureEntitlements(), /sub down/)
+  fail = false
+  await store.ensureEntitlements()
+  assert.equal(store.effectiveTier, 'flipper')
+})
+
+test('concurrent refreshes share one request pair and ensureEntitlements skips once loaded', async () => {
+  let subscriptionCalls = 0
+  let accessCalls = 0
+  const store = createStore(async () => {
+    subscriptionCalls++
+    return []
+  }, async () => {
+    accessCalls++
+    return { tier: 'flipper', source: 'ownership' }
+  })
+  await Promise.all([store.refreshEntitlements(), store.ensureEntitlements(), store.ensureEntitlements()])
+  assert.deepEqual([subscriptionCalls, accessCalls], [1, 1])
+  await store.ensureEntitlements()
+  assert.deepEqual([subscriptionCalls, accessCalls], [1, 1])
+  await store.refreshEntitlements()
+  assert.deepEqual([subscriptionCalls, accessCalls], [2, 2])
+})
+
+test('ensureEntitlements reloads after the token changes', async () => {
+  let accessCalls = 0
+  const store = createStore(async () => [], async () => {
+    accessCalls++
+    return { tier: 'free' }
+  })
+  await store.ensureEntitlements()
+  store.token = 'account-b'
+  await store.ensureEntitlements()
+  assert.equal(accessCalls, 2)
+})
+
+test('fuzzy filter gate is reactive and loads entitlements on mount', async () => {
+  const { descriptor } = parse(await readFile(new URL('../components/filters/fuzzyFilter.vue', import.meta.url), 'utf8'))
+  const code = stripTypeScriptTypes(compileScript(descriptor, { id: 'fuzzy-test' }).content)
+    .replace(/import\s*\{([^}]*)\}\s*from\s*['"]vue['"]/g, (_, names) => `const {${names.replace(/\bas\b/g, ':')}} = __vue`)
+    .replace(/^import .*$/gm, '').replace('export default', 'return')
+  const user = reactive({
+    effectiveTier: 'free',
+    token: 't',
+    ensured: 0,
+    ensureEntitlements() {
+      user.ensured++
+      return Promise.resolve()
+    },
+  })
+  const scope = effectScope()
+  let hasBasicPlan
+  scope.run(() => {
+    const setup = new Function('__vue', 'useUserStore', 'computed', 'watch', 'onMounted', 'fuzzyOptions', code)(
+      { ...vue, useModel: () => ref({}) }, () => user, computed, watch, fn => fn(), [],
+    )
+    hasBasicPlan = setup.setup({}, { expose() {} }).hasBasicPlan
+  })
+  assert.equal(user.ensured, 1)
+  assert.equal(hasBasicPlan.value, true)
+  user.effectiveTier = 'flipper'
+  assert.equal(hasBasicPlan.value, false)
+  user.token = 'u'
+  await nextTick()
+  assert.equal(user.ensured, 2)
+  scope.stop()
 })
 
 test('consumers of the plan use the effective tier instead of the subscription product', async () => {

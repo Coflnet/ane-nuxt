@@ -336,6 +336,7 @@ export const useUserStore = defineStore('user', () => {
     access.value = null
     subscriptionStartDate.value = ''
     noPremium.value = null
+    resetEntitlementLoad()
     // the cached invite link belongs to the signed-out account
     userReferralCode.value = ''
 
@@ -401,38 +402,72 @@ export const useUserStore = defineStore('user', () => {
     return { used: 0, total: 0, refreshData: 0 }
   }
 
+  // Intentional reset: forgets cached entitlements and refetches them (a refresh already in flight is abandoned).
   async function getSubscriptionEndDate() {
     currentPlan.value = null
     access.value = null
     subscriptionStartDate.value = ''
     noPremium.value = null
+    resetEntitlementLoad()
+    await refreshEntitlements()
+  }
+
+  // Entitlement load bookkeeping. Plain variables on purpose: they must not be persisted or hydrated.
+  let loadedEntitlementsToken: string | null = null
+  let inflightRefresh: { token: string, promise: Promise<void> } | null = null
+
+  function resetEntitlementLoad() {
+    loadedEntitlementsToken = null
+    inflightRefresh = null
+  }
+
+  // Resolves immediately once entitlements for the current token are loaded, otherwise shares the in-flight refresh.
+  async function ensureEntitlements() {
+    if (!token.value || loadedEntitlementsToken === token.value) return
     await refreshEntitlements()
   }
 
   // Reloads subscription plan and effective access without clearing the cached values first,
-  // so a refresh never flickers the tier down to free.
-  async function refreshEntitlements() {
+  // so a refresh never flickers the tier down to free. Concurrent callers share one request pair per token.
+  function refreshEntitlements(): Promise<void> {
     const requestToken = token.value
     if (!requestToken) {
       currentPlan.value = null
       access.value = null
-      return
+      resetEntitlementLoad()
+      return Promise.resolve()
     }
+    if (inflightRefresh?.token === requestToken) return inflightRefresh.promise
 
+    const promise = loadEntitlements(requestToken)
+    const entry = { token: requestToken, promise }
+    inflightRefresh = entry
+    const release = () => {
+      if (inflightRefresh === entry) inflightRefresh = null
+    }
+    promise.then(release, release)
+    return promise
+  }
+
+  async function loadEntitlements(requestToken: string) {
     const headers = { Authorization: `Bearer ${requestToken}` }
     const [subscriptions, effectiveAccess] = await Promise.allSettled([
       getSubscription({ composable: '$fetch', headers, signal: AbortSignal.timeout(8000) }),
-      loadAccess(headers),
+      fetchAccess(headers),
     ])
     if (token.value !== requestToken) return
 
-    // access is applied even when the subscription call failed, so a grant still counts
+    // access is authoritative for the tier (it merges subscription and ownership grants server side)
     access.value = effectiveAccess.status === 'fulfilled' ? effectiveAccess.value : null
-    if (subscriptions.status === 'rejected') {
-      noPremium.value = null
+    if (subscriptions.status === 'fulfilled') applySubscriptions(subscriptions.value)
+    else noPremium.value = null
+
+    // the tier is only unknown when both lookups failed
+    if (subscriptions.status === 'rejected' && effectiveAccess.status === 'rejected')
       throw subscriptions.reason
-    }
-    applySubscriptions(subscriptions.value)
+    if (subscriptions.status === 'rejected')
+      console.error('Failed to load subscription:', subscriptions.reason)
+    loadedEntitlementsToken = requestToken
   }
 
   function applySubscriptions(result: ActiveSubscription[]) {
@@ -443,14 +478,8 @@ export const useUserStore = defineStore('user', () => {
     noPremium.value = currentPlan.value === null && accessTier(access.value) === 'free'
   }
 
-  async function loadAccess(headers: { Authorization: string }): Promise<AccessInfo | null> {
-    try {
-      return await getAccess({ composable: '$fetch', headers, signal: AbortSignal.timeout(8000) })
-    }
-    catch (error) {
-      console.error('Failed to load effective access:', error)
-      return null
-    }
+  function fetchAccess(headers: { Authorization: string }): Promise<AccessInfo> {
+    return getAccess({ composable: '$fetch', headers, signal: AbortSignal.timeout(8000) })
   }
 
   function getTimeTillSubscriptionRenewal(startDateString: string) {
@@ -533,6 +562,7 @@ export const useUserStore = defineStore('user', () => {
     loadRemainingSearches,
     getSubscriptionEndDate,
     refreshEntitlements,
+    ensureEntitlements,
     generateReferralCode,
     useRefferalCode,
     getUserData,
