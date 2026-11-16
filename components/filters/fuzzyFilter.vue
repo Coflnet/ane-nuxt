@@ -38,5 +38,5 @@ import type { Filter } from '~/types/FilterType'
 
 const model = defineModel<Filter>()
 
-const hasBasicPlan = useUserStore().currentPlan?.product == 'basic' || !useUserStore().currentPlan?.product
+const hasBasicPlan = useUserStore().effectiveTier === 'free'
 </script>

@@ -930,6 +930,12 @@ export type OpensearchProductMarketplaceSource = {
     maxPrice?: number | null;
 };
 
+export type PaymentControllerAccessInfo = {
+    tier?: string | null;
+    until?: string | null;
+    source?: string | null;
+};
+
 export type PaymentControllerActiveSubscription = {
     id?: string | null;
     product?: string | null;
@@ -4051,6 +4057,57 @@ export type GetSubscriptionResponses = {
 };
 
 export type GetSubscriptionResponse = GetSubscriptionResponses[keyof GetSubscriptionResponses];
+
+export type GetAccessData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/payment/access';
+};
+
+export type GetAccessErrors = {
+    /**
+     * Bad Request
+     */
+    400: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * More info about the error, may sometimes be sufficient to display to user
+         */
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: {
+        /**
+         * Human readable id for this kind of error
+         */
+        slug?: string;
+        /**
+         * Unknown error occured
+         */
+        message?: string;
+        /**
+         * Id for the error report with this id
+         */
+        trace?: string;
+    };
+};
+
+export type GetAccessError = GetAccessErrors[keyof GetAccessErrors];
+
+export type GetAccessResponses = {
+    /**
+     * OK
+     */
+    200: PaymentControllerAccessInfo;
+};
+
+export type GetAccessResponse = GetAccessResponses[keyof GetAccessResponses];
 
 export type SubscribeData = {
     body?: PaymentControllerSubscriptionRequest;

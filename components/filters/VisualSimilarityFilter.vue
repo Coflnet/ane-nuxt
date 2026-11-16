@@ -281,10 +281,7 @@ const userStore = useUserStore()
 const localePath = useLocalePath()
 const checkingPlan = ref(true)
 const planError = ref(false)
-const hasCollectorPlan = computed(() => {
-  const product = userStore.currentPlan?.product
-  return !checkingPlan.value && !planError.value && (product === 'collector' || product === 'flipper')
-})
+const hasCollectorPlan = computed(() => !checkingPlan.value && !planError.value && userStore.effectiveTier !== 'free')
 
 async function loadPlan() {
   const token = userStore.token

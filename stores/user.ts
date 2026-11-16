@@ -2,10 +2,27 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { createUserWithEmailAndPassword, type EmailAuthCredential, EmailAuthProvider, GoogleAuthProvider, linkWithCredential, linkWithPopup, signInAnonymously, signInWithEmailAndPassword, signInWithPopup, type Auth, updateProfile, type UserCredential, getAdditionalUserInfo } from 'firebase/auth'
 import { navigateTo } from '#app'
-import { createLink, getStats, listLinks, loginFirebase, useLink } from '~/src/api-client'
-import type { PaymentControllerActiveSubscription as ActiveSubscription, ClientModelFilterMatch as FilterMatch } from '~/src/api-client'
+import { createLink, getAccess, getStats, listLinks, loginFirebase, useLink } from '~/src/api-client'
+import type { PaymentControllerAccessInfo as AccessInfo, PaymentControllerActiveSubscription as ActiveSubscription, ClientModelFilterMatch as FilterMatch } from '~/src/api-client'
 import { canCreateReferralLink, isSelfReferral, REFERRAL_LINK_NAME, REFERRAL_LINK_TEXT } from '~/utils/referral'
 import { canLoadStats } from '~/utils/stats'
+
+export type AccessTier = 'free' | 'collector' | 'flipper'
+
+const tierRank: Record<AccessTier, number> = { free: 0, collector: 1, flipper: 2 }
+
+function highestTier(a: AccessTier, b: AccessTier): AccessTier {
+  return tierRank[a] >= tierRank[b] ? a : b
+}
+
+function planTier(plan: ActiveSubscription | null | undefined): AccessTier {
+  if (plan?.product === 'flipper') return 'flipper'
+  return plan?.product && plan.product !== 'basic' ? 'collector' : 'free'
+}
+
+function accessTier(info: AccessInfo | null | undefined): AccessTier {
+  return info?.tier === 'flipper' || info?.tier === 'collector' ? info.tier : 'free'
+}
 
 // Types
 export interface User {
@@ -55,7 +72,10 @@ export const useUserStore = defineStore('user', () => {
   const cachedFilters = ref<{ [id: number]: string }>()
   const currentPlan = ref<ActiveSubscription | null>()
   const subscriptionStartDate = ref('')
+  // effective access from /api/payment/access; also covers manual ownership grants that have no subscription
+  const access = ref<AccessInfo | null>(null)
   const noPremium = ref<boolean | null>(null)
+  const effectiveTier = computed<AccessTier>(() => highestTier(planTier(currentPlan.value), accessTier(access.value)))
   const remainingFilters = ref<number>(3)
   const acceptingReferralCode = ref<string>('')
   const userReferralCode = ref<string>('')
@@ -313,6 +333,7 @@ export const useUserStore = defineStore('user', () => {
     isAuthenticated.value = false
     token.value = null
     currentPlan.value = null
+    access.value = null
     subscriptionStartDate.value = ''
     noPremium.value = null
     // the cached invite link belongs to the signed-out account
@@ -381,24 +402,55 @@ export const useUserStore = defineStore('user', () => {
   }
 
   async function getSubscriptionEndDate() {
-    const requestToken = token.value
     currentPlan.value = null
+    access.value = null
     subscriptionStartDate.value = ''
     noPremium.value = null
-    if (!requestToken) return
+    await refreshEntitlements()
+  }
 
-    const result = await getSubscription({
-      composable: '$fetch',
-      headers: { Authorization: `Bearer ${requestToken}` },
-      signal: AbortSignal.timeout(8000),
-    })
+  // Reloads subscription plan and effective access without clearing the cached values first,
+  // so a refresh never flickers the tier down to free.
+  async function refreshEntitlements() {
+    const requestToken = token.value
+    if (!requestToken) {
+      currentPlan.value = null
+      access.value = null
+      return
+    }
+
+    const headers = { Authorization: `Bearer ${requestToken}` }
+    const [subscriptions, effectiveAccess] = await Promise.allSettled([
+      getSubscription({ composable: '$fetch', headers, signal: AbortSignal.timeout(8000) }),
+      loadAccess(headers),
+    ])
     if (token.value !== requestToken) return
 
+    // access is applied even when the subscription call failed, so a grant still counts
+    access.value = effectiveAccess.status === 'fulfilled' ? effectiveAccess.value : null
+    if (subscriptions.status === 'rejected') {
+      noPremium.value = null
+      throw subscriptions.reason
+    }
+    applySubscriptions(subscriptions.value)
+  }
+
+  function applySubscriptions(result: ActiveSubscription[]) {
     const active = result.filter(subscription => !subscription.endsAt || Date.parse(subscription.endsAt) > Date.now())
     currentPlan.value = active.find(subscription => subscription.product === 'flipper')
       ?? active.find(subscription => subscription.product === 'collector') ?? active[0] ?? null
     subscriptionStartDate.value = currentPlan.value?.createdAt ?? ''
-    noPremium.value = currentPlan.value === null
+    noPremium.value = currentPlan.value === null && accessTier(access.value) === 'free'
+  }
+
+  async function loadAccess(headers: { Authorization: string }): Promise<AccessInfo | null> {
+    try {
+      return await getAccess({ composable: '$fetch', headers, signal: AbortSignal.timeout(8000) })
+    }
+    catch (error) {
+      console.error('Failed to load effective access:', error)
+      return null
+    }
   }
 
   function getTimeTillSubscriptionRenewal(startDateString: string) {
@@ -451,6 +503,8 @@ export const useUserStore = defineStore('user', () => {
     notificationSettings,
     cachedAuctions,
     currentPlan,
+    access,
+    effectiveTier,
     subscriptionStartDate,
     noPremium,
     remainingFilters,
@@ -478,6 +532,7 @@ export const useUserStore = defineStore('user', () => {
     signInWithEmailPassword,
     loadRemainingSearches,
     getSubscriptionEndDate,
+    refreshEntitlements,
     generateReferralCode,
     useRefferalCode,
     getUserData,

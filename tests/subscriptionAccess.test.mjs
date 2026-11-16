@@ -8,9 +8,9 @@ import { computed, ref } from 'vue'
 const source = await readFile(new URL('../stores/user.ts', import.meta.url), 'utf8')
 const code = stripTypeScriptTypes(source).replace(/^import .*$/gm, '').replace('export const useUserStore', 'const useUserStore')
 
-function createStore(getSubscription) {
-  const useStore = new Function('defineStore', 'ref', 'computed', 'useLocalePath', 'navigateTo', 'getSubscription', `${code}; return useUserStore`)(
-    defineStore, ref, computed, () => path => path, () => {}, getSubscription,
+function createStore(getSubscription, getAccess = async () => ({ tier: 'free', until: null, source: null })) {
+  const useStore = new Function('defineStore', 'ref', 'computed', 'useLocalePath', 'navigateTo', 'getSubscription', 'getAccess', `${code}; return useUserStore`)(
+    defineStore, ref, computed, () => path => path, () => {}, getSubscription, getAccess,
   )
   const store = useStore(createPinia())
   store.token = 'account-a'
@@ -27,7 +27,7 @@ test('subscription refresh prioritizes active Flipper then Collector and rejects
   const flipper = { product: 'flipper', createdAt: '2026-02-01T00:00:00Z', endsAt: '2999-01-01T00:00:00Z' }
   const basic = { product: 'basic', endsAt: null }
   let subscriptions = [basic, expired, invalid, collector, flipper]
-  const store = createStore(async options => {
+  const store = createStore(async (options) => {
     assert.equal(options.headers.Authorization, 'Bearer account-a')
     assert.ok(options.signal instanceof AbortSignal)
     return subscriptions
@@ -98,4 +98,73 @@ test('logout clears subscription state and an outstanding lookup cannot restore 
   assert.equal(store.currentPlan, null)
   assert.equal(store.subscriptionStartDate, '')
   assert.equal(store.noPremium, null)
+})
+
+test('ownership-only grant gives the effective flipper tier without a subscription plan', async () => {
+  const until = '2999-01-01T00:00:00Z'
+  const store = createStore(async () => [], async (options) => {
+    assert.equal(options.headers.Authorization, 'Bearer account-a')
+    return { tier: 'flipper', until, source: 'ownership' }
+  })
+  await store.getSubscriptionEndDate()
+  assert.equal(store.currentPlan, null)
+  assert.equal(store.effectiveTier, 'flipper')
+  assert.equal(store.noPremium, false)
+  assert.equal(store.access.until, until)
+})
+
+test('effective tier takes the higher of subscription and access and ignores a failing access lookup', async () => {
+  const collector = { product: 'collector', createdAt: '2026-01-01T00:00:00Z', endsAt: null }
+  const store = createStore(async () => [collector], async () => ({ tier: 'flipper', source: 'ownership' }))
+  await store.getSubscriptionEndDate()
+  assert.equal(store.effectiveTier, 'flipper')
+
+  const failing = createStore(async () => [collector], async () => {
+    throw new Error('down')
+  })
+  await failing.getSubscriptionEndDate()
+  assert.equal(failing.effectiveTier, 'collector')
+  assert.equal(failing.access, null)
+})
+
+test('free users and the basic product stay free', async () => {
+  const store = createStore(async () => [{ product: 'basic', endsAt: null }])
+  await store.getSubscriptionEndDate()
+  assert.equal(store.effectiveTier, 'free')
+})
+
+test('refreshEntitlements keeps the previous tier while loading and clears it without a token', async () => {
+  let seen
+  const store = createStore(async () => [], async () => ({ tier: 'collector', source: 'ownership' }))
+  const pending = store.refreshEntitlements()
+  seen = store.currentPlan
+  await pending
+  assert.equal(seen?.product, 'collector')
+  assert.equal(store.effectiveTier, 'collector')
+  store.token = null
+  await store.refreshEntitlements()
+  assert.equal(store.effectiveTier, 'free')
+})
+
+test('a failing subscription lookup still applies the ownership grant and rethrows', async () => {
+  const store = createStore(async () => {
+    throw new Error('500')
+  }, async () => ({ tier: 'flipper', until: '2999-01-01T00:00:00Z', source: 'ownership' }))
+  await assert.rejects(store.getSubscriptionEndDate(), /500/)
+  assert.equal(store.effectiveTier, 'flipper')
+  assert.equal(store.currentPlan, null)
+})
+
+test('consumers of the plan use the effective tier instead of the subscription product', async () => {
+  for (const file of ['components/filters/VisualSimilarityFilter.vue', 'components/filters/fuzzyFilter.vue', 'components/filters/SearchValueMarketplaceFilter.vue']) {
+    const text = await readFile(new URL(`../${file}`, import.meta.url), 'utf8')
+    assert.match(text, /effectiveTier/, file)
+    assert.doesNotMatch(text, /currentPlan\?\.product/, file)
+  }
+})
+
+test('subscriptions page loads the grant independent of subscription records', async () => {
+  const text = await readFile(new URL('../pages/subscriptions.vue', import.meta.url), 'utf8')
+  const body = text.slice(text.indexOf('async function getCurrentSubscription'), text.indexOf('async function loadGrant'))
+  assert.ok(body.indexOf('await loadGrant()') > 0 && body.indexOf('await loadGrant()') < body.indexOf('await getSubscription'))
 })

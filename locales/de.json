@@ -748,6 +748,8 @@
   "errorReffering": "Beim Einlösen Ihres Empfehlungsbonus ist ein Fehler aufgetreten. Bitte kontaktieren Sie den Support.",
   "subscriptionAlreadyCanceledHeader": "Ihr Abonnement ist bereits gekündigt",
   "subscriptionAlreadyCanceledFooter": "Sie haben Ihr Abonnement bereits gekündigt, aber es ist noch Restlaufzeit vorhanden. Sobald diese abläuft, ändert sich Ihr aktueller Plan und es fallen keine weiteren Kosten an.",
+  "grantActiveUntil": "{plan} aktiv bis {date}",
+  "grantActive": "{plan} aktiv",
   "soundsGood": "Einverstanden",
   "accountSettings": "Kontoeinstellungen",
   "accountSettingsSubtitle": "Verwalten Sie Ihre Kontoinformationen und -einstellungen",

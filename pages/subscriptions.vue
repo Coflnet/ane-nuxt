@@ -35,6 +35,14 @@
       </p>
     </div>
 
+    <p
+      v-if="grantLabel"
+      data-testid="access-grant"
+      class="max-w-md mx-auto mb-8 text-center text-sm text-green-400"
+    >
+      {{ grantLabel }}
+    </p>
+
     <div class="grid gap-8 lg:grid-cols-3 sm:grid-cols-2 sm:gap-6">
       <SubscriptionsPlanCard
         v-for="plan in displayPlans"
@@ -62,6 +70,7 @@
 
 <script setup lang="ts">
 import { plans, type PlanId, type Plan } from '~/constants/SubscriptionConstants'
+import { getAccess } from '~/src/api-client'
 
 interface AuthErrorLike {
   response?: {
@@ -83,6 +92,14 @@ const selectedPlan = ref<PlanId | null>(null)
 const confirmCancelation = ref(false)
 const endDate = ref<Date | null>(null)
 const subscriptionCanceled = computed(() => Number.isNaN(endDate.value?.getTime()))
+// manual grant (ownership) that is not a subscription, so it has nothing to cancel
+const grant = ref<{ tier: string, until: Date | null } | null>(null)
+const grantLabel = computed(() => {
+  if (!grant.value) return ''
+  const plan = grant.value.tier === 'flipper' ? 'Flipper' : 'Collector'
+  if (!grant.value.until) return t('grantActive', { plan })
+  return t('grantActiveUntil', { plan, date: grant.value.until.toLocaleDateString() })
+})
 const discountCode = ref('')
 const discountApplied = ref(false)
 const discountPercent = ref(0)
@@ -180,6 +197,10 @@ async function confirmCancelSubscription() {
   if (!(await ensureAuth())) return
   try {
     const result = await getSubscription({ composable: '$fetch', headers: { Authorization: getApiToken() } })
+    if (!result[0]) {
+      confirmCancelation.value = false
+      return
+    }
     await cancelSubscription({
       composable: '$fetch',
       path: { id: result[0]?.id ?? '' },
@@ -202,6 +223,8 @@ async function getCurrentSubscription() {
   endDate.value = userStore.currentPlan?.endsAt != null ? new Date(userStore.currentPlan?.endsAt) : null
 
   if (!userStore.token) return
+  // independent of the subscription branches: a grant can exist next to a lapsed or lower subscription
+  await loadGrant()
   try {
     const result = await getSubscription({ composable: '$fetch', headers: { Authorization: getApiToken() } })
     if (result.length == 0) {
@@ -226,6 +249,19 @@ async function getCurrentSubscription() {
     if (handleAuthError(error)) return
     push.error(`${t('errorCreatingSubscription')} ${error}`)
     console.error(error)
+  }
+}
+
+async function loadGrant() {
+  grant.value = null
+  try {
+    const access = await getAccess({ composable: '$fetch', headers: { Authorization: getApiToken() } })
+    userStore.access = access
+    if (access.source !== 'ownership' || (access.tier !== 'flipper' && access.tier !== 'collector')) return
+    grant.value = { tier: access.tier, until: access.until ? new Date(access.until) : null }
+  }
+  catch (error) {
+    console.error('Failed to load access grant:', error)
   }
 }
 

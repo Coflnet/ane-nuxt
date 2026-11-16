@@ -31,7 +31,7 @@ import type { Filter } from '~/types/FilterType'
 import type { Options } from '~/constants/CreateFilterConstants'
 import { marketplaces, frequency } from '~/constants/CreateFilterConstants'
 
-const hasBasicPlan = useUserStore().currentPlan?.product == 'basic' || !useUserStore().currentPlan?.product
+const hasBasicPlan = useUserStore().effectiveTier === 'free'
 
 const premiumMarkets = ref(false)
 const model = defineModel<Filter>()
@@ -56,7 +56,7 @@ watch(selectedMarketplaces, (_) => {
     premiumMarkets.value = true
     // the default value or every 10 minutes
     model.value!.frequency = '*/20 * * * *'
-    if (useUserStore().currentPlan?.product == 'basic' || !useUserStore().currentPlan?.product)
+    if (useUserStore().effectiveTier === 'free')
       model.value!.frequency = '0 */6 * * *'
   }
 }, { deep: true })

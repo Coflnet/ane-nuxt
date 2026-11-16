@@ -536,7 +536,7 @@
 import { getRetailPriceGap } from '~/utils/retailFlip'
 import { ref, reactive, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import { client as apiClient } from '~/src/api-client/client.gen'
-import { addFilter, getFlips, getSubscription, type PaymentControllerActiveSubscription as ActiveSubscription, type Flip, type ClientModelTargetType } from '~/src/api-client'
+import { addFilter, getFlips, type Flip, type ClientModelTargetType } from '~/src/api-client'
 
 type FeedTier = 'free' | 'collector' | 'flipper'
 type LiveFlipMessage = {
@@ -608,12 +608,7 @@ watch(autoScroll, (value) => {
   localStorage.setItem(STORAGE_KEY_AUTOSCROLL, String(value))
 })
 
-const feedTier = computed<FeedTier>(() => {
-  const plan = userStore.currentPlan?.product
-  if (plan === 'flipper') return 'flipper'
-  if (plan) return 'collector'
-  return 'free'
-})
+const feedTier = computed<FeedTier>(() => userStore.effectiveTier)
 
 const isFlipperTier = computed(() => feedTier.value === 'flipper')
 
@@ -865,28 +860,10 @@ function getAuthHeaders() {
   return { Authorization: `Bearer ${userStore.token}` }
 }
 
-function isActiveSubscription(subscription: ActiveSubscription): boolean {
-  return !subscription.endsAt || new Date(subscription.endsAt) > new Date()
-}
-
-function pickCurrentPlan(subscriptions: ActiveSubscription[]): ActiveSubscription | null {
-  const activeSubscriptions = subscriptions.filter(isActiveSubscription)
-  return activeSubscriptions.find(subscription => subscription.product === 'flipper') ?? activeSubscriptions[0] ?? null
-}
-
 async function syncCurrentPlan() {
   await userStore.checkAuth(useFirebaseAuth()!)
-  if (!userStore.token) {
-    userStore.currentPlan = null
-    return
-  }
-
   try {
-    const subscriptions = await getSubscription({
-      composable: '$fetch',
-      headers: { Authorization: `Bearer ${userStore.token}` },
-    })
-    userStore.currentPlan = pickCurrentPlan(subscriptions)
+    await userStore.refreshEntitlements()
   }
   catch (error) {
     console.error('Failed to refresh current plan:', error)
