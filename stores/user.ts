@@ -384,8 +384,8 @@ export const useUserStore = defineStore('user', () => {
         headers: { Authorization: apiToken },
       })
 
-      if (subscriptionStartDate.value == '' && noPremium.value == null)
-        await getSubscriptionEndDate()
+      // shares the store's entitlement load; the clearing reload dropped a granted tier to free while it ran
+      await ensureEntitlements().catch(error => console.error('Failed to load entitlements:', error))
 
       remainingFilters.value = (response.listenerLimit ?? 3) - (response.listenerCount ?? 0)
 
@@ -400,6 +400,16 @@ export const useUserStore = defineStore('user', () => {
       push.error(useI18n().t('loadRemainingError'))
     }
     return { used: 0, total: 0, refreshData: 0 }
+  }
+
+  /**
+   * The filter allowance is cached from the last stats load and can be stale after an upgrade, a grant or a deleted
+   * filter, so an exhausted allowance is reloaded before the user is turned away.
+   */
+  async function canCreateFilter(): Promise<boolean> {
+    if (remainingFilters.value > 0) return true
+    await loadRemainingSearches()
+    return remainingFilters.value > 0
   }
 
   // Intentional reset: forgets cached entitlements and refetches them (a refresh already in flight is abandoned).
@@ -560,6 +570,7 @@ export const useUserStore = defineStore('user', () => {
     loadFilterCache,
     signInWithEmailPassword,
     loadRemainingSearches,
+    canCreateFilter,
     getSubscriptionEndDate,
     refreshEntitlements,
     ensureEntitlements,

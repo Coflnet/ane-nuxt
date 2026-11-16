@@ -17,11 +17,9 @@
 const { t } = useI18n()
 const localePath = useLocalePath()
 
-function checkForAvaiableFilters(url: string) {
-  const user = useUserStore()
-
-  // Check if the user has remaining filters
-  if (user.remainingFilters > 0) {
+async function checkForAvaiableFilters(url: string) {
+  // the cached allowance may predate an upgrade or grant, so the store reloads it before refusing
+  if (await useUserStore().canCreateFilter()) {
     navigateTo(url)
     return
   }

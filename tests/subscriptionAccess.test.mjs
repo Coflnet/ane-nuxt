@@ -6,13 +6,16 @@ import { createPinia, defineStore } from 'pinia'
 import { compileScript, parse } from 'vue/compiler-sfc'
 import * as vue from 'vue'
 import { computed, effectScope, nextTick, reactive, ref, watch } from 'vue'
+import { canLoadStats } from '../utils/stats.ts'
+import { displayedPlan } from '../utils/displayedPlan.ts'
 
 const source = await readFile(new URL('../stores/user.ts', import.meta.url), 'utf8')
 const code = stripTypeScriptTypes(source).replace(/^import .*$/gm, '').replace('export const useUserStore', 'const useUserStore')
 
-function createStore(getSubscription, getAccess = async () => ({ tier: 'free', until: null, source: null })) {
-  const useStore = new Function('defineStore', 'ref', 'computed', 'useLocalePath', 'navigateTo', 'getSubscription', 'getAccess', `${code}; return useUserStore`)(
-    defineStore, ref, computed, () => path => path, () => {}, getSubscription, getAccess,
+function createStore(getSubscription, getAccess = async () => ({ tier: 'free', until: null, source: null }), getStats = async () => assert.fail('unexpected stats request')) {
+  const useStore = new Function('defineStore', 'ref', 'computed', 'useLocalePath', 'navigateTo', 'getSubscription', 'getAccess', 'getStats', 'canLoadStats', 'push', 'useI18n', `${code}; return useUserStore`)(
+    defineStore, ref, computed, () => path => path, () => {}, getSubscription, getAccess, getStats, canLoadStats,
+    { error: message => assert.fail(`unexpected error toast: ${message}`) }, () => ({ t: key => key }),
   )
   const store = useStore(createPinia())
   store.token = 'account-a'
@@ -254,8 +257,105 @@ test('consumers of the plan use the effective tier instead of the subscription p
   }
 })
 
-test('subscriptions page loads the grant independent of subscription records', async () => {
+test('subscriptions page shows the store selection and grant instead of the raw first subscription record', async () => {
+  // Regression: the page stored result[0] as the plan, so an ended or lower subscription listed first
+  // replaced the active Flipper plan in the store and on the page.
   const text = await readFile(new URL('../pages/subscriptions.vue', import.meta.url), 'utf8')
-  const body = text.slice(text.indexOf('async function getCurrentSubscription'), text.indexOf('async function loadGrant'))
-  assert.ok(body.indexOf('await loadGrant()') > 0 && body.indexOf('await loadGrant()') < body.indexOf('await getSubscription'))
+  const body = text.slice(text.indexOf('async function getCurrentSubscription'), text.indexOf('const route = useRoute()'))
+  assert.match(body, /await userStore\.refreshEntitlements\(\)/)
+  assert.match(body, /ownershipGrant\(userStore\.access\)/)
+  assert.doesNotMatch(body, /userStore\.currentPlan\s*=/)
+  assert.doesNotMatch(body, /result\[0\]/)
+  const cancel = text.slice(text.indexOf('async function confirmCancelSubscription'), text.indexOf('async function getCurrentSubscription'))
+  assert.match(cancel, /path: \{ id: subscriptionId \}/)
+  assert.doesNotMatch(cancel, /result\[0\]/)
+})
+
+test('subscriptions page marks the highest tier as current however it was obtained', () => {
+  // Regression: a grant-only Flipper saw "Basic" as the current plan and was offered an upgrade to Flipper.
+  const grant = { tier: 'flipper', until: '2026-12-26T00:00:00Z', source: 'ownership' }
+  assert.deepEqual(displayedPlan(null, grant), { id: 'flipper', endDate: new Date('2026-12-26T00:00:00Z') })
+  assert.deepEqual(displayedPlan({ product: 'collector', endsAt: null }, grant), { id: 'flipper', endDate: new Date('2026-12-26T00:00:00Z') })
+
+  // a subscription at least as high as the access keeps its own end date
+  const flipperSub = { product: 'flipper', endsAt: '2027-01-05T00:00:00Z' }
+  assert.deepEqual(displayedPlan(flipperSub, { tier: 'flipper', until: null, source: 'subscription' }), { id: 'flipper', endDate: new Date('2027-01-05T00:00:00Z') })
+  assert.deepEqual(displayedPlan({ product: 'collector', endsAt: '' }, { tier: 'collector', until: null, source: 'subscription' }), { id: 'collector', endDate: null })
+
+  // free users and unknown tiers stay on Basic
+  assert.deepEqual(displayedPlan(null, null), { id: 'basic', endDate: null })
+  assert.deepEqual(displayedPlan(null, { tier: 'free', until: null, source: null }), { id: 'basic', endDate: null })
+
+  const page = text => text.slice(text.indexOf('function showEntitlements'), text.indexOf('function ownershipGrant'))
+  return readFile(new URL('../pages/subscriptions.vue', import.meta.url), 'utf8')
+    .then(text => assert.match(page(text), /displayedPlan\(userStore\.currentPlan, userStore\.access\)/))
+})
+
+function grantOnlyStore(getStats) {
+  const calls = { access: 0 }
+  const store = createStore(async () => {
+    throw new Error('subscription lookup down')
+  }, async () => {
+    calls.access++
+    return { tier: 'flipper', until: '2999-01-01T00:00:00Z', source: 'ownership' }
+  }, getStats)
+  store.currentPlan = null
+  store.subscriptionStartDate = ''
+  store.isAuthenticated = true
+  store.isAnonymous = false
+  return { store, calls }
+}
+
+test('loading the search stats keeps a granted tier instead of clearing and refetching it', async () => {
+  // Regression: loadRemainingSearches called the clearing getSubscriptionEndDate whenever the subscription
+  // lookup had failed, dropping a grant-only Flipper to free while the overview loaded.
+  const { store, calls } = grantOnlyStore(async () => {
+    assert.equal(store.effectiveTier, 'flipper')
+    return { listenerLimit: 100, listenerCount: 4, searchesUsedMonthly: 1, activeSearchesLeft: 2 }
+  })
+  await store.ensureEntitlements()
+  const result = await store.loadRemainingSearches()
+  assert.equal(calls.access, 1)
+  assert.equal(store.effectiveTier, 'flipper')
+  assert.equal(store.remainingFilters, 96)
+  assert.deepEqual(result, { used: 1, total: 2, refreshData: 0 })
+})
+
+test('an exhausted cached filter allowance is reloaded before refusing a new filter', async () => {
+  // Regression: the allowance only refreshed on the overview, so after a grant or upgrade the filters page
+  // kept refusing new filters from the free-tier value.
+  let stats = 0
+  let limit = 100
+  const { store } = grantOnlyStore(async () => {
+    stats++
+    return { listenerLimit: limit, listenerCount: 3 }
+  })
+  store.remainingFilters = 0
+  assert.equal(await store.canCreateFilter(), true)
+  assert.equal(store.remainingFilters, 97)
+  assert.equal(await store.canCreateFilter(), true)
+  assert.equal(stats, 1, 'a positive allowance needs no reload')
+
+  limit = 3
+  store.remainingFilters = 0
+  assert.equal(await store.canCreateFilter(), false)
+})
+
+test('create filter button asks the store whether a filter may be created', async () => {
+  const { descriptor } = parse(await readFile(new URL('../components/ui/CreateFilterButton.vue', import.meta.url), 'utf8'))
+  const code = stripTypeScriptTypes(compileScript(descriptor, { id: 'create-filter-test' }).content)
+    .replace(/import\s*\{([^}]*)\}\s*from\s*['"]vue['"]/g, (_, names) => `const {${names.replace(/\bas\b/g, ':')}} = __vue`)
+    .replace(/^import .*$/gm, '').replace('export default', 'return')
+  const navigated = []
+  const errors = []
+  const store = { remainingFilters: 0, canCreateFilter: async () => true }
+  const setup = new Function('__vue', 'useUserStore', 'useI18n', 'useLocalePath', 'navigateTo', 'push', code)(
+    vue, () => store, () => ({ t: key => key }), () => path => path, url => navigated.push(url), { error: message => errors.push(message) },
+  )
+  const { checkForAvaiableFilters } = setup.setup({}, { expose() {} })
+  await checkForAvaiableFilters('/filters/create')
+  assert.deepEqual(navigated, ['/filters/create'])
+  store.canCreateFilter = async () => false
+  await checkForAvaiableFilters('/filters/create')
+  assert.deepEqual(errors, ['noAvailableFilters'])
 })

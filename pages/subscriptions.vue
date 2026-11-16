@@ -70,7 +70,7 @@
 
 <script setup lang="ts">
 import { plans, type PlanId, type Plan } from '~/constants/SubscriptionConstants'
-import { getAccess } from '~/src/api-client'
+import { displayedPlan } from '~/utils/displayedPlan'
 
 interface AuthErrorLike {
   response?: {
@@ -196,14 +196,16 @@ async function confirmCancelSubscription() {
   }
   if (!(await ensureAuth())) return
   try {
-    const result = await getSubscription({ composable: '$fetch', headers: { Authorization: getApiToken() } })
-    if (!result[0]) {
+    // cancel the active plan the page shows, not whichever subscription record is listed first
+    await userStore.refreshEntitlements()
+    const subscriptionId = userStore.currentPlan?.id
+    if (!subscriptionId) {
       confirmCancelation.value = false
       return
     }
     await cancelSubscription({
       composable: '$fetch',
-      path: { id: result[0]?.id ?? '' },
+      path: { id: subscriptionId },
       headers: { Authorization: getApiToken() },
     })
 
@@ -217,58 +219,34 @@ async function confirmCancelSubscription() {
   }
 }
 
+// The store picks the active Flipper, then Collector subscription and loads the access (with grants) next to it;
+// reading the raw first subscription record here could show and store an ended or lower plan.
 async function getCurrentSubscription() {
-  // accessing the product from the same type that is returned from the api
-  currentPlan.value = userStore.currentPlan?.product as PlanId ?? 'basic'
-  endDate.value = userStore.currentPlan?.endsAt != null ? new Date(userStore.currentPlan?.endsAt) : null
-
+  showEntitlements()
   if (!userStore.token) return
-  // independent of the subscription branches: a grant can exist next to a lapsed or lower subscription
-  await loadGrant()
   try {
-    const result = await getSubscription({ composable: '$fetch', headers: { Authorization: getApiToken() } })
-    if (result.length == 0) {
-      if (currentPlan.value !== 'basic')
-        resetSubscription()
-      return
-    }
-    currentPlan.value = result[0]?.product as PlanId
-    userStore.currentPlan = result[0]
-    if (result[0]?.endsAt == '')
-      return
-
-    if (new Date(result[0]?.endsAt ?? '') < new Date()) {
-      resetSubscription()
-      return
-    }
-
-    if (result[0]?.endsAt !== '')
-      endDate.value = new Date(result[0]?.endsAt ?? '')
+    await userStore.refreshEntitlements()
   }
   catch (error) {
     if (handleAuthError(error)) return
     push.error(`${t('errorCreatingSubscription')} ${error}`)
     console.error(error)
   }
+  showEntitlements()
 }
 
-async function loadGrant() {
-  grant.value = null
-  try {
-    const access = await getAccess({ composable: '$fetch', headers: { Authorization: getApiToken() } })
-    userStore.access = access
-    if (access.source !== 'ownership' || (access.tier !== 'flipper' && access.tier !== 'collector')) return
-    grant.value = { tier: access.tier, until: access.until ? new Date(access.until) : null }
-  }
-  catch (error) {
-    console.error('Failed to load access grant:', error)
-  }
+// the current plan is the highest tier however it was obtained (subscription or grant)
+function showEntitlements() {
+  const shown = displayedPlan(userStore.currentPlan, userStore.access)
+  currentPlan.value = shown.id
+  endDate.value = shown.endDate
+  grant.value = ownershipGrant(userStore.access)
 }
 
-async function resetSubscription() {
-  currentPlan.value = 'basic'
-  userStore.currentPlan = null
-  endDate.value = null
+// manual grant (ownership) that is not a subscription
+function ownershipGrant(access: typeof userStore.access) {
+  if (access?.source !== 'ownership' || (access.tier !== 'flipper' && access.tier !== 'collector')) return null
+  return { tier: access.tier, until: access.until ? new Date(access.until) : null }
 }
 
 const route = useRoute()
