@@ -70,6 +70,14 @@ export type ClientModelStoredListing = {
     latitude?: number | null;
     longitude?: number | null;
     shipping?: string | null;
+    /**
+     * Only set by POST /api/filters/test?aboveMaxFactor=...: the listing matches only with the max raised
+     */
+    aboveMax?: boolean | null;
+    /**
+     * Price plus shipping as the backend compares it with the max (listing currency); set for above-max matches
+     */
+    totalPrice?: number | null;
     returnPolicy?: string | null;
     attributes?: {
         [key: string]: string;
@@ -2706,7 +2714,12 @@ export type GetFilterByTokenResponse = GetFilterByTokenResponses[keyof GetFilter
 export type TestFilterData = {
     body?: ClientModelListingListener;
     path?: never;
-    query?: never;
+    query?: {
+        /**
+         * Also return up to ~20 listings that match with the max price raised to max x factor
+         */
+        aboveMaxFactor?: number;
+    };
     url: '/api/filters/test';
 };
 

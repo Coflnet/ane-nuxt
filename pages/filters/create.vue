@@ -135,6 +135,7 @@ import { parseFilterPrefillQuery, parseListingUrl, prefillFormFields } from '~/u
 import type { FilterPrefill } from '~/utils/filterPrefill'
 import { buildFilters, defaultFilterState, parseFilters } from '~/utils/filterWire'
 import { applyReferenceListing, applyReferencePrices, clearReference, initialPriceSelectors } from '~/utils/referencePreview'
+import { ABOVE_MAX_FACTOR } from '~/utils/overCapOffers'
 import { pickDefaultNotification } from '~/utils/notifyDefault'
 
 const { t } = useI18n()
@@ -278,8 +279,8 @@ function matchSignature() {
 
 const offers = useMatchingOffers({
   buildRequest: () => filterToCreate(true),
-  test: (listener, signal) => filterStore.testFilter(listener, signal),
-  includeAboveMax: true,
+  test: (listener, signal, aboveMaxFactor) => filterStore.testFilter(listener, signal, aboveMaxFactor),
+  aboveMaxFactor: ABOVE_MAX_FACTOR,
   signature: matchSignature,
   enabled: () => visualReady.value && hasSomethingToMatch.value,
   delay: () => (filter.value.visualSimilarity ? 1200 : 600),

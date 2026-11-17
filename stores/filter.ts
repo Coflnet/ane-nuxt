@@ -80,7 +80,8 @@ export const useFilterStore = defineStore('filter', () => {
     await loadFilters()
   }
 
-  async function testFilter(filter: ListingListener, signal?: AbortSignal): Promise<StoredListing[] | null> {
+  /** `aboveMaxFactor` also returns matches (flagged `aboveMax`) that fit once the max is raised by that factor. */
+  async function testFilter(filter: ListingListener, signal?: AbortSignal, aboveMaxFactor?: number): Promise<StoredListing[] | null> {
     try {
       if (!userStore.token) {
         console.error('No token found, can not test filter')
@@ -91,6 +92,7 @@ export const useFilterStore = defineStore('filter', () => {
       return await $fetch<StoredListing[]>(`${apiBase}/api/filters/test`, {
         method: 'POST',
         signal,
+        query: aboveMaxFactor ? { aboveMaxFactor } : undefined,
         headers: { Authorization: `Bearer ${userStore.token}` },
         body: filter,
       })
