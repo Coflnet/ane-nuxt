@@ -8,6 +8,8 @@
  * always loads its saved values instead.
  */
 
+import { decodeAttributes } from './attributeAlternatives.ts'
+
 /** Matches Vue Router's `LocationQuery` value shape, so callers can pass `route.query` directly. */
 export type FilterPrefillQueryValue = string | (string | null)[] | null | undefined
 
@@ -23,7 +25,19 @@ export interface FilterPrefillQuery {
   referencePrice?: FilterPrefillQueryValue
   referenceAdditionalSelectors?: FilterPrefillQueryValue
   referenceCurrency?: FilterPrefillQueryValue
+  /** A listing link; behaves like a link pasted into the search box. */
+  url?: FilterPrefillQueryValue
+  /** Attribute chips in the `Attributes` wire format (`key=alt|alt;key=alt`). */
+  attributes?: FilterPrefillQueryValue
+  /** Category of the originating search; context only, never saved. */
+  category?: FilterPrefillQueryValue
+  /** Where the link came from, for the "from …" tags: search | listing | photo. */
+  source?: FilterPrefillQueryValue
+  /** `photo` opens the photo entry. */
+  entry?: FilterPrefillQueryValue
 }
+
+export type FilterPrefillSource = 'search' | 'listing' | 'photo'
 
 export interface FilterPrefill {
   searchValue?: string
@@ -37,7 +51,20 @@ export interface FilterPrefill {
   referencePrice?: number
   referenceAdditionalSelectors?: string[]
   referenceCurrency?: string
+  url?: string
+  attributes?: Record<string, string[]>
+  category?: string
+  source?: FilterPrefillSource
+  entry?: 'photo'
 }
+
+/** The prefill keys that are form fields (the rest only steers the page). */
+export const PREFILL_FORM_FIELDS = [
+  'searchValue', 'minPrice', 'maxPrice', 'condition', 'marketplace', 'attributes', 'referenceUrl', 'referenceTitle',
+  'referenceSelector', 'referencePrice', 'referenceAdditionalSelectors', 'referenceCurrency',
+] as const
+
+const VALID_SOURCES = new Set<FilterPrefillSource>(['search', 'listing', 'photo'])
 
 /**
  * The only condition values the create-filter form (and backend) understand — see
@@ -57,6 +84,51 @@ function parseClampedPrice(value: FilterPrefillQueryValue): number | undefined {
   const n = Number(raw)
   if (!Number.isFinite(n)) return undefined
   return Math.max(0, n)
+}
+
+/**
+ * A single marketplace or a comma-joined list; each one is normalized to its supported
+ * spelling, unknown ones are dropped. 'all' only counts on its own.
+ */
+function parseMarketplaces(value: FilterPrefillQueryValue, supported: string[]): string | undefined {
+  const known = (firstString(value) ?? '').split(',')
+    .map(name => supported.find(option => option.toLowerCase() === name.trim().toLowerCase()))
+    .filter((name): name is string => !!name)
+  const unique = [...new Set(known)]
+  const explicit = unique.filter(name => name !== 'all')
+  if (explicit.length) return explicit.join(',')
+  return unique[0]
+}
+
+/** Only plain http(s) links without credentials are accepted as a listing link. */
+export function parseListingUrl(value: string | undefined): string | undefined {
+  try {
+    const url = new URL(value?.trim() ?? '')
+    if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password || url.href.length > 2048) return undefined
+    return url.href
+  }
+  catch {
+    return undefined
+  }
+}
+
+function parseContext(query: FilterPrefillQuery): Partial<FilterPrefill> {
+  const context: Partial<FilterPrefill> = {}
+  const url = parseListingUrl(firstString(query.url))
+  if (url) context.url = url
+  const attributes = decodeAttributes(firstString(query.attributes)?.slice(0, 2000))
+  if (Object.keys(attributes).length) context.attributes = attributes
+  const category = firstString(query.category)?.trim().slice(0, 120)
+  if (category) context.category = category
+  const source = firstString(query.source)?.toLowerCase() as FilterPrefillSource | undefined
+  if (source && VALID_SOURCES.has(source)) context.source = source
+  if (firstString(query.entry) === 'photo') context.entry = 'photo'
+  return context
+}
+
+/** The form-field part of a prefill, ready to assign onto the form state. */
+export function prefillFormFields(prefill: FilterPrefill): Partial<Pick<FilterPrefill, typeof PREFILL_FORM_FIELDS[number]>> {
+  return Object.fromEntries(PREFILL_FORM_FIELDS.filter(key => prefill[key] !== undefined).map(key => [key, prefill[key]]))
 }
 
 /**
@@ -83,9 +155,10 @@ export function parseFilterPrefillQuery(query: FilterPrefillQuery, supportedMark
   const condition = firstString(query.condition)?.trim().toLowerCase()
   if (condition && VALID_CONDITIONS.has(condition)) result.condition = condition
 
-  const marketplace = firstString(query.marketplace)?.toLowerCase()
-  const supportedMarket = supportedMarketplaces.find(value => value.toLowerCase() === marketplace)
-  if (supportedMarket) result.marketplace = supportedMarket
+  const marketplace = parseMarketplaces(query.marketplace, supportedMarketplaces)
+  if (marketplace) result.marketplace = marketplace
+
+  Object.assign(result, parseContext(query))
 
   const referenceUrl = firstString(query.referenceUrl)
   const referenceSelector = firstString(query.referenceSelector)

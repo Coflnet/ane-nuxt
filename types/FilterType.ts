@@ -22,19 +22,31 @@ export interface FilterFace {
   isFlipNotification?: boolean
 }
 
+/** One entry of a saved filter's `filters[]` as it travels over the wire. */
+export interface WireFilter {
+  name: string
+  value: string | number | boolean
+}
+
+/** The create/edit form state; utils/filterWire.ts converts it to and from WireFilter[]. */
 export interface Filter {
   name: string
   marketplace: string
   searchValue: string
-  totalCost: number
   zipcode: string
   searchRadius: number | null
-  commercialSeller: boolean
   seller: string
   keywords: string[][]
   blacklist: string[]
-  minPrice: number
-  maxPrice: number
+  /** '' = no lower bound ("any price") */
+  minPrice: number | ''
+  /** '' = no upper bound ("any price") */
+  maxPrice: number | ''
+  /** Attribute chips per key (utils/attributeAlternatives.ts). */
+  attributes: Record<string, string[]>
+  kleinanzeigenCategory: string
+  /** Saved filters[] entries the form does not model; saved back unchanged. */
+  passthrough: WireFilter[]
   currency: string
   location: string
   id: number
