@@ -1,33 +1,24 @@
 <template>
-  <!-- The grid component does not want to work with this -->
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-x-8 pt-2 mt-4">
-    <UiMultiSelect
-      v-model="condiditonSelected"
-      label-aria="Condition Select"
-      class="col-span-2"
-      :label="$t('condition')"
-      :options="condidtion"
-      override-value="all"
-    />
-
-    <div class="flex items-center mb-4 space-x-2 col-span-2">
+  <!-- Price range and budget currency; the condition lives in ConditionFilter.vue. -->
+  <div class="grid grid-cols-2 gap-x-4">
+    <div class="flex items-end mb-4 gap-2 col-span-2">
       <UiInput
         v-model="model!.minPrice"
         label-aria="Min Price Input"
-        :label="$t('priceRange')"
+        :label="minLabel"
         type="number"
-        placeholder=""
+        :placeholder="anyPlaceholder"
       />
-      <span class="text-slate-400 mt-3.5">-</span>
+      <span class="text-slate-400 pb-2.5">-</span>
       <UiInput
         v-model="model!.maxPrice"
         label-aria="Max Price Input"
-        class="mt-5"
+        :label="maxLabel"
         type="number"
-        placeholder="0"
+        :placeholder="anyPlaceholder"
       />
     </div>
-    <div class="col-span-2 md:col-span-4">
+    <div class="col-span-2">
       <UiDropdown
         id="budget-currency"
         v-model="budgetCurrency"
@@ -46,11 +37,9 @@
 
 <script setup lang='ts'>
 import type { Filter } from '~/types/FilterType'
-import { condidtion } from '~/constants/CreateFilterConstants'
-
-const condiditonSelected = ref<{ value: string, label: string }[]>([])
 
 const model = defineModel<Filter>()
+defineProps<{ minLabel?: string, maxLabel?: string, anyPlaceholder?: string }>()
 
 const hasReferencePrice = computed(() => !!model.value!.referenceUrl && model.value!.referencePrice > 0)
 const budgetCurrency = computed({
@@ -66,23 +55,4 @@ watch(() => model.value!.marketplace, (marketplace) => {
   const currency = ({ Gumtree: 'GBP', Blocket: 'SEK', OLX: 'PLN' } as Record<string, string>)[marketplace]
   if (currency) model.value!.referenceCurrency = currency
 }, { immediate: true })
-
-// reconstuct the selected conditions from a string updated when editing a filter
-watch(() => model.value!.condition, () => {
-  condiditonSelected.value = []
-  model.value?.condition.split(',').map((condidtionName) => {
-    const marketplaceItem = condidtion.find(m => m.value == condidtionName)
-    if (marketplaceItem)
-      condiditonSelected.value.push(marketplaceItem)
-  })
-})
-
-// constuct the string send to backend here instead of in handleFilters()
-watch(condiditonSelected, () => {
-  if (condiditonSelected.value.map(item => item.value).includes('all')) {
-    model.value!.condition = 'all'
-    return
-  }
-  model.value!.condition = condiditonSelected.value.map(i => i.value).join(',')
-})
 </script>

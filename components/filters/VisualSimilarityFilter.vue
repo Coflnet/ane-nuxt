@@ -200,6 +200,31 @@
             </select>
           </details>
         </div>
+        <div
+          v-else-if="presets"
+          class="max-w-md"
+        >
+          <label
+            for="photo-threshold"
+            class="block text-sm mb-1"
+          >{{ $t('styleSearch.matchRange') }}</label>
+          <select
+            id="photo-threshold"
+            v-model.number="threshold"
+            class="w-full bg-slate-700 border border-slate-600 rounded-lg p-2"
+            :disabled="!hasCollectorPlan"
+          >
+            <option :value="0.70">
+              {{ $t('styleSearch.broader') }}
+            </option>
+            <option :value="0.80">
+              {{ $t('styleSearch.balanced') }}
+            </option>
+            <option :value="0.88">
+              {{ $t('styleSearch.closer') }}
+            </option>
+          </select>
+        </div>
         <template v-else>
           <label class="block text-sm mb-1">
             {{ $t('visualSimilarity.threshold') }}: {{ threshold.toFixed(2) }}
@@ -269,6 +294,10 @@
 const props = defineProps<{
   modelValue: string // serialized JSON payload (or empty string)
   styleMode?: boolean
+  /** Broader / Balanced / Closer instead of the raw threshold slider. */
+  presets?: boolean
+  /** A photo picked outside this component (filter tree photo entry); prepared once the plan allows it. */
+  file?: File | null
 }>()
 
 const emit = defineEmits<{
@@ -279,6 +308,7 @@ const emit = defineEmits<{
 
 const userStore = useUserStore()
 const localePath = useLocalePath()
+const apiBase = useApiBaseUrl()
 const checkingPlan = ref(true)
 const planError = ref(false)
 const hasCollectorPlan = computed(() => !checkingPlan.value && !planError.value && userStore.effectiveTier !== 'free')
@@ -430,6 +460,10 @@ async function onFileSelected(ev: Event) {
   if (!file) return
   input.value = ''
 
+  await acceptFile(file)
+}
+
+async function acceptFile(file: File) {
   emit('dirty')
   if (isStyle.value && hasEmbedding.value) garmentType.value = ''
   sourceFile.value = file
@@ -437,6 +471,13 @@ async function onFileSelected(ev: Event) {
   cropPending.value = false
   await prepareImage(file)
 }
+
+let handedFile: File | null = null
+watch(() => [props.file, hasCollectorPlan.value] as const, ([file, allowed]) => {
+  if (!file || !allowed || file === handedFile) return
+  handedFile = file
+  void acceptFile(file)
+}, { immediate: true })
 
 function refreshReference() {
   try {
@@ -468,7 +509,7 @@ async function prepareImage(file: File, selectedCrop: typeof crop.value = null) 
     // Ask backend to embed it (single CLIP call, stored on the filter)
     const apiToken = userStore.token ? `Bearer ${userStore.token}` : ''
     const res = await $fetch<Partial<Payload> & { embedding?: number[], suggestedGarmentType?: string }>(
-      'https://ane.coflnet.com/api/filters/visual-similarity/prepare',
+      `${apiBase}/api/filters/visual-similarity/prepare`,
       {
         method: 'POST',
         signal: current.signal,

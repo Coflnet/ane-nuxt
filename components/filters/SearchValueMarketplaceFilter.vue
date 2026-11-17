@@ -1,13 +1,6 @@
 <template>
+  <!-- Marketplaces (+ frequency for premium sources); the search value lives in the filter tree omnibox. -->
   <UiGrid :grid-size="2">
-    <!-- Search Value -->
-    <UiInput
-      v-model="model!.searchValue"
-      :name="$t('searchValue')"
-      :placeholder="$t('cameraEg')"
-      :label="$t('searchValue')"
-    />
-    <!-- Marketplace select -->
     <UiMultiSelect
       v-model="selectedMarketplaces"
       :options="resolvedMarketplaceOptions"

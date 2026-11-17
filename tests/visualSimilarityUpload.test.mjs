@@ -9,14 +9,15 @@ const proof = { model_id: 'synthetic/model', model_revision: 'a'.repeat(40), mod
 const previous = JSON.stringify({ threshold: 0.7, emb: [1, 0], thumb: 'previous', thumbMime: 'image/jpeg' })
 const file = { name: 'replacement.png', base64: 'replacement' }
 
-async function createFilter(value = previous, plan = 'collector', styleMode = false) {
+async function createFilter(value = previous, plan = 'collector', styleMode = false, extraProps = {}) {
   const { descriptor } = parse(await readFile(new URL('../components/filters/VisualSimilarityFilter.vue', import.meta.url), 'utf8'))
   const code = stripTypeScriptTypes(compileScript(descriptor, { id: 'visual-upload-test' }).content)
     .replace(/import\s*\{([^}]*)\}\s*from\s*['"]vue['"]/g, (_, names) => `const {${names.replace(/\bas\b/g, ':')}} = __vue`)
     .replace('export default', 'return')
   const pending = [], emitted = [], events = [], cleanup = [], draws = []
-  const props = reactive({ modelValue: value, styleMode })
-  const user = reactive({ currentPlan: { product: plan }, get effectiveTier() { return plan === 'collector' || plan === 'flipper' ? plan : 'free' }, token: 'local-test-token', ensureEntitlements: async () => {} })
+  const props = reactive({ modelValue: value, styleMode, ...extraProps })
+  const tier = plan === 'collector' || plan === 'flipper' ? plan : 'free'
+  const user = reactive({ currentPlan: { product: plan }, effectiveTier: tier, token: 'local-test-token', ensureEntitlements: async () => {} })
   class Reader {
     readAsDataURL(input) {
       queueMicrotask(() => {
@@ -50,9 +51,9 @@ async function createFilter(value = previous, plan = 'collector', styleMode = fa
       image = value
     } }), toDataURL: () => `data:image/jpeg;base64,${image.value.split(',')[1]}` }
   } }
-  const component = new Function('__vue', 'ref', 'shallowRef', 'computed', 'watch', 'onBeforeUnmount', 'onMounted', 'useUserStore', 'useLocalePath', 'useI18n', '$fetch', 'FileReader', 'Image', 'document', 'File', code)(
+  const component = new Function('__vue', 'ref', 'shallowRef', 'computed', 'watch', 'onBeforeUnmount', 'onMounted', 'useUserStore', 'useLocalePath', 'useI18n', '$fetch', 'FileReader', 'Image', 'document', 'File', 'useApiBaseUrl', code)(
     await import('vue'), ref, shallowRef, computed, watch, fn => cleanup.push(fn), fn => fn(), () => user, () => path => path, () => ({ t: key => key }),
-    (url, options) => new Promise((resolve, reject) => pending.push({ url, options, resolve, reject })), Reader, Photo, document, UploadedFile,
+    (url, options) => new Promise((resolve, reject) => pending.push({ url, options, resolve, reject })), Reader, Photo, document, UploadedFile, () => 'https://api.example.test',
   )
   const effects = effectScope()
   const state = effects.run(() => component.setup(props, { expose() {}, emit: (event, payload) => {
@@ -330,4 +331,29 @@ test('replacement style photos get their own garment suggestion while retries ke
   await attempt
   assert.equal(field.state.garmentType.value, 'coat')
   field.stop()
+})
+
+test('prepare uses the configured API base instead of a hardcoded host', async () => {
+  const field = await createFilter()
+  void field.select()
+  await settle()
+  assert.equal(field.pending[0].url, 'https://api.example.test/api/filters/visual-similarity/prepare')
+  field.stop()
+})
+
+test('a photo handed over by the filter tree is prepared once, after the plan allows it', async () => {
+  const handed = { name: 'tree.png', base64: 'tree' }
+  const field = await createFilter('', 'collector', false, { file: handed })
+  await settle()
+  assert.equal(field.pending.length, 1)
+  assert.equal(field.pending[0].options.body.imageBase64, 'tree')
+  assert.equal('mode' in field.pending[0].options.body, false, 'the generic lane prepares without the style mode')
+  field.props.styleMode = false
+  await settle()
+  assert.equal(field.pending.length, 1, 'later prop updates do not upload the same photo again')
+  field.stop()
+  const free = await createFilter('', 'free', false, { file: handed })
+  await settle()
+  assert.equal(free.pending.length, 0, 'no upload without the Collector plan')
+  free.stop()
 })

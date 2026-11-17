@@ -11,6 +11,9 @@
       class="w-full px-4 py-2 rounded-lg border border-slate-600 bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-400"
       @change="updateCategory"
     >
+      <option value="">
+        {{ $t('filterTree.more.anyCategory') }}
+      </option>
       <option
         v-for="(o, index) in props.options"
         :key="index"

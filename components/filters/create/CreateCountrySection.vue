@@ -35,14 +35,12 @@ const model = defineModel<Filter>()
 
 const deliveryKindSelected = ref<{ value: string, label: string }[]>([])
 
-watch(() => model.value!.deliveryMethod, () => {
-  deliveryKindSelected.value = []
-  model.value?.deliveryMethod.split(',').map((condidtionName) => {
-    const item = deliveryKind.find(m => m.value == condidtionName)
-    if (item)
-      deliveryKindSelected.value.push(item)
-  })
-})
+// Immediate, so a prefilled method is selected before the dropdown falls back to "all" on mount.
+watch(() => model.value!.deliveryMethod, (method) => {
+  const selected = deliveryKind.filter(item => method.split(',').includes(item.value))
+  // '' (any, or a saved filter without DeliveryMethod) shows "all" like a fresh dropdown does.
+  deliveryKindSelected.value = selected.length ? selected : deliveryKind.slice(0, 1)
+}, { immediate: true })
 
 // constuct the string send to backend here instead of in handleFilters()
 watch(deliveryKindSelected, () => {

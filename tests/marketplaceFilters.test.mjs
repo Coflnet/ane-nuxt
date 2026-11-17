@@ -4,24 +4,27 @@ import { stripTypeScriptTypes } from 'node:module'
 import test from 'node:test'
 import { compileScript, parse } from 'vue/compiler-sfc'
 import * as vue from 'vue'
-import { activeMarketplaces, marketplaces, filterFreeMarketplaces } from '../constants/CreateFilterConstants.ts'
-import { parseFilterPrefillQuery } from '../utils/filterPrefill.ts'
+import { activeMarketplaces, condidtion, marketplaces, filterFreeMarketplaces } from '../constants/CreateFilterConstants.ts'
+import { parseFilterPrefillQuery, prefillFormFields } from '../utils/filterPrefill.ts'
+import { buildFilters, defaultFilterState, parseFilters } from '../utils/filterWire.ts'
 
 const { computed, effectScope, nextTick, ref, toRaw, watch } = vue
 
-// Execute the actual page initialization, edit loader, prefill and wire serializer.
+// The page's initialization (defaults + prefill), edit loader and wire serializer are the
+// pure utils pages/filters/create.vue calls.
 async function page(query = {}, saved = []) {
-  const { descriptor } = parse(await readFile(new URL('../pages/filters/create.vue', import.meta.url), 'utf8'))
-  const ast = compileScript(descriptor, { id: 'marketplace-page' }).scriptSetupAst
-  const source = descriptor.scriptSetup.content
-  const names = new Set(['filter', 'isNewFilter'])
-  const functions = new Set(['applyPrefillFromQuery', 'loadEditParam', 'handleFilters'])
-  const code = ast.filter(node => (node.type === 'VariableDeclaration' && node.declarations.some(d => names.has(d.id.name)))
-    || (node.type === 'FunctionDeclaration' && functions.has(node.id.name)))
-    .map(node => source.slice(node.start, node.end)).join('\n')
-  const route = { query }
-  const filterStore = { getUserFilters: saved, getUserFilterById: () => null }
-  return new Function('ref', 'computed', 'toRaw', 'route', 'filterStore', 'marketplaces', 'filterFreeMarketplaces', 'parseFilterPrefillQuery', `${stripTypeScriptTypes(code)}\nreturn {filter, applyPrefillFromQuery, loadEditParam, handleFilters}`)(ref, computed, toRaw, route, filterStore, marketplaces, filterFreeMarketplaces, parseFilterPrefillQuery)
+  const prefill = 'id' in query ? {} : prefillFormFields(parseFilterPrefillQuery(query, marketplaces.map(m => m.value)))
+  const filter = ref(defaultFilterState())
+  const ctx = { freeMarketplaces: filterFreeMarketplaces(marketplaces).map(m => m.value), location: null, attributesSupported: true }
+  return {
+    filter,
+    applyPrefillFromQuery: () => Object.assign(filter.value, prefill),
+    loadEditParam: async () => {
+      const entry = saved.find(item => Number(item.id) === Number(query.id))
+      filter.value = { ...parseFilters(entry.filters), id: entry.id }
+    },
+    handleFilters: async () => buildFilters(toRaw(filter.value), ctx),
+  }
 }
 
 // Compile actual SFC setup, replacing only imports and the component model boundary.
@@ -32,7 +35,7 @@ async function field(filename, model) {
     .replace(/import\s*\{([^}]*)\}\s*from\s*['"]~\/constants\/CreateFilterConstants['"]/g, (_, names) => `const {${names}} = __constants`)
     .replace('export default', 'return')
   const component = new Function('__vue', '__constants', 'ref', 'computed', 'watch', 'useUserStore', 'onMounted', code)(
-    { ...vue, useModel: () => model }, { marketplaces, frequency: [], condidtion: [] }, ref, computed, watch, () => ({ currentPlan: { product: 'collector' }, ensureEntitlements: async () => {} }), fn => fn(),
+    { ...vue, useModel: () => model }, { marketplaces, frequency: [], condidtion }, ref, computed, watch, () => ({ currentPlan: { product: 'collector' }, ensureEntitlements: async () => {} }), fn => fn(),
   )
   const scope = effectScope()
   const state = scope.run(() => component.setup({}, { expose() {}, emit() {} }))
@@ -95,13 +98,13 @@ test('budget smart defaults serialize the correct currency without converting am
     assert.equal(ui.state.budgetCurrency.value, currency)
     let wire = await p.handleFilters()
     assert.equal(wire.find(f => f.name === 'ReferenceCurrency').value, currency)
-    assert.equal(wire.find(f => f.name === 'PriceRange').value, '0-100')
+    assert.equal(wire.find(f => f.name === 'PriceRange'), undefined, 'a new filter defaults to any price')
     ui.state.budgetCurrency.value = 'EUR'
     p.filter.value.marketplace = 'Gumtree,Blocket'
     await nextTick()
     wire = await p.handleFilters()
     assert.equal(wire.find(f => f.name === 'ReferenceCurrency').value, 'EUR')
-    assert.equal(wire.find(f => f.name === 'PriceRange').value, '0-100')
+    assert.equal(wire.find(f => f.name === 'PriceRange'), undefined, 'a new filter defaults to any price')
     ui.stop()
   }
 })
@@ -121,4 +124,14 @@ test('saved implicit EUR and imported reference amounts retain their original cu
   assert.equal(wire.find(f => f.name === 'ReferenceCurrency').value, 'GBP')
   assert.equal(wire.find(f => f.name === 'PriceRange').value, '12-48')
   ui.stop()
+})
+
+test('condition dropdown keeps a prefilled or saved choice and shows "all" for an omitted condition', async () => {
+  for (const [condition, expected] of [['used', ['used']], ['broken', ['broken']], ['', ['all']], ['new,used', ['new', 'used']]]) {
+    const p = await page()
+    p.filter.value.condition = condition
+    const ui = await field('ConditionFilter', p.filter)
+    assert.deepEqual(ui.state.conditionSelected.value.map(option => option.value), expected)
+    ui.stop()
+  }
 })

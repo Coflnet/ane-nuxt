@@ -7,6 +7,8 @@
       <input
         :id="config.notificationType"
         :checked="filter.notificationType === config.notificationType"
+        :data-testid="config.testId"
+        name="notification-type"
         type="radio"
         :value="config.notificationType"
         class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300"
@@ -66,6 +68,7 @@ const props = defineProps<{
     placeholder?: string
     icon: string
     textInput?: boolean
+    testId?: string
   }
   messages: {
     footer: string

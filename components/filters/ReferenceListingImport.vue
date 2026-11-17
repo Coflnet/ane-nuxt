@@ -1,6 +1,9 @@
 <template>
   <section class="mb-6 min-w-0 border border-slate-700 bg-slate-900/40 rounded-lg p-3 sm:p-4">
-    <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_auto] gap-3 items-end">
+    <div
+      v-if="!seedPreview"
+      class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_auto] gap-3 items-end"
+    >
       <UiInput
         v-model="url"
         :label="$t('referenceListingUrl')"
@@ -24,6 +27,7 @@
     </div>
 
     <a
+      v-if="!seedPreview"
       href="/downloads/ane-extension-install.html"
       target="_blank"
       rel="noopener noreferrer"
@@ -295,67 +299,11 @@
 import { client as apiClient } from '~/src/api-client/client.gen'
 import { useFormat } from '~/composable/useFormat'
 import type { Filter } from '~/types/FilterType'
-
-type ReferenceRenderedNode = {
-  xpath: string
-  css: string
-  role: string
-  text: string
-  x: number
-  y: number
-  width: number
-  height: number
-  price?: number | null
-  currency?: string | null
-  confidence: number
-}
-
-type ReferencePriceCandidate = {
-  selector: string
-  text: string
-  price: number
-  currency: string
-  confidence: number
-  source: string
-  isAutoSelected: boolean
-}
-
-type ReferenceListingPreviewResponse = {
-  url: string
-  host: string
-  marketplace: string
-  listing: {
-    title: string
-    description: string
-    imageUrls: string[]
-    productSearchQuery: string
-  }
-  priceCandidates: ReferencePriceCandidate[]
-  previewElements: unknown[]
-  selectedReference?: ReferencePriceCandidate | null
-  requiresReferencePriceSelection: boolean
-  suggestedFilter: {
-    searchTerm: string
-    marketplace: string
-    minPrice: number
-    maxPrice?: number | null
-    referenceUrl: string
-    referenceTitle: string
-    referenceMarketplace: string
-    referencePrice?: number | null
-    referenceCurrency?: string | null
-    referenceSelector?: string | null
-  }
-  screenshotPngBase64?: string | null
-  viewportWidth: number
-  viewportHeight: number
-  fullPageHeight: number
-  sandboxHtml?: string | null
-  renderedNodes: ReferenceRenderedNode[]
-  primarySelectorXPath?: string | null
-}
+import type { ReferenceListingPreviewResponse, ReferencePriceCandidate, ReferenceRenderedNode } from '~/types/ReferenceListing'
 
 const model = defineModel<Filter>()
+/** A preview the page already loaded (filter tree); skips the URL input and the second request. */
+const props = defineProps<{ seedPreview?: ReferenceListingPreviewResponse | null }>()
 const { t, locale } = useI18n()
 const { formatCurrency } = useFormat()
 
@@ -421,6 +369,15 @@ const sandboxSrcDoc = computed(() => {
     return html.replace(/<body([^>]*)>/i, '<body$1>' + injection)
   return injection + html
 })
+
+watch(() => props.seedPreview, (seed) => {
+  if (!seed) return
+  preview.value = seed
+  url.value = seed.url
+  const saved = model.value?.referenceSelector
+  selectedReference.value = seed.priceCandidates.find(c => c.selector === saved) ?? seed.selectedReference ?? null
+  additionalSelectors.value = saved && selectedReference.value?.selector === saved ? [...(model.value?.referenceAdditionalSelectors ?? [])] : []
+}, { immediate: true })
 
 watch(() => model.value?.referenceUrl, (value) => {
   if (value && value !== url.value)
@@ -618,7 +575,8 @@ function applyReference() {
 function applySelectedReference(showToast: boolean) {
   if (!preview.value || !model.value || !selectedReference.value)
     return
-  applySearchFields()
+  // In the filter tree (seeded) the search term is the user's; picking a price must not reset it.
+  if (!props.seedPreview) applySearchFields()
   const price = additionalSelectors.value.length > 0 ? summedPrice.value : selectedReference.value.price
   model.value.maxPrice = Math.max(1, Math.ceil(price))
   model.value.currency = selectedReference.value.currency

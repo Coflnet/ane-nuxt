@@ -1,435 +1,292 @@
 <template>
-  <div>
-    <h1
-      v-if="styleMode"
-      class="text-2xl mb-6"
-    >
-      {{ $t('styleSearch.title') }}
-    </h1>
+  <div class="pb-8">
     <FiltersCreateHeader
-      v-else
       :is-new-filter="isNewFilter"
       :item-id="filterId"
     />
-    <UiButton
-      v-if="!styleMode"
-      :primary="true"
-      :proccessing="savingFilter"
-      :disabled="!visualReady || feedbackPending"
-      aria-label="Save Filter"
-      class="w-full block md:hidden mb-4"
-      @on-click="saveFilter"
+
+    <form
+      class="flex flex-wrap items-start gap-6"
+      @submit.prevent="saveFilter"
     >
-      {{ isNewFilter ? $t('createFilter') : $t('updateFilter') }}
-    </UiButton>
-
-    <UiDefaultContainer class="mb-6 p-3 sm:p-6">
-      <form
-        class="overflow-visible"
-        @submit.prevent="saveFilter"
+      <fieldset
+        :disabled="savingFilter"
+        class="min-w-0 flex-[999_1_560px]"
       >
-        <fieldset
-          :disabled="savingFilter"
-          class="min-w-0"
-        >
-          <button
-            type="button"
-            class="text-sm underline mb-4"
-            @click="setStyleMode(!styleMode)"
+        <FiltersTreeFilterTree>
+          <FiltersTreeBranch
+            v-bind="branch('looking')"
+            @toggle="toggleBranch('looking')"
           >
-            {{ styleMode ? $t('styleSearch.keywordSearch') : $t('styleSearch.title') }}
-          </button>
-          <template v-if="styleMode">
-            <FiltersVisualSimilarityFilter
-              v-model="filter.visualSimilarity"
-              :style-mode="true"
-              @ready="visualReady = $event"
-              @dirty="referenceDirty = true"
-            />
-          </template>
-          <FiltersReferenceListingImport
-            v-else
-            v-model="filter"
-          />
-          <component
-            :is="styleMode ? 'details' : 'div'"
-            class="mb-4"
-          >
-            <summary
-              v-if="styleMode"
-              class="cursor-pointer text-sm"
+            <FiltersTreeLookingForBranch
+              ref="lookingFor"
+              v-model="filter"
+              :interpretation="interpretation"
+              :attributes-supported="attributesSupported"
+              :kleinanzeigen-options="kleinanzeigenOptions"
+              :photo-open="photoOpen"
+              :suggest-context="suggestContext"
+              @import-url="importListing"
+              @open-photo="openPhoto(null)"
+              @open-reference-photo="openPhoto('other')"
             >
-              {{ $t('styleSearch.moreFilters') }}
-            </summary>
-            <FiltersSearchValueMarketplaceFilter v-model="filter" />
-
-            <FiltersPriceConditionFilter v-model="filter" />
-            <FiltersCreateCountrySection :model-value="filter" />
-
-            <!-- Dont worry about this, this whole system needs to get reworked by akwav -->
-            <div
-              v-for="option in filterStore.getFilterOptions"
-              :key="option.name"
-            >
-              <FiltersKleinanzeigenCategoryFilter
-                v-if="option.name === 'KleinanzeigenKategorie' && filter.marketplace == 'kleinanzeigen'"
-                :filter="filter"
-                :options="option.value.options"
+              <FiltersTreeReferenceCard
+                :url="filter.referenceUrl"
+                :title="filter.referenceTitle"
+                :image="reference.preview.value?.listing.imageUrls[0]"
+                :loading="reference.loading.value"
+                :error="reference.error.value"
+                @remove="removeReference"
               />
-            </div>
-            <component
-              :is="styleMode ? 'div' : UiExpandOption"
-              class="mt-1"
-            >
-              <FiltersKeywordFilter
-                class="my-4"
-                :model-value="filter.blacklist"
-                :label="$t('blackKeywords')"
-                :footer="$t('addblacklistKeywords')"
-                :place-holder="$t('addBlackListPressEnter')"
-              />
-              <FiltersWhitelistFilter
-                class="my-4"
-                :model-value="filter.keywords"
-              />
-              <FiltersFuzzyFilter :model-value="filter" />
-              <FiltersVisualSimilarityFilter
-                v-if="!styleMode"
+              <FiltersTreePhotoEntry
+                v-if="photoOpen"
                 v-model="filter.visualSimilarity"
+                :lane="photoLane"
+                @choose-lane="choosePhotoLane"
+                @change-lane="setPhotoLane"
                 @ready="visualReady = $event"
                 @dirty="referenceDirty = true"
+                @close="closePhoto"
+                @focus-search="focusSearch"
               />
-            </component>
-          </component>
-          <div
-            v-if="styleMode"
-            class="mb-4"
-            aria-live="polite"
-          >
-            <h2 class="text-xl">
-              {{ $t('styleSearch.preview') }}
-            </h2>
-            <p v-if="previewLoading">
-              {{ $t('styleSearch.loading') }}
-            </p>
-            <p
-              v-else-if="previewError"
-              role="alert"
-            >
-              {{ $t('styleSearch.previewError') }} <button
-                type="button"
-                class="underline"
-                @click="testFilter"
-              >
-                {{ $t('retry') }}
-              </button>
-            </p>
-            <p v-else-if="previewDone && !matches.length">
-              {{ $t('styleSearch.empty') }}
-            </p>
-            <p v-if="feedbackPending">
-              {{ $t('styleSearch.feedbackLoading') }}
-            </p>
-            <p
-              v-if="feedbackError"
-              role="alert"
-            >
-              {{ $t('styleSearch.feedbackError') }}
-              <button
-                type="button"
-                class="underline"
-                :disabled="feedbackPending || savingFilter"
-                @click="addFeedback(feedbackError.listing, feedbackError.positive)"
-              >
-                {{ $t('retry') }}
-              </button>
-            </p>
-            <button
-              v-if="exampleCount"
-              type="button"
-              class="underline my-2"
-              :disabled="feedbackPending || savingFilter"
-              @click="clearFeedback"
-            >
-              {{ $t('styleSearch.clearFeedback') }}
-            </button>
-            <p v-if="exampleCount >= 4">
-              {{ $t('styleSearch.feedbackLimit') }}
-            </p>
-            <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 mt-4">
-              <article
-                v-for="match in matches.slice(0, 3)"
-                :key="`${match.listingData?.platform}-${match.listingData?.id}`"
-                class="rounded border border-slate-600 p-3"
-              >
-                <a
-                  :href="listingStore.constructListingUrl(match.listingData, locale) ?? undefined"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <img
-                    v-if="match.listingData?.imageUrls?.[0]"
-                    :src="match.listingData.imageUrls[0]"
-                    :alt="match.listingData.title ?? ''"
-                    loading="lazy"
-                    class="w-full h-32 object-contain"
-                  >
-                  <h3 class="line-clamp-2 text-sm">{{ match.listingData?.title }}</h3>
-                </a>
-                <p>{{ useFormat().formatCurrency(match.listingData?.price ?? 0, match.listingData?.currency ?? '', locale) }}</p>
-                <div class="flex gap-3 mt-2">
-                  <button
-                    type="button"
-                    class="min-h-11 min-w-11 p-2 rounded hover:bg-slate-700"
-                    :disabled="!visualReady || feedbackPending || savingFilter || (exampleCount >= 4 && feedbackChoice(match.listingData) === undefined)"
-                    :aria-label="$t('styleSearch.moreLike')"
-                    :title="$t('styleSearch.moreLike')"
-                    :aria-pressed="feedbackChoice(match.listingData) === true"
-                    :class="{ 'bg-indigo-700 px-2 rounded font-semibold': feedbackChoice(match.listingData) === true }"
-                    @click="match.listingData && addFeedback(match.listingData, true)"
-                  >
-                    <Icon
-                      name="tabler:thumb-up"
-                      aria-hidden="true"
-                    />
-                  </button>
-                  <button
-                    type="button"
-                    class="min-h-11 min-w-11 p-2 rounded hover:bg-slate-700"
-                    :disabled="!visualReady || feedbackPending || savingFilter || (exampleCount >= 4 && feedbackChoice(match.listingData) === undefined)"
-                    :aria-label="$t('styleSearch.notRelevant')"
-                    :title="$t('styleSearch.notRelevant')"
-                    :aria-pressed="feedbackChoice(match.listingData) === false"
-                    :class="{ 'bg-indigo-700 px-2 rounded font-semibold': feedbackChoice(match.listingData) === false }"
-                    @click="match.listingData && addFeedback(match.listingData, false)"
-                  >
-                    <Icon
-                      name="tabler:thumb-down"
-                      aria-hidden="true"
-                    />
-                  </button>
-                </div>
-              </article>
-            </div>
-          </div>
+            </FiltersTreeLookingForBranch>
+          </FiltersTreeBranch>
 
-          <component
-            :is="styleMode ? 'details' : 'div'"
-            class="mt-4"
+          <FiltersTreeBranch
+            v-bind="branch('condition')"
+            @toggle="toggleBranch('condition')"
           >
-            <summary
-              v-if="styleMode"
-              class="cursor-pointer text-sm"
-            >
-              {{ notificationSummary }}
-            </summary>
-            <FiltersNotificationSettingsFilter v-model="filter" />
-          </component>
+            <FiltersConditionFilter v-model="filter" />
+          </FiltersTreeBranch>
 
-          <FiltersCreateConfirmCreation
+          <FiltersTreeBranch
+            v-bind="branch('price')"
+            @toggle="toggleBranch('price')"
+          >
+            <FiltersTreePriceBranch
+              v-model="filter"
+              :preview="reference.preview.value"
+              :loading-reference="reference.loading.value"
+              @load-reference="reloadSavedReference"
+            />
+          </FiltersTreeBranch>
+
+          <FiltersTreeBranch
+            v-bind="branch('where')"
+            @toggle="toggleBranch('where')"
+          >
+            <FiltersTreeWhereBranch v-model="filter" />
+          </FiltersTreeBranch>
+
+          <FiltersTreeBranch
+            v-bind="branch('notify')"
+            @toggle="toggleBranch('notify')"
+          >
+            <FiltersTreeNotifyBranch v-model="filter" />
+          </FiltersTreeBranch>
+
+          <FiltersTreeSummary
+            :filter="filter"
+            :has-photo="!!filter.visualSimilarity"
             :is-new-filter="isNewFilter"
-            :save-label="styleMode ? $t('styleSearch.saveAlert') : undefined"
             :saving="savingFilter"
-            :disabled="!visualReady || feedbackPending"
+            :disabled="!visualReady || feedback.pending.value"
           />
-        </fieldset>
-      </form>
-    </UiDefaultContainer>
+        </FiltersTreeFilterTree>
+      </fieldset>
 
-    <OverviewRecentMatchTable
-      v-if="!styleMode && matches.length > 0"
-      :matches
-      :title="$t('auctionMatchedToFilters')"
-    />
+      <aside class="min-w-0 flex-[1_1_340px] lg:sticky lg:top-4">
+        <FiltersTreeMatchingOffers
+          :offers="offers.offers.value"
+          :loading="offers.loading.value"
+          :error="offers.error.value"
+          :done="offers.done.value"
+          :enabled="hasSomethingToMatch"
+          :style-mode="styleMode"
+          :feedback-pending="feedback.pending.value"
+          :feedback-failed="!!feedback.failure.value"
+          :example-count="feedback.exampleCount.value"
+          :feedback-choice="feedback.feedbackChoice"
+          :can-feedback="feedback.canGiveFeedback"
+          @retry="offers.run"
+          @feedback="feedback.addFeedback"
+          @clear-feedback="feedback.clearFeedback"
+          @retry-feedback="feedback.retry"
+        />
+      </aside>
+    </form>
   </div>
 </template>
 
 <script setup lang="ts">
-import { UiExpandOption } from '#components'
-import lodash from 'lodash'
 import { getMessaging, getToken } from 'firebase/messaging'
 import { useFirebaseApp } from 'vuefire'
-import type { ClientModelFilterMatch as FilterMatch, ClientModelListingListener as ListingListener, ClientModelStoredListing as StoredListing } from '~/src/api-client'
-import type { Filter, TargetType } from '~/types/FilterType'
+import { getLocation } from '~/src/api-client'
+import type { ClientModelListingListener as ListingListener } from '~/src/api-client'
+import type { Filter, WireFilter } from '~/types/FilterType'
+import type { PhotoLane } from '~/components/filters/tree/PhotoEntry.vue'
+import type { BranchId } from '~/composables/useFilterTreeAnswers'
 import { filterFreeMarketplaces, marketplaces } from '~/constants/CreateFilterConstants'
-import { parseFilterPrefillQuery } from '~/utils/filterPrefill'
-import { useFormat } from '~/composable/useFormat'
+import { parseFilterPrefillQuery, parseListingUrl, prefillFormFields } from '~/utils/filterPrefill'
+import type { FilterPrefill } from '~/utils/filterPrefill'
+import { buildFilters, defaultFilterState, parseFilters } from '~/utils/filterWire'
+import { applyReferenceListing, applyReferencePrices, clearReference, initialPriceSelectors } from '~/utils/referencePreview'
+import { pickDefaultNotification } from '~/utils/notifyDefault'
 
-const { debounce } = lodash
-
-const { t, locale } = useI18n()
-const listingStore = useListingStore()
-
+const { t } = useI18n()
+const route = useRoute()
+const localePath = useLocalePath()
 const filterStore = useFilterStore()
 const userStore = useUserStore()
 const firebaseApp = useFirebaseApp()
-const savingFilter = ref(false)
-
-const localePath = useLocalePath()
-
-const route = useRoute()
+// Injected during setup: onMounted only uses it after an await, where inject() no longer works and an
+// anonymous visitor would never be signed in (no token: no preview, no saving).
+const firebaseAuth = useFirebaseAuth()
 
 const filterId = computed(() => Number(route.query.id ?? 0))
+const isNewFilter = computed(() => route.query.id == '' || route.query.id == undefined)
 
-const isNewFilter = computed(() => {
-  return route.query.id == '' || route.query.id == undefined
-})
+// Prefill is applied during setup, before the dropdowns mount and fall back to "all".
+const prefill: FilterPrefill = isNewFilter.value ? parseFilterPrefillQuery(route.query, marketplaces.map(m => m.value)) : {}
+const filter = ref<Filter>({ ...defaultFilterState(), ...prefillFormFields(prefill) } as Filter)
 
-const matches = ref<FilterMatch[]>([])
-const styleMode = ref(isNewFilter.value && route.query.mode === 'style')
-const visualReady = ref(!styleMode.value)
+const savingFilter = ref(false)
 const referenceDirty = ref(false)
-const feedbackPending = ref(false)
-const feedbackError = shallowRef<{ listing: StoredListing, positive: boolean } | null>(null)
-let feedbackRequest: AbortController | undefined
-const feedbackExamples = computed<{ sourceListingId: string, sourcePlatform: string, positive: boolean }[]>(() => {
-  try {
-    return JSON.parse(filter.value.visualSimilarity || '{}').examples ?? []
-  }
-  catch { return [] }
-})
-const exampleCount = computed(() => feedbackExamples.value.length)
-function feedbackChoice(listing: StoredListing | undefined) {
-  return feedbackExamples.value.find(example => example.sourceListingId === listing?.id && example.sourcePlatform === listing?.platform)?.positive
-}
-
-const previewLoading = ref(false)
-const previewError = ref(false)
-const previewDone = ref(false)
-let previewRequest: AbortController | undefined
+const savedHadAttributes = ref(false)
 let savedSnapshot = ''
-const dirty = computed(() => referenceDirty.value || (!!savedSnapshot && savedSnapshot !== JSON.stringify(filter.value)))
-function setStyleMode(value: boolean) {
-  if (savingFilter.value || styleMode.value === value) return
+
+// ---- photo lane ---------------------------------------------------------------------------
+const photoLane = ref<PhotoLane | null>(isNewFilter.value && route.query.mode === 'style' ? 'style' : null)
+const photoOpen = ref(!!photoLane.value || prefill.entry === 'photo')
+const styleMode = computed(() => photoLane.value === 'style')
+const visualReady = ref(!styleMode.value)
+
+function setPhotoLane(lane: PhotoLane | null) {
+  if (savingFilter.value || photoLane.value === lane) return
   if ((filter.value.visualSimilarity || referenceDirty.value) && !window.confirm(t('styleSearch.switchMode'))) return
-  styleMode.value = value
+  photoLane.value = lane
   filter.value.visualSimilarity = ''
-  visualReady.value = !value
+  referenceDirty.value = false
+  visualReady.value = lane !== 'style'
 }
 
-const filter = ref<Filter>({
-  name: '',
-  marketplace: 'all',
-  searchValue: '',
-  totalCost: 0,
-  zipcode: '',
-  searchRadius: 100,
-  commercialSeller: false,
-  seller: '',
-  keywords: [[]],
-  blacklist: [] as string[],
-  minPrice: 0,
-  maxPrice: 100,
-  currency: '€',
-  location: '',
-  id: 0,
-  notificationType: 'Unknown',
-  notificationTarget: '',
-  country: 'EU,US,GB',
-  condition: '',
-  deliveryMethod: '',
-  frequency: '',
-  fuzzyness: '0',
-  visualSimilarity: '',
-  referenceUrl: '',
-  referenceTitle: '',
-  referenceMarketplace: '',
-  referencePrice: 0,
-  referenceCurrency: '',
-  referenceSelector: '',
-  referenceAdditionalSelectors: [],
-  referenceLastRefreshedAt: '',
+function choosePhotoLane(lane: PhotoLane) {
+  setPhotoLane(lane)
+  if (lane === 'other') focusSearch()
+}
+
+function openPhoto(lane: PhotoLane | null) {
+  photoOpen.value = true
+  openBranch.value = 'looking'
+  if (lane) setPhotoLane(lane)
+}
+
+function closePhoto() {
+  setPhotoLane(null)
+  if (!photoLane.value) photoOpen.value = false
+}
+
+const lookingFor = ref<{ focus: () => void } | null>(null)
+function focusSearch() {
+  nextTick(() => lookingFor.value?.focus())
+}
+
+// ---- accordion and answers ----------------------------------------------------------------
+const openBranch = ref<BranchId | null>('looking')
+const derivedNotify = ref<{ type: string } | null>(null)
+const answers = useFilterTreeAnswers(filter, {
+  hasPhoto: () => !!filter.value.visualSimilarity,
+  notifyDerived: () => derivedNotify.value?.type === filter.value.notificationType,
 })
 
-const notificationSummary = computed(() => {
-  switch (filter.value.notificationType) {
-    case 'Email': return t('email')
-    case 'DiscordWebhook': return 'Discord'
-    case 'FireBase': return t('pushNotifications')
-    default: return t('styleSearch.notifications')
+function toggleBranch(id: BranchId) {
+  openBranch.value = openBranch.value === id ? null : id
+}
+
+function branch(id: BranchId) {
+  return {
+    id,
+    title: t(`filterTree.branch.${id}`),
+    answer: answers.answers.value[id],
+    decided: answers.decided.value[id],
+    tag: answers.tag(id),
+    open: openBranch.value === id,
   }
+}
+
+// ---- interpretation, attribute support, reference listing ---------------------------------
+const { interpretation, refresh: refreshInterpretation } = useFilterInterpretation(() => filter.value.searchValue)
+const attributesSupported = computed(() => savedHadAttributes.value || filterStore.getFilterOptions.some(option => option.name === 'Attributes'))
+const kleinanzeigenOptions = computed(() => {
+  // The backend compares the category with every listing, so it only makes sense for Kleinanzeigen alone.
+  if (filter.value.marketplace !== 'Kleinanzeigen') return null
+  return filterStore.getFilterOptions.find(option => option.name === 'KleinanzeigenKategorie')?.value.options ?? null
 })
 
-watch(() => filter.value.visualSimilarity, () => {
-  feedbackRequest?.abort()
-  feedbackRequest = undefined
-  feedbackPending.value = false
-  feedbackError.value = null
+const reference = useReferencePreview()
+
+/** Pasted/linked listing: suggested search term, reference fields and price chips. */
+async function importListing(url: string, options: { saved?: { selector?: string, extras?: string[] }, keepSearch?: boolean } = {}) {
+  const { saved } = options
+  if (parseListingUrl(filter.value.searchValue.trim())) filter.value.searchValue = ''
+  const searchBefore = filter.value.searchValue
+  const result = await reference.load({ url, selectedSelector: saved?.selector, additionalSelectors: saved?.extras })
+  if (!result) return
+  // A term the user typed while the listing loaded (or a reload of a saved filter) wins.
+  applyReferenceListing(filter.value, result, { search: !options.keepSearch && filter.value.searchValue === searchBefore })
+  answers.markSource('looking', 'listing')
+  const confirmed = !saved?.selector || result.selectedReference?.selector === saved.selector
+  if (!confirmed) {
+    reference.error.value = t('referenceSelectionUnavailable')
+    return
+  }
+  applyReferencePrices(filter.value, result, initialPriceSelectors(result, saved?.selector, saved?.extras))
+  if (filter.value.referenceSelector) answers.markSource('price', 'listing')
+}
+
+/** Edit mode: fetch the saved reference again so its price parts can be re-picked. */
+function reloadSavedReference() {
+  const { referenceUrl, referenceSelector, referenceAdditionalSelectors } = filter.value
+  if (referenceUrl) void importListing(referenceUrl, { saved: { selector: referenceSelector, extras: referenceAdditionalSelectors }, keepSearch: true })
+}
+
+function removeReference() {
+  clearReference(filter.value)
+  reference.reset()
+}
+
+// ---- matching offers and style feedback ---------------------------------------------------
+const feedback = useStyleFeedback({
+  visual: computed({ get: () => filter.value.visualSimilarity, set: (value: string) => { filter.value.visualSimilarity = value } }),
+  saving: savingFilter,
+  ready: visualReady,
+  apiBase: useApiBaseUrl(),
+  token: () => userStore.token,
+  fetcher: $fetch as <T>(url: string, options: Record<string, unknown>) => Promise<T>,
 })
 
-function clearFeedback() {
-  if (savingFilter.value) return
-  const payload = JSON.parse(filter.value.visualSimilarity)
-  delete payload.examples
-  filter.value.visualSimilarity = JSON.stringify(payload)
+const hasSomethingToMatch = computed(() => !!filter.value.searchValue.trim() || (styleMode.value && !!filter.value.visualSimilarity))
+
+/** Everything that changes which offers match; notification edits do not refetch. */
+function matchSignature() {
+  return JSON.stringify({ ...filter.value, notificationType: '', notificationTarget: '', name: '', id: 0 })
 }
 
-async function addFeedback(listing: StoredListing, positive: boolean) {
-  if (savingFilter.value || !visualReady.value || feedbackPending.value || (exampleCount.value >= 4 && feedbackChoice(listing) === undefined) || !listing.id || !listing.platform) return
-  const reference = filter.value.visualSimilarity
-  const current = new AbortController()
-  feedbackRequest = current
-  feedbackPending.value = true
-  feedbackError.value = null
-  try {
-    const example = await $fetch<{ emb: number[], provenance: Record<string, unknown>, sourceListingId: string, sourcePlatform: string, sourceImageUrl: string }>('https://ane.coflnet.com/api/filters/visual-similarity/example', {
-      method: 'POST',
-      signal: current.signal,
-      headers: { Authorization: `Bearer ${userStore.token}` },
-      body: { listingId: listing.id, platform: listing.platform, photoIndex: 0 },
-    })
-    if (feedbackRequest !== current || current.signal.aborted || reference !== filter.value.visualSimilarity) return
-    const sourceImage = new URL(example.sourceImageUrl)
-    if (!example.emb?.length || !example.provenance || example.sourceListingId !== listing.id || example.sourcePlatform !== listing.platform || example.sourceImageUrl.length > 2048 || sourceImage.protocol !== 'https:' || sourceImage.username || sourceImage.password) throw new Error('Invalid example')
-    const payload = JSON.parse(reference)
-    const preference = { emb: example.emb, provenance: example.provenance, sourceListingId: example.sourceListingId, sourcePlatform: example.sourcePlatform, sourceImageUrl: example.sourceImageUrl, positive }
-    const examples = payload.examples ?? []
-    const existing = examples.findIndex((item: typeof preference) => item.sourceListingId === listing.id && item.sourcePlatform === listing.platform)
-    if (existing >= 0) examples[existing] = preference
-    else if (examples.length < 4) examples.push(preference)
-    payload.examples = examples
-    filter.value.visualSimilarity = JSON.stringify(payload)
-  }
-  catch {
-    if (feedbackRequest === current && !current.signal.aborted) feedbackError.value = { listing, positive }
-  }
-  finally {
-    if (feedbackRequest === current) feedbackPending.value = false
-  }
-}
+const offers = useMatchingOffers({
+  buildRequest: () => filterToCreate(true),
+  test: (listener, signal) => filterStore.testFilter(listener, signal),
+  signature: matchSignature,
+  enabled: () => visualReady.value && hasSomethingToMatch.value,
+  delay: () => (filter.value.visualSimilarity ? 1200 : 600),
+})
 
-watch([filter, visualReady], () => {
-  previewRequest?.abort()
-  debouncedTestFilter.cancel()
-  previewLoading.value = false
-  debouncedTestFilter()
-}, { deep: true })
+const suggestContext = computed(() => ({
+  searchTerm: filter.value.searchValue,
+  filterNames: buildFilters(filter.value, wireContext(null)).map(entry => entry.name),
+}))
 
-const debouncedTestFilter = debounce(() => testFilter(), 500)
-
-async function testFilter() {
-  previewRequest?.abort()
-  if (!visualReady.value || (!styleMode.value && !filter.value.searchValue)) return
-  const current = new AbortController()
-  previewRequest = current
-  previewLoading.value = true
-  previewError.value = false
-  try {
-    const f = await filterToCreate(true)
-    if (!f || current.signal.aborted) return
-    const res = await filterStore.testFilter(f, current.signal)
-    if (previewRequest !== current || current.signal.aborted) return
-    if (res === null) throw new Error('Preview unavailable')
-    matches.value = res.map(i => ({ matchedAt: i.foundAt, listenerId: 0, listingData: i }))
-    previewDone.value = true
-  }
-  catch {
-    if (previewRequest === current && !current.signal.aborted) previewError.value = true
-  }
-  finally {
-    if (previewRequest === current) previewLoading.value = false
-  }
-}
+// ---- leaving with unsaved changes ---------------------------------------------------------
+const dirty = computed(() => referenceDirty.value || (!!savedSnapshot && savedSnapshot !== JSON.stringify(filter.value)))
 
 function beforeUnload(event: BeforeUnloadEvent) {
   if (dirty.value || savingFilter.value) {
@@ -438,162 +295,178 @@ function beforeUnload(event: BeforeUnloadEvent) {
   }
 }
 onBeforeRouteLeave(() => !savingFilter.value && (!dirty.value || window.confirm(t('styleSearch.unsaved'))))
-onBeforeUnmount(() => {
-  previewRequest?.abort()
-  feedbackRequest?.abort()
-  debouncedTestFilter.cancel()
-  window.removeEventListener('beforeunload', beforeUnload)
-})
+onBeforeUnmount(() => window.removeEventListener('beforeunload', beforeUnload))
 
-const radiusError = ref(false)
-
-// Prefill a new filter from query params, e.g. the "Notify me about new offers" link on a
-// product page (utils/notifyFilterUrl.ts builds it, this reads it back). Only applies when
-// creating a new filter — editing an existing one always loads its saved values instead —
-// and only runs once on mount; every field stays freely editable afterwards.
-function applyPrefillFromQuery() {
-  if (!isNewFilter.value) return
-
-  const prefill = parseFilterPrefillQuery(route.query, marketplaces.map(m => m.value))
-  Object.assign(filter.value, prefill)
+async function takeSnapshot() {
+  await nextTick()
+  savedSnapshot = JSON.stringify(filter.value)
 }
 
-async function loadEditParam() {
-  if (isNewFilter.value) {
+// ---- loading ------------------------------------------------------------------------------
+function markPrefillSources() {
+  const kind = prefill.source
+  if (!kind || kind === 'photo') return
+  if (prefill.searchValue || prefill.attributes) answers.markSource('looking', kind)
+  if (prefill.condition) answers.markSource('condition', kind)
+  if (prefill.minPrice !== undefined || prefill.maxPrice !== undefined) answers.markSource('price', kind)
+  if (prefill.marketplace) answers.markSource('where', kind)
+}
+
+async function importPrefilledListing() {
+  if (prefill.url) return importListing(prefill.url)
+  if (!prefill.referenceUrl) return
+  await importListing(prefill.referenceUrl, { saved: { selector: prefill.referenceSelector, extras: prefill.referenceAdditionalSelectors } })
+}
+
+function loadEditParam() {
+  if (isNewFilter.value) return
+  const saved = filterStore.getUserFilters.find(item => Number(item.id ?? 0) === filterId.value)
+  if (!saved?.filters) {
+    console.error('Filter not found')
     return
   }
+  filter.value = {
+    ...parseFilters(saved.filters),
+    name: saved.name ?? '',
+    id: saved.id ?? 0,
+    notificationTarget: saved.target ?? '',
+    notificationType: saved.targetType === 'UnknownDefaultOpenApi' ? 'Unknown' : saved.targetType ?? 'Unknown',
+  }
+  savedHadAttributes.value = saved.filters.some(item => item.name === 'Attributes')
+  restorePhotoLane(filter.value.visualSimilarity)
+}
 
+function restorePhotoLane(payload: string) {
+  if (!payload) return
   try {
-    const cachedFilters = filterStore.getUserFilters
-    const currentId = Number(route.query.id ?? 0)
+    photoLane.value = JSON.parse(payload).mode === 'style' ? 'style' : 'other'
+  }
+  catch {
+    photoLane.value = 'other'
+  }
+  photoOpen.value = true
+}
 
-    const activeFilter = cachedFilters.find(i => Number(i.id ?? 0) === currentId)
-      ?? filterStore.getUserFilterById(currentId)
+/** New filters start with the user's usual channel (see utils/notifyDefault.ts). */
+function preselectNotification() {
+  if (!isNewFilter.value || filter.value.notificationType !== 'Unknown') return
+  const choice = pickDefaultNotification({
+    filters: filterStore.getUserFilters,
+    isWebView: userStore.isWebView,
+    pushAllowed: userStore.isWebView || (typeof Notification !== 'undefined' && Notification.permission === 'granted'),
+    isLoggedIn: userStore.isLoggedIn,
+    savedEmail: userStore.notificationSettings.email.address,
+    accountEmail: userStore.getUser?.email,
+    savedDiscordWebhook: userStore.notificationSettings.discord.webhookUrl,
+  })
+  if (!choice.derived) return
+  filter.value.notificationType = choice.type
+  filter.value.notificationTarget = choice.target
+  derivedNotify.value = { type: choice.type }
+  if (choice.type === 'FireBase') requestAppPushToken()
+}
 
-    if (!activeFilter?.filters) {
-      console.error('Filter not found')
-      return
-    }
+function requestAppPushToken() {
+  if (!userStore.isWebView || !window.sendToFlutter) return
+  window.sendToFlutter({ action: 'requestNotifications' })
+  if (!userStore.notificationToken) window.sendToFlutter({ action: 'generateNotificationToken' })
+}
 
-    filter.value.notificationTarget = activeFilter.target ?? ''
-    filter.value.name = activeFilter.name ?? ''
-    filter.value.id = activeFilter.id ?? 0
-    filter.value.notificationType = activeFilter.targetType === 'UnknownDefaultOpenApi' ? 'Unknown' : activeFilter.targetType ?? 'Unknown'
+/** Attribute chips need the backend to support `Attributes`; prefilled chips are dropped otherwise. */
+async function loadFilterOptions() {
+  try {
+    await filterStore.loadFilterOptions()
+  }
+  catch {
+    return
+  }
+  if (!attributesSupported.value) filter.value.attributes = {}
+}
 
-    activeFilter.filters.forEach((item) => {
-      switch (item.name) {
-        case 'Radius': {
-          const [_lat, _lon, radius, zipcode] = item.value?.split?.(';') ?? ''
-          filter.value.searchRadius = Number(radius ?? 0)
-          filter.value.zipcode = zipcode ?? ''
-          break
-        }
-        case 'ContainsKeyWord':{
-          if (item.value == '') break
-          const joinedItems = item.value!.split('|')
-          filter.value.keywords = joinedItems.map((i: string) => i.split(','))
-          console.log(filter.value.keywords)
-          break
-        }
-        case 'NotContainsKeyWord':
-          if (item.value == '') break
-          item?.value?.split(',').forEach((keyword: string) => {
-            filter.value.blacklist.push(keyword)
-          })
-          break
-        case 'PriceRange': {
-          const [min, max] = item.value!.split('-')
-          filter.value.minPrice = Number(min)
-          filter.value.maxPrice = Number(max)
-          break
-        }
-        case 'IncludePlatforms': {
-          // A saved explicit list stays explicit as the advertised sources change.
-          filter.value.marketplace = item.value ?? ''
-          break
-        }
-        case 'CommercialSeller':
-          filter.value.commercialSeller = Boolean(item.value)
-          break
-        case 'SearchTerm':
-          filter.value.searchValue = item.value ?? ''
-          break
-        case 'Condition':
-          filter.value.condition = item.value ?? ''
-          break
-        case 'DeliveryMethod':
-          filter.value.deliveryMethod = item.value ?? ''
-          break
-        case 'TotalCost': {
-          const [min, _max] = item.value!.split('-')
-          filter.value.totalCost = Number(min)
-          break
-        }
-        case 'Fuzzyness':
-          filter.value.fuzzyness = item.value ?? '2'
-          break
-        case 'Frequency':
-          filter.value.frequency = item.value ?? ''
-          break
-        case 'Country':
-          filter.value.country = item.value ?? ''
-          break
-        case 'VisualSimilarityFilter':
-          filter.value.visualSimilarity = item.value ?? ''
-          try {
-            styleMode.value = JSON.parse(item.value || '{}').mode === 'style'
-          }
-          catch { /* Keep legacy mode for malformed saved values. */ }
-          break
-        case 'ReferenceUrl':
-          filter.value.referenceUrl = item.value ?? ''
-          break
-        case 'ReferenceTitle':
-          filter.value.referenceTitle = item.value ?? ''
-          break
-        case 'ReferenceMarketplace':
-          filter.value.referenceMarketplace = item.value ?? ''
-          break
-        case 'ReferencePrice':
-          filter.value.referencePrice = Number(item.value ?? 0)
-          break
-        case 'ReferenceCurrency':
-          filter.value.referenceCurrency = item.value ?? ''
-          break
-        case 'ReferenceSelector':
-          filter.value.referenceSelector = item.value ?? ''
-          break
-        case 'ReferenceAdditionalSelectors':
-          filter.value.referenceAdditionalSelectors = (item.value ?? '')
-            .split('\n')
-            .map(s => s.trim())
-            .filter(s => s.length > 0)
-          break
-        case 'ReferenceLastRefreshedAt':
-          filter.value.referenceLastRefreshedAt = item.value ?? ''
-          break
-      }
-    })
+onMounted(async () => {
+  window.addEventListener('beforeunload', beforeUnload)
+  const options = loadFilterOptions()
+  await takeSnapshot()
+  try {
+    await userStore.checkAuth(firebaseAuth!)
+    await Promise.allSettled([filterStore.loadFilters()])
+    loadEditParam()
+    preselectNotification()
   }
   catch (e) {
     console.error(e)
     push.error(`${t('weRanIntoAnError')}\n ${e}`)
   }
+  await takeSnapshot()
+  refreshInterpretation()
+  await keepPristine(async () => {
+    await options
+    markPrefillSources()
+    await importPrefilledListing()
+  })
+  offers.schedule()
+})
+
+/** Re-takes the snapshot after automatic changes, unless the user changed something before they started. */
+async function keepPristine(work: () => Promise<void>) {
+  const untouched = savedSnapshot === JSON.stringify(filter.value)
+  await work()
+  if (untouched) await takeSnapshot()
+}
+
+// ---- saving -------------------------------------------------------------------------------
+/** Definite answers only (a location, or null for an unknown zip); failed lookups are retried. */
+const locationCache = new Map<string, [string, string] | null>()
+
+/** undefined = the lookup itself failed. */
+async function lookupZip(zip: string): Promise<[string, string] | null | undefined> {
+  try {
+    const location = await getLocation({ path: { zip }, composable: '$fetch' })
+    if (location.lat == 0 && location.lon == 0) return null
+    return [String(location.lat), String(location.lon)]
+  }
+  catch (error) {
+    console.error('Error fetching location:', error)
+    return undefined
+  }
+}
+
+/** Resolves the zip code; problems are only reported when saving, not for previews while typing. */
+async function resolveLocation(zip: string, report: boolean): Promise<[string, string] | null> {
+  if (!locationCache.has(zip)) {
+    const result = await lookupZip(zip)
+    if (result === undefined) {
+      if (report) push.error(t('issueGettingLocationData'))
+      return null
+    }
+    locationCache.set(zip, result)
+  }
+  const location = locationCache.get(zip) ?? null
+  if (!location && report) push.error(t('invalidZipCode'))
+  return location
+}
+
+function wireContext(location: [string, string] | null) {
+  return {
+    freeMarketplaces: filterFreeMarketplaces(marketplaces).map(m => m.value),
+    location,
+    attributesSupported: attributesSupported.value,
+  }
 }
 
 async function saveFilter() {
-  if (!visualReady.value || feedbackPending.value || savingFilter.value) return
+  if (!visualReady.value || feedback.pending.value || savingFilter.value) return
   try {
     savingFilter.value = true
     const submittedSnapshot = JSON.stringify(filter.value)
     const f = await filterToCreate()
 
-    if (!f || !visualReady.value || feedbackPending.value || JSON.stringify(filter.value) !== submittedSnapshot) {
+    if (!f || !visualReady.value || feedback.pending.value || JSON.stringify(filter.value) !== submittedSnapshot) {
       console.log('aborting')
       return
     }
     const saved = await filterStore.saveFilter(f)
-    const unchanged = JSON.stringify(filter.value) === submittedSnapshot && visualReady.value && !feedbackPending.value
+    const unchanged = JSON.stringify(filter.value) === submittedSnapshot && visualReady.value && !feedback.pending.value
     if (saved?.id) filter.value.id = saved.id
     savedSnapshot = JSON.stringify({ ...JSON.parse(submittedSnapshot), id: filter.value.id })
     if (!unchanged) {
@@ -616,167 +489,47 @@ async function saveFilter() {
 }
 
 async function filterToCreate(preview = false): Promise<ListingListener | null> {
-  if (radiusError.value) {
-    return null
-  }
-
   const rawFilter = toRaw(filter.value)
-
-  let notificationTarget = rawFilter.notificationTarget
-  if (!preview && rawFilter.notificationType == 'FireBase') {
-    notificationTarget = await connectPushNotifications()
-  }
-
-  if (!preview && rawFilter.notificationType == 'DiscordWebhook') {
-    userStore.notificationSettings.discord.webhookUrl = rawFilter.notificationTarget
-  }
-
-  if (!preview && rawFilter.notificationType == 'Email') {
-    userStore.notificationSettings.email.address = rawFilter.notificationTarget
-  }
-
-  const filterToCreate: ListingListener = {
+  const filters = await handleFilters(preview)
+  if (!filters) return null
+  return {
     name: rawFilter.searchValue.slice(0, 12) || (styleMode.value ? t('styleSearch.title') : ''),
     userId: '',
-    id: filter.value.id,
-    target: preview ? '' : notificationTarget,
-    targetType: preview ? 'Unknown' : rawFilter.notificationType as TargetType,
-    // FilterInfo.value is typed as `string` in the generated spec, but this
-    // pipeline intentionally stores numeric/boolean filter values (radius,
-    // price, toggles) as-is; narrow adapter to keep the wire payload unchanged.
-    filters: await handleFilters() as unknown as ListingListener['filters'],
+    id: rawFilter.id,
+    target: preview ? '' : await notificationTarget(rawFilter),
+    targetType: preview ? 'Unknown' : rawFilter.notificationType,
+    // FilterInfo.value is typed as `string` in the generated spec, but this pipeline
+    // intentionally keeps boolean values (CommercialSeller) as they were saved.
+    filters: filters as unknown as ListingListener['filters'],
   }
-
-  return filterToCreate
 }
 
-async function handleFilters(): Promise<{ name: string, value: string | number | boolean }[]> {
+/** Side effects of saving with a channel: push token, remembered webhook/address. */
+async function notificationTarget(rawFilter: Filter): Promise<string> {
+  if (rawFilter.notificationType === 'FireBase') return connectPushNotifications()
+  if (rawFilter.notificationType === 'DiscordWebhook') userStore.notificationSettings.discord.webhookUrl = rawFilter.notificationTarget
+  if (rawFilter.notificationType === 'Email') userStore.notificationSettings.email.address = rawFilter.notificationTarget
+  return rawFilter.notificationTarget
+}
+
+/** The wire filters, or null when the zip code cannot be resolved. */
+async function handleFilters(preview = false): Promise<WireFilter[] | null> {
   const rawFilter = toRaw(filter.value)
-  const filters: { name: string, value: string | number | boolean }[] = []
-
-  // '2' is the default value or false
-  if (rawFilter.fuzzyness != '0') {
-    filters.push({ name: 'Fuzzyness', value: rawFilter.fuzzyness })
-  }
-
-  // 'EU,US,GB' is the default value
-  if (rawFilter.country != 'EU,US,GB')
-    filters.push({ name: 'Country', value: rawFilter.country })
-
-  if (rawFilter.frequency != '')
-    filters.push({ name: 'Frequency', value: rawFilter.frequency })
-
-  if (rawFilter.minPrice != 0 || rawFilter.maxPrice || rawFilter.maxPrice == 0)
-    filters.push({ name: 'PriceRange', value: `${Number(rawFilter.minPrice)}-${Number(rawFilter.maxPrice)}` })
-
-  if (rawFilter.condition != 'all')
-    filters.push({ name: 'Condition', value: rawFilter.condition })
-
-  if (rawFilter.deliveryMethod != 'all')
-    filters.push({ name: 'DeliveryMethod', value: rawFilter.deliveryMethod })
-
-  if (rawFilter.marketplace != 'all') {
-    filters.push({ name: 'IncludePlatforms', value: rawFilter.marketplace })
-  }
-  else {
-    const marketplacesArray = filterFreeMarketplaces(marketplaces)
-    filters.push({ name: 'IncludePlatforms', value: marketplacesArray.map(m => m.value).join(',') })
-  }
-
-  if (rawFilter.commercialSeller)
-    filters.push({ name: 'CommercialSeller', value: true })
-
-  if (rawFilter.zipcode != '') {
-    const location = await handleSearchRadius()
-    filters.push({ name: 'Radius', value: `${location[0]};${location[1]};${rawFilter.searchRadius};${rawFilter.zipcode}` })
-  }
-
-  filters.push({ name: 'SearchTerm', value: rawFilter.searchValue })
-  if (rawFilter.totalCost != 0)
-    filters.push({ name: 'TotalCost', value: `${rawFilter.totalCost}-${rawFilter.totalCost}` })
-
-  if (rawFilter.keywords[0]!.length != 0) {
-    // first join the text writen in the input fields with a comma than join all the groups or input fields with a pipe
-    const joinedItems = rawFilter.keywords.map(i => i.join(',')).filter(i => i != '')
-    filters.push({ name: 'ContainsKeyWord', value: joinedItems.join('|') })
-  }
-  if (rawFilter.blacklist.length != 0)
-    filters.push({ name: 'NotContainsKeyWord', value: rawFilter.blacklist.join(',') })
-
-  // Visual similarity payload is JSON-encoded base64 thumbnail + CLIP embedding
-  // produced client-side via /api/filters/visual-similarity/prepare. Empty when
-  // the user did not pick a reference image.
-  if (rawFilter.visualSimilarity && rawFilter.visualSimilarity.length > 0)
-    filters.push({ name: 'VisualSimilarityFilter', value: rawFilter.visualSimilarity })
-
-  if (rawFilter.referenceUrl)
-    filters.push({ name: 'ReferenceUrl', value: rawFilter.referenceUrl })
-  if (rawFilter.referenceTitle)
-    filters.push({ name: 'ReferenceTitle', value: rawFilter.referenceTitle })
-  if (rawFilter.referenceMarketplace)
-    filters.push({ name: 'ReferenceMarketplace', value: rawFilter.referenceMarketplace })
-  if (rawFilter.referencePrice)
-    filters.push({ name: 'ReferencePrice', value: String(rawFilter.referencePrice) })
-  filters.push({ name: 'ReferenceCurrency', value: rawFilter.referenceCurrency || 'EUR' })
-  if (rawFilter.referenceSelector)
-    filters.push({ name: 'ReferenceSelector', value: rawFilter.referenceSelector })
-  if (rawFilter.referenceAdditionalSelectors && rawFilter.referenceAdditionalSelectors.length > 0)
-    filters.push({ name: 'ReferenceAdditionalSelectors', value: rawFilter.referenceAdditionalSelectors.join('\n') })
-  if (rawFilter.referenceLastRefreshedAt)
-    filters.push({ name: 'ReferenceLastRefreshedAt', value: rawFilter.referenceLastRefreshedAt })
-
-  return filters
-}
-
-async function handleSearchRadius(): Promise<[string, string]> {
-  // If you are looking at this... I am sorry
-  try {
-    const locationData = await getLocation(
-      {
-        path: { zip: filter.value.zipcode },
-        composable: '$fetch',
-      },
-    )
-
-    if (locationData.lat == 0 && locationData.lon == 0) {
-      push.error(t('invalidZipCode'))
-      radiusError.value = true
-      return ['', '']
-    }
-
-    return [String(locationData.lat), String(locationData.lon)]
-  }
-  catch (error) {
-    console.error('Error fetching country:', error)
-    savingFilter.value = false
-    push.error(`${t('issueGettingLocationData')}\n ${error}`)
-  }
-  return ['', '']
+  const location = rawFilter.zipcode ? await resolveLocation(rawFilter.zipcode, !preview) : null
+  if (rawFilter.zipcode && !location) return null
+  return buildFilters(rawFilter, wireContext(location))
 }
 
 async function connectPushNotifications(): Promise<string> {
-  if (useUserStore().isWebView) {
-    const token = useUserStore().notificationToken
-    useUserStore().notificationToken = ''
+  if (userStore.isWebView) {
+    const token = userStore.notificationToken
+    userStore.notificationToken = ''
     return token
   }
   const messaging = getMessaging(firebaseApp)
   // vapid key is meant to be public
-  const token = await getToken(messaging, { vapidKey: 'BC2o4A75_oGlbklpFN4iVXjdZE3lg6Qci7EZg0NrsRAKyKmySam77NrlUAodBAzKhTECJGj-rgfdbQ0qzWUh9nU' })
-  return token
+  return await getToken(messaging, { vapidKey: 'BC2o4A75_oGlbklpFN4iVXjdZE3lg6Qci7EZg0NrsRAKyKmySam77NrlUAodBAzKhTECJGj-rgfdbQ0qzWUh9nU' })
 }
-
-onMounted(async () => {
-  // Only reads route.query — independent of auth/filter-store state, so it runs first and
-  // isn't skipped if checkAuth/loadFilters below ever reject.
-  applyPrefillFromQuery()
-  savedSnapshot = JSON.stringify(filter.value)
-  window.addEventListener('beforeunload', beforeUnload)
-  await useUserStore().checkAuth(useFirebaseAuth()!)
-  await Promise.allSettled([filterStore.loadFilters()])
-  await loadEditParam()
-  if (!isNewFilter.value) savedSnapshot = JSON.stringify(filter.value)
-})
 
 useSeoMeta({
   title: () => t('aneCreate'),

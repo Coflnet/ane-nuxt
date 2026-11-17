@@ -10,6 +10,7 @@
       placeholder: $t('discordWebHookUrl'),
       icon: 'tabler:brand-discord',
       textInput: true,
+      testId: 'notify-discord',
     }"
     :messages="{
       error: $t('invalidDiscordWebhook'),

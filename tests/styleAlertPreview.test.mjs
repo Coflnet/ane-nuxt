@@ -2,6 +2,9 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import { stripTypeScriptTypes } from 'node:module'
 import test from 'node:test'
+import { effectScope, nextTick, ref } from 'vue'
+import { useMatchingOffers } from '../composables/useMatchingOffers.ts'
+import { useStyleFeedback } from '../composables/useStyleFeedback.ts'
 
 const source = await readFile(new URL('../pages/filters/create.vue', import.meta.url), 'utf8')
 const serialize = stripTypeScriptTypes(source.slice(source.indexOf('async function filterToCreate('), source.indexOf('\nasync function handleFilters(')))
@@ -11,8 +14,8 @@ function serializer(notificationType) {
   const userStore = { notificationSettings: { discord: { webhookUrl: 'unchanged' }, email: { address: 'unchanged' } } }
   let pushConnections = 0
   const visual = JSON.stringify({ mode: 'style', garmentType: 'jacket', emb: [1, 0], threshold: 0.8 })
-  const create = new Function('radiusError', 'filter', 'toRaw', 'connectPushNotifications', 'userStore', 'styleMode', 't', 'handleFilters', `${serialize}; return filterToCreate`)(
-    { value: false }, filter, value => value, async () => {
+  const create = new Function('filter', 'toRaw', 'connectPushNotifications', 'userStore', 'styleMode', 't', 'handleFilters', `${serialize}; return filterToCreate`)(
+    filter, value => value, async () => {
       pushConnections++
       return 'push-secret'
     }, userStore, { value: true }, key => key,
@@ -49,8 +52,8 @@ test('save still connects push notifications when explicitly saving', async () =
 test('save handler refuses unfinished image work before serialization or persistence', async () => {
   const body = stripTypeScriptTypes(source.slice(source.indexOf('async function saveFilter()'), source.indexOf('\nasync function filterToCreate(')))
   let calls = 0
-  const save = new Function('visualReady', 'savingFilter', 'filterToCreate', `${body}; return saveFilter`)(
-    { value: false }, { value: false }, () => {
+  const save = new Function('visualReady', 'feedback', 'savingFilter', 'filterToCreate', `${body}; return saveFilter`)(
+    { value: false }, { pending: { value: false } }, { value: false }, () => {
       calls++
       throw new Error('must not serialize')
     },
@@ -60,14 +63,17 @@ test('save handler refuses unfinished image work before serialization or persist
 })
 
 function preview() {
-  const body = stripTypeScriptTypes(source.slice(source.indexOf('async function testFilter()'), source.indexOf('\nfunction beforeUnload(')))
-  const state = { visualReady: { value: true }, styleMode: { value: true }, filter: { value: { searchValue: '' } }, previewLoading: { value: false }, previewError: { value: false }, previewDone: { value: false }, matches: { value: [{ listenerId: 99 }] } }
   const requests = []
-  const run = new Function(...Object.keys(state), 'filterToCreate', 'filterStore', `let previewRequest; ${body}; return testFilter`)(
-    ...Object.values(state), async () => ({ filters: [] }),
-    { testFilter: (_, signal) => new Promise((resolve, reject) => requests.push({ resolve, reject, signal })) },
-  )
-  return { state, requests, run }
+  const scope = effectScope()
+  const offers = scope.run(() => useMatchingOffers({
+    buildRequest: async () => ({ filters: [] }),
+    test: (_, signal) => new Promise((resolve, reject) => requests.push({ resolve, reject, signal })),
+    signature: () => '',
+    enabled: () => true,
+    delay: () => 0,
+  }))
+  offers.offers.value = [{ id: 'previous' }]
+  return { offers, requests, run: offers.run, stop: () => scope.stop() }
 }
 
 const settle = () => new Promise(resolve => setImmediate(resolve))
@@ -83,8 +89,9 @@ test('a late obsolete style preview cannot replace newer matches', async () => {
   await second
   field.requests[0].resolve([{ id: 'obsolete' }])
   await first
-  assert.equal(field.state.matches.value[0].listingData.id, 'newer')
-  assert.equal(field.state.previewLoading.value, false)
+  assert.equal(field.offers.offers.value[0].id, 'newer')
+  assert.equal(field.offers.loading.value, false)
+  field.stop()
 })
 
 test('failed style preview preserves previous matches and exposes retry state', async () => {
@@ -93,27 +100,63 @@ test('failed style preview preserves previous matches and exposes retry state', 
   await settle()
   field.requests[0].reject(new Error('Temporary outage'))
   await attempt
-  assert.deepEqual(field.state.matches.value, [{ listenerId: 99 }])
-  assert.equal(field.state.previewError.value, true)
-  assert.equal(field.state.previewLoading.value, false)
+  assert.deepEqual(field.offers.offers.value, [{ id: 'previous' }])
+  assert.equal(field.offers.error.value, true)
+  assert.equal(field.offers.loading.value, false)
   const retry = field.run()
   await settle()
   field.requests[1].resolve([])
   await retry
-  assert.deepEqual(field.state.matches.value, [])
-  assert.equal(field.state.previewError.value, false)
-  assert.equal(field.state.previewDone.value, true)
+  assert.deepEqual(field.offers.offers.value, [])
+  assert.equal(field.offers.error.value, false)
+  assert.equal(field.offers.done.value, true)
+  field.stop()
+})
+
+test('matching offers debounce signature changes, abort the in-flight call and skip without input', async () => {
+  const requests = []
+  const signature = ref('a')
+  const unrelated = ref(0)
+  const enabled = ref(true)
+  const scope = effectScope()
+  scope.run(() => useMatchingOffers({
+    buildRequest: async () => ({ filters: [] }),
+    test: (_, signal) => new Promise(resolve => requests.push({ resolve, signal })),
+    signature: () => `${unrelated.value * 0}${signature.value}`,
+    enabled: () => enabled.value,
+    delay: () => 5,
+  }))
+  signature.value = 'b'
+  await nextTick()
+  signature.value = 'c'
+  await nextTick()
+  await new Promise(resolve => setTimeout(resolve, 20))
+  assert.equal(requests.length, 1, 'quick edits collapse into one preview call')
+  unrelated.value++
+  await nextTick()
+  await new Promise(resolve => setTimeout(resolve, 20))
+  assert.equal(requests.length, 1, 'edits that keep the signature (e.g. notification settings) do not refetch')
+  assert.equal(requests[0].signal.aborted, false)
+  signature.value = 'd'
+  await nextTick()
+  assert.equal(requests[0].signal.aborted, true, 'a newer signature aborts the in-flight call')
+  enabled.value = false
+  await nextTick()
+  await new Promise(resolve => setTimeout(resolve, 20))
+  assert.equal(requests.length, 1, 'no call without a search term or style photo')
+  scope.stop()
 })
 
 function feedback(examples = []) {
-  const body = stripTypeScriptTypes(source.slice(source.indexOf('function clearFeedback()'), source.indexOf('\nwatch([filter, visualReady]')))
   const initial = JSON.stringify({ mode: 'style', garmentType: 'jacket', emb: [1, 0], examples })
-  const state = { savingFilter: { value: false }, visualReady: { value: true }, feedbackPending: { value: false }, exampleCount: { value: examples.length }, filter: { value: { visualSimilarity: initial } }, feedbackError: { value: null }, userStore: { token: 'auth-token' } }
+  const visual = ref(initial)
   const requests = []
-  const actions = new Function(...Object.keys(state), 'feedbackChoice', '$fetch', `let feedbackRequest; ${body}; return { addFeedback, clearFeedback }`)(
-    ...Object.values(state), listing => JSON.parse(state.filter.value.visualSimilarity).examples?.find(example => example.sourceListingId === listing.id && example.sourcePlatform === listing.platform)?.positive, (url, options) => new Promise((resolve, reject) => requests.push({ url, options, resolve, reject })),
-  )
-  return { state, requests, ...actions }
+  const scope = effectScope()
+  const actions = scope.run(() => useStyleFeedback({
+    visual, saving: ref(false), ready: ref(true), apiBase: 'https://api.example.test', token: () => 'auth-token',
+    fetcher: (url, options) => new Promise((resolve, reject) => requests.push({ url, options, resolve, reject })),
+  }))
+  return { visual, requests, ...actions }
 }
 
 const listing = { id: 'sample-listing', platform: 'Ebay', imageUrls: ['https://example.invalid/photo'], title: 'Jacket' }
@@ -123,11 +166,13 @@ test('explicit style feedback posts listing identity without URLs or notificatio
   const field = feedback()
   const attempt = field.addFeedback(listing, false)
   assert.deepEqual(field.requests[0].options.body, { listingId: listing.id, platform: listing.platform, photoIndex: 0 })
+  assert.equal(field.requests[0].url, 'https://api.example.test/api/filters/visual-similarity/example', 'uses the configured API base')
+  assert.equal(JSON.stringify(field.requests[0].options).includes('secret'), false)
   field.requests[0].resolve({ emb: [0, 1], provenance: proof, sourceListingId: listing.id, sourcePlatform: listing.platform, sourceImageUrl: 'https://images.example.test/garment.jpg' })
   await attempt
-  assert.deepEqual(JSON.parse(field.state.filter.value.visualSimilarity).examples, [{ emb: [0, 1], provenance: proof, sourceListingId: listing.id, sourcePlatform: listing.platform, sourceImageUrl: 'https://images.example.test/garment.jpg', positive: false }])
+  assert.deepEqual(JSON.parse(field.visual.value).examples, [{ emb: [0, 1], provenance: proof, sourceListingId: listing.id, sourcePlatform: listing.platform, sourceImageUrl: 'https://images.example.test/garment.jpg', positive: false }])
   field.clearFeedback()
-  assert.equal(JSON.parse(field.state.filter.value.visualSimilarity).examples, undefined)
+  assert.equal(JSON.parse(field.visual.value).examples, undefined)
 })
 
 test('style preferences are bounded and a changed reference ignores late feedback', async () => {
@@ -136,66 +181,69 @@ test('style preferences are bounded and a changed reference ignores late feedbac
   assert.equal(full.requests.length, 0)
   const field = feedback()
   const attempt = field.addFeedback(listing, true)
-  field.state.filter.value.visualSimilarity = 'new reference'
+  field.visual.value = 'new reference'
   field.requests[0].resolve({ emb: [0, 1], provenance: proof, sourceListingId: listing.id, sourcePlatform: listing.platform, sourceImageUrl: 'https://images.example.test/garment.jpg' })
   await attempt
-  assert.equal(field.state.filter.value.visualSimilarity, 'new reference')
+  assert.equal(field.visual.value, 'new reference')
 })
 
 test('feedback failure preserves serialized input and permits retry', async () => {
   const field = feedback()
-  const before = field.state.filter.value.visualSimilarity
+  const before = field.visual.value
   const attempt = field.addFeedback(listing, true)
   field.requests[0].reject(new Error('Temporary failure'))
   await attempt
-  assert.equal(field.state.filter.value.visualSimilarity, before)
-  assert.equal(field.state.feedbackError.value.positive, true)
-  const retry = field.addFeedback(field.state.feedbackError.value.listing, field.state.feedbackError.value.positive)
+  assert.equal(field.visual.value, before)
+  assert.equal(field.failure.value.positive, true)
+  const retry = field.addFeedback(field.failure.value.listing, field.failure.value.positive)
   field.requests[1].resolve({ emb: [0, 1], provenance: proof, sourceListingId: listing.id, sourcePlatform: listing.platform, sourceImageUrl: 'https://images.example.test/garment.jpg' })
   await retry
-  assert.equal(JSON.parse(field.state.filter.value.visualSimilarity).examples[0].positive, true)
-  assert.equal(field.state.feedbackError.value, null)
+  assert.equal(JSON.parse(field.visual.value).examples[0].positive, true)
+  assert.equal(field.failure.value, null)
 })
 
-test('switching search mode asks before discarding an image and preserves it when cancelled', () => {
-  const body = stripTypeScriptTypes(source.slice(source.indexOf('function setStyleMode('), source.indexOf('\nconst filter = ref<Filter>')))
+test('switching the photo lane asks before discarding an image and preserves it when cancelled', () => {
+  const body = stripTypeScriptTypes(source.slice(source.indexOf('function setPhotoLane('), source.indexOf('\nfunction choosePhotoLane(')))
   const filter = { value: { visualSimilarity: 'saved image and preferences' } }
-  const styleMode = { value: true }
+  const photoLane = { value: 'style' }
   const visualReady = { value: true }
   let accepted = false
-  const switchMode = new Function('filter', 'styleMode', 'visualReady', 'referenceDirty', 'savingFilter', 'window', 't', `${body}; return setStyleMode`)(
-    filter, styleMode, visualReady, { value: false }, { value: false }, { confirm: () => accepted }, key => key,
+  const switchLane = new Function('filter', 'photoLane', 'visualReady', 'referenceDirty', 'savingFilter', 'window', 't', `${body}; return setPhotoLane`)(
+    filter, photoLane, visualReady, { value: false }, { value: false }, { confirm: () => accepted }, key => key,
   )
-  switchMode(false)
-  assert.equal(styleMode.value, true)
+  switchLane('other')
+  assert.equal(photoLane.value, 'style')
   assert.equal(filter.value.visualSimilarity, 'saved image and preferences')
   accepted = true
-  switchMode(false)
-  assert.equal(styleMode.value, false)
+  switchLane('other')
+  assert.equal(photoLane.value, 'other')
   assert.equal(filter.value.visualSimilarity, '')
+  assert.equal(visualReady.value, true)
+  switchLane('style')
+  assert.equal(visualReady.value, false, 'the style lane waits for its photo and garment type')
 })
 
 test('feedback without matching source proof cannot be saved into the reference', async () => {
   for (const source of [{}, { sourceListingId: 'other-listing', sourcePlatform: listing.platform, sourceImageUrl: 'https://images.example.test/garment.jpg' }, { sourceListingId: listing.id, sourcePlatform: 'Other' }]) {
     const field = feedback()
-    const before = field.state.filter.value.visualSimilarity
+    const before = field.visual.value
     const attempt = field.addFeedback(listing, true)
     field.requests[0].resolve({ emb: [0, 1], provenance: proof, sourceImageUrl: 'https://images.example.test/garment.jpg', ...source })
     await attempt
-    assert.equal(field.state.filter.value.visualSimilarity, before)
-    assert.equal(field.state.feedbackError.value.listing.id, listing.id)
+    assert.equal(field.visual.value, before)
+    assert.equal(field.failure.value.listing.id, listing.id)
   }
 })
 
 test('feedback rejects insecure, credential-bearing, invalid and oversized source image URLs', async () => {
   for (const sourceImageUrl of ['http://images.example.test/a.jpg', 'https://user:secret@images.example.test/a.jpg', 'not-a-url', `https://images.example.test/${'x'.repeat(2048)}`]) {
     const field = feedback()
-    const before = field.state.filter.value.visualSimilarity
+    const before = field.visual.value
     const attempt = field.addFeedback(listing, true)
     field.requests[0].resolve({ emb: [0, 1], provenance: proof, sourceListingId: listing.id, sourcePlatform: listing.platform, sourceImageUrl })
     await attempt
-    assert.equal(field.state.filter.value.visualSimilarity, before)
-    assert.equal(field.state.feedbackError.value.listing.id, listing.id)
+    assert.equal(field.visual.value, before)
+    assert.equal(field.failure.value.listing.id, listing.id)
   }
 })
 
@@ -205,7 +253,7 @@ test('programmatic edits during saving stay in the form and retain the saved id 
   let finish
   const messages = []
   let navigation = 0
-  const state = { visualReady: { value: true }, feedbackPending: { value: false }, savingFilter: { value: false }, filter, referenceDirty: { value: true } }
+  const state = { visualReady: { value: true }, feedback: { pending: { value: false } }, savingFilter: { value: false }, filter, referenceDirty: { value: true } }
   const save = new Function(...Object.keys(state), 'filterToCreate', 'filterStore', 'push', 't', 'navigateTo', 'localePath', `let savedSnapshot; ${body}; return saveFilter`)(
     ...Object.values(state), async () => ({ filters: [] }), { saveFilter: () => new Promise((resolve) => { finish = resolve }) },
     { error: message => messages.push(message), success: message => messages.push(message) }, key => key, async () => { navigation++ }, value => value,
@@ -232,7 +280,7 @@ test('changing a listing preference replaces its vector and polarity even when f
     assert.equal(field.requests.length, 1)
     field.requests[0].resolve({ emb: [0, 1], provenance: proof, sourceListingId: listing.id, sourcePlatform: listing.platform, sourceImageUrl: 'https://images.example.test/new.jpg' })
     await attempt
-    const updated = JSON.parse(field.state.filter.value.visualSimilarity).examples
+    const updated = JSON.parse(field.visual.value).examples
     assert.equal(updated.length, count)
     assert.equal(updated[0].positive, true)
     assert.deepEqual(updated[0].emb, [0, 1])

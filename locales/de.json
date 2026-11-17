@@ -1494,6 +1494,136 @@
     }
   },
   "filterTree": {
+    "treeLabel": "Filter-Baukasten",
+    "branch": {
+      "looking": "Gesucht",
+      "condition": "Zustand",
+      "price": "Preis",
+      "where": "Wo",
+      "notify": "Benachrichtigung"
+    },
+    "tag": {
+      "listing": "aus Anzeige",
+      "photo": "aus Foto",
+      "search": "aus Suche",
+      "default": "Standard",
+      "settings": "deine Einstellungen"
+    },
+    "looking": {
+      "label": "Wonach suchst du?",
+      "placeholder": "Beschreibe es, füge einen Anzeigen-Link ein oder lade ein Foto hoch",
+      "pasteLink": "Anzeigen-Link einfügen",
+      "usePhoto": "Foto verwenden",
+      "noLinkInClipboard": "Kein Anzeigen-Link in der Zwischenablage. Füge den Link hier ein oder tippe ihn.",
+      "pasteHere": "Füge den Anzeigen-Link in das Feld ein.",
+      "photoOnly": "Artikel wie auf deinem Foto",
+      "empty": "Noch nicht festgelegt",
+      "neverInclude": "Niemals enthalten",
+      "understood": "Verstanden als {name}",
+      "understoodIn": "Verstanden als {name} in {category}"
+    },
+    "chips": {
+      "catalogueCount": "{count} Produkte in unserem Katalog",
+      "more": "Mehr ({count})",
+      "less": "Weniger",
+      "countsHint": "Die Zahlen zeigen passende Produkte in unserem Katalog.",
+      "limitHint": "Limit erreicht: Entferne einen Chip, um einen weiteren zu wählen."
+    },
+    "attributes": {
+      "storage": "Speicher",
+      "ram": "RAM",
+      "memory": "Arbeitsspeicher",
+      "size": "Größe",
+      "color": "Farbe",
+      "colour": "Farbe",
+      "screen_size": "Bildschirmgröße",
+      "model": "Modell",
+      "edition": "Edition",
+      "media_format": "Format",
+      "console_name": "Konsole",
+      "language": "Sprache"
+    },
+    "reference": {
+      "loading": "Anzeige wird gelesen…",
+      "from": "Referenzanzeige auf {host}",
+      "open": "Anzeige öffnen",
+      "remove": "Referenzanzeige entfernen"
+    },
+    "photo": {
+      "title": "Mit einem Foto suchen",
+      "close": "Fotosuche entfernen",
+      "choose": "Foto auswählen oder hierher ziehen",
+      "question": "Was ist auf dem Foto?",
+      "clothing": "Kleidung, Schuhe oder eine Tasche",
+      "other": "Etwas anderes",
+      "nameIt": "Benenne es jetzt im Suchfeld, damit wir wissen, wonach wir suchen.",
+      "nameItAction": "Benennen",
+      "styleHint": "Wir suchen Kleidung in ähnlichem Stil. Bewerte die passenden Angebote, um die Ergebnisse zu schärfen.",
+      "switchToOther": "Keine Kleidung? Stattdessen als Referenzfoto verwenden",
+      "switchToStyle": "Kleidung, Schuhe oder eine Tasche? Stattdessen nach Stil suchen"
+    },
+    "more": {
+      "title": "Mehr",
+      "mustInclude": "Muss enthalten",
+      "spelling": "Tippfehler-Toleranz",
+      "referencePhoto": "Referenzfoto",
+      "kleinanzeigenCategory": "Kleinanzeigen-Kategorie",
+      "anyCategory": "Jede Kategorie"
+    },
+    "condition": {
+      "any": "Jeder Zustand"
+    },
+    "price": {
+      "any": "Jeder Preis",
+      "freeOnly": "Nur kostenlose Artikel",
+      "upTo": "Bis {max}",
+      "from": "Ab {min}",
+      "fromListing": "Preise in der Anzeige – wähle, was zählt:",
+      "total": "Summe:",
+      "pickOnPage": "Stattdessen auf der Seite auswählen",
+      "loadFromListing": "Preise aus der Referenzanzeige laden",
+      "min": "Min.",
+      "max": "Max.",
+      "anyPlaceholder": "Beliebig"
+    },
+    "where": {
+      "allFree": "Alle kostenlosen Marktplätze",
+      "anyCountry": "Jedes Land",
+      "anyDelivery": "Versand oder Abholung",
+      "near": "im Umkreis von {radius} km um {zip}"
+    },
+    "notify": {
+      "none": "Keine Benachrichtigungen",
+      "noneHint": "Wähle einen Kanal, um Alarme zu bekommen. Ohne Kanal erscheinen Treffer nur in deiner Übersicht."
+    },
+    "offers": {
+      "title": "Passende Angebote",
+      "idle": "Sag uns, wonach du suchst, um passende Angebote zu sehen.",
+      "loading": "Suche passende Angebote…",
+      "error": "Passende Angebote konnten nicht geladen werden.",
+      "count": "{count} aktuelles Angebot passt | {count} aktuelle Angebote passen",
+      "empty": "Noch passen keine aktuellen Angebote. Neue erreichen dich trotzdem."
+    },
+    "summary": {
+      "title": "Erstellen",
+      "condition": {
+        "new": "neue",
+        "used": "gebrauchte",
+        "broken": "defekte"
+      },
+      "photo": "Artikel wie auf deinem Foto",
+      "anything": "alles",
+      "under": "unter {max}",
+      "over": "über {min}",
+      "between": "zwischen {min} und {max}",
+      "allMarketplaces": "auf allen kostenlosen Marktplätzen",
+      "on": "auf {marketplaces}",
+      "byEmail": "per E-Mail",
+      "byDiscord": "über Discord",
+      "byPush": "per Push-Benachrichtigung",
+      "alert": "Benachrichtige mich über {what}",
+      "collect": "Sammle {what} (ohne Benachrichtigung)"
+    },
     "suggest": {
       "open": "Fehlt ein Filter? Schlag einen vor",
       "title": "Filter vorschlagen",

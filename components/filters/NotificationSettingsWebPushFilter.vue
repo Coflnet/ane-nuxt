@@ -8,6 +8,7 @@
       name: userStore.isWebView ? $t('pushNotification') : $t('webPush'),
       icon: 'tabler:mail',
       textInput: false,
+      testId: 'notify-push',
     }"
     :messages="{
       footer: userStore.isWebView ? $t('sendPushNotifications') : $t('browserNotifications'),

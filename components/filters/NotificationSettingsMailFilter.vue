@@ -10,6 +10,7 @@
       placeholder: $t('enterEmailAddress'),
       icon: 'tabler:mail',
       textInput: true,
+      testId: 'notify-email',
     }"
     :messages="{
       error: $t('invalidEmail'),

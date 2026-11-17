@@ -1494,6 +1494,136 @@
     }
   },
   "filterTree": {
+    "treeLabel": "Filter builder",
+    "branch": {
+      "looking": "Looking for",
+      "condition": "Condition",
+      "price": "Price",
+      "where": "Where",
+      "notify": "Notify"
+    },
+    "tag": {
+      "listing": "from listing",
+      "photo": "from photo",
+      "search": "from search",
+      "default": "default",
+      "settings": "your settings"
+    },
+    "looking": {
+      "label": "What are you looking for?",
+      "placeholder": "Describe it, paste a listing link, or drop a photo",
+      "pasteLink": "Paste a listing link",
+      "usePhoto": "Use a photo",
+      "noLinkInClipboard": "No listing link in your clipboard. Paste or type the link here.",
+      "pasteHere": "Paste the listing link into the box.",
+      "photoOnly": "Items like your photo",
+      "empty": "Not set yet",
+      "neverInclude": "Never include",
+      "understood": "Understood as {name}",
+      "understoodIn": "Understood as {name} in {category}"
+    },
+    "chips": {
+      "catalogueCount": "{count} products in our catalogue",
+      "more": "More ({count})",
+      "less": "Less",
+      "countsHint": "Numbers show matching products in our catalogue.",
+      "limitHint": "Limit reached: remove a chip to add another."
+    },
+    "attributes": {
+      "storage": "Storage",
+      "ram": "RAM",
+      "memory": "Memory",
+      "size": "Size",
+      "color": "Colour",
+      "colour": "Colour",
+      "screen_size": "Screen size",
+      "model": "Model",
+      "edition": "Edition",
+      "media_format": "Format",
+      "console_name": "Console",
+      "language": "Language"
+    },
+    "reference": {
+      "loading": "Reading the listing…",
+      "from": "Reference listing on {host}",
+      "open": "Open listing",
+      "remove": "Remove reference listing"
+    },
+    "photo": {
+      "title": "Search with a photo",
+      "close": "Remove photo search",
+      "choose": "Choose or drop a photo",
+      "question": "What is in the photo?",
+      "clothing": "Clothing, shoes or a bag",
+      "other": "Something else",
+      "nameIt": "Now name it in the search box, so we know what to look for.",
+      "nameItAction": "Name it",
+      "styleHint": "We look for clothes in a similar style. Rate the matching offers to sharpen the results.",
+      "switchToOther": "Not clothing? Use it as a reference photo instead",
+      "switchToStyle": "Clothing, shoes or a bag? Search by style instead"
+    },
+    "more": {
+      "title": "More",
+      "mustInclude": "Must include words",
+      "spelling": "Spelling tolerance",
+      "referencePhoto": "Reference photo",
+      "kleinanzeigenCategory": "Kleinanzeigen category",
+      "anyCategory": "Any category"
+    },
+    "condition": {
+      "any": "Any condition"
+    },
+    "price": {
+      "any": "Any price",
+      "freeOnly": "Free items only",
+      "upTo": "Up to {max}",
+      "from": "From {min}",
+      "fromListing": "Prices on the listing — pick what counts:",
+      "total": "Total:",
+      "pickOnPage": "Pick on the page instead",
+      "loadFromListing": "Load the prices from the reference listing",
+      "min": "Min",
+      "max": "Max",
+      "anyPlaceholder": "Any"
+    },
+    "where": {
+      "allFree": "All free marketplaces",
+      "anyCountry": "Any country",
+      "anyDelivery": "Shipping or pickup",
+      "near": "within {radius} km of {zip}"
+    },
+    "notify": {
+      "none": "No notifications",
+      "noneHint": "Pick a channel to get alerts. Without one, matches only show up in your overview."
+    },
+    "offers": {
+      "title": "Matching offers",
+      "idle": "Tell us what you are looking for to see matching offers.",
+      "loading": "Looking for matching offers…",
+      "error": "Could not load matching offers.",
+      "count": "{count} recent offer matches | {count} recent offers match",
+      "empty": "No recent offers match yet. New ones will still reach you."
+    },
+    "summary": {
+      "title": "Create",
+      "condition": {
+        "new": "new",
+        "used": "used",
+        "broken": "for-parts"
+      },
+      "photo": "items like your photo",
+      "anything": "anything",
+      "under": "under {max}",
+      "over": "over {min}",
+      "between": "between {min} and {max}",
+      "allMarketplaces": "on all free marketplaces",
+      "on": "on {marketplaces}",
+      "byEmail": "by email",
+      "byDiscord": "via Discord",
+      "byPush": "by push notification",
+      "alert": "Alert me about {what}",
+      "collect": "Collect {what} (no notifications)"
+    },
     "suggest": {
       "open": "Missing a filter? Suggest one",
       "title": "Suggest a filter",
