@@ -2,12 +2,16 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { createUserWithEmailAndPassword, type EmailAuthCredential, EmailAuthProvider, GoogleAuthProvider, linkWithCredential, linkWithPopup, signInAnonymously, signInWithEmailAndPassword, signInWithPopup, type Auth, updateProfile, type UserCredential, getAdditionalUserInfo } from 'firebase/auth'
 import { navigateTo } from '#app'
-import { createLink, getAccess, getStats, listLinks, loginFirebase, useLink } from '~/src/api-client'
+import { createLink, getAccess, getMe, getStats, getSubscription, listLinks, loginFirebase, useLink } from '~/src/api-client'
 import type { PaymentControllerAccessInfo as AccessInfo, PaymentControllerActiveSubscription as ActiveSubscription, ClientModelFilterMatch as FilterMatch } from '~/src/api-client'
 import { canCreateReferralLink, isSelfReferral, REFERRAL_LINK_NAME, REFERRAL_LINK_TEXT } from '~/utils/referral'
 import { canLoadStats } from '~/utils/stats'
 
 export type AccessTier = 'free' | 'collector' | 'flipper'
+
+// ofetch's own timeout: the generated client deep-clones its options, so an AbortSignal arrives as a plain
+// object and fetch rejects the request before it is sent.
+const ENTITLEMENT_TIMEOUT_MS = 8000
 
 const tierRank: Record<AccessTier, number> = { free: 0, collector: 1, flipper: 2 }
 
@@ -462,7 +466,7 @@ export const useUserStore = defineStore('user', () => {
   async function loadEntitlements(requestToken: string) {
     const headers = { Authorization: `Bearer ${requestToken}` }
     const [subscriptions, effectiveAccess] = await Promise.allSettled([
-      getSubscription({ composable: '$fetch', headers, signal: AbortSignal.timeout(8000) }),
+      getSubscription({ composable: '$fetch', headers, timeout: ENTITLEMENT_TIMEOUT_MS }),
       fetchAccess(headers),
     ])
     if (token.value !== requestToken) return
@@ -489,7 +493,7 @@ export const useUserStore = defineStore('user', () => {
   }
 
   function fetchAccess(headers: { Authorization: string }): Promise<AccessInfo> {
-    return getAccess({ composable: '$fetch', headers, signal: AbortSignal.timeout(8000) })
+    return getAccess({ composable: '$fetch', headers, timeout: ENTITLEMENT_TIMEOUT_MS })
   }
 
   function getTimeTillSubscriptionRenewal(startDateString: string) {

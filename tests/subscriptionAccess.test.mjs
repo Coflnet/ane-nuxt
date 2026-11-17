@@ -34,7 +34,9 @@ test('subscription refresh prioritizes active Flipper then Collector and rejects
   let subscriptions = [basic, expired, invalid, collector, flipper]
   const store = createStore(async (options) => {
     assert.equal(options.headers.Authorization, 'Bearer account-a')
-    assert.ok(options.signal instanceof AbortSignal)
+    // a timeout, not an AbortSignal: the generated client deep-clones options, which breaks a signal
+    assert.equal(options.timeout, 8000)
+    assert.equal(options.signal, undefined)
     return subscriptions
   })
   await store.getSubscriptionEndDate()
