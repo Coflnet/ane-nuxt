@@ -206,7 +206,14 @@
   "rights": "© 2025 Coflnet GmbH. Alle Rechte vorbehalten.",
   "searchKeywords": "Suchwörter",
   "searchRadius": "Suchradius",
-  "searchRadiusAroundYou": "Suchradius um dich herum, in Kilometern",
+  "radiusScope": {
+    "all": "Nur Angebote in meiner Nähe",
+    "allHint": "Auch Versand-Angebote müssen im Umkreis liegen. Angebote ohne Standortangabe werden ausgeblendet (bei eBay fehlt sie manchmal).",
+    "pickup": "Abholung in meiner Nähe, Versand von überall",
+    "pickupHint": "Angebote mit Versand werden unabhängig vom Standort gezeigt.",
+    "pickupOnlyHint": "Es werden nur Abholangebote im Umkreis von {radius} km gezeigt."
+  },
+  "searchRadiusAroundYou": "Umkreis in Kilometern um deine Postleitzahl",
   "searchRadiusTooltip": "Für den Suchradius wird eine Postleitzahl benötigt",
 
   "searchValue": "Suchwert",
@@ -1610,7 +1617,10 @@
       "allFree": "Alle kostenlosen Marktplätze",
       "anyCountry": "Jedes Land",
       "anyDelivery": "Versand oder Abholung",
-      "near": "im Umkreis von {radius} km um {zip}"
+      "near": "im Umkreis von {radius} km um {zip}",
+      "onlyNear": "nur im Umkreis von {radius} km um {zip}",
+      "pickupNear": "Abholung im Umkreis von {radius} km um {zip}",
+      "shippingAnywhere": "Versand von überall"
     },
     "notify": {
       "none": "Keine Benachrichtigungen",
@@ -1643,6 +1653,9 @@
       "between": "zwischen {min} und {max}",
       "allMarketplaces": "auf allen kostenlosen Marktplätzen",
       "on": "auf {marketplaces}",
+      "near": "im Umkreis von {radius} km um {zip}",
+      "pickupNear": "zur Abholung im Umkreis von {radius} km um {zip}",
+      "pickupNearShippingAnywhere": "zur Abholung im Umkreis von {radius} km um {zip} oder mit Versand von überall",
       "byEmail": "per E-Mail",
       "byDiscord": "über Discord",
       "byPush": "per Push-Benachrichtigung",

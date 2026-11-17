@@ -4,12 +4,13 @@
  *
  * The push order is part of the contract (E2E asserts it and older crawlers read it in order):
  * Fuzzyness, Country, Frequency, PriceRange, Condition, DeliveryMethod, IncludePlatforms,
- * CommercialSeller, Radius, SearchTerm, Attributes, TotalCost, ContainsKeyWord,
+ * CommercialSeller, Radius, RadiusScope, SearchTerm, Attributes, TotalCost, ContainsKeyWord,
  * NotContainsKeyWord, VisualSimilarityFilter, Reference*, KleinanzeigenKategorie, then every
  * saved entry the form does not model, unchanged. Names are never emitted twice: crawlers
  * build a dictionary by name and would crash on duplicates.
  */
 import type { Filter, WireFilter } from '../types/FilterType.ts'
+import { DEFAULT_RADIUS_SCOPE, decodeRadiusScope, effectiveRadiusScope } from './radiusScope.ts'
 import { decodeAttributes, encodeAttributes, stripAttributeTokens } from './attributeAlternatives.ts'
 
 export const DEFAULT_FILTER_COUNTRY = 'EU,US,GB'
@@ -33,6 +34,7 @@ export function defaultFilterState(): Filter {
     searchValue: '',
     zipcode: '',
     searchRadius: 100,
+    radiusScope: DEFAULT_RADIUS_SCOPE,
     seller: '',
     keywords: [[]],
     blacklist: [],
@@ -112,9 +114,17 @@ function platforms(state: Filter, ctx: BuildFiltersContext): string {
   return state.marketplace === 'all' ? ctx.freeMarketplaces.join(',') : state.marketplace
 }
 
+function sendsRadius(state: Filter, ctx: BuildFiltersContext): boolean {
+  return !!state.zipcode && !!ctx.location
+}
+
 function radius(state: Filter, ctx: BuildFiltersContext): string | undefined {
-  if (!state.zipcode || !ctx.location) return undefined
+  if (!sendsRadius(state, ctx) || !ctx.location) return undefined
   return `${ctx.location[0]};${ctx.location[1]};${state.searchRadius};${state.zipcode}`
+}
+
+function radiusScope(state: Filter, ctx: BuildFiltersContext): string | undefined {
+  return sendsRadius(state, ctx) ? effectiveRadiusScope(state.deliveryMethod, state.radiusScope) : undefined
 }
 
 function sendsAttributes(state: Filter, ctx: BuildFiltersContext): boolean {
@@ -138,6 +148,7 @@ const ENCODERS: [string, Encoder | null][] = [
   ['IncludePlatforms', platforms],
   ['CommercialSeller', null],
   ['Radius', radius],
+  ['RadiusScope', radiusScope],
   ['SearchTerm', searchTerm],
   ['Attributes', (s, ctx) => (sendsAttributes(s, ctx) ? encodeAttributes(s.attributes) : undefined)],
   ['TotalCost', null],
@@ -197,6 +208,7 @@ const DECODERS: Record<string, Decoder> = {
   // A saved explicit list stays explicit as the advertised sources change.
   IncludePlatforms: (s, v) => { s.marketplace = v },
   Radius: decodeRadius,
+  RadiusScope: (s, v) => { s.radiusScope = decodeRadiusScope(v) },
   SearchTerm: (s, v) => { s.searchValue = v },
   Attributes: (s, v) => { s.attributes = decodeAttributes(v) },
   ContainsKeyWord: (s, v) => { if (v) s.keywords = v.split('|').map(group => group.split(',')) },
@@ -225,6 +237,9 @@ export function parseFilters(filters: { name?: string | null, value?: unknown }[
     else if (!state.passthrough.some(entry => entry.name === item.name))
       state.passthrough.push({ name: item.name, value: item.value as WireFilter['value'] })
   }
+  // Radius without a saved scope is a legacy filter: it keeps "pickup" until the user changes it.
+  const has = (name: string) => filters.some(item => item.name === name)
+  if (has('Radius') && !has('RadiusScope')) state.radiusScope = decodeRadiusScope(undefined)
   return state
 }
 

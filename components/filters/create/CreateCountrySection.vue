@@ -15,7 +15,7 @@
     <div class="flex space-x-4">
       <UiInput
         v-model="model!.zipcode"
-        :disabled="model?.deliveryMethod.includes('shipping')"
+        :disabled="!radiusApplicable(model?.deliveryMethod)"
         label-aria="Zip Code Input"
         :label="$t('zipCode')"
         :placeholder="$t('zipCodeEq')"
@@ -24,12 +24,14 @@
 
       <FiltersNotificationSettingsRadius :model-value="model" />
     </div>
+    <FiltersCreateRadiusScope v-model="model!" />
   </UiGrid>
 </template>
 
 <script setup lang="ts">
 import type { Filter } from '~/types/FilterType'
 import { deliveryKind } from '~/constants/CreateFilterConstants'
+import { radiusApplicable } from '~/utils/radiusScope'
 
 const model = defineModel<Filter>()
 

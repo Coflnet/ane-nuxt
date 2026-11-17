@@ -29,6 +29,7 @@ import type { Filter } from '~/types/FilterType'
 import { condidtion, marketplaces } from '~/constants/CreateFilterConstants'
 import { isAnyChoice } from '~/utils/filterWire'
 import { useFormat } from '~/composable/useFormat'
+import { radiusSummary, type RadiusSummary } from '~/utils/radiusScope'
 
 const props = defineProps<{
   filter: Filter
@@ -69,6 +70,17 @@ function wherePart(f: Filter): string {
   return t('filterTree.summary.on', { marketplaces: names.join(', ') })
 }
 
+const NEAR_KEYS: Partial<Record<RadiusSummary, string>> = {
+  everything: 'filterTree.summary.near',
+  pickupOnly: 'filterTree.summary.pickupNear',
+  pickupShippingAnywhere: 'filterTree.summary.pickupNearShippingAnywhere',
+}
+
+function nearPart(f: Filter): string {
+  const key = NEAR_KEYS[radiusSummary(f.deliveryMethod, f.zipcode, f.radiusScope)]
+  return key ? t(key, { radius: f.searchRadius ?? 0, zip: f.zipcode }) : ''
+}
+
 function notifyPart(f: Filter): string {
   switch (f.notificationType) {
     case 'Email': return t('filterTree.summary.byEmail')
@@ -84,6 +96,7 @@ const sentence = computed(() => {
   const item = [conditionPart(f), whatPart(f)].filter(Boolean).join(' ')
   const head = [item, pricePart(f)].filter(Boolean).join(', ')
   const key = notify ? 'filterTree.summary.alert' : 'filterTree.summary.collect'
-  return t(key, { what: [head, wherePart(f), notify].filter(Boolean).join(' ') })
+  // The notification channel comes before the radius so it never reads as part of "shipping from anywhere".
+  return t(key, { what: [head, wherePart(f), notify, nearPart(f)].filter(Boolean).join(' ') })
 })
 </script>

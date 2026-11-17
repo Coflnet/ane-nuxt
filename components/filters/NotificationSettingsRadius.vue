@@ -11,7 +11,7 @@
       slot-is-button
     >
       <UiButton
-        :disabled="model?.zipcode === ''"
+        :disabled="radiusDisabled"
         class="w-full"
         @on-click="handleWindowState"
       >
@@ -90,11 +90,13 @@
 <script setup lang="ts">
 import { getLocation } from '~/src/api-client'
 import type { Filter } from '~/types/FilterType'
+import { radiusApplicable } from '~/utils/radiusScope'
 
 const { t } = useI18n()
 const openMapWindow = ref(false)
 
 const model = defineModel<Filter>()
+const radiusDisabled = computed(() => model.value?.zipcode === '' || !radiusApplicable(model.value?.deliveryMethod))
 const mapZoom = ref(9.8)
 
 const userLocation = ref([0.0, 0.0])

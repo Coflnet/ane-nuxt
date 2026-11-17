@@ -3,6 +3,7 @@ import type { Ref } from 'vue'
 import type { Filter } from '~/types/FilterType'
 import { condidtion, deliveryKind, marketplaces } from '~/constants/CreateFilterConstants'
 import { DEFAULT_FILTER_COUNTRY, isAnyChoice } from '~/utils/filterWire'
+import { radiusSummary } from '~/utils/radiusScope'
 import { useFormat } from '~/composable/useFormat'
 
 export type BranchId = 'looking' | 'condition' | 'price' | 'where' | 'notify'
@@ -53,8 +54,18 @@ export function useFilterTreeAnswers(filter: Ref<Filter>, options: { hasPhoto: (
   function whereAnswer(f: Filter): string {
     const country = f.country === DEFAULT_FILTER_COUNTRY ? t('filterTree.where.anyCountry') : f.country.split(',').map(code => t(COUNTRY_LABELS[code] ?? code)).join(', ')
     const delivery = isAnyChoice(f.deliveryMethod) ? t('filterTree.where.anyDelivery') : f.deliveryMethod.split(',').map(value => labelOf(deliveryKind, value)).join(', ')
-    const near = f.zipcode ? t('filterTree.where.near', { zip: f.zipcode, radius: f.searchRadius ?? 0 }) : ''
-    return [marketplaceAnswer(f), country, delivery, near].filter(Boolean).join(' · ')
+    return [marketplaceAnswer(f), country, ...deliveryAndRadius(f, delivery)].filter(Boolean).join(' · ')
+  }
+
+  /** Delivery plus radius, worded by what the radius really limits (see utils/radiusScope.ts). */
+  function deliveryAndRadius(f: Filter, delivery: string): string[] {
+    const params = { zip: f.zipcode, radius: f.searchRadius ?? 0 }
+    switch (radiusSummary(f.deliveryMethod, f.zipcode, f.radiusScope)) {
+      case 'pickupOnly': return [delivery, t('filterTree.where.near', params)]
+      case 'everything': return [delivery, t('filterTree.where.onlyNear', params)]
+      case 'pickupShippingAnywhere': return [t('filterTree.where.pickupNear', params), t('filterTree.where.shippingAnywhere')]
+      default: return [delivery]
+    }
   }
 
   function notifyAnswer(f: Filter): string {

@@ -39,8 +39,8 @@ test('E2E order: Country, PriceRange, Condition, DeliveryMethod, IncludePlatform
 test('round trip keeps every modelled value', () => {
   const saved = [
     { name: 'Fuzzyness', value: '2' }, { name: 'Country', value: 'DE' }, { name: 'Frequency', value: '0 * * * *' },
-    { name: 'PriceRange', value: '10-200' }, { name: 'Condition', value: 'new,used' }, { name: 'DeliveryMethod', value: 'shipping' },
-    { name: 'IncludePlatforms', value: 'Kleinanzeigen' }, { name: 'Radius', value: '48.1;11.5;40;80331' }, { name: 'SearchTerm', value: 'iphone 15' },
+    { name: 'PriceRange', value: '10-200' }, { name: 'Condition', value: 'new,used' }, { name: 'DeliveryMethod', value: 'pickup' },
+    { name: 'IncludePlatforms', value: 'Kleinanzeigen' }, { name: 'Radius', value: '48.1;11.5;40;80331' }, { name: 'RadiusScope', value: 'all' }, { name: 'SearchTerm', value: 'iphone 15' },
     { name: 'Attributes', value: 'storage=256 gb;color=blau|blue' }, { name: 'ContainsKeyWord', value: 'pro,max|mini' },
     { name: 'NotContainsKeyWord', value: 'defekt,hülle' }, { name: 'VisualSimilarityFilter', value: '{"threshold":0.7}' },
     { name: 'ReferenceUrl', value: 'https://example.com/a' }, { name: 'ReferenceTitle', value: 'A' }, { name: 'ReferenceMarketplace', value: 'Vinted' },

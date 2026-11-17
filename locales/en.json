@@ -203,7 +203,14 @@
   "rights": "© 2025 Coflnet GmbH. All rights reserved.",
   "searchKeywords": "Search Keywords",
   "searchRadius": "Search Radius",
-  "searchRadiusAroundYou": "Search radius around you in KM (requires zip code)",
+  "radiusScope": {
+    "all": "Only offers near me",
+    "allHint": "Offers with shipping must be within the radius too. Offers without a known location are hidden (eBay sometimes lacks one).",
+    "pickup": "Pickup near me, shipping from anywhere",
+    "pickupHint": "Offers with shipping are shown regardless of their location.",
+    "pickupOnlyHint": "Only pickup offers within {radius} km are shown."
+  },
+  "searchRadiusAroundYou": "Distance in km around your zip code",
 
   "searchValue": "Search Value",
   "searchPageTitle": "Search - Compare Prices",
@@ -1610,7 +1617,10 @@
       "allFree": "All free marketplaces",
       "anyCountry": "Any country",
       "anyDelivery": "Shipping or pickup",
-      "near": "within {radius} km of {zip}"
+      "near": "within {radius} km of {zip}",
+      "onlyNear": "only within {radius} km of {zip}",
+      "pickupNear": "Pickup within {radius} km of {zip}",
+      "shippingAnywhere": "shipping from anywhere"
     },
     "notify": {
       "none": "No notifications",
@@ -1643,6 +1653,9 @@
       "between": "between {min} and {max}",
       "allMarketplaces": "on all free marketplaces",
       "on": "on {marketplaces}",
+      "near": "within {radius} km of {zip}",
+      "pickupNear": "for pickup within {radius} km of {zip}",
+      "pickupNearShippingAnywhere": "for pickup within {radius} km of {zip} or with shipping from anywhere",
       "byEmail": "by email",
       "byDiscord": "via Discord",
       "byPush": "by push notification",

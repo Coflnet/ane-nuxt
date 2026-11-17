@@ -35,6 +35,8 @@ export interface Filter {
   searchValue: string
   zipcode: string
   searchRadius: number | null
+  /** Whether the radius also limits offers with shipping (utils/radiusScope.ts). */
+  radiusScope: 'all' | 'pickup'
   seller: string
   keywords: string[][]
   blacklist: string[]
