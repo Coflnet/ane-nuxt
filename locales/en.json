@@ -1392,6 +1392,25 @@
     "photoError": "The photo could not be analysed. Retry or enter the measurements manually.",
     "discardDraft": "Leave this page and discard your unsubmitted part search changes?"
   },
+  "searchMore": {
+    "moreWays": "More ways to search",
+    "photo": "Search by photo",
+    "partsTitle": "Looking for a replacement part?",
+    "partsBody": "The parts finder matches gears, bearings and spare parts by measurements, part number or the machine they fit.",
+    "partsOpen": "Open parts finder →",
+    "partsDismiss": "Not a part",
+    "chips": {
+      "teeth": "{value} teeth",
+      "boreMm": "{value} mm bore",
+      "outerDiameterMm": "Ø {value} mm",
+      "innerDiameterMm": "Inner Ø {value} mm",
+      "widthMm": "{value} mm wide",
+      "module": "Module {value}",
+      "partNumber": "Part no. {value}",
+      "partKey": "{value}",
+      "machine": "Fits {value}"
+    }
+  },
   "budgetCurrency": "Budget currency",
   "budgetCurrencyNote": "This budget only matches offers in {currency}. Amounts are not converted between currencies.",
   "budgetReferenceCurrencyNote": "The currency follows your reference price. Remove the reference to change it.",

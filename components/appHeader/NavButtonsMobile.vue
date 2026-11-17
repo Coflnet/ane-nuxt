@@ -77,17 +77,6 @@
 
           <UiTextButton
             class="justify-start"
-            @on-click="navigateAndClose('/parts')"
-          >
-            <Icon
-              name="lucide:cog"
-              class="w-5 h-5 mr-2"
-            />
-            {{ $t('parts.nav') }}
-          </UiTextButton>
-
-          <UiTextButton
-            class="justify-start"
             @on-click="navigateAndClose('/filters')"
           >
             <Icon

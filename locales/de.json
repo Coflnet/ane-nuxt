@@ -1392,6 +1392,25 @@
     "photoError": "Das Foto konnte nicht analysiert werden. Versuche es erneut oder gib die Maße von Hand ein.",
     "discardDraft": "Diese Seite verlassen und noch nicht abgesendete Änderungen an der Ersatzteilsuche verwerfen?"
   },
+  "searchMore": {
+    "moreWays": "Weitere Suchmöglichkeiten",
+    "photo": "Per Foto suchen",
+    "partsTitle": "Suchst du ein Ersatzteil?",
+    "partsBody": "Der Teilefinder findet Zahnräder, Lager und Ersatzteile anhand von Maßen, Teilenummer oder passendem Gerät.",
+    "partsOpen": "Teilefinder öffnen →",
+    "partsDismiss": "Kein Ersatzteil",
+    "chips": {
+      "teeth": "{value} Zähne",
+      "boreMm": "{value} mm Bohrung",
+      "outerDiameterMm": "Ø {value} mm",
+      "innerDiameterMm": "Innen-Ø {value} mm",
+      "widthMm": "{value} mm breit",
+      "module": "Modul {value}",
+      "partNumber": "Teile-Nr. {value}",
+      "partKey": "{value}",
+      "machine": "Passend für {value}"
+    }
+  },
   "budgetCurrency": "Währung des Preislimits",
   "budgetCurrencyNote": "Dieses Preislimit gilt nur für Angebote in {currency}. Beträge werden nicht zwischen Währungen umgerechnet.",
   "budgetReferenceCurrencyNote": "Die Währung entspricht deinem Referenzpreis. Entferne die Referenz, um sie zu ändern.",

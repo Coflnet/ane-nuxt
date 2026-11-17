@@ -23,16 +23,42 @@
         @search="onSearch"
         @select-category="onSearchCategorySelect"
       />
-      <NuxtLink
-        :to="localePath('/parts')"
-        class="mt-4 inline-flex items-center gap-2 text-sm text-cyan-300 hover:text-cyan-200"
+      <details
+        class="group mx-auto mt-3 max-w-2xl text-left text-sm"
+        data-testid="more-ways-to-search"
       >
-        <Icon
-          name="tabler:settings"
-          class="h-4 w-4"
-        />
-        {{ $t('parts.title') }} →
-      </NuxtLink>
+        <summary class="mx-auto flex min-h-11 w-fit cursor-pointer list-none items-center gap-1 rounded-lg px-3 text-slate-400 hover:text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-400 [&::-webkit-details-marker]:hidden">
+          {{ $t('searchMore.moreWays') }}
+          <Icon
+            name="tabler:chevron-down"
+            class="h-4 w-4 transition-transform group-open:rotate-180"
+          />
+        </summary>
+        <div class="mt-2 flex flex-wrap justify-center gap-2">
+          <NuxtLink
+            :to="localePath('/parts')"
+            class="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-700 bg-slate-800 px-3 text-slate-200 hover:border-indigo-400 hover:text-white"
+            data-testid="more-ways-parts"
+          >
+            <Icon
+              name="tabler:settings"
+              class="h-4 w-4 text-indigo-300"
+            />
+            {{ $t('parts.nav') }}
+          </NuxtLink>
+          <NuxtLink
+            :to="localePath({ path: '/filters/create', query: { entry: 'photo' } })"
+            class="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-700 bg-slate-800 px-3 text-slate-200 hover:border-indigo-400 hover:text-white"
+            data-testid="more-ways-photo"
+          >
+            <Icon
+              name="tabler:camera"
+              class="h-4 w-4 text-indigo-300"
+            />
+            {{ $t('searchMore.photo') }}
+          </NuxtLink>
+        </div>
+      </details>
     </div>
 
     <!-- Results Section (if searching) -->
@@ -58,6 +84,18 @@
           <span v-else>{{ $t('noResultsFound', 'No results found') }}</span>
         </h2>
         <div class="flex flex-wrap items-center gap-3">
+          <NuxtLink
+            v-if="notifyFilterLink"
+            :to="notifyFilterLink"
+            class="inline-flex min-h-11 sm:min-h-0 items-center gap-1.5 rounded-lg px-1 py-1.5 text-sm font-medium text-indigo-300 hover:text-indigo-200"
+            data-testid="notify-from-search"
+          >
+            <Icon
+              name="tabler:bell-plus"
+              class="h-4 w-4"
+            />
+            {{ $t('product.notifyMe') }}
+          </NuxtLink>
           <button
             class="lg:hidden inline-flex min-h-11 sm:min-h-0 items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-slate-200 bg-slate-800 border border-slate-600/50 hover:bg-slate-700 transition-colors"
             type="button"
@@ -120,6 +158,11 @@
           >{{ hint.action.label }}</button>
         </span>
       </div>
+      <ProductPartsSuggestionCard
+        :query="searchQuery"
+        :is-part-query="interpretation?.isPartQuery"
+        :hints="interpretation?.partHints"
+      />
       <!-- Active filters badges -->
       <div class="active-filter-badges flex flex-wrap gap-2 mb-4">
         <button
@@ -290,19 +333,21 @@
           class="lg:col-span-1 space-y-4 min-w-0 overflow-hidden"
           :class="isFilterPanelOpen ? 'block' : 'hidden lg:block'"
         >
-          <label class="flex items-start gap-3 rounded-xl border border-slate-700/50 bg-slate-800/50 p-5 text-sm text-slate-300">
-            <input
-              type="checkbox"
-              :checked="includeIndividualOffers || includePartOffers"
-              class="mt-0.5 accent-cyan-400"
-              data-testid="include-individual-offers"
-              @change="toggleIndividualOffers"
-            >
-            <span>
-              {{ $t(includePartOffers && !includeIndividualOffers ? 'includePartOffers' : 'includeIndividualOffers') }}
-              <span v-if="!includePartOffers || includeIndividualOffers" class="block mt-1 text-xs text-slate-400">{{ $t('includeIndividualOffersHint') }}</span>
-            </span>
-          </label>
+          <template v-if="individualOffersToggleVisible">
+            <label class="flex items-start gap-3 rounded-xl border border-slate-700/50 bg-slate-800/50 p-5 text-sm text-slate-300">
+              <input
+                type="checkbox"
+                :checked="includeIndividualOffers || includePartOffers"
+                class="mt-0.5 accent-cyan-400"
+                data-testid="include-individual-offers"
+                @change="toggleIndividualOffers"
+              >
+              <span>
+                {{ $t(includePartOffers && !includeIndividualOffers ? 'includePartOffers' : 'includeIndividualOffers') }}
+                <span v-if="!includePartOffers || includeIndividualOffers" class="block mt-1 text-xs text-slate-400">{{ $t('includeIndividualOffersHint') }}</span>
+              </span>
+            </label>
+          </template>
           <fieldset
             class="bg-slate-800/50 p-5 rounded-xl border border-slate-700/50"
             data-testid="marketplace-filter"
@@ -340,42 +385,44 @@
               </label>
             </div>
           </fieldset>
-          <fieldset
-            class="bg-slate-800/50 p-5 rounded-xl border border-slate-700/50"
-            data-testid="store-reference-filter"
-          >
-            <legend class="text-sm font-bold text-slate-300 uppercase tracking-wider px-1">
-              {{ $t('storeReferenceFilter') }}
-            </legend>
-            <label
-              v-for="store in ['Lefeld', 'GoTools']"
-              :key="store"
-              class="flex min-h-11 items-center gap-2 text-sm text-slate-300 cursor-pointer"
+          <template v-if="storeReferenceVisible">
+            <fieldset
+              class="bg-slate-800/50 p-5 rounded-xl border border-slate-700/50"
+              data-testid="store-reference-filter"
             >
-              <input
-                type="checkbox"
-                :checked="selectedStore.toLowerCase() === store.toLowerCase()"
-                class="accent-cyan-400"
-                :data-testid="`store-reference-${store.toLowerCase()}`"
-                @change="toggleFilter('store', store)"
+              <legend class="text-sm font-bold text-slate-300 uppercase tracking-wider px-1">
+                {{ $t('storeReferenceFilter') }}
+              </legend>
+              <label
+                v-for="store in ['Lefeld', 'GoTools']"
+                :key="store"
+                class="flex min-h-11 items-center gap-2 text-sm text-slate-300 cursor-pointer"
               >
-              <span>{{ store }}</span>
-              <span
-                v-if="storeBuckets.find(bucket => bucket.value === store)"
-                class="text-xs text-slate-400"
-              >({{ storeBuckets.find(bucket => bucket.value === store)?.count }})</span>
-            </label>
-            <p class="mt-2 text-xs text-slate-400">
-              {{ $t('storeReferenceFilterHint') }}
-            </p>
-            <p
-              v-if="!storeBuckets.length"
-              class="mt-2 text-xs text-slate-400"
-              role="status"
-            >
-              {{ $t('storeReferenceCoverageUnavailable') }}
-            </p>
-          </fieldset>
+                <input
+                  type="checkbox"
+                  :checked="selectedStore.toLowerCase() === store.toLowerCase()"
+                  class="accent-cyan-400"
+                  :data-testid="`store-reference-${store.toLowerCase()}`"
+                  @change="toggleFilter('store', store)"
+                >
+                <span>{{ store }}</span>
+                <span
+                  v-if="storeBuckets.find(bucket => bucket.value === store)"
+                  class="text-xs text-slate-400"
+                >({{ storeBuckets.find(bucket => bucket.value === store)?.count }})</span>
+              </label>
+              <p class="mt-2 text-xs text-slate-400">
+                {{ $t('storeReferenceFilterHint') }}
+              </p>
+              <p
+                v-if="!storeBuckets.length"
+                class="mt-2 text-xs text-slate-400"
+                role="status"
+              >
+                {{ $t('storeReferenceCoverageUnavailable') }}
+              </p>
+            </fieldset>
+          </template>
           <!-- Category Filter -->
           <div
             v-if="availableCategoryBuckets.length > 0"
@@ -1293,7 +1340,7 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { searchProducts } from '~/src/api-client'
+import { getLocation, searchProducts } from '~/src/api-client'
 import { client as apiClient } from '~/src/api-client/client.gen'
 import type { OpensearchProductAttribute as ProductAttribute, OpensearchProductDocument as ProductDocument, ServicesProductServiceFilterBucket as FilterBucket, SearchProductsResponse } from '~/src/api-client/types.gen'
 import { useCategories } from '~/composable/useCategories'
@@ -1308,6 +1355,9 @@ import { attributeValues, toggleAttributeValue, facetSearchParams } from '~/util
 import { countPopulatedSubCategories, formatCategoryCount, getCategoryProductCount as getCategoryProductCountFor, normalizeCategoryCounts, resolveCategoryCount } from '~/utils/categoryCounts'
 import { resolveSearchCategoryParam } from '~/utils/searchCategoryParam'
 import { isGameCaseProduct } from '~/utils/productRelations'
+import type { PartHints } from '~/utils/partsSuggestion'
+import { showIndividualOffersToggle, showStoreReference } from '~/utils/searchSpecialVisibility'
+import { searchToFilterQuery } from '~/utils/searchToFilterQuery'
 import {
   MEASUREMENT_RANGE_KEYS,
   hasInvalidMeasurementRange,
@@ -1498,6 +1548,10 @@ interface SearchInterpretation {
   impliedAttributes?: Record<string, string> | null
   /** The text typed for them ("android 15+"), removed from the query when the chip is dismissed */
   impliedAttributesPhrase?: string | null
+  /** The query looks like a replacement-part search (gear, bearing, part number, ...) */
+  isPartQuery?: boolean
+  /** Part details read from the query, carried over to the /parts finder */
+  partHints?: PartHints | null
 }
 const interpretation = ref<SearchInterpretation | null>(null)
 
@@ -1537,6 +1591,28 @@ function syncPrevQuery() {
 // Share the existing supersession sequence with the initial client response/error watchers.
 const PAGE_SIZE = 20
 let searchSeq = 0
+
+// "Special" search controls only appear when they are relevant to this search.
+const individualOffersToggleVisible = computed(() => showIndividualOffersToggle({
+  toggleActive: includeIndividualOffers.value || includePartOffers.value,
+  isPartQuery: !!interpretation.value?.isPartQuery,
+  hasSearched: hasSearched.value,
+  totalResults: totalResults.value,
+  pageSize: PAGE_SIZE,
+}))
+const storeReferenceVisible = computed(() => showStoreReference(storeBuckets.value, selectedStore.value))
+const notifyFilterLink = computed(() => {
+  if (!searchQuery.value.trim()) return null
+  return localePath(searchToFilterQuery({
+    query: searchQuery.value,
+    minPrice: selectedMinPrice.value,
+    maxPrice: selectedMaxPrice.value,
+    condition: selectedCondition.value,
+    attributes: activeAttributeFilters.value,
+    category: selectedCategory.value,
+    platforms: selectedPlatforms.value,
+  }))
+})
 
 // First results page: rendered server-side when the backend is quick, otherwise
 // a skeleton is sent and the client re-fetches after hydration. ZIP-based
@@ -1881,7 +1957,7 @@ const globalCategoryCounts = ref<Record<string, number>>({})
 
 async function fetchGlobalCategoryCounts() {
   try {
-    const counts = await $fetch<Record<string, number>>('https://ane.coflnet.com/api/Categories/with-counts')
+    const counts = await $fetch<Record<string, number>>(new URL('/api/Categories/with-counts', apiClient.getConfig().baseURL).toString())
     if (counts && Object.keys(counts).length > 0) {
       globalCategoryCounts.value = normalizeCategoryCounts(counts)
     }

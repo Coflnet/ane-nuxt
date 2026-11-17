@@ -19,6 +19,15 @@
             </h3>
             <ul class="space-y-2">
               <li>
+                <NuxtLink
+                  :to="localePath('/parts')"
+                  class="flex items-center text-slate-400 hover:text-indigo-400"
+                  data-testid="footer-parts"
+                >
+                  {{ $t('parts.nav') }}
+                </NuxtLink>
+              </li>
+              <li>
                 <UiLinkLabel
                   :href="'https://ane.coflnet.com/api/index.html'"
                   :gray="true"
@@ -98,4 +107,5 @@
 
 <script setup lang="ts">
 const { locale } = useI18n()
+const localePath = useLocalePath()
 </script>

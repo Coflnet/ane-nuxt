@@ -17,13 +17,6 @@
     </UiLinkButton>
 
     <UiLinkButton
-      :white="true"
-      :to="localePath('/parts')"
-    >
-      {{ $t('parts.nav') }}
-    </UiLinkButton>
-
-    <UiLinkButton
       aria-label="Filters Navigation Button"
       :white="true"
       :to="localePath('/filters')"
