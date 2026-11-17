@@ -69,6 +69,7 @@
 </template>
 
 <script setup lang="ts">
+import { cancelSubscription, getDiscount, subscribe } from '~/src/api-client'
 import { plans, type PlanId, type Plan } from '~/constants/SubscriptionConstants'
 import { displayedPlan } from '~/utils/displayedPlan'
 

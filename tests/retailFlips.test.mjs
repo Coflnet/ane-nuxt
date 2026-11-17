@@ -46,8 +46,8 @@ const code = stripTypeScriptTypes(compileScript(descriptor, { id: 'retail-card',
   .replace(/import \{([^}]+)\} from ['"]vue['"]/g, (_, names) => `const {${names.replaceAll(' as ', ': ')}} = Vue`)
   .replace(/^import .*$/gm, '').replace('export default', 'return')
 async function renderCard(item) {
-  const component = new Function('Vue', 'useI18n', 'useLocalePath', 'useUserStore', 'getPlatformUrl', 'parseHistoryCurrency', 'formatDistanceToNow', 'de', 'getRetailPriceGap', 'getRetailReferenceUrl', code)(
-    Vue, () => ({ locale: Vue.ref('en'), t: key => key }), () => value => value.path, () => ({}), getPlatformUrl, parseHistoryCurrency, formatDistanceToNow, de, getRetailPriceGap, getRetailReferenceUrl,
+  const component = new Function('Vue', 'useI18n', 'useLocalePath', 'useUserStore', 'useApiBaseUrl', 'getPlatformUrl', 'parseHistoryCurrency', 'formatDistanceToNow', 'de', 'getRetailPriceGap', 'getRetailReferenceUrl', code)(
+    Vue, () => ({ locale: Vue.ref('en'), t: key => key }), () => value => value.path, () => ({}), () => 'https://api.test', getPlatformUrl, parseHistoryCurrency, formatDistanceToNow, de, getRetailPriceGap, getRetailReferenceUrl,
   )
   const app = Vue.createSSRApp(component, { item })
   app.component('Icon', { render: () => null })

@@ -87,6 +87,7 @@
 </template>
 
 <script setup lang="ts">
+import { getLocation } from '~/src/api-client'
 import type { Filter } from '~/types/FilterType'
 
 const { t } = useI18n()

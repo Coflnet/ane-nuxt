@@ -1,3 +1,5 @@
+import { loginFirebase } from '~/src/api-client'
+
 declare global {
   interface Window {
     greetFromFlutter: () => void

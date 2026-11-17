@@ -348,7 +348,7 @@ const { locale, t } = useI18n()
 const localePath = useLocalePath()
 const dateFnsLocale = computed(() => locale.value === 'de' ? { locale: de } : {})
 
-const API_BASE = 'https://ane.coflnet.com'
+const API_BASE = useApiBaseUrl()
 const userStore = useUserStore()
 
 const props = defineProps<{

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { getFilters, addFilter, getOptions, testFilter as callTestFilter } from '~/src/api-client'
+import { getFilters, addFilter, getOptions } from '~/src/api-client'
 import type { ClientModelListingListener as ListingListener, ClientModelFilterOptions as FilterOptions, ClientModelStoredListing as StoredListing } from '~/src/api-client'
 import { withoutInactivityPause } from '~/utils/filterState'
 
@@ -10,6 +10,7 @@ type NamedOption = {
 
 export const useFilterStore = defineStore('filter', () => {
   const userStore = useUserStore()
+  const apiBase = useApiBaseUrl()
 
   const filters = ref<ListingListener[]>([])
   const filterOptions = ref<NamedOption[]>([])
@@ -86,15 +87,13 @@ export const useFilterStore = defineStore('filter', () => {
         return null
       }
 
-      const apiToken = `Bearer ${userStore.token}`
-      const listings = await callTestFilter({
-        composable: '$fetch',
+      // plain $fetch: the generated client deep-clones its options, so it cannot carry the AbortSignal
+      return await $fetch<StoredListing[]>(`${apiBase}/api/filters/test`, {
+        method: 'POST',
         signal,
-        headers: { Authorization: apiToken },
-        body: filter as unknown as typeof filter,
+        headers: { Authorization: `Bearer ${userStore.token}` },
+        body: filter,
       })
-
-      return listings
     }
     catch (e) {
       console.error('Error testing filter', e)

@@ -18,8 +18,8 @@ const code = stripTypeScriptTypes(compileScript(descriptor, { id: 'flip-history'
 
 async function renderCard(listing, recentSells = [], prices = {}) {
   const localePath = ({ path, query, hash }) => '/de' + path + (Object.keys(query).length ? '?' + new URLSearchParams(query) : '') + hash
-  const component = new Function('Vue', 'useI18n', 'useLocalePath', 'useUserStore', 'getPlatformUrl', 'parseHistoryCurrency', 'formatDistanceToNow', 'de', code)(
-    Vue, () => ({ locale: Vue.ref('de'), t: key => key }), () => localePath, () => ({}), getPlatformUrl, parseHistoryCurrency, formatDistanceToNow, de,
+  const component = new Function('Vue', 'useI18n', 'useLocalePath', 'useUserStore', 'useApiBaseUrl', 'getPlatformUrl', 'parseHistoryCurrency', 'formatDistanceToNow', 'de', code)(
+    Vue, () => ({ locale: Vue.ref('de'), t: key => key }), () => localePath, () => ({}), () => 'https://api.test', getPlatformUrl, parseHistoryCurrency, formatDistanceToNow, de,
   )
   const app = Vue.createSSRApp(component, { item: { listing, recentSells, ...prices } })
   app.component('Icon', { render: () => null })

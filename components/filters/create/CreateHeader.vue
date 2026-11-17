@@ -39,6 +39,8 @@
 </template>
 
 <script setup lang="ts">
+import { deleteFilter } from '~/src/api-client'
+
 const localePath = useLocalePath()
 
 const props = defineProps({
