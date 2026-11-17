@@ -211,6 +211,12 @@ export default defineNuxtConfig({
     auth: {
       enabled: true,
     },
+    // Only active for local E2E/demo builds (AneE2E/local): nuxt-vuefire enables the auth emulator when
+    // VUEFIRE_EMULATORS is set and an emulator hub answers on :4400. Production builds never do. The SDK's
+    // full-width "emulator mode" banner would cover the bottom of the page, so it is hidden.
+    emulators: {
+      auth: { options: { disableWarnings: true } },
+    },
 
   },
 })
