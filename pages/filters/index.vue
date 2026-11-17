@@ -51,6 +51,10 @@
         <UiHeaderLabel :label="$t('noFilters')" />
         <UiFooterLabel :label="$t('tryCreatingFilters')" />
       </div>
+
+      <div class="mt-4 text-center sm:text-left">
+        <FiltersSuggestFilterDialog :context="{ searchTerm: '', filterNames: [] }" />
+      </div>
     </UiDefaultContainer>
   </div>
 </template>

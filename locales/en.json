@@ -1492,5 +1492,20 @@
       "boots": "Boots",
       "bag": "Bag"
     }
+  },
+  "filterTree": {
+    "suggest": {
+      "open": "Missing a filter? Suggest one",
+      "title": "Suggest a filter",
+      "label": "Which filter is missing, and what would you use it for?",
+      "placeholder": "e.g. only listings with original box",
+      "count": "{count} / {max}",
+      "submit": "Send suggestion",
+      "sending": "Sending…",
+      "thanks": "Thank you! We read every suggestion.",
+      "close": "Close",
+      "tooMany": "Too many suggestions, try again later.",
+      "failed": "Could not send your suggestion. Please try again."
+    }
   }
 }

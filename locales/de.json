@@ -1492,5 +1492,20 @@
       "boots": "Stiefel",
       "bag": "Tasche"
     }
+  },
+  "filterTree": {
+    "suggest": {
+      "open": "Fehlt ein Filter? Schlag einen vor",
+      "title": "Filter vorschlagen",
+      "label": "Welcher Filter fehlt und wofür würdest du ihn nutzen?",
+      "placeholder": "z. B. nur Anzeigen mit Originalverpackung",
+      "count": "{count} / {max}",
+      "submit": "Vorschlag senden",
+      "sending": "Wird gesendet…",
+      "thanks": "Danke! Wir lesen jeden Vorschlag.",
+      "close": "Schließen",
+      "tooMany": "Zu viele Vorschläge, versuch es später noch einmal.",
+      "failed": "Dein Vorschlag konnte nicht gesendet werden. Bitte versuch es noch einmal."
+    }
   }
 }
