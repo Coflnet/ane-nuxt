@@ -8,6 +8,7 @@
     <UiTooltipHover
       :text="$t('searchRadiusTooltip')"
       :disabled="model?.zipcode !== ''"
+      slot-is-button
     >
       <UiButton
         :disabled="model?.zipcode === ''"

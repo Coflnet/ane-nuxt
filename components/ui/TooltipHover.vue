@@ -1,14 +1,15 @@
 <template>
   <div class="relative flex items-center group w-full justify-center">
-    <button
-      type="button"
+    <component
+      :is="slotIsButton ? 'div' : 'button'"
+      :type="slotIsButton ? undefined : 'button'"
       class="inline-flex items-center justify-center w-full"
       @click.stop="toggleTooltip"
       @mouseenter="showTooltip"
       @mouseleave="hideTooltip"
     >
       <slot />
-    </button>
+    </component>
 
     <div
       v-if="!disabled"
@@ -30,7 +31,10 @@ import { ref, onMounted, onUnmounted } from 'vue'
 
 defineProps<{
   text?: string
-  disabled?: boolean }>()
+  disabled?: boolean
+  /** The slot is a button itself; a button may not contain one (the HTML parser splits them, hydration mismatches). */
+  slotIsButton?: boolean
+}>()
 
 const isOpen = ref<boolean>(false)
 let timeoutId: ReturnType<typeof setTimeout> | null = null

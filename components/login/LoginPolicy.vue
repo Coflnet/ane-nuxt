@@ -5,7 +5,7 @@
   >
     <i18n-t
       keypath="signInAgreeMessage.text"
-      tag="p"
+      tag="span"
     >
       <template #tos>
         <a
