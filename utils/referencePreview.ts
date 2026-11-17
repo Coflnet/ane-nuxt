@@ -110,8 +110,21 @@ export function applyReferenceListing(state: Filter, preview: ReferenceListingPr
   state.referenceMarketplace = preview.marketplace
 }
 
+/** The max follows the reference price only while the user has not customised it: empty, or equal to ceil(previous reference price). */
+export function maxFollowsReference(state: Pick<Filter, 'maxPrice' | 'referencePrice'>): boolean {
+  if (!(state.referencePrice > 0)) return state.maxPrice === ''
+  // A max the user cleared stays cleared, like the backend refresh leaves an open max alone.
+  return state.maxPrice === Math.max(1, Math.ceil(state.referencePrice))
+}
+
 /** Selected price parts → reference price, its currency and the max price (total rounded up). */
-export function applyReferencePrices(state: Filter, preview: ReferenceListingPreviewResponse, selectors: string[], now = new Date()): void {
+export function applyReferencePrices(
+  state: Filter,
+  preview: ReferenceListingPreviewResponse,
+  selectors: string[],
+  now = new Date(),
+  options: { keepCustomMax?: boolean } = {},
+): void {
   const chosen = compatibleSelectors(preview, selectors)
   if (!chosen.length) {
     state.referenceSelector = ''
@@ -121,7 +134,7 @@ export function applyReferencePrices(state: Filter, preview: ReferenceListingPre
   }
   const total = referenceTotal(preview, chosen)
   const currency = pricedPart(preview, chosen[0]!)!.currency
-  state.maxPrice = Math.max(1, Math.ceil(total))
+  if (!options.keepCustomMax || maxFollowsReference(state)) state.maxPrice = Math.max(1, Math.ceil(total))
   state.currency = currency
   state.referencePrice = total
   state.referenceCurrency = currency

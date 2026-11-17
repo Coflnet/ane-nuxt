@@ -121,3 +121,21 @@ test('listing titles lose standalone punctuation before they become a search ter
   applyReferenceListing(state, real)
   assert.equal(state.searchValue, 'iphone 6 16 gb')
 })
+
+test('reloading a saved reference keeps a max the user raised, but follows an uncustomised one', () => {
+  const raised = { ...defaultFilterState(), referencePrice: 640, maxPrice: 900 }
+  applyReferencePrices(raised, preview, ['//price'], new Date(0), { keepCustomMax: true })
+  assert.equal(raised.maxPrice, 900)
+  const untouched = { ...defaultFilterState(), referencePrice: 639.2, maxPrice: 640 }
+  applyReferencePrices(untouched, preview, ['//price'], new Date(0), { keepCustomMax: true })
+  assert.equal(untouched.maxPrice, 640)
+  const stale = { ...defaultFilterState(), referencePrice: 100, maxPrice: 100 }
+  applyReferencePrices(stale, preview, ['//price', '//shipping'], new Date(0), { keepCustomMax: true })
+  assert.equal(stale.maxPrice, 655)
+  const empty = { ...defaultFilterState(), maxPrice: '' }
+  applyReferencePrices(empty, preview, ['//price'], new Date(0), { keepCustomMax: true })
+  assert.equal(empty.maxPrice, 640)
+  const cleared = { ...defaultFilterState(), referencePrice: 640, maxPrice: '' }
+  applyReferencePrices(cleared, preview, ['//price'], new Date(0), { keepCustomMax: true })
+  assert.equal(cleared.maxPrice, '')
+})

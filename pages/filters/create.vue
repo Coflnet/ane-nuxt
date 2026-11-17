@@ -98,6 +98,9 @@
       <aside class="min-w-0 flex-[1_1_340px] lg:sticky lg:top-4">
         <FiltersTreeMatchingOffers
           :offers="offers.offers.value"
+          :above-max="offers.aboveMax.value"
+          :max-price="filter.maxPrice"
+          :budget-currency="filter.referenceCurrency || 'EUR'"
           :loading="offers.loading.value"
           :error="offers.error.value"
           :done="offers.done.value"
@@ -109,6 +112,7 @@
           :feedback-choice="feedback.feedbackChoice"
           :can-feedback="feedback.canGiveFeedback"
           @retry="offers.run"
+          @raise-max="(max: number) => { filter.maxPrice = max }"
           @feedback="feedback.addFeedback"
           @clear-feedback="feedback.clearFeedback"
           @retry-feedback="feedback.retry"
@@ -240,7 +244,7 @@ async function importListing(url: string, options: { saved?: { selector?: string
     reference.error.value = t('referenceSelectionUnavailable')
     return
   }
-  applyReferencePrices(filter.value, result, initialPriceSelectors(result, saved?.selector, saved?.extras))
+  applyReferencePrices(filter.value, result, initialPriceSelectors(result, saved?.selector, saved?.extras), new Date(), { keepCustomMax: !!saved })
   if (filter.value.referenceSelector) answers.markSource('price', 'listing')
 }
 
@@ -275,6 +279,7 @@ function matchSignature() {
 const offers = useMatchingOffers({
   buildRequest: () => filterToCreate(true),
   test: (listener, signal) => filterStore.testFilter(listener, signal),
+  includeAboveMax: true,
   signature: matchSignature,
   enabled: () => visualReady.value && hasSomethingToMatch.value,
   delay: () => (filter.value.visualSimilarity ? 1200 : 600),

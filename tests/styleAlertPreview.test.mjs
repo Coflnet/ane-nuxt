@@ -296,3 +296,54 @@ test('explicitly saving with notifications off preserves the existing None choic
   assert.equal(fixture.pushConnections, 0)
   assert.deepEqual(fixture.userStore.notificationSettings, { discord: { webhookUrl: 'unchanged' }, email: { address: 'unchanged' } })
 })
+
+test('with a max the extra uncapped request fills aboveMax; its failure never breaks the main result', async () => {
+  const calls = []
+  const scope = effectScope()
+  const capped = { filters: [{ name: 'PriceRange', value: '0-270' }] }
+  const field = scope.run(() => useMatchingOffers({
+    buildRequest: async () => capped,
+    includeAboveMax: true,
+    test: async (l) => {
+      calls.push(l)
+      if (l.filters[0].value !== '0-270') throw new Error('boom')
+      return [{ id: 'a', platform: 'E', price: 100 }]
+    },
+    signature: () => '',
+    enabled: () => true,
+    delay: () => 0,
+  }))
+  await field.run()
+  await settle()
+  assert.equal(calls.length, 2)
+  assert.equal(field.error.value, false)
+  assert.equal(field.offers.value.length, 1)
+  assert.deepEqual(field.aboveMax.value, [])
+  scope.stop()
+})
+
+test('the within-cap result is published before the uncapped request finishes', async () => {
+  const pending = []
+  const scope = effectScope()
+  const field = scope.run(() => useMatchingOffers({
+    buildRequest: async () => ({ filters: [{ name: 'PriceRange', value: '0-270' }] }),
+    test: l => new Promise(resolve => pending.push({ l, resolve })),
+    includeAboveMax: true,
+    signature: () => '',
+    enabled: () => true,
+    delay: () => 0,
+  }))
+  const running = field.run()
+  await settle()
+  const main = pending.find(p => p.l.filters[0].value === '0-270')
+  const extra = pending.find(p => p.l.filters[0].value !== '0-270')
+  main.resolve([{ id: 'a', platform: 'E', price: 100 }])
+  await running
+  assert.equal(field.done.value, true)
+  assert.equal(field.loading.value, false)
+  assert.deepEqual(field.aboveMax.value, [])
+  extra.resolve([{ id: 'a', platform: 'E', price: 100 }, { id: 'b', platform: 'E', price: 300 }])
+  await settle()
+  assert.deepEqual(field.aboveMax.value.map(o => o.id), ['b'])
+  scope.stop()
+})

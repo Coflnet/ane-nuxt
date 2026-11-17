@@ -1622,7 +1622,12 @@
       "loading": "Looking for matching offers…",
       "error": "Could not load matching offers.",
       "count": "{count} recent offer matches | {count} recent offers match",
-      "empty": "No recent offers match yet. New ones will still reach you."
+      "empty": "No recent offers match yet. New ones will still reach you.",
+      "emptyAboveMax": "None at or below your max price yet — {count} recent offer is above it. | None at or below your max price yet — {count} recent offers are above it.",
+      "aboveMax": "above your max",
+      "aboveMaxTitle": "{count} recent offer above your max | {count} recent offers above your max",
+      "raiseMax": "Raise max to {price}",
+      "inclShipping": "incl. shipping"
     },
     "summary": {
       "title": "Create",
