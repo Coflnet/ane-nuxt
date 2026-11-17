@@ -3,13 +3,72 @@
  * to the filter form: search term, reference fields and the price chips of the Price branch.
  */
 import type { Filter } from '../types/FilterType.ts'
-import type { ReferenceListingPreviewResponse } from '../types/ReferenceListing.ts'
+import type { ReferenceListingPreviewResponse, ReferencePriceCandidate } from '../types/ReferenceListing.ts'
 
 interface PricedPart { price: number, currency: string }
 
-/** The search term the backend suggests; raw page titles match almost nothing. */
+const WORD_CHARACTER = /[\p{L}\p{N}]/u
+const EDGE_PUNCTUATION = /^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu
+
+/**
+ * Listing titles become search terms: "iPhone 6 - 16 GB" → "iphone 6 16 gb". Standalone punctuation
+ * ("-", "|", "/") and edge punctuation ("TOP!!!") go; the backend tokenizes on punctuation anyway and
+ * treats "|" as an alternative, so a pipe in a title would silently split the search in two.
+ */
+export function cleanSearchTerm(raw: string): string {
+  return raw.replace(/\|/g, ' ').split(/\s+/)
+    .map(token => token.replace(EDGE_PUNCTUATION, ''))
+    .filter(token => WORD_CHARACTER.test(token))
+    .join(' ').toLowerCase()
+}
+
+/** The search term the backend suggests (cleaned); raw page titles match almost nothing. */
 export function suggestedSearchTerm(preview: ReferenceListingPreviewResponse): string {
-  return (preview.suggestedFilter?.searchTerm || preview.listing?.productSearchQuery || '').trim()
+  return cleanSearchTerm(preview.suggestedFilter?.searchTerm || preview.listing?.productSearchQuery || '')
+}
+
+const SOURCE_RANK: Record<string, number> = { render: 0, markup: 1, meta: 2 }
+export const MAX_PRICE_CHIPS = 4
+
+function sourceRank(candidate: ReferencePriceCandidate): number {
+  return SOURCE_RANK[candidate.source] ?? 3
+}
+
+/** Better duplicate first: a kept (applied) selector, then render > markup > meta, confidence, shortest text. */
+function compareDuplicates(keep: Set<string>) {
+  return (a: ReferencePriceCandidate, b: ReferencePriceCandidate) =>
+    Number(keep.has(b.selector)) - Number(keep.has(a.selector))
+    || sourceRank(a) - sourceRank(b)
+    || b.confidence - a.confidence
+    || a.text.length - b.text.length
+}
+
+function bestPerPrice(candidates: ReferencePriceCandidate[], keep: Set<string>): ReferencePriceCandidate[] {
+  const groups = new Map<string, ReferencePriceCandidate[]>()
+  for (const candidate of candidates) {
+    const key = `${candidate.currency}:${candidate.price}`
+    groups.set(key, [...(groups.get(key) ?? []), candidate])
+  }
+  return [...groups.values()].map(group => [...group].sort(compareDuplicates(keep))[0]!)
+}
+
+/**
+ * Price chips to show: one per price and currency, auto-selected first, then by confidence, at most
+ * four. Candidates in `keep` (already applied to the form) are never dropped or hidden by the cap.
+ */
+export function displayPriceCandidates(preview: ReferenceListingPreviewResponse, keep: string[] = []): ReferencePriceCandidate[] {
+  const kept = new Set(keep)
+  const sorted = bestPerPrice(preview.priceCandidates, kept)
+    .sort((a, b) => Number(b.isAutoSelected) - Number(a.isAutoSelected) || b.confidence - a.confidence)
+  const mustShow = sorted.filter(c => kept.has(c.selector) || c.isAutoSelected)
+  const room = Math.max(MAX_PRICE_CHIPS - mustShow.length, 0)
+  const optional = sorted.filter(c => !mustShow.includes(c)).slice(0, room)
+  return sorted.filter(c => mustShow.includes(c) || optional.includes(c))
+}
+
+/** The listing has prices but none was chosen: the user has to say which one is the price. */
+export function needsPriceChoice(preview: ReferenceListingPreviewResponse, applied: string[]): boolean {
+  return preview.requiresReferencePriceSelection && !applied.length && preview.priceCandidates.length > 0
 }
 
 function pricedPart(preview: ReferenceListingPreviewResponse, selector: string): PricedPart | undefined {

@@ -1598,6 +1598,7 @@
       "upTo": "Bis {max}",
       "from": "Ab {min}",
       "fromListing": "Preise in der Anzeige – wähle, was zählt:",
+      "whichOne": "Welcher davon ist der Preis?",
       "total": "Summe:",
       "pickOnPage": "Stattdessen auf der Seite auswählen",
       "loadFromListing": "Preise aus der Referenzanzeige laden",

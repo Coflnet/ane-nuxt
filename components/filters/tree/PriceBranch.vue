@@ -17,9 +17,16 @@
       <p class="mb-2 text-sm text-slate-300">
         {{ $t('filterTree.price.fromListing') }}
       </p>
+      <p
+        v-if="askWhichPrice"
+        class="mb-2 text-sm font-medium text-amber-300"
+        data-testid="price-choice-hint"
+      >
+        {{ $t('filterTree.price.whichOne') }}
+      </p>
       <div class="flex flex-wrap gap-2">
         <button
-          v-for="candidate in preview.priceCandidates"
+          v-for="candidate in candidates"
           :key="candidate.selector"
           type="button"
           class="min-h-9 rounded-full px-3 py-1 text-sm"
@@ -65,7 +72,7 @@
 <script setup lang="ts">
 import type { Filter } from '~/types/FilterType'
 import type { ReferenceListingPreviewResponse } from '~/types/ReferenceListing'
-import { appliedSelectors, applyReferencePrices, referenceTotal } from '~/utils/referencePreview'
+import { appliedSelectors, applyReferencePrices, displayPriceCandidates, needsPriceChoice, referenceTotal } from '~/utils/referencePreview'
 import { useFormat } from '~/composable/useFormat'
 
 const model = defineModel<Filter>({ required: true })
@@ -80,6 +87,8 @@ const { formatCurrency } = useFormat()
 const picking = ref(false)
 
 const checked = computed(() => appliedSelectors(model.value))
+const candidates = computed(() => (props.preview ? displayPriceCandidates(props.preview, checked.value) : []))
+const askWhichPrice = computed(() => !!props.preview && needsPriceChoice(props.preview, checked.value))
 const total = computed(() => (props.preview ? referenceTotal(props.preview, checked.value) : 0))
 
 function format(value: number, currency?: string) {

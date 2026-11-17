@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { defaultFilterState } from '../utils/filterWire.ts'
-import { applyReferenceListing, applyReferencePrices, appliedSelectors, clearReference, initialPriceSelectors, referenceTotal } from '../utils/referencePreview.ts'
+import { applyReferenceListing, applyReferencePrices, appliedSelectors, cleanSearchTerm, clearReference, displayPriceCandidates, initialPriceSelectors, needsPriceChoice, referenceTotal } from '../utils/referencePreview.ts'
 
 const preview = {
   url: 'https://www.vinted.de/items/1-iphone',
@@ -24,7 +24,7 @@ const preview = {
 test('the suggested search term replaces the raw page title', () => {
   const state = { ...defaultFilterState(), searchValue: 'iPhone 15 Pro 256GB blau TOP!!!' }
   applyReferenceListing(state, preview)
-  assert.equal(state.searchValue, 'Apple iPhone 15 Pro')
+  assert.equal(state.searchValue, 'apple iphone 15 pro')
   assert.equal(state.referenceTitle, preview.listing.title)
   assert.equal(state.referenceMarketplace, 'Vinted')
 })
@@ -68,4 +68,56 @@ test('a reload keeps the search term the user saved or typed', () => {
   applyReferenceListing(state, preview, { search: false })
   assert.equal(state.searchValue, 'my own words')
   assert.equal(state.referenceUrl, preview.url)
+})
+
+// Production response for https://www.kleinanzeigen.de/s-anzeige/iphone-6-16-gb/3530498571-173-9660
+const candidate = (selector, text, price, source) => ({ selector, text, price, currency: 'EUR', confidence: 0.5, source, isAutoSelected: false })
+const real = {
+  ...preview,
+  listing: { title: 'iPhone 6 - 16 GB', description: '', imageUrls: [], productSearchQuery: 'iPhone 6 - 16 GB' },
+  suggestedFilter: { ...preview.suggestedFilter, searchTerm: 'iPhone 6 - 16 GB' },
+  priceCandidates: [
+    candidate('meta', '30.00 EUR', 30, 'meta'),
+    candidate('vb1', '19 € VB', 19, 'markup'),
+    candidate('vb2', '19 € VB', 19, 'markup'),
+    candidate('render-19', '19 € VB', 19, 'render'),
+    candidate('m30', '30 €', 30, 'markup'),
+    candidate('m30vb', '30 € VB', 30, 'markup'),
+  ],
+  selectedReference: null,
+  requiresReferencePriceSelection: true,
+}
+
+test('duplicate prices become one chip, preferring render over markup over meta', () => {
+  const chips = displayPriceCandidates(real)
+  assert.deepEqual(chips.map(c => [c.price, c.selector]).sort((a, b) => a[0] - b[0]), [[19, 'render-19'], [30, 'm30']])
+})
+
+test('chips put auto-selected first, then higher confidence, and stop at four', () => {
+  const many = { ...real, priceCandidates: [1, 2, 3, 4, 5, 6].map(n => ({ ...candidate(`s${n}`, `${n} €`, n, 'markup'), confidence: n / 10, isAutoSelected: n === 2 })) }
+  assert.deepEqual(displayPriceCandidates(many).map(c => c.selector), ['s2', 's6', 's5', 's4'])
+})
+
+test('an applied selector is kept even when it is a duplicate or beyond the cap', () => {
+  assert.ok(displayPriceCandidates(real, ['meta']).some(c => c.selector === 'meta'))
+  const many = { ...real, priceCandidates: [1, 2, 3, 4, 5, 6].map(n => ({ ...candidate(`s${n}`, `${n} €`, n, 'markup'), confidence: n / 10 })) }
+  assert.ok(displayPriceCandidates(many, ['s1']).some(c => c.selector === 's1'))
+  assert.equal(displayPriceCandidates(many, ['s1']).length, 4)
+})
+
+test('nothing is picked silently when the listing needs a price choice', () => {
+  assert.deepEqual(initialPriceSelectors(real), [])
+  assert.equal(needsPriceChoice(real, []), true)
+  assert.equal(needsPriceChoice(real, ['m30']), false)
+  assert.equal(needsPriceChoice({ ...real, requiresReferencePriceSelection: false }, []), false)
+})
+
+test('listing titles lose standalone punctuation before they become a search term', () => {
+  assert.equal(cleanSearchTerm('iPhone 6 - 16 GB'), 'iphone 6 16 gb')
+  assert.equal(cleanSearchTerm('  Sofa – 3er | grau / neu : TOP!!! '), 'sofa 3er grau neu top')
+  assert.equal(cleanSearchTerm('USB-C Kabel 3.5 mm'), 'usb-c kabel 3.5 mm')
+  assert.equal(cleanSearchTerm('- | /'), '')
+  const state = defaultFilterState()
+  applyReferenceListing(state, real)
+  assert.equal(state.searchValue, 'iphone 6 16 gb')
 })

@@ -1598,6 +1598,7 @@
       "upTo": "Up to {max}",
       "from": "From {min}",
       "fromListing": "Prices on the listing — pick what counts:",
+      "whichOne": "Which one is the price?",
       "total": "Total:",
       "pickOnPage": "Pick on the page instead",
       "loadFromListing": "Load the prices from the reference listing",
