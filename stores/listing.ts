@@ -103,7 +103,8 @@ export const useListingStore = defineStore('listing', () => {
       return `https://www.gumtree.com/p/redirect/redirect/${id}`
     }
     if (listing === 'Shpock') {
-      return `https://www.shpock.com/${lang}/i/${id}`
+      // Shpock only exists under de-de, whatever the UI language is
+      return `https://www.shpock.com/de-de/i/${id}`
     }
     if (listing === 'Marktplaats') {
       if (id.includes('/')) {

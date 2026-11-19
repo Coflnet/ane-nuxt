@@ -202,7 +202,7 @@ Implementation date: 29 October 2026. Run numbers below identify the reports, no
 
 ### Claim sources
 
-- The notifier editor offers eBay, Kleinanzeigen, Marktplaats, Willhaben, Vinted, Blocket, ParuVendu, OLX, Gumtree, AutoScout24 and Craigslist: `constants/CreateFilterConstants.ts:7`, `constants/CreateFilterConstants.ts:19`; the editor consumes that list at `components/filters/SearchValueMarketplaceFilter.vue:32`.
+- The notifier editor offers eBay, Kleinanzeigen, Marktplaats, Willhaben, Vinted, Blocket, ParuVendu, OLX, Gumtree, Shpock, Wallapop, AutoScout24 and Craigslist: `constants/CreateFilterConstants.ts:7`, `constants/CreateFilterConstants.ts:19`; the editor consumes that list at `components/filters/SearchValueMarketplaceFilter.vue:32`.
 - The country selector offers Europe, United States, Canada, United Kingdom, Germany, France, Italy, Japan, Netherlands and Australia: `components/ui/CountryDropDown.vue:32`.
 - Shipping selection disables the postcode field: `components/filters/create/CreateCountrySection.vue:18`.
 - Web push requests browser permission, while the app bridge sends a notification-permission request: `components/filters/NotificationSettingsWebPushFilter.vue:34`, `components/filters/NotificationSettingsWebPushFilter.vue:51`. This establishes the request, not successful device authorization or delivery.

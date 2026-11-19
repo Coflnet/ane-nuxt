@@ -6,7 +6,7 @@
       "sections": [
         {
           "heading": "Which marketplaces can I select?",
-          "body": "The notifier editor lists eBay, Kleinanzeigen, Marktplaats, Willhaben, Vinted, Blocket, ParuVendu, OLX, Gumtree, AutoScout24 and Craigslist. These are selectable integrations, not a guarantee that every site or region has live results. Check a narrow search before relying on an alert."
+          "body": "The notifier editor lists eBay, Kleinanzeigen, Marktplaats, Willhaben, Vinted, Blocket, ParuVendu, OLX, Gumtree, Shpock, Wallapop, AutoScout24 and Craigslist. These are selectable integrations, not a guarantee that every site or region has live results. Check a narrow search before relying on an alert."
         },
         {
           "heading": "Which countries can I select?",
@@ -193,7 +193,7 @@
       "sections": [
         {
           "heading": "Welche Marktplätze kann ich auswählen?",
-          "body": "Im Suchauftragseditor stehen eBay, Kleinanzeigen, Marktplaats, Willhaben, Vinted, Blocket, ParuVendu, OLX, Gumtree, AutoScout24 und Craigslist. Die Auswahl belegt keine lückenlose Live-Abdeckung jeder Plattform und Region. Prüfe zuerst eine konkrete Suche, bevor du dich auf einen Suchauftrag verlässt."
+          "body": "Im Suchauftragseditor stehen eBay, Kleinanzeigen, Marktplaats, Willhaben, Vinted, Blocket, ParuVendu, OLX, Gumtree, Shpock, Wallapop, AutoScout24 und Craigslist. Die Auswahl belegt keine lückenlose Live-Abdeckung jeder Plattform und Region. Prüfe zuerst eine konkrete Suche, bevor du dich auf einen Suchauftrag verlässt."
         },
         {
           "heading": "Welche Länder kann ich auswählen?",

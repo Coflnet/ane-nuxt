@@ -42,11 +42,10 @@ async function field(filename, model) {
   return { state, stop: () => scope.stop() }
 }
 
-const advertised = ['Ebay', 'Kleinanzeigen', 'Marktplaats', 'Willhaben', 'Vinted', 'Blocket', 'ParuVendu', 'OLX', 'Gumtree', 'AutoScout24', 'Craigslist']
+const advertised = ['Ebay', 'Kleinanzeigen', 'Marktplaats', 'Willhaben', 'Vinted', 'Blocket', 'ParuVendu', 'OLX', 'Gumtree', 'Shpock', 'Wallapop', 'AutoScout24', 'Craigslist']
 
-test('all exposes and serializes all nine sources and legacy choices in both timezones', async () => {
-  assert.deepEqual(activeMarketplaces.map(m => m.value), advertised.slice(0, 9))
-  assert.ok(!marketplaces.some(m => m.value === 'Wallapop'))
+test('all exposes and serializes all eleven sources and legacy choices in both timezones', async () => {
+  assert.deepEqual(activeMarketplaces.map(m => m.value), advertised.slice(0, 11))
   for (const zone of ['America/New_York', 'Europe/Berlin']) {
     const previous = process.env.TZ
     try {
@@ -79,7 +78,7 @@ test('reloaded explicit selections remain explicit, including a retired source',
 })
 
 test('new-source prefills and actual marketplace picker serialize canonical explicit selections', async () => {
-  for (const source of advertised.slice(4, 9)) {
+  for (const source of advertised.slice(4, 11)) {
     const p = await page({ marketplace: source.toLowerCase(), searchValue: 'camera' })
     p.applyPrefillFromQuery()
     const ui = await field('SearchValueMarketplaceFilter', p.filter)

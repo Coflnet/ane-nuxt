@@ -504,7 +504,7 @@
     "items": {
       "first": {
         "question": "What platforms are supported?",
-        "answer": "The notifier editor lists eBay, Kleinanzeigen, Marktplaats, Willhaben, Vinted, Blocket, ParuVendu, OLX, Gumtree, AutoScout24 and Craigslist. Check the marketplace guide and a sample search for your region; selectable filters do not guarantee live coverage."
+        "answer": "The notifier editor lists eBay, Kleinanzeigen, Marktplaats, Willhaben, Vinted, Blocket, ParuVendu, OLX, Gumtree, Shpock, Wallapop, AutoScout24 and Craigslist. Check the marketplace guide and a sample search for your region; selectable filters do not guarantee live coverage."
       },
       "second": {
         "question": "Is there a free trial?",

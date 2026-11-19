@@ -14,6 +14,8 @@ export const activeMarketplaces: Options[] = [
   { value: 'ParuVendu', label: 'ParuVendu' },
   { value: 'OLX', label: 'OLX' },
   { value: 'Gumtree', label: 'Gumtree' },
+  { value: 'Shpock', label: 'Shpock' },
+  { value: 'Wallapop', label: 'Wallapop' },
 ]
 
 export const marketplaces: Options[] = [

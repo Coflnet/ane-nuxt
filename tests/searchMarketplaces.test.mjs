@@ -117,7 +117,7 @@ test('marketplace-only browsing offers reset; unknown counts stay unknown and se
   const page = await searchPage({ platforms: 'AutoScout24' })
   try {
     assert.equal(page.hasActiveFilters.value, true)
-    assert.equal(page.availablePlatforms.value.length, 10)
+    assert.equal(page.availablePlatforms.value.length, 12)
     assert.equal(page.availablePlatforms.value.find(option => option.value === 'AutoScout24').count, undefined)
     page.platformBuckets.value = [{ value: 'Ebay', count: 7 }, { value: 'Vinted', count: 0 }]
     assert.equal(page.availablePlatforms.value.find(option => option.value === 'Ebay').count, 7)
@@ -128,7 +128,7 @@ test('marketplace-only browsing offers reset; unknown counts stay unknown and se
     assert.deepEqual(page.route.query, {})
     assert.equal(page.hasActiveFilters.value, false)
     assert.deepEqual(page.selectedPlatforms.value, [])
-    assert.equal(page.availablePlatforms.value.length, 9)
+    assert.equal(page.availablePlatforms.value.length, 11)
   }
   finally { page.stop() }
 })
@@ -151,7 +151,7 @@ test('case-varied marketplace deep links select existing checkboxes and canonica
   const page = await searchPage({ q: 'camera', platforms: 'ebay,Ebay,OLX,olx' })
   try {
     assert.deepEqual(page.selectedPlatforms.value, ['Ebay', 'OLX'])
-    assert.equal(page.availablePlatforms.value.length, 9, 'case variants must not create additional checkbox choices')
+    assert.equal(page.availablePlatforms.value.length, 11, 'case variants must not create additional checkbox choices')
     const checked = page.availablePlatforms.value.filter(option => page.selectedPlatforms.value.includes(option.value))
     assert.deepEqual(checked.map(option => option.value), ['Ebay', 'OLX'])
     assert.equal(page.buildSearchParams().platforms, 'Ebay,OLX')

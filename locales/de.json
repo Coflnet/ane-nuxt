@@ -554,7 +554,7 @@
     "items": {
       "first": {
         "question": "Welche Plattformen werden unterstützt?",
-        "answer": "Der Suchauftragseditor listet eBay, Kleinanzeigen, Marktplaats, Willhaben, Vinted, Blocket, ParuVendu, OLX, Gumtree, AutoScout24 und Craigslist. Prüfe die Marktplatz-Anleitung und eine Beispielsuche für deine Region; auswählbare Filter garantieren keine Live-Abdeckung."
+        "answer": "Der Suchauftragseditor listet eBay, Kleinanzeigen, Marktplaats, Willhaben, Vinted, Blocket, ParuVendu, OLX, Gumtree, Shpock, Wallapop, AutoScout24 und Craigslist. Prüfe die Marktplatz-Anleitung und eine Beispielsuche für deine Region; auswählbare Filter garantieren keine Live-Abdeckung."
       },
       "second": {
         "question": "Gibt es eine kostenlose Testversion?",
